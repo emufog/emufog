@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Settings>
+    <BaseAddress>10.0.0.0</BaseAddress>
+    <OverwriteOutputFile>true</OverwriteOutputFile>
+    <maxFogNodes>500</maxFogNodes>
+    <costThreshold>0.0</costThreshold>
+    <edgeDeviceDelay>0.0</edgeDeviceDelay>
+    <edgeDeviceBandwidth>10000.0</edgeDeviceBandwidth>
+    <threadCount>1</threadCount>
+    <fogNodeTypes>
+        <FogType ID="0">
+            <dockerImage>
+                <name>ubuntu</name>
+                <version>latest</version>
+            </dockerImage>
+            <maxClients>1</maxClients>
+            <costs>1</costs>
+            <memoryLimit>1000</memoryLimit>
+            <cpuShare>1</cpuShare>
+        </FogType>
+        <FogType ID="1">
+            <dockerImage>
+                <name>debian</name>
+                <version>latest</version>
+            </dockerImage>
+            <maxClients>5</maxClients>
+            <costs>1.5</costs>
+            <memoryLimit>2000</memoryLimit>
+            <cpuShare>1.5</cpuShare>
+        </FogType>
+    </fogNodeTypes>
+    <deviceNodeTypes>
+        <DeviceType ID="2">
+            <dockerImage>
+                <name>ubuntu</name>
+                <version>latest</version>
+            </dockerImage>
+            <scalingFactor>1</scalingFactor>
+            <averageDeviceCount>1.0</averageDeviceCount>
+            <memoryLimit>500</memoryLimit>
+            <cpuShare>1</cpuShare>
+        </DeviceType>
+    </deviceNodeTypes>
+</Settings>
