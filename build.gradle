@@ -1,0 +1,26 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+targetCompatibility = 1.8
+sourceCompatibility = 1.8
+
+mainClassName = 'launcher.emufog.Emufog'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.beust:jcommander:1.69'
+}
+
+version = '0.1'
+jar {
+    manifest {
+        attributes(
+                'Implementation-Title': 'EmuFog',
+                'Implementation-Version': version,
+                'Main-Class': 'launcher.emufog.Emufog'
+        )
+    }
+}
