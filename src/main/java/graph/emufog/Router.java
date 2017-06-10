@@ -35,10 +35,22 @@ public class Router extends Node {
     }
 
     /**
-     * Increments the device counter by one.
+     * Increments the device counter by the given number.
+     *
+     * @param n the number to increase the device count
      */
-    void incrementDeviceCount() {
-        deviceCount++;
+    void incrementDeviceCount(int n) {
+        deviceCount += n;
+    }
+
+    /**
+     * Returns the device count of this router.
+     * The count includes the scaling factor given by the settings.
+     *
+     * @return device count
+     */
+    public int getDeviceCount() {
+        return deviceCount;
     }
 
     @Override

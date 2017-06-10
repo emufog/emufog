@@ -174,10 +174,10 @@ public class Graph {
         }
 
         if (from instanceof Router && to instanceof HostDevice) {
-            ((Router) from).incrementDeviceCount();
+            ((Router) from).incrementDeviceCount(((HostDevice) to).getDockerType().scalingFactor);
         }
         if (from instanceof HostDevice && to instanceof Router) {
-            ((Router) to).incrementDeviceCount();
+            ((Router) to).incrementDeviceCount(((HostDevice) from).getDockerType().scalingFactor);
         }
 
         return edge;
