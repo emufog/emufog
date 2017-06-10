@@ -5,6 +5,9 @@ package graph.emufog;
  */
 public class Router extends Node {
 
+    /* number of devices connected to this router */
+    private int deviceCount;
+
     /**
      * Creates a new router instance.
      *
@@ -13,6 +16,8 @@ public class Router extends Node {
      */
     Router(int id, AS as) {
         super(id, as);
+
+        deviceCount = 0;
     }
 
     @Override
@@ -20,15 +25,20 @@ public class Router extends Node {
         as.addRouter(this);
     }
 
+    /**
+     * Returns indication whether this router has devices connected.
+     *
+     * @return true if there are devices connected, false otherwise
+     */
     public boolean hasDevices() {
-        boolean result = false;
+        return deviceCount > 0;
+    }
 
-        for (int i = 0; i < edges.length && !result; ++i) {
-            Node neighbor = edges[i].getDestinationForSource(this);
-            result = neighbor instanceof HostDevice;
-        }
-
-        return result;
+    /**
+     * Increments the device counter by one.
+     */
+    void incrementDeviceCount() {
+        deviceCount++;
     }
 
     @Override

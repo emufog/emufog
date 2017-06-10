@@ -173,6 +173,13 @@ public class Graph {
             to.as.incrementDegree();
         }
 
+        if (from instanceof Router && to instanceof HostDevice) {
+            ((Router) from).incrementDeviceCount();
+        }
+        if (from instanceof HostDevice && to instanceof Router) {
+            ((Router) to).incrementDeviceCount();
+        }
+
         return edge;
     }
 
