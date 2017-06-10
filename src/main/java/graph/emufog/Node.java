@@ -1,8 +1,6 @@
 package graph.emufog;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * Represents a general node of graph with the basic functionality.
@@ -74,23 +72,6 @@ public abstract class Node {
      */
     public Edge[] getEdges() {
         return edges;
-    }
-
-    /**
-     * Returns a list of all edges that point to a node in the same AS as this node.
-     *
-     * @return list of edges in the same AS
-     */
-    public List<Edge> getSameASEdges() {
-        List<Edge> result = new ArrayList<>();
-
-        for (Edge e : edges) {
-            if (!e.isCrossASEdge()) {
-                result.add(e);
-            }
-        }
-
-        return result;
     }
 
     /**
