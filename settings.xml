@@ -7,6 +7,7 @@
     <edgeDeviceDelay>0.0</edgeDeviceDelay>
     <edgeDeviceBandwidth>10000.0</edgeDeviceBandwidth>
     <threadCount>1</threadCount>
+    <fogParallel>true</fogParallel>
     <fogNodeTypes>
         <FogType ID="0">
             <dockerImage>

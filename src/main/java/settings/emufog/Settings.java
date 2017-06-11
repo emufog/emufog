@@ -49,6 +49,9 @@ public class Settings {
     /* number of threads to use for the backbone and fog placement */
     public final int threadCount;
 
+    /* indicator whether the fog graph should be build in parallel */
+    public final boolean fogGraphParallel;
+
     /**
      * Creates a new instance of the Settings class.
      *
@@ -61,10 +64,11 @@ public class Settings {
      * @param edgeDeviceDelay
      * @param edgeDeviceBandwidth
      * @param threadCount
+     * @param fogGraphParallel
      */
     private Settings(String baseAddress, boolean overwriteExperimentFile, List<FogType> fogNodeTypes,
                      List<DeviceType> deviceNodeTypes, int maxFogNodes, float costThreshold,
-                     float edgeDeviceDelay, float edgeDeviceBandwidth, int threadCount) {
+                     float edgeDeviceDelay, float edgeDeviceBandwidth, int threadCount, boolean fogGraphParallel) {
         this.baseAddress = baseAddress;
         this.overwriteExperimentFile = overwriteExperimentFile;
         this.fogNodeTypes = fogNodeTypes;
@@ -74,6 +78,7 @@ public class Settings {
         this.edgeDeviceDelay = edgeDeviceDelay;
         this.edgeDeviceBandwidth = edgeDeviceBandwidth;
         this.threadCount = threadCount;
+        this.fogGraphParallel = fogGraphParallel;
     }
 
     /**
@@ -120,6 +125,9 @@ public class Settings {
             Node threadNode = getFirstNode(doc, "threadCount");
             int threadCount = Integer.parseInt(threadNode.getTextContent());
 
+            Node fogParallelNode = getFirstNode(doc, "fogParallel");
+            boolean fogParallel = Boolean.parseBoolean(fogParallelNode.getTextContent());
+
             List<FogType> fogTypes = new ArrayList<>();
             NodeList fogNodes = getFirstNode(doc, "fogNodeTypes").getChildNodes();
             for (int i = 0; i < fogNodes.getLength(); ++i) {
@@ -140,7 +148,7 @@ public class Settings {
 
             // create the actual settings object with the read in values
             settings = new Settings(baseAddress, overwriteExperimentFile, fogTypes, deviceTypes,
-                    maxNodes, costThreshold, edgeDelay, edgeBandwidth, threadCount);
+                    maxNodes, costThreshold, edgeDelay, edgeBandwidth, threadCount, fogParallel);
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
             throw new XMLParsingException("Error while parsing the XML file.");
