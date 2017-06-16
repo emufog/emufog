@@ -2,6 +2,7 @@ package graph.emufog;
 
 import docker.emufog.DeviceType;
 import settings.emufog.Settings;
+import util.emufog.LoggerLevel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +26,7 @@ public class CoordinateGraph extends Graph {
     public CoordinateGraph(Settings settings) throws IllegalArgumentException {
         super(settings);
 
-        this.coordinates = new HashMap<>();
+        coordinates = new HashMap<>();
     }
 
     /**
@@ -100,13 +101,15 @@ public class CoordinateGraph extends Graph {
             throw new IllegalArgumentException("The latency estimator object in not initialized.");
         }
 
-        NodeCoordinates fromCoords = coordinates.get(from);
+        NodeCoordinates fromCoords = coordinates.get(from.getID());
         if (fromCoords == null) {
-            throw new IllegalArgumentException("The source " + from + " is not associated with coordinates.");
+            logger.log("The source " + from + " is not associated with coordinates.", LoggerLevel.WARNING);
+            return null;
         }
-        NodeCoordinates toCoords = coordinates.get(to);
+        NodeCoordinates toCoords = coordinates.get(to.getID());
         if (toCoords == null) {
-            throw new IllegalArgumentException("The source " + to + " is not associated with coordinates.");
+            logger.log("The source " + to + " is not associated with coordinates.", LoggerLevel.WARNING);
+            return null;
         }
 
         float delay = latencyEstimator.getLatency(fromCoords.x, fromCoords.y, toCoords.x, toCoords.y);
