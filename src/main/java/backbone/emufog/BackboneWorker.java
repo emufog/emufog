@@ -104,20 +104,22 @@ class BackboneWorker implements Runnable {
             }
 
             // add or update neighborhood
-            for (Edge e : current.getSameASEdges()) {
-                Node neighbor = e.getDestinationForSource(current);
-                // avoid visiting twice
-                if (!visited.get(neighbor.getID())) {
-                    if (seen.get(neighbor.getID())) {
-                        // update the predecessor if necessary
-                        if (current instanceof Switch && predecessors.get(neighbor) instanceof Router) {
+            for (Edge e : current.getEdges()) {
+                if (!e.isCrossASEdge()) {
+                    Node neighbor = e.getDestinationForSource(current);
+                    // avoid visiting twice
+                    if (!visited.get(neighbor.getID())) {
+                        if (seen.get(neighbor.getID())) {
+                            // update the predecessor if necessary
+                            if (current instanceof Switch && predecessors.get(neighbor) instanceof Router) {
+                                predecessors.put(neighbor, current);
+                            }
+                        } else {
+                            // push a new node to the queue
                             predecessors.put(neighbor, current);
+                            queue.add(neighbor);
+                            seen.set(neighbor.getID());
                         }
-                    } else {
-                        // push a new node to the queue
-                        predecessors.put(neighbor, current);
-                        queue.add(neighbor);
-                        seen.set(neighbor.getID());
                     }
                 }
             }
