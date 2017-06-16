@@ -64,6 +64,19 @@ public class Logger {
      */
     public void log(String msg, LoggerLevel level) {
         if (msg != null) {
+
+            switch (level) {
+                case WARNING:
+                    msg = "[WARNING] " + msg;
+                    break;
+                case ERROR:
+                    msg = "[ERROR]" + msg;
+                    break;
+                case ADVANCED:
+                    msg = "[ADVANCED]" + msg;
+                    break;
+            }
+
             System.out.println(msg);
             lines.add(msg);
         }
@@ -93,7 +106,7 @@ public class Logger {
      * @return string in ms format
      */
     public static String convertToMs(long start, long end) {
-        return (double)(end - start) / 1000000 + "ms";
+        return (double) (end - start) / 1000000 + "ms";
     }
 
     /**
