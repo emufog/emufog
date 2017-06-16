@@ -34,7 +34,7 @@ public class Graph {
     private final UniqueIDProvider edgeIDprovider;
 
     /* logger instance to log warnings */
-    private final Logger logger;
+    protected final Logger logger;
 
     /**
      * Creates a new basic graph instance.
