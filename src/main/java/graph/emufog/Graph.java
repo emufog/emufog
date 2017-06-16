@@ -1,6 +1,7 @@
 package graph.emufog;
 
 import docker.emufog.DeviceType;
+import docker.emufog.FogType;
 import settings.emufog.Settings;
 import util.emufog.Logger;
 import util.emufog.LoggerLevel;
@@ -204,6 +205,28 @@ public class Graph {
                 }
             }
         }
+    }
+
+    /**
+     * Places a fog node in the graph's topology. The graph has to contain the given node.
+     * Also a new unique IP address will be assigned.
+     *
+     * @param node node to place a fog node at
+     * @param type fog type to set the node to
+     * @throws IllegalArgumentException if the parameters are null, the graph does not contain the given node
+     */
+    public void placeFogNode(Node node, FogType type) throws IllegalArgumentException {
+        if (node == null) {
+            throw new IllegalArgumentException("The given node is not initialized.");
+        }
+        if (type == null) {
+            throw new IllegalArgumentException("The given fog type is not initialized.");
+        }
+        if (!nodes.containsKey(node.id)) {
+            throw new IllegalArgumentException("This graph object does not contain the given node.");
+        }
+
+        node.emulationSettings = new EmulationSettings(IPprovider.getNextIPV4Address(), type);
     }
 
     /**
