@@ -21,3 +21,4 @@ and build the Jar with Gradle
 ## Uses Open Source Software
 
 * [jCommander](http://jcommander.org/)
+* [FreeHEP](https://freehep.github.io/freehep-vectorgraphics/)
