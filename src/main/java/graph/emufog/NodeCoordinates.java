@@ -3,7 +3,7 @@ package graph.emufog;
 /**
  * Coordinate structure to map nodes to their respective coordinates on the 2D plane.
  */
-class NodeCoordinates {
+public class NodeCoordinates {
 
     /* x coordinate */
     final float x;
@@ -20,5 +20,23 @@ class NodeCoordinates {
     NodeCoordinates(float x, float y) {
         this.x = x;
         this.y = y;
+    }
+
+    /**
+     * Returns the x value of the coordinate system.
+     *
+     * @return x coordinate
+     */
+    public float getX() {
+        return x;
+    }
+
+    /**
+     * Returns the y value of the coordinate system.
+     *
+     * @return y coordinate
+     */
+    public float getY() {
+        return y;
     }
 }

@@ -123,4 +123,14 @@ public class CoordinateGraph extends Graph {
     public void clearCoordinates() {
         coordinates.clear();
     }
+
+    /**
+     * Returns the coordinates of the node with the given ID.
+     *
+     * @param id ID of the node
+     * @return coordinates in the graph or null if not existent
+     */
+    public NodeCoordinates getCoordinates(int id) {
+        return coordinates.get(id);
+    }
 }
