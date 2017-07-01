@@ -1,0 +1,44 @@
+{
+  "BaseAddress": "10.0.0.0",
+  "OverWriteOutputFile": true,
+  "MaxFogNodes": 100,
+  "CostThreshold": 1,
+  "HostDeviceLatency": 0,
+  "HostDeviceBandwidth": 1000,
+  "ThreadCount": 1,
+  "ParalleledFogBuilding": false,
+  "DeviceNodeTypes": [
+    {
+      "DockerImage": {
+        "Name": "Ubuntu",
+        "Version": "Latest"
+      },
+      "ScalingFactor": 1,
+      "AverageDeviceCount": 1,
+      "MemoryLimit": 500,
+      "CPUShare": 1
+    }
+  ],
+  "FogNodeTypes": [
+    {
+      "DockerImage": {
+        "Name": "Ubuntu",
+        "Version": "Latest"
+      },
+      "MaximumConnections": 1,
+      "Costs": 1,
+      "MemoryLimit": 1000,
+      "CPUShare": 1
+    },
+    {
+      "DockerImage": {
+        "Name": "Debian",
+        "Version": "Latest"
+      },
+      "MaximumConnections": 5,
+      "Costs": 2.5,
+      "MemoryLimit": 2000,
+      "CPUShare": 1.5
+    }
+  ]
+}
