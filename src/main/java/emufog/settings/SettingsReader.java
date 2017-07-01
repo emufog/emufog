@@ -75,7 +75,9 @@ public class SettingsReader {
     }
 
     class FogType extends DockerType {
+        int ID;
         int MaximumConnections;
         float Costs;
+        int[] Dependencies;
     }
 }

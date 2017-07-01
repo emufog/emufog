@@ -4,7 +4,9 @@ import emufog.docker.DeviceType;
 import emufog.docker.FogType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The settings class contains all different settings used within the application.
@@ -57,11 +59,21 @@ public class Settings {
         threadCount = json.ThreadCount;
         fogGraphParallel = json.ParalleledFogBuilding;
 
-        fogNodeTypes = new ArrayList<>();
+        Map<Integer, FogType> fogTypes = new HashMap<>();
         for (SettingsReader.FogType fogType : json.FogNodeTypes) {
-            fogNodeTypes.add(new FogType(fogType.DockerImage.toString(), fogType.MaximumConnections, fogType.Costs,
+            fogTypes.put(fogType.ID, new FogType(fogType.DockerImage.toString(), fogType.MaximumConnections, fogType.Costs,
                     fogType.MemoryLimit, fogType.CPUShare));
         }
+        for (SettingsReader.FogType fogType : json.FogNodeTypes) {
+            FogType fogNodeType = fogTypes.get(fogType.ID);
+            if (fogType.Dependencies != null) {
+                for (int id : fogType.Dependencies) {
+                    fogNodeType.addDependency(fogTypes.get(id));
+                }
+            }
+        }
+        fogNodeTypes = new ArrayList<>(fogTypes.values());
+
         deviceNodeTypes = new ArrayList<>();
         for (SettingsReader.DeviceType deviceType : json.DeviceNodeTypes) {
             deviceNodeTypes.add(new DeviceType(deviceType.DockerImage.toString(), deviceType.ScalingFactor,

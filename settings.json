@@ -21,6 +21,7 @@
   ],
   "FogNodeTypes": [
     {
+      "ID": 1,
       "DockerImage": {
         "Name": "Ubuntu",
         "Version": "Latest"
@@ -31,6 +32,7 @@
       "CPUShare": 1
     },
     {
+      "ID": 2,
       "DockerImage": {
         "Name": "Debian",
         "Version": "Latest"
@@ -39,6 +41,20 @@
       "Costs": 2.5,
       "MemoryLimit": 2000,
       "CPUShare": 1.5
+    },
+    {
+      "ID": 3,
+      "DockerImage": {
+        "Name": "Debian",
+        "Version": "Latest"
+      },
+      "MaximumConnections": 5,
+      "Costs": 1.5,
+      "MemoryLimit": 1500,
+      "CPUShare": 1.5,
+      "Dependencies": [
+        2
+      ]
     }
   ]
 }
