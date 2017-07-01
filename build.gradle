@@ -14,6 +14,7 @@ dependencies {
     compile 'com.beust:jcommander:1.69'
     compile 'org.freehep:freehep-graphicsio:2.4'
     compile 'org.freehep:freehep-graphicsio-pdf:2.4'
+    compile 'com.google.code.gson:gson:2.8.1'
 }
 
 version = '0.1'
