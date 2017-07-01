@@ -13,6 +13,7 @@ import emufog.reader.BriteFormatReader;
 import emufog.reader.CaidaFormatReader;
 import emufog.reader.GraphReader;
 import emufog.settings.Settings;
+import emufog.settings.SettingsReader;
 import emufog.util.Logger;
 import emufog.util.LoggerLevel;
 import emufog.util.Tuple;
@@ -45,7 +46,7 @@ public class Emufog {
             JCommander.newBuilder().addObject(arguments).build().parse(args);
 
             // read in the settings file
-            Settings settings = Settings.readSettings(arguments.settingsPath);
+            Settings settings = SettingsReader.read(arguments.settingsPath);
 
             // determines the respective format reader
             GraphReader reader = getReader(arguments.inputType, settings);
