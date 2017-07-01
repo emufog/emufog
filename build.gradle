@@ -4,7 +4,7 @@ apply plugin: 'application'
 targetCompatibility = 1.8
 sourceCompatibility = 1.8
 
-mainClassName = 'launcher.emufog.Emufog'
+mainClassName = 'emufog.launcher.Emufog'
 
 repositories {
     mavenCentral()
@@ -23,7 +23,7 @@ jar {
         attributes(
                 'Implementation-Title': 'EmuFog',
                 'Implementation-Version': version,
-                'Main-Class': 'launcher.emufog.Emufog'
+                'Main-Class': 'emufog.launcher.Emufog'
         )
     }
 }
