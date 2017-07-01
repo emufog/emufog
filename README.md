@@ -22,3 +22,4 @@ and build the Jar with Gradle
 
 * [jCommander](http://jcommander.org/)
 * [FreeHEP](https://freehep.github.io/freehep-vectorgraphics/)
+* [gson](https://github.com/google/gson)
