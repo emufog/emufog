@@ -2,6 +2,7 @@ package emufog.fog;
 
 import emufog.docker.FogType;
 import emufog.graph.Node;
+import emufog.graph.Router;
 
 import java.util.*;
 
@@ -133,7 +134,7 @@ abstract class FogNode {
             result.add(c.edge);
         }
 
-        if (this instanceof EdgeNode) {
+        if (this instanceof EdgeNode && ((Router) oldNode).hasDevices()) {
             assert result.contains((EdgeNode) this) : "edge node is not part of its own covered nodes set";
         }
 
