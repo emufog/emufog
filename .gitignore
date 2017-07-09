@@ -9,7 +9,9 @@ tests/
 *.iml
 *.ipr
 caida-topology/
-src/main/java/emufog/test
+src/main/java/emufog/test/
+src/main/java/emufog/ilp/
+src/main/java/emufog/visualization/
 
 ### Intellij ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and Webstorm
