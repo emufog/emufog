@@ -17,6 +17,9 @@ class Arguments {
     @Parameter(names = {"-Type", "-t"}, description = "input format to read in")
     String inputType;
 
+    @Parameter(names = {"-Output", "-o"}, description = "path to the output file")
+    String output;
+
     @Parameter(names = {"-Files", "-f"}, description = "files to read in")
     List<Path> files = new ArrayList<>();
 }
