@@ -8,7 +8,7 @@ import java.util.Collection;
 /**
  * This worker processes routers sequentially.
  */
-class FogWorker extends Worker {
+class SequentialFogWorker extends Worker {
 
     /**
      * Creates a new sequential worker to identify fog nodes in the given AS.
@@ -16,7 +16,7 @@ class FogWorker extends Worker {
      * @param as         AS to cover by this worker
      * @param classifier master classifier synchronizing the remaining nodes to place
      */
-    FogWorker(AS as, FogNodeClassifier classifier) {
+    SequentialFogWorker(AS as, FogNodeClassifier classifier) {
         super(as, classifier);
     }
 

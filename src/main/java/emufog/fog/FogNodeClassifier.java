@@ -122,7 +122,7 @@ public class FogNodeClassifier {
         if (settings.fogGraphParallel) {
             return new ParallelFogWorker(as, this);
         } else {
-            return new FogWorker(as, this);
+            return new SequentialFogWorker(as, this);
         }
     }
 
