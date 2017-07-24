@@ -81,7 +81,7 @@ public class Emufog {
                     graph.placeFogNode(tuple.getKey(), tuple.getValue());
                 }
 
-                IGraphExporter exporter = new MaxiNetExporter(Paths.get("./test.py"), settings);
+                IGraphExporter exporter = new MaxiNetExporter(Paths.get(arguments.output), settings);
                 exporter.exportGraph(graph);
             } else {
                 // no fog placement found, aborting
@@ -108,7 +108,7 @@ public class Emufog {
         GraphReader reader = null;
 
         switch (type.toLowerCase()) {
-            case "emufog":
+            case "brite":
                 reader = new BriteFormatReader(settings);
                 break;
             case "caida":
