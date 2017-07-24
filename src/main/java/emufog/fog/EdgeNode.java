@@ -1,8 +1,10 @@
 package emufog.fog;
 
+import emufog.graph.Node;
 import emufog.graph.Router;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -13,16 +15,38 @@ class EdgeNode extends FogNode {
     /* list of possible fog nodes in range of the threshold */
     private final List<FogNode> possibleNodes;
 
+    private int deviceCount;
+
     /**
      * Creates a new edge node for the sub graph algorithm.
      *
-     * @param graph original graph instance
-     * @param node  edge node
+     * @param graph  original graph instance
+     * @param router edge node
      */
-    EdgeNode(FogGraph graph, Router node) {
+    EdgeNode(FogGraph graph, Router router) {
+        super(graph, router);
+
+        possibleNodes = new ArrayList<>();
+        deviceCount = router.getDeviceCount();
+
+        if (deviceCount == 0) {
+            int x =4;
+        }
+    }
+
+    EdgeNode(FogGraph graph, Node node, Collection<EdgeNode> assignedNodes) {
         super(graph, node);
 
         possibleNodes = new ArrayList<>();
+
+        assert !assignedNodes.isEmpty() : "no nodes assigned";
+        deviceCount = 0;
+        for (EdgeNode e : assignedNodes) {
+            deviceCount += e.getDeviceCount();
+        }
+        if (deviceCount == 0) {
+            int x =4;
+        }
     }
 
     /**
@@ -79,6 +103,7 @@ class EdgeNode extends FogNode {
      * @return number of connected devices
      */
     int getDeviceCount() {
-        return ((Router) oldNode).getDeviceCount();
+        assert deviceCount > 0 : "count is 0";
+        return deviceCount;
     }
 }

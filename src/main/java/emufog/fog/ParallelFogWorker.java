@@ -1,7 +1,7 @@
 package emufog.fog;
 
 import emufog.graph.AS;
-import emufog.graph.Router;
+import emufog.graph.Node;
 
 import java.util.Collection;
 
@@ -21,7 +21,7 @@ class ParallelFogWorker extends Worker {
     }
 
     @Override
-    void iterateRouters(FogGraph g, Collection<Router> routers, float t) {
-        routers.parallelStream().forEach(r -> processRouter(g, r, t));
+    void iterateNodes(FogGraph g, Collection<Node> startingNodes, float t) {
+        startingNodes.parallelStream().forEach(n -> processNode(g, n, t));
     }
 }

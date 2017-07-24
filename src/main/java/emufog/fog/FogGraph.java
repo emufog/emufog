@@ -6,6 +6,8 @@ import emufog.graph.Node;
 import emufog.graph.Router;
 import emufog.graph.Switch;
 import emufog.util.Logger;
+import emufog.util.LoggerLevel;
+import emufog.util.Tuple;
 
 import java.util.*;
 
@@ -53,20 +55,27 @@ class FogGraph {
     /**
      * Initializes the node equivalents of the given AS and adds them to the mapping.
      *
-     * @param as as to cover
+     * @param startNodes
+     * @param as
      */
-    void initNodes(AS as) {
+    void initNodes(List<Tuple<Node, List<EdgeNode>>> startNodes, AS as) {
         for (Router r : as.getRouters()) {
-            EdgeNode edgeNode = new EdgeNode(this, r);
-            nodeMapping.put(r, edgeNode);
-
-            if (r.hasDevices()) {
-                edgeNodes.add(edgeNode);
-            }
+            nodeMapping.put(r, new SwitchNode(this, r));
         }
 
         for (Switch s : as.getSwitches()) {
             nodeMapping.put(s, new SwitchNode(this, s));
+        }
+
+        for (Tuple<Node, List<EdgeNode>> t : startNodes) {
+            EdgeNode edgeNode;
+            if (t.getKey() instanceof Router && t.getValue() == null) {
+                edgeNode = new EdgeNode(this, (Router) t.getKey());
+            } else {
+                edgeNode = new EdgeNode(this, t.getKey(), t.getValue());
+            }
+            nodeMapping.put(t.getKey(), edgeNode);
+            edgeNodes.add(edgeNode);
         }
     }
 
@@ -100,10 +109,10 @@ class FogGraph {
     }
 
     /**
-     * Returns the next node of the fog placement algorithm.
+     * Returns the nextLevels node of the fog placement algorithm.
      * Possible nodes get sorted with the FogComparator and the graph updated according to the node picked.
      *
-     * @return next node picked
+     * @return nextLevels node picked
      */
     FogNode getNext() {
         Logger logger = Logger.getInstance();
@@ -115,6 +124,8 @@ class FogGraph {
         for (FogNode n : fogNodes) {
             n.findFogType();
         }
+        long end = System.nanoTime();
+        logger.log("Find Types Time: " + Logger.convertToMs(start, end), LoggerLevel.ADVANCED);
 
         //TODO debug
         for (EdgeNode edgeNode : edgeNodes) {
@@ -122,10 +133,13 @@ class FogGraph {
             assert edgeNode.isMappedToItself() : "edge node is not mapped to itself";
         }
 
+        start = System.nanoTime();
         // sort the possible fog nodes with a FogComparator
         fogNodes.sort(comparator);
+        end = System.nanoTime();
+        logger.log("Sort Time: " + Logger.convertToMs(start, end), LoggerLevel.ADVANCED);
 
-        // retrieve the next optimal node
+        // retrieve the nextLevels optimal node
         FogNode next = fogNodes.get(0);
 
         // get covered nodes by the fog node placement
@@ -133,13 +147,14 @@ class FogGraph {
 
         //TODO debug
         if (next instanceof EdgeNode && edgeNodes.contains(next)) {
-            assert coveredNodes.contains(next) : "covered nodes set doesn't contain next node";
+            assert coveredNodes.contains(next) : "covered nodes set doesn't contain nextLevels node";
         }
 
-        // remove the next node from the mapping
+        start = System.nanoTime();
+        // remove the nextLevels node from the mapping
         nodeMapping.remove(next.oldNode);
 
-        // update all edge nodes connected to next
+        // update all edge nodes connected to nextLevels
         for (EdgeNode edgeNode : next.getConnectedEdgeNodes()) {
             edgeNode.removePossibleNode(next);
         }
@@ -154,11 +169,13 @@ class FogGraph {
 
         // remove all covered nodes from the edge nodes set
         edgeNodes.removeAll(coveredNodes);
+        end = System.nanoTime();
+        logger.log("remove nodes Time: " + Logger.convertToMs(start, end), LoggerLevel.ADVANCED);
 
         assert edgeNodes.size() <= nodeMapping.size() : "weniger edge nodes als gesamt";
 
-        long end = System.nanoTime();
-        logger.log("remove nodes Time: " + Logger.convertToMs(start, end));
+        end = System.nanoTime();
+        logger.log("GetNext() Time: " + Logger.convertToMs(start, end), LoggerLevel.ADVANCED);
 
         return next;
     }

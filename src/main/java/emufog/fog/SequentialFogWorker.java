@@ -1,7 +1,7 @@
 package emufog.fog;
 
 import emufog.graph.AS;
-import emufog.graph.Router;
+import emufog.graph.Node;
 
 import java.util.Collection;
 
@@ -21,9 +21,9 @@ class SequentialFogWorker extends Worker {
     }
 
     @Override
-    void iterateRouters(FogGraph g, Collection<Router> routers, float t) {
-        for (Router r : routers) {
-            processRouter(g, r, t);
+    void iterateNodes(FogGraph g, Collection<Node> startingNodes, float t) {
+        for (Node n : startingNodes) {
+            processNode(g, n, t);
         }
     }
 }
