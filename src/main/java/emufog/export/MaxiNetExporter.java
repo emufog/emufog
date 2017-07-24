@@ -163,7 +163,7 @@ public class MaxiNetExporter extends GraphExporter {
 
     @Override
     protected void validateFileName(Path path) throws IllegalArgumentException {
-        PathMatcher matcher = FileSystems.getDefault().getPathMatcher("*.py");
+        PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.py");
 
         if (!matcher.matches(path)) {
             throw new IllegalArgumentException("The file name for MaxiNet hat to be a python file (.py)");
