@@ -20,6 +20,6 @@ class Arguments {
     @Parameter(names = {"-Output", "-o"}, description = "path to the output file")
     String output;
 
-    @Parameter(names = {"-Files", "-f"}, description = "files to read in")
+    @Parameter(names = {"-File", "-f"}, description = "files to read in")
     List<Path> files = new ArrayList<>();
 }
