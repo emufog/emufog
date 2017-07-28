@@ -64,7 +64,7 @@ public class Emufog {
 
             // compute the backbone of the network
             start = System.nanoTime();
-            new BackboneClassifier(graph).startClassification();
+            BackboneClassifier.identifyBackbone(graph);
             end = System.nanoTime();
             logger.log("Time to determine the backbone of the topology: " + Logger.convertToMs(start, end));
             logger.logSeparator();

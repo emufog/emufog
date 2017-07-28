@@ -20,36 +20,23 @@ import static java.util.concurrent.Executors.newFixedThreadPool;
  */
 public class BackboneClassifier {
 
-    /* graph to run the algorithm on */
-    private final Graph graph;
-
     /**
-     * Creates a new classifier instance to run on the given graph instance.
-     *
-     * @param graph graph to run the classification algorithm on
-     * @throws IllegalArgumentException if the graph object is null
-     */
-    public BackboneClassifier(Graph graph) throws IllegalArgumentException {
-        if (graph == null) {
-            throw new IllegalArgumentException("The graph object is not initialized.");
-        }
-
-        this.graph = graph;
-    }
-
-    /**
-     * Starts the backbone classification algorithm on the associated graph.
+     * Starts the backbone classification algorithm on the given graph.
      * Returns the graph including backbone and edge of the network.
      *
      * @return the modified graph
      */
-    public Graph startClassification() {
+    public static Graph identifyBackbone(Graph graph) {
+        if (graph == null) {
+            throw new IllegalArgumentException("The graph object is not initialized.");
+        }
+
         Logger logger = Logger.getInstance();
 
         // 1st step sequentially
         logger.log("Start Backbone Classification", LoggerLevel.ADVANCED);
         long start = System.nanoTime();
-        markASEdgeNodes();
+        markASEdgeNodes(graph);
         long stop = System.nanoTime();
         logger.log("Graph Step 1 - Time: " + Logger.convertToMs(start, stop), LoggerLevel.ADVANCED);
         logger.log("Backbone Size: " + graph.getSwitches().size(), LoggerLevel.ADVANCED);
@@ -86,7 +73,7 @@ public class BackboneClassifier {
     /**
      * This methods marks all cross-AS edge's endpoints as backbone nodes.
      */
-    private void markASEdgeNodes() {
+    private static void markASEdgeNodes(Graph graph) {
         SwitchConverter converter = new SwitchConverter();
 
         for (Edge e : graph.getEdges()) {
