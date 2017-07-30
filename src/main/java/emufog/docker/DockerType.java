@@ -29,7 +29,7 @@ public abstract class DockerType {
             throw new IllegalArgumentException("The given docker image object is not instantiated.");
         }
         // check if the image name has the right pattern
-        if (!dockerImage.matches("[^:]+:[^:]+")) {
+        if (!dockerImage.matches("([a-z,0-9]+/)?([a-z,0-9]+):([a-z,0-9]+)")) {
             throw new IllegalArgumentException("The docker image name: " + dockerImage + " does not match the standard.");
         }
 
