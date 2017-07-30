@@ -81,8 +81,8 @@ public class Emufog {
                     graph.placeFogNode(tuple.getKey(), tuple.getValue());
                 }
 
-                IGraphExporter exporter = new MaxiNetExporter(Paths.get(arguments.output), settings);
-                exporter.exportGraph(graph);
+                IGraphExporter exporter = new MaxiNetExporter();
+                exporter.exportGraph(graph, Paths.get(arguments.output));
             } else {
                 // no fog placement found, aborting
                 logger.log("Unable to find a fog placement with the provided settings.", LoggerLevel.ERROR);

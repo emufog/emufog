@@ -7,17 +7,20 @@ import emufog.graph.Graph;
 import emufog.graph.Node;
 import emufog.settings.Settings;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class exports a graph object to a valid python file usable with the
  * MaxiNet (https://maxinet.github.io/) network emulation framework.
  */
-public class MaxiNetExporter extends GraphExporter {
+public class MaxiNetExporter implements IGraphExporter {
 
     /* list of all lines of the respective file in top down order */
     private final List<String> lines;
@@ -25,31 +28,40 @@ public class MaxiNetExporter extends GraphExporter {
     /* blank line object to reuse for all blank lines */
     private final String blankLine;
 
+    /* mapping of edges to their respective connector */
+    private final Map<Edge, String> connectors;
+
     /**
-     * Creates a new MaxiNet exporter with the given parameter.
-     *
-     * @param path     path to the python file
-     * @param settings settings that apply to that export
-     * @throws IllegalArgumentException The file ending has to be .py for python files.
+     * Creates a new MaxiNet exporter instance.
      */
-    public MaxiNetExporter(Path path, Settings settings) throws IllegalArgumentException {
-        super(path, settings);
-
-        // check if the file format is a python file
-        if (!file.getName().endsWith(".py")) {
-            throw new IllegalArgumentException("The filename has to be a valid python filename.");
-        }
-
+    public MaxiNetExporter() {
         lines = new ArrayList<>();
         blankLine = "";
+        connectors = new HashMap<>();
     }
 
     @Override
-    public boolean exportGraph(Graph graph) throws IllegalArgumentException {
+    public boolean exportGraph(Graph graph, Path path) throws IllegalArgumentException {
         if (graph == null) {
             throw new IllegalArgumentException("The given graph object does not exist.");
         }
+        if (path == null) {
+            throw new IllegalArgumentException("The given path is null. Please provide a valid path");
+        }
 
+        Settings settings = graph.getSettings();
+        File f = path.toFile();
+        if (!settings.overwriteExperimentFile && f.exists()) {
+            throw new IllegalArgumentException("The given file already exist. Please provide a valid path");
+        }
+        PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.py");
+
+        if (!matcher.matches(path)) {
+            throw new IllegalArgumentException("The file name for MaxiNet hat to be a python file (.py)");
+        }
+
+        lines.clear();
+        connectors.clear();
         boolean result;
 
         // begin to write the python file
@@ -59,6 +71,7 @@ public class MaxiNetExporter extends GraphExporter {
         lines.add("topo = Topo()");
         addHosts(graph);
         addSwitches(graph);
+        addConnectors(graph);
         addLinks(graph);
         setupExperiment();
 
@@ -66,7 +79,7 @@ public class MaxiNetExporter extends GraphExporter {
             // set the overwrite option if feature is set in the settings file
             StandardOpenOption overwrite = settings.overwriteExperimentFile ? StandardOpenOption.TRUNCATE_EXISTING : StandardOpenOption.APPEND;
             // write output in UTF-8 to the specified file
-            Files.write(file.toPath(), lines, StandardCharsets.UTF_8, StandardOpenOption.CREATE, overwrite);
+            Files.write(f.toPath(), lines, StandardCharsets.UTF_8, StandardOpenOption.CREATE, overwrite);
             result = true;
         } catch (IOException e) {
             e.printStackTrace();
@@ -122,6 +135,26 @@ public class MaxiNetExporter extends GraphExporter {
     }
 
     /**
+     * Creates connectors between two hosts to run in MaxiNet.
+     *
+     * @param graph graph to export
+     */
+    private void addConnectors(Graph graph) {
+        addBlankLine();
+        lines.add("# add connectors");
+
+        int counter = 0;
+        for (Edge e : graph.getEdges()) {
+            if (e.getSource().hasEmulationSettings() && e.getDestination().hasEmulationSettings()) {
+                String name = "c" + counter;
+                lines.add(name + " = topo.addSwitch(\"" + name + "\")");
+                connectors.put(e, name);
+                counter++;
+            }
+        }
+    }
+
+    /**
      * Established the connections between two nodes based on the edges of the graph.
      *
      * @param graph graph to export
@@ -131,9 +164,27 @@ public class MaxiNetExporter extends GraphExporter {
         lines.add("# add links");
 
         for (Edge e : graph.getEdges()) {
-            lines.add("topo.addLink(" + e.getSource().getName() + ", " + e.getDestination().getName() +
-                    ", delay='" + e.getDelay() + "ms', bw=" + e.getBandwidth() + ")");
+            if (connectors.containsKey(e)) {
+                String connector = connectors.get(e);
+                addLink(e.getSource().getName(), connector, e.getDelay() / 2, e.getBandwidth());
+                addLink(connector, e.getDestination().getName(), e.getDelay() / 2, e.getBandwidth());
+            } else {
+                addLink(e.getSource().getName(), e.getDestination().getName(), e.getDelay(), e.getBandwidth());
+            }
         }
+    }
+
+    /**
+     * Adds a new link between two nodes to the document.
+     *
+     * @param source      source of the link
+     * @param destination destination of the link
+     * @param latency     latency applied to this link
+     * @param bandwidth   bandwidth limitations of this link
+     */
+    private void addLink(String source, String destination, float latency, float bandwidth) {
+        lines.add("topo.addLink(" + source + ", " + destination +
+                ", delay='" + latency + "ms', bw=" + bandwidth + ")");
     }
 
     /**
@@ -159,14 +210,5 @@ public class MaxiNetExporter extends GraphExporter {
         lines.add("cluster = maxinet.Cluster()");
         lines.add("exp = maxinet.Experiment(cluster, topo, switch=OVSSwitch)");
         lines.add("exp.setup()");
-    }
-
-    @Override
-    protected void validateFileName(Path path) throws IllegalArgumentException {
-        PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.py");
-
-        if (!matcher.matches(path)) {
-            throw new IllegalArgumentException("The file name for MaxiNet hat to be a python file (.py)");
-        }
     }
 }
