@@ -2,7 +2,7 @@
   "BaseAddress": "10.0.0.0",
   "OverWriteOutputFile": true,
   "MaxFogNodes": 100,
-  "CostThreshold": 1,
+  "CostThreshold": 6,
   "HostDeviceLatency": 0,
   "HostDeviceBandwidth": 1000,
   "ThreadCount": 1,
@@ -10,12 +10,12 @@
   "DeviceNodeTypes": [
     {
       "DockerImage": {
-        "Name": "Ubuntu",
-        "Version": "Latest"
+        "Name": "ubuntu",
+        "Version": "latest"
       },
       "ScalingFactor": 1,
       "AverageDeviceCount": 1,
-      "MemoryLimit": 500,
+      "MemoryLimit": 524288000,
       "CPUShare": 1
     }
   ],
@@ -23,38 +23,24 @@
     {
       "ID": 1,
       "DockerImage": {
-        "Name": "Ubuntu",
-        "Version": "Latest"
+        "Name": "ubuntu",
+        "Version": "trusty"
       },
       "MaximumConnections": 1,
       "Costs": 1,
-      "MemoryLimit": 1000,
+      "MemoryLimit": 1048576000,
       "CPUShare": 1
     },
     {
       "ID": 2,
       "DockerImage": {
-        "Name": "Debian",
-        "Version": "Latest"
+        "Name": "debian",
+        "Version": "latest"
       },
       "MaximumConnections": 5,
       "Costs": 2.5,
-      "MemoryLimit": 2000,
+      "MemoryLimit": 1048576000,
       "CPUShare": 1.5
-    },
-    {
-      "ID": 3,
-      "DockerImage": {
-        "Name": "Debian",
-        "Version": "Latest"
-      },
-      "MaximumConnections": 5,
-      "Costs": 1.5,
-      "MemoryLimit": 1500,
-      "CPUShare": 1.5,
-      "Dependencies": [
-        2
-      ]
     }
   ]
 }
