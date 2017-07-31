@@ -20,7 +20,7 @@ public class DeviceType extends DockerType {
      * @param dockerImage        actual docker image to deploy
      * @param scalingFactor      scaling factor of this docker image, factor >= 1
      * @param averageDeviceCount average number of devices of this image deployed to each router
-     * @param memoryLimit        upper limit of memory to use in Mb
+     * @param memoryLimit        upper limit of memory to use in Bytes
      * @param cpuShare           of the sum of available computing resources
      * @throws IllegalArgumentException the docker image name cannot be null and must
      *                                  match the pattern of a docker container name

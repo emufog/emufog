@@ -9,7 +9,7 @@ public abstract class DockerType {
     /* name of the docker image */
     public final String dockerImage;
 
-    /* upper memory limit in Mb for the docker image */
+    /* upper memory limit in Bytes for the docker image */
     public final int memoryLimit;
 
     /* maximum share of the underlying CPUs */
@@ -19,7 +19,7 @@ public abstract class DockerType {
      * Creates new Docker image object with the given limits for memory and CPU.
      *
      * @param dockerImage actual docker image to deploy
-     * @param memoryLimit upper limit of memory to use in Mb
+     * @param memoryLimit upper limit of memory to use in Bytes
      * @param cpuShare    share of the sum of available computing resources
      * @throws IllegalArgumentException the docker image name cannot be null and must
      *                                  match the pattern of a docker container name

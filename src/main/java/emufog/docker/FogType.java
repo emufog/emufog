@@ -24,7 +24,7 @@ public class FogType extends DockerType {
      * @param dockerImage actual docker image to deploy
      * @param maxClients  maximum number of clients to serve
      * @param costs       costs to deploy this image
-     * @param memoryLimit upper limit of memory to use in Mb
+     * @param memoryLimit upper limit of memory to use in Bytes
      * @param cpuShare    share of the sum of available computing resources
      * @throws IllegalArgumentException the docker image name cannot be null and must
      *                                  match the pattern of a docker container name
