@@ -11,8 +11,7 @@ public interface IGraphExporter {
      *
      * @param graph the graph to export
      * @param path  path to export the graph to
-     * @return true if exported successfully, false otherwise
      * @throws IllegalArgumentException throws exception if the input parameters are invalid
      */
-    boolean exportGraph(Graph graph, Path path) throws IllegalArgumentException;
+    void exportGraph(Graph graph, Path path) throws IllegalArgumentException;
 }
