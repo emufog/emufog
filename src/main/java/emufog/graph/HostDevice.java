@@ -33,6 +33,6 @@ public class HostDevice extends Node {
 
     @Override
     public String getName() {
-        return "host" + id;
+        return "h" + id;
     }
 }

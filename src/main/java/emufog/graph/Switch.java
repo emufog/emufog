@@ -23,6 +23,6 @@ public class Switch extends Node {
 
     @Override
     public String getName() {
-        return "switch" + id;
+        return "s" + id;
     }
 }

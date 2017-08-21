@@ -55,6 +55,6 @@ public class Router extends Node {
 
     @Override
     public String getName() {
-        return "router" + id;
+        return "r" + id;
     }
 }
