@@ -41,6 +41,9 @@ public class SettingsReader {
         return settings;
     }
 
+    /**
+     * Top level settings object of the JSON document.
+     */
     class JSONSettings {
         String BaseAddress;
         boolean OverWriteOutputFile;
@@ -54,17 +57,27 @@ public class SettingsReader {
         Collection<FogType> FogNodeTypes;
     }
 
+    /**
+     * Abstract docker type class for host devices and fog nodes.
+     */
     abstract class DockerType {
         DockerName DockerImage;
         int MemoryLimit;
         float CPUShare;
     }
 
+    /**
+     * Docker type for host devices extending the abstract docker type with scaling
+     * factor and the device count.
+     */
     class DeviceType extends DockerType {
         int ScalingFactor;
         int AverageDeviceCount;
     }
 
+    /**
+     * Name of a Docker container consisting of the name of the image and the version to use.
+     */
     class DockerName {
         String Name;
         String Version;
@@ -75,6 +88,10 @@ public class SettingsReader {
         }
     }
 
+    /**
+     * Docker type for fog nodes with their respective dependencies and properties for
+     * the placement algorithm.
+     */
     class FogType extends DockerType {
         int ID;
         int MaximumConnections;
