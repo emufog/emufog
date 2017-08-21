@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * This class exports a graph object to a valid python file usable with the
@@ -41,7 +42,7 @@ public class MaxiNetExporter implements IGraphExporter {
     }
 
     @Override
-    public boolean exportGraph(Graph graph, Path path) throws IllegalArgumentException {
+    public void exportGraph(Graph graph, Path path) throws IllegalArgumentException, IOException {
         if (graph == null) {
             throw new IllegalArgumentException("The given graph object does not exist.");
         }
@@ -49,20 +50,22 @@ public class MaxiNetExporter implements IGraphExporter {
             throw new IllegalArgumentException("The given path is null. Please provide a valid path");
         }
 
+        // check if file exists and can be overwritten
         Settings settings = graph.getSettings();
-        File f = path.toFile();
-        if (!settings.overwriteExperimentFile && f.exists()) {
+        File file = path.toFile();
+        if (!settings.overwriteExperimentFile && file.exists()) {
             throw new IllegalArgumentException("The given file already exist. Please provide a valid path");
         }
-        PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.py");
 
+        // check the file ending of the given path
+        PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.py");
         if (!matcher.matches(path)) {
             throw new IllegalArgumentException("The file name for MaxiNet hat to be a python file (.py)");
         }
 
+        // initialize empty sets to start the writing
         lines.clear();
         connectors.clear();
-        boolean result;
 
         // begin to write the python file
         setupImports();
@@ -75,18 +78,10 @@ public class MaxiNetExporter implements IGraphExporter {
         addLinks(graph);
         setupExperiment();
 
-        try {
-            // set the overwrite option if feature is set in the settings file
-            StandardOpenOption overwrite = settings.overwriteExperimentFile ? StandardOpenOption.TRUNCATE_EXISTING : StandardOpenOption.APPEND;
-            // write output in UTF-8 to the specified file
-            Files.write(f.toPath(), lines, StandardCharsets.UTF_8, StandardOpenOption.CREATE, overwrite);
-            result = true;
-        } catch (IOException e) {
-            e.printStackTrace();
-            result = false;
-        }
-
-        return result;
+        // set the overwrite option if feature is set in the settings file
+        StandardOpenOption overwrite = settings.overwriteExperimentFile ? StandardOpenOption.TRUNCATE_EXISTING : StandardOpenOption.APPEND;
+        // write output in UTF-8 to the specified file
+        Files.write(file.toPath(), lines, StandardCharsets.UTF_8, StandardOpenOption.CREATE, overwrite);
     }
 
     /**
@@ -105,13 +100,11 @@ public class MaxiNetExporter implements IGraphExporter {
         addBlankLine();
         lines.add("# add hosts");
 
-        for (Node n : graph.getNodes()) {
-            if (n.hasEmulationSettings()) {
-                EmulationSettings emu = n.getEmulationNode();
-                DockerType docker = emu.getDockerType();
-                lines.add(n.getName() + " = topo.addHost(\"" + n.getName() + "\", cls=Docker, ip=\"" + emu.getIP() +
-                        "\", dimage=\"" + docker.dockerImage + "\", mem_limit=" + docker.memoryLimit + ")");
-            }
+        for (Node n : graph.getNodes().stream().filter(Node::hasEmulationSettings).collect(Collectors.toList())) {
+            EmulationSettings emu = n.getEmulationNode();
+            DockerType docker = emu.getDockerType();
+            lines.add(n.getName() + " = topo.addHost(\"" + n.getName() + "\", cls=Docker, ip=\"" + emu.getIP() +
+                    "\", dimage=\"" + docker.dockerImage + "\", mem_limit=" + docker.memoryLimit + ")");
         }
     }
 
@@ -127,10 +120,8 @@ public class MaxiNetExporter implements IGraphExporter {
         List<Node> nodes = new ArrayList<>();
         nodes.addAll(graph.getRouters());
         nodes.addAll(graph.getSwitches());
-        for (Node n : nodes) {
-            if (!n.hasEmulationSettings()) {
-                lines.add(n.getName() + " = topo.addSwitch(\"" + n.getName() + "\")");
-            }
+        for (Node n : nodes.stream().filter(n -> !n.hasEmulationSettings()).collect(Collectors.toList())) {
+            lines.add(n.getName() + " = topo.addSwitch(\"" + n.getName() + "\")");
         }
     }
 
