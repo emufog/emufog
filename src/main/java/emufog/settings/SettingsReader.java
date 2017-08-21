@@ -19,22 +19,23 @@ public class SettingsReader {
      * @param path path to JSON file
      * @return settings object or null if impossible to read
      * @throws IllegalArgumentException if the given path is null
+     * @throws FileNotFoundException    if the given path can not be found
      */
-    public static Settings read(Path path) throws IllegalArgumentException {
+    public static Settings read(Path path) throws IllegalArgumentException, FileNotFoundException {
         if (path == null) {
             throw new IllegalArgumentException("The given file path is not initialized.");
         }
+        if (!path.endsWith(".json")) {
+            throw new IllegalArgumentException("The file ending does not match .json.");
+        }
 
         Settings settings = null;
-        try {
-            Gson gson = new Gson();
-            JSONSettings json = gson.fromJson(new FileReader(path.toFile()), JSONSettings.class);
+        // parse JSON document to a java object
+        JSONSettings json = new Gson().fromJson(new FileReader(path.toFile()), JSONSettings.class);
 
-            if (json != null) {
-                settings = new Settings(json);
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+        if (json != null) {
+            // create the actual settings object with the information of the read in objects
+            settings = new Settings(json);
         }
 
         return settings;
