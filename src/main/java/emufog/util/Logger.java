@@ -113,18 +113,16 @@ public class Logger {
      * Writes the log to the given file and resets it.
      *
      * @param path path to write the output to
+     * @throws IllegalArgumentException thrown if the path object is null
+     * @throws IOException              thrown in case of an error while writing the file
      */
-    public void saveLogFile(Path path) {
+    public void saveLogFile(Path path) throws IllegalArgumentException, IOException {
         if (path == null) {
             throw new IllegalArgumentException("The given path object is not initialized.");
         }
 
-        try {
-            Files.write(path, lines, StandardCharsets.UTF_8, StandardOpenOption.CREATE,
-                    StandardOpenOption.TRUNCATE_EXISTING);
-            lines.clear();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Files.write(path, lines, StandardCharsets.UTF_8, StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING);
+        lines.clear();
     }
 }
