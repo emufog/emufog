@@ -134,16 +134,15 @@ class BackboneWorker implements Runnable {
      * @return the average degree
      */
     private float calculateAverageDegree() {
-        float averageDegree = 0.f;
+        int sum = 0;
 
         for (Node n : as.getRouters()) {
-            averageDegree += n.getDegree();
+            sum += n.getDegree();
         }
         for (Node n : as.getSwitches()) {
-            averageDegree += n.getDegree();
+            sum += n.getDegree();
         }
-        averageDegree /= (as.getSwitches().size() + as.getRouters().size());
 
-        return averageDegree;
+        return sum / (as.getSwitches().size() + as.getRouters().size());
     }
 }
