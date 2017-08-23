@@ -86,7 +86,7 @@ public class BriteFormatReader extends GraphReader {
 
     @Override
     public Graph readGraph(List<Path> files) throws IOException, IllegalArgumentException {
-        if (files == null || files.size() < 1) {
+        if (files == null || files.isEmpty()) {
             throw new IllegalArgumentException("No files given to read in.");
         }
         Graph graph = new Graph(settings);
