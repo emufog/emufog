@@ -290,7 +290,7 @@ public class CaidaFormatReader extends GraphReader {
      * @param fileExtension file extension to match
      * @return the file of the list matching the extension or null if not found
      */
-    private Path getPathForEnding(List<Path> files, String fileExtension) {
+    private static Path getPathForEnding(List<Path> files, String fileExtension) {
         Optional<Path> query = files.stream().filter(x -> x.toString().endsWith(fileExtension)).findFirst();
 
         return query.orElse(null);
