@@ -27,7 +27,12 @@ public class HostDevice extends Node {
         as.addDevice(this);
     }
 
-    public DeviceType getDockerType() {
+    /**
+     * Returns the docker type for this host device. The type is always a device type instance.
+     *
+     * @return device docker type
+     */
+    DeviceType getDockerType() {
         return (DeviceType) emulationSettings.dockerType;
     }
 
