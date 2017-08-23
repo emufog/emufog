@@ -126,6 +126,7 @@ public class CaidaFormatReader extends GraphReader {
     private void logResults() {
         Logger logger = Logger.getInstance();
 
+        // additional logging for debugging
         logger.log("ID out of Integer range: " + idOutOfRange, LoggerLevel.ADVANCED);
         logger.log("AS out of Integer range: " + asOutOfRange, LoggerLevel.ADVANCED);
         logger.log("Coordinates out of Float range: " + coordinatesOutOfRange, LoggerLevel.ADVANCED);
