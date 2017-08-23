@@ -29,7 +29,8 @@ public abstract class GraphReader {
      *
      * @param files list of files to read in
      * @return the read in graph structure
-     * @throws IOException throws exception in case there is a problem with reading in the respective file
+     * @throws IOException              throws exception in case there is a problem with reading in the respective file
+     * @throws IllegalArgumentException throws exception if given file list is invalid
      */
     public abstract Graph readGraph(List<Path> files) throws IOException, IllegalArgumentException;
 }
