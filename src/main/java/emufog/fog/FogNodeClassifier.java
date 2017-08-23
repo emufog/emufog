@@ -96,6 +96,7 @@ public class FogNodeClassifier {
             e.printStackTrace();
             logger.log("Fog Placement Thread for " + t.getKey() + " was interrupted.", LoggerLevel.ERROR);
             logger.log("Error message: " + e.getMessage(), LoggerLevel.ERROR);
+            stop = true;
         } finally {
             pool.shutdownNow();
         }
