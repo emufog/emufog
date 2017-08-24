@@ -2,7 +2,6 @@ package emufog.fog;
 
 import emufog.docker.FogType;
 import emufog.graph.Node;
-import emufog.graph.Router;
 
 import java.util.*;
 
@@ -24,6 +23,7 @@ abstract class FogNode {
     /* number of nodes covered with the current associated type */
     private int coveredCount;
 
+    /* list of edge nodes that are covered by this node */
     private List<EdgeNode> coveredNodes;
 
     /* average connection costs for  */
@@ -34,8 +34,6 @@ abstract class FogNode {
 
     /* identifier whether the fog node has changed since the last fog type calculation */
     private boolean modified;
-
-    private boolean selected;
 
     /**
      * Creates a new node for the sub graph based on the underlying graph.
@@ -48,7 +46,6 @@ abstract class FogNode {
         this.oldNode = oldNode;
         connectedNodes = new HashMap<>();
         modified = true;
-        selected = false;
     }
 
     /**
@@ -132,12 +129,8 @@ abstract class FogNode {
         if (coveredNodes == null) {
             List<Connection> connections = new ArrayList<>(connectedNodes.values());
             connections.sort(new ConnectionComparator());
-            //assert coveredCount <= connectedNodes.size() : "higher number of covered nodes than available";
 
             coveredNodes = new ArrayList<>();
-            //for (Connection c : nodes.subList(0, coveredCount)) {
-            //    coveredNodes.add(c.edge);
-            //}
             int remaining = coveredCount;
             for (int i = 0; i < connections.size() && remaining > 0; ++i) {
                 Connection connection = connections.get(i);
@@ -148,6 +141,7 @@ abstract class FogNode {
                 }
             }
 
+            //TODO debug
             if (this instanceof EdgeNode) {
                 assert coveredNodes.contains((EdgeNode) this) : "edge node is not part of its own covered nodes set";
             }
@@ -228,23 +222,11 @@ abstract class FogNode {
                 }
             }
 
-            if (type == null) {
-                int x = 5;
-            }
-
             assert type != null : "no fog type set";
 
             calculateAverageCosts();
             setModified(false);
         }
-    }
-
-    void setSelected() {
-        selected = true;
-    }
-
-    boolean getStatus() {
-        return selected;
     }
 
     /**
