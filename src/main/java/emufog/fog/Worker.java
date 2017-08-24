@@ -8,7 +8,6 @@ import emufog.util.Tuple;
 
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
 
 /**
  * The worker class identifies fog nodes on the given AS. Therefore the worker uses a partly
@@ -25,6 +24,7 @@ abstract class Worker implements Callable<FogResult> {
     /* logger for advanced logging */
     private final Logger logger;
 
+    /* mapping of fog types to all nodes with this type */
     private final Map<FogType, List<FogNode>> fogPlacements;
 
     /**
@@ -83,63 +83,12 @@ abstract class Worker implements Callable<FogResult> {
     abstract void iterateNodes(FogGraph g, Collection<Node> startingNodes, float t);
 
     /**
-     * Calculates the costs and predecessors for the given router object.
+     * Calculates the costs and predecessors for the given node object.
      *
      * @param g         fog graph to set costs and predecessors in
-     * @param r         current router to process
+     * @param n         current node to process
      * @param threshold cost function threshold
      */
-    void processNode(FogGraph g, Router r, float threshold) {
-        if (!r.hasDevices()) {
-            return;
-        }
-
-        long start = System.nanoTime();
-
-        // push the router as a starting point in the queue
-        EdgeNode edgeNode = (EdgeNode) g.getNode(r);
-        PriorityQueue<FogNode> queue = new PriorityQueue<>(new CostComparator(edgeNode));
-        edgeNode.initPredecessor(edgeNode, edgeNode, 0);
-        queue.add(edgeNode);
-
-        // using the dijkstra algorithm to iterate the graph
-        while (!queue.isEmpty()) {
-            FogNode current = queue.poll();
-
-            float currentCosts = current.getCosts(edgeNode);
-
-            // check all edges leaving the current node
-            for (Edge e : current.oldNode.getEdges()) {
-                if (!e.isCrossASEdge()) {
-
-                    Node neighbor = e.getDestinationForSource(current.oldNode);
-
-                    // ignore host devices as they are not considered to be possible nodes
-                    if (!(neighbor instanceof HostDevice)) {
-                        float nextCosts = currentCosts + calculateCosts(e);
-                        if (nextCosts <= threshold) {
-                            FogNode neighborNode = g.getNode(neighbor);
-                            float neighborCosts = neighborNode.getCosts(edgeNode);
-
-                            if (neighborCosts == Float.MAX_VALUE) {
-                                // newly discovered node
-                                neighborNode.initPredecessor(edgeNode, current, nextCosts);
-                                queue.add(neighborNode);
-                            } else if (nextCosts < neighborCosts) {
-                                // update an already discovered node
-                                neighborNode.updatePredecessor(edgeNode, current, nextCosts);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        long end = System.nanoTime();
-        logger.log("Time per router to build graph: " + Logger.convertToMs(start, end),
-                LoggerLevel.ADVANCED);
-    }
-
     void processNode(FogGraph g, Node n, float threshold) {
         long start = System.nanoTime();
 
@@ -187,6 +136,12 @@ abstract class Worker implements Callable<FogResult> {
                 LoggerLevel.ADVANCED);
     }
 
+    /**
+     * Calculates the dependencies of fog levels and returns the first level to start with.
+     *
+     * @return first fog level to start with
+     * @throws Exception
+     */
     private FogLevel getFirstLevel() throws Exception {
         List<FogType> remainingTypes = new ArrayList<>(classifier.fogTypes);
         Map<FogType, FogLevel> levelMap = new HashMap<>();
@@ -251,6 +206,13 @@ abstract class Worker implements Callable<FogResult> {
         return firstLevel;
     }
 
+    /**
+     * This methods checks whether two fog types a and b have the exact same dependencies.
+     *
+     * @param a first fog type to check
+     * @param b second fog type to check
+     * @return true if the dependencies are equal, false otherwise
+     */
     private static boolean haveSameDependencies(FogType a, FogType b) {
         return a.dependencies.containsAll(b.dependencies) && b.dependencies.containsAll(a.dependencies);
     }
@@ -283,7 +245,6 @@ abstract class Worker implements Callable<FogResult> {
                         LoggerLevel.ADVANCED);
 
                 // add the new fog node to the partial result
-                next.setSelected();
                 partResult.addFogNode(next);
                 classifier.reduceRemainingNodes();
                 // add placement to the map
