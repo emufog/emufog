@@ -15,13 +15,14 @@ class EdgeNode extends FogNode {
     /* list of possible fog nodes in range of the threshold */
     private final List<FogNode> possibleNodes;
 
+    /* number of devices to cover for this edge node */
     private int deviceCount;
 
     /**
-     * Creates a new edge node for the sub graph algorithm.
+     * Creates a new edge node for the fog node placement algorithm.
      *
      * @param graph  original graph instance
-     * @param router edge node
+     * @param router edge node for the iteration
      */
     EdgeNode(FogGraph graph, Router router) {
         super(graph, router);
@@ -30,6 +31,13 @@ class EdgeNode extends FogNode {
         deviceCount = router.getDeviceCount();
     }
 
+    /**
+     * Creates a new edge node for the fog node placement algorithm.
+     *
+     * @param graph         original graph instance
+     * @param node          node representing the edge for the iteration
+     * @param assignedNodes collection of all edge nodes covered in the original graph
+     */
     EdgeNode(FogGraph graph, Node node, Collection<EdgeNode> assignedNodes) {
         super(graph, node);
 
