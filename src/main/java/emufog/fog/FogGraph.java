@@ -55,8 +55,8 @@ class FogGraph {
     /**
      * Initializes the node equivalents of the given AS and adds them to the mapping.
      *
-     * @param startNodes
-     * @param as
+     * @param startNodes list of nodes with their respective edge nodes
+     * @param as         AS instance to work on
      */
     void initNodes(List<Tuple<Node, List<EdgeNode>>> startNodes, AS as) {
         for (Router r : as.getRouters()) {
