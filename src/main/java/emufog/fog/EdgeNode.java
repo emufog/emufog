@@ -28,10 +28,6 @@ class EdgeNode extends FogNode {
 
         possibleNodes = new ArrayList<>();
         deviceCount = router.getDeviceCount();
-
-        if (deviceCount == 0) {
-            int x =4;
-        }
     }
 
     EdgeNode(FogGraph graph, Node node, Collection<EdgeNode> assignedNodes) {
@@ -43,9 +39,6 @@ class EdgeNode extends FogNode {
         deviceCount = 0;
         for (EdgeNode e : assignedNodes) {
             deviceCount += e.getDeviceCount();
-        }
-        if (deviceCount == 0) {
-            int x =4;
         }
     }
 
