@@ -4,7 +4,9 @@ import com.google.gson.Gson;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.util.Collection;
 
 /**
@@ -25,7 +27,8 @@ public class SettingsReader {
         if (path == null) {
             throw new IllegalArgumentException("The given file path is not initialized.");
         }
-        if (!path.endsWith(".json")) {
+        PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.json");
+        if (!matcher.matches(path)) {
             throw new IllegalArgumentException("The file ending does not match .json.");
         }
 
