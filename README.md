@@ -12,7 +12,7 @@ In case you have Gradle version 3.4+ installed you can use the local installatio
 
 To build EmuFog simply clone the git repository
 
-    git clone https://github.com/unly/emufog.git
+    git clone https://github.com/emufog/emufog.git
     
 change the directory to the newly added emufog directory
 
