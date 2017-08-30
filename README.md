@@ -2,19 +2,39 @@
 
 ## Dependencies
 
-EmuFog requires the [JDK 8+](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) to build and run.
+EmuFog is build using the [JDK 8+](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) to build and run.
+Make sure to have Java 8 installed on your device.
 
-## Build EmuFog
+## Build EmuFog From Source
 
-To build EmuFog simply clone the repository
+The EmuFog project uses [Gradle](https://gradle.org/) to include dependencies and build binaries from the source code.
+In case you have Gradle version 3.4+ installed you can use the local installation otherwise the already included Gradle wrapper.
+
+To build EmuFog simply clone the git repository
 
     git clone https://github.com/unly/emufog.git
+    
+change the directory to the newly added emufog directory
 
-To simplify the compiling this project can be build with [Gradle 3.4+](https://gradle.org/) by calling
+    cd emufog/
 
-    gradle build ./emufog
+### Build EmuFog With Gradle
 
-## Uses Open Source Software
+With an installed version of Gradle simply call:
+
+    gradle build
+    
+### Build EmuFog Without Gradle
+
+For Linux and macOS call:
+    
+    ./gradlew build
+    
+For Microsoft Windows call: 
+
+    gradlew build
+
+## EmuFog Uses Open Source Software
 
 * [jCommander](http://jcommander.org/)
 * [gson](https://github.com/google/gson)
