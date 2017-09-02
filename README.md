@@ -34,6 +34,12 @@ For Microsoft Windows call:
 
     gradlew build
 
+## Running EmuFog
+
+Issue command `gradle installApp` which packages the application into a binary with all libraries.
+
+Packaged binary is found in `build/install/emufog/bin`. Execute it with the command line arguments to main () .
+
 ## EmuFog Uses Open Source Software
 
 * [jCommander](http://jcommander.org/)
