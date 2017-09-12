@@ -15,7 +15,7 @@ dependencies {
     compile 'com.google.code.gson:gson:2.8.1'
 }
 
-version = '0.1'
+version = '1.0'
 jar {
     manifest {
         attributes(
