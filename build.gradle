@@ -12,8 +12,6 @@ repositories {
 
 dependencies {
     compile 'com.beust:jcommander:1.69'
-    compile 'org.freehep:freehep-graphicsio:2.4'
-    compile 'org.freehep:freehep-graphicsio-pdf:2.4'
     compile 'com.google.code.gson:gson:2.8.1'
 }
 
@@ -26,4 +24,15 @@ jar {
                 'Main-Class': 'emufog.launcher.Emufog'
         )
     }
+}
+
+task fatJar(type: Jar) {
+    manifest.from jar.manifest
+    classifier = 'fat'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+artifacts {
+    archives fatJar
 }
