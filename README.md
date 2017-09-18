@@ -38,7 +38,8 @@ For Microsoft Windows call:
 
 Issue command `gradle installApp` which packages the application into a binary with all libraries.
 
-Packaged binary is found in `build/install/emufog/bin`. Execute it with the command line arguments to main () .
+Packaged binary is found in `build/install/emufog/bin`. Execute it with the command line arguments to main ().
+The [wiki](https://github.com/emufog/emufog/wiki) explains how to use EmuFog in more detail.
 
 ## EmuFog Uses Open Source Software
 
