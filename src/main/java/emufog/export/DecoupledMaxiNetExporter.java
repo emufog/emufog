@@ -85,9 +85,9 @@ public class DecoupledMaxiNetExporter extends MaxiNetExporter {
 
         for (Node n : graph.getNodes().stream().filter(Node::hasEmulationSettings).collect(Collectors.toList())) {
             EmulationSettings emu = n.getEmulationNode();
+            DockerType docker = emu.getDockerType(); // To be deleted...
             // We still need memory limit, where are we getting that from now?
             // Does emulation settings still exist in the decoupled exporter?
-            DockerType docker = emu.getDockerType();
             String image = images.get(n.getID());
             lines.add(n.getName() + " = topo.addHost(\"" + n.getName() + "\", cls=Docker, ip=\"" + emu.getIP() +
                     "\", dimage=\"" + image + "\", mem_limit=" + docker.memoryLimit + ")");
