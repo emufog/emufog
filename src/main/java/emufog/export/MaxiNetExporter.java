@@ -179,6 +179,15 @@ public class MaxiNetExporter implements IGraphExporter {
     }
 
     /**
+     * Adds a new link between MininetHosts inside a multiApplication Fog node.
+     * @param source
+     * @param destination
+     */
+    private void addFogLink(String source, String destination) {
+        lines.add("topo.addLink(" + source + ", " + destination + ", delay='0ms', bw='10000')");
+    }
+
+    /**
      * Writes the necessary imports at the top of the output file.
      */
     private void setupImports() {
