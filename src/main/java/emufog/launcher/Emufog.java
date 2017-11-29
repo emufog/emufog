@@ -3,6 +3,7 @@ package emufog.launcher;
 import com.beust.jcommander.JCommander;
 import emufog.backbone.BackboneClassifier;
 import emufog.docker.FogType;
+import emufog.export.CoupledMaxiNetExporter;
 import emufog.export.IGraphExporter;
 import emufog.export.MaxiNetExporter;
 import emufog.fog.FogNodeClassifier;
@@ -81,7 +82,7 @@ public class Emufog {
                     graph.placeFogNode(tuple.getKey(), tuple.getValue());
                 }
 
-                IGraphExporter exporter = new MaxiNetExporter();
+                IGraphExporter exporter = new CoupledMaxiNetExporter();
                 exporter.exportGraph(graph, Paths.get(arguments.output));
             } else {
                 // no fog placement found, aborting
