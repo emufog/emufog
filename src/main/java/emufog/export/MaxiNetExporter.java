@@ -1,15 +1,10 @@
 package emufog.export;
 
-import emufog.docker.DockerType;
 import emufog.graph.Edge;
-import emufog.graph.EmulationSettings;
 import emufog.graph.Graph;
 import emufog.graph.Node;
-import emufog.settings.Settings;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,102 +13,63 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * This class exports a graph object to a valid python file usable with the
- * MaxiNet (https://maxinet.github.io/) network emulation framework.
+ * This class is a framework with helper methods for classes that export a
+ * graph object to a valid python file usable with the MaxiNet
+ * (https://maxinet.github.io/) network emulation framework.
  */
-public class MaxiNetExporter implements IGraphExporter {
+public abstract class MaxiNetExporter implements IGraphExporter {
 
     /* list of all lines of the respective file in top down order */
-    private final List<String> lines;
+    final List<String> lines;
 
     /* blank line object to reuse for all blank lines */
     private final String blankLine;
 
     /* mapping of edges to their respective connector */
-    private final Map<Edge, String> connectors;
+    final Map<Edge, String> connectors;
 
     /**
      * Creates a new MaxiNet exporter instance.
      */
-    public MaxiNetExporter() {
+    MaxiNetExporter() {
         lines = new ArrayList<>();
         blankLine = "";
         connectors = new HashMap<>();
     }
 
     @Override
-    public void exportGraph(Graph graph, Path path) throws IllegalArgumentException, IOException {
-        if (graph == null) {
-            throw new IllegalArgumentException("The given graph object does not exist.");
-        }
-        if (path == null) {
-            throw new IllegalArgumentException("The given path is null. Please provide a valid path");
-        }
-
-        // check if file exists and can be overwritten
-        Settings settings = graph.getSettings();
-        File file = path.toFile();
-        if (!settings.overwriteExperimentFile && file.exists()) {
-            throw new IllegalArgumentException("The given file already exist. Please provide a valid path");
-        }
-
-        // check the file ending of the given path
-        PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.py");
-        if (!matcher.matches(path)) {
-            throw new IllegalArgumentException("The file name for MaxiNet hat to be a python file (.py)");
-        }
-
-        // initialize empty sets to start the writing
-        lines.clear();
-        connectors.clear();
-
-        // begin to write the python file
-        setupImports();
-
-        addBlankLine();
-        lines.add("topo = Topo()");
-        addHosts(graph);
-        addSwitches(graph);
-        addConnectors(graph);
-        addLinks(graph);
-        setupExperiment();
-
-        // set the overwrite option if feature is set in the settings file
-        StandardOpenOption overwrite = settings.overwriteExperimentFile ? StandardOpenOption.TRUNCATE_EXISTING : StandardOpenOption.APPEND;
-        // write output in UTF-8 to the specified file
-        Files.write(file.toPath(), lines, StandardCharsets.UTF_8, StandardOpenOption.CREATE, overwrite);
-    }
+    public abstract void exportGraph(Graph graph, Path path) throws IllegalArgumentException, IOException;
 
     /**
-     * Adds a blank line to the output file.
+     * Validates graph's relevant data to ensure that it will be able to
+     * generate the appropriate python file.
+     *
+     * @param graph graph to validate
+     * @return graph validity
      */
-    private void addBlankLine() {
-        lines.add(blankLine);
-    }
+    abstract boolean validateGraph(Graph graph);
 
     /**
      * Writes all docker host nodes of the graph to the output file.
      *
      * @param graph graph to export
      */
-    private void addHosts(Graph graph) {
-        addBlankLine();
-        lines.add("# add hosts");
+    abstract void addHosts(Graph graph);
 
-        for (Node n : graph.getNodes().stream().filter(Node::hasEmulationSettings).collect(Collectors.toList())) {
-            EmulationSettings emu = n.getEmulationNode();
-            DockerType docker = emu.getDockerType();
-            lines.add(n.getName() + " = topo.addHost(\"" + n.getName() + "\", cls=Docker, ip=\"" + emu.getIP() +
-                    "\", dimage=\"" + docker.dockerImage + "\", mem_limit=" + docker.memoryLimit + ")");
-        }
+    /**
+     * Adds a blank line to the output file.
+     */
+    void addBlankLine() {
+        lines.add(blankLine);
     }
+
 
     /**
      * Writes all switches that do not require docker to the output file.
      *
      * @param graph graph to export
      */
-    private void addSwitches(Graph graph) {
+    void addSwitches(Graph graph) {
         addBlankLine();
         lines.add("# add switches");
 
@@ -130,7 +86,7 @@ public class MaxiNetExporter implements IGraphExporter {
      *
      * @param graph graph to export
      */
-    private void addConnectors(Graph graph) {
+    void addConnectors(Graph graph) {
         addBlankLine();
         lines.add("# add connectors");
 
@@ -150,7 +106,7 @@ public class MaxiNetExporter implements IGraphExporter {
      *
      * @param graph graph to export
      */
-    private void addLinks(Graph graph) {
+    void addLinks(Graph graph) {
         addBlankLine();
         lines.add("# add links");
 
@@ -190,7 +146,7 @@ public class MaxiNetExporter implements IGraphExporter {
     /**
      * Writes the necessary imports at the top of the output file.
      */
-    private void setupImports() {
+    void setupImports() {
         lines.add("#!/usr/bin/env python2");
         addBlankLine();
         lines.add("import time");
@@ -204,7 +160,7 @@ public class MaxiNetExporter implements IGraphExporter {
     /**
      * Writes the lines to setup and start an experiment in MaxiNet.
      */
-    private void setupExperiment() {
+    void setupExperiment() {
         addBlankLine();
         lines.add("# create experiment");
         lines.add("cluster = maxinet.Cluster()");
