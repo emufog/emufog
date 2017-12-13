@@ -1,0 +1,18 @@
+{
+	"FogImages": [
+		{
+			"Name": "ubuntu",
+			"Version": "trusty"
+		},
+		{
+			"Name": "debian",
+			"Version": "latest"
+		}
+	],
+	"DeviceImages": [
+		{
+			"Name": "ubuntu",
+			"Version": "latest"
+		}
+	]
+}
