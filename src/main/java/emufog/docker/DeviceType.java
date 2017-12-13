@@ -25,8 +25,8 @@ public class DeviceType extends DockerType {
      * @throws IllegalArgumentException the docker image name cannot be null and must
      *                                  match the pattern of a docker container name
      */
-    public DeviceType(String dockerImage, int scalingFactor, float averageDeviceCount, int memoryLimit, float cpuShare) throws IllegalArgumentException {
-        super(dockerImage, memoryLimit, cpuShare);
+    public DeviceType(/*String dockerImage,*/ int scalingFactor, float averageDeviceCount, int memoryLimit, float cpuShare) throws IllegalArgumentException {
+        super(/*dockerImage,*/ memoryLimit, cpuShare);
 
         this.scalingFactor = scalingFactor;
         this.averageDeviceCount = averageDeviceCount;

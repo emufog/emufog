@@ -36,6 +36,10 @@ public class Graph {
 
     /* logger instance to log warnings */
     protected final Logger logger;
+    
+    private final Map<Integer, String> nodeToImageMap;
+    
+    private final Map<Integer, List<String>> nodeToCommandsMap;
 
     /**
      * Creates a new basic graph instance.
@@ -56,6 +60,8 @@ public class Graph {
         IPprovider = new UniqueIPProvider(settings);
         nodeIDprovider = new UniqueIDProvider();
         edgeIDprovider = new UniqueIDProvider();
+        nodeToImageMap = new HashMap<>();
+        nodeToCommandsMap = new HashMap<>();
         logger = Logger.getInstance();
     }
 
@@ -364,4 +370,21 @@ public class Graph {
     public Collection<AS> getSystems() {
         return systems.values();
     }
+
+	public Map<Integer, String> getImages() {
+		return nodeToImageMap;
+	}
+
+	public Map<Integer, List<String>> getCommands() {
+		return nodeToCommandsMap;
+	}
+	
+	public void setImages(Map<? extends Integer, ? extends String> map) {
+		nodeToImageMap.clear();
+		nodeToImageMap.putAll(map);
+	}
+	public void setCommands(Map<? extends Integer, ? extends List<String>> map) {
+		nodeToCommandsMap.clear();
+		nodeToCommandsMap.putAll(map);
+	}
 }

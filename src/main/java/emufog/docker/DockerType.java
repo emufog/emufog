@@ -7,7 +7,7 @@ package emufog.docker;
 public abstract class DockerType {
 
     /* name of the docker image */
-    public final String dockerImage;
+    public String dockerImage;
 
     /* upper memory limit in Bytes for the docker image */
     public final int memoryLimit;
@@ -24,16 +24,17 @@ public abstract class DockerType {
      * @throws IllegalArgumentException the docker image name cannot be null and must
      *                                  match the pattern of a docker container name
      */
-    DockerType(String dockerImage, int memoryLimit, float cpuShare) throws IllegalArgumentException {
-        if (dockerImage == null) {
+    DockerType(/*String dockerImage,*/ int memoryLimit, float cpuShare) throws IllegalArgumentException {
+        /*if (dockerImage == null) {
             throw new IllegalArgumentException("The given docker image object is not instantiated.");
         }
         // check if the image name has the right pattern
         if (!dockerImage.matches("([a-z,0-9]+/)?([a-z,0-9]+):([a-z,0-9]+)")) {
             throw new IllegalArgumentException("The docker image name: " + dockerImage + " does not match the standard.");
-        }
+        }*/
 
-        this.dockerImage = dockerImage;
+        //this.dockerImage = dockerImage;
+    	this.dockerImage = "";
         this.memoryLimit = memoryLimit;
         this.cpuShare = cpuShare;
     }

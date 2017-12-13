@@ -23,22 +23,26 @@ public class SettingsReader {
      * @throws IllegalArgumentException if the given path is null
      * @throws FileNotFoundException    if the given path can not be found
      */
-    public static Settings read(Path path) throws IllegalArgumentException, FileNotFoundException {
-        if (path == null) {
-            throw new IllegalArgumentException("The given file path is not initialized.");
+    public static Settings read(Path settingsPath, Path imagesPath) throws IllegalArgumentException, FileNotFoundException {
+        if (settingsPath == null) {
+            throw new IllegalArgumentException("The given settings file path is not initialized.");
+        }
+        if (imagesPath == null) {
+            throw new IllegalArgumentException("The given images file path is not initialized.");
         }
         PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.json");
-        if (!matcher.matches(path)) {
+        if (!matcher.matches(settingsPath) || !matcher.matches(imagesPath)) {
             throw new IllegalArgumentException("The file ending does not match .json.");
         }
 
         Settings settings = null;
         // parse JSON document to a java object
-        JSONSettings json = new Gson().fromJson(new FileReader(path.toFile()), JSONSettings.class);
+        JSONSettings jsonSettings = new Gson().fromJson(new FileReader(settingsPath.toFile()), JSONSettings.class);
+        JSONImages jsonImages = new Gson().fromJson(new FileReader(imagesPath.toFile()), JSONImages.class);
 
-        if (json != null) {
+        if (jsonSettings != null && jsonImages != null) {
             // create the actual settings object with the information of the read in objects
-            settings = new Settings(json);
+            settings = new Settings(jsonSettings, jsonImages);
         }
 
         return settings;
@@ -59,12 +63,16 @@ public class SettingsReader {
         Collection<DeviceType> DeviceNodeTypes;
         Collection<FogType> FogNodeTypes;
     }
+    class JSONImages {
+    	Collection<DockerName> FogImages;
+    	Collection<DockerName> DeviceImages;
+    }
 
     /**
      * Abstract docker type class for host devices and fog nodes.
      */
     abstract class DockerType {
-        DockerName DockerImage;
+        //DockerName DockerImage;
         int MemoryLimit;
         float CPUShare;
     }
