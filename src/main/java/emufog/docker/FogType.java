@@ -29,8 +29,8 @@ public class FogType extends DockerType {
      * @throws IllegalArgumentException the docker image name cannot be null and must
      *                                  match the pattern of a docker container name
      */
-    public FogType(String dockerImage, int maxClients, float costs, int memoryLimit, float cpuShare) throws IllegalArgumentException {
-        super(dockerImage, memoryLimit, cpuShare);
+    public FogType(/*String dockerImage, */int maxClients, float costs, int memoryLimit, float cpuShare) throws IllegalArgumentException {
+        super(/*dockerImage,*/ memoryLimit, cpuShare);
 
         this.maxClients = maxClients;
         this.costs = costs;

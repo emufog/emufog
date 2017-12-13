@@ -9,10 +9,6 @@
   "ParalleledFogBuilding": false,
   "DeviceNodeTypes": [
     {
-      "DockerImage": {
-        "Name": "ubuntu",
-        "Version": "latest"
-      },
       "ScalingFactor": 1,
       "AverageDeviceCount": 1,
       "MemoryLimit": 524288000,
@@ -22,10 +18,6 @@
   "FogNodeTypes": [
     {
       "ID": 1,
-      "DockerImage": {
-        "Name": "ubuntu",
-        "Version": "trusty"
-      },
       "MaximumConnections": 1,
       "Costs": 1,
       "MemoryLimit": 1048576000,
@@ -33,10 +25,6 @@
     },
     {
       "ID": 2,
-      "DockerImage": {
-        "Name": "debian",
-        "Version": "latest"
-      },
       "MaximumConnections": 5,
       "Costs": 2.5,
       "MemoryLimit": 1048576000,

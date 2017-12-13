@@ -31,8 +31,10 @@ abstract class FogNode {
 
     /* the optimal Docker type to use */
     private FogType type;
+    
+    //private String image;
 
-    /* identifier whether the fog node has changed since the last fog type calculation */
+	/* identifier whether the fog node has changed since the last fog type calculation */
     private boolean modified;
 
     /**
@@ -254,6 +256,14 @@ abstract class FogNode {
     public int hashCode() {
         return oldNode.hashCode();
     }
+    
+    public String getImage() {
+		return type.dockerImage;
+	}
+
+	public void setImage(String image) {
+		this.type.dockerImage = image;
+	}
 
     /**
      * This class represents a connection from the edge to the fog node instance.

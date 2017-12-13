@@ -13,6 +13,9 @@ class Arguments {
 
     @Parameter(names = {"-Settings", "-s"}, description = "settings file to use")
     Path settingsPath;
+    
+    @Parameter(names = {"-Images", "-i"}, description = "file with list of images to use")
+    Path imagesPath;
 
     @Parameter(names = {"-Type", "-t"}, description = "input format to read in")
     String inputType;

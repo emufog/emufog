@@ -1,15 +1,20 @@
 package emufog.launcher;
 
+import java.io.IOException;
+import java.nio.file.Paths;
+
 import com.beust.jcommander.JCommander;
+
 import emufog.backbone.BackboneClassifier;
 import emufog.docker.FogType;
 import emufog.export.CoupledMaxiNetExporter;
 import emufog.export.IGraphExporter;
-import emufog.export.MaxiNetExporter;
 import emufog.fog.FogNodeClassifier;
 import emufog.fog.FogResult;
 import emufog.graph.Graph;
 import emufog.graph.Node;
+import emufog.images.IApplicationImageAssignmentPolicy;
+import emufog.images.MongoCaseAssignmentPolicy;
 import emufog.reader.BriteFormatReader;
 import emufog.reader.CaidaFormatReader;
 import emufog.reader.GraphReader;
@@ -18,9 +23,6 @@ import emufog.settings.SettingsReader;
 import emufog.util.Logger;
 import emufog.util.LoggerLevel;
 import emufog.util.Tuple;
-
-import java.io.IOException;
-import java.nio.file.Paths;
 
 /**
  * The EmuFog main launcher class. Starts a new instance of the application with the given parameters
@@ -47,7 +49,7 @@ public class Emufog {
             JCommander.newBuilder().addObject(arguments).build().parse(args);
 
             // read in the settings file
-            Settings settings = SettingsReader.read(arguments.settingsPath);
+            Settings settings = SettingsReader.read(arguments.settingsPath, arguments.imagesPath);
 
             // determines the respective format reader
             GraphReader reader = getReader(arguments.inputType, settings);
@@ -81,7 +83,9 @@ public class Emufog {
                 for (Tuple<Node, FogType> tuple : result.getFogNodes()) {
                     graph.placeFogNode(tuple.getKey(), tuple.getValue());
                 }
-
+                IApplicationImageAssignmentPolicy policy = new MongoCaseAssignmentPolicy();
+                policy.generateImageMapping(graph, settings);
+                policy.generateCommandsLists(graph, settings);
                 IGraphExporter exporter = new CoupledMaxiNetExporter();
                 exporter.exportGraph(graph, Paths.get(arguments.output));
             } else {

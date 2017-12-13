@@ -43,13 +43,18 @@ public class Settings {
 
     /* indicator whether the fog graph should be build in parallel */
     public final boolean fogGraphParallel;
+    
+
+	public final List<String> fogImages;
+
+	public final List<String> deviceImages;
 
     /**
      * Creates a new instance of the Settings class using the JSON object.
      *
      * @param json JSON object containing the required information
      */
-    Settings(SettingsReader.JSONSettings json) {
+    Settings(SettingsReader.JSONSettings json, SettingsReader.JSONImages imageFile) {
         baseAddress = json.BaseAddress;
         overwriteExperimentFile = json.OverWriteOutputFile;
         maxFogNodes = json.MaxFogNodes;
@@ -61,7 +66,7 @@ public class Settings {
 
         Map<Integer, FogType> fogTypes = new HashMap<>();
         for (SettingsReader.FogType fogType : json.FogNodeTypes) {
-            fogTypes.put(fogType.ID, new FogType(fogType.DockerImage.toString(), fogType.MaximumConnections, fogType.Costs,
+            fogTypes.put(fogType.ID, new FogType(/*fogType.DockerImage.toString(),*/ fogType.MaximumConnections, fogType.Costs,
                     fogType.MemoryLimit, fogType.CPUShare));
         }
         for (SettingsReader.FogType fogType : json.FogNodeTypes) {
@@ -76,8 +81,16 @@ public class Settings {
 
         deviceNodeTypes = new ArrayList<>();
         for (SettingsReader.DeviceType deviceType : json.DeviceNodeTypes) {
-            deviceNodeTypes.add(new DeviceType(deviceType.DockerImage.toString(), deviceType.ScalingFactor,
+            deviceNodeTypes.add(new DeviceType(/*deviceType.DockerImage.toString(),*/ deviceType.ScalingFactor,
                     deviceType.AverageDeviceCount, deviceType.MemoryLimit, deviceType.CPUShare));
+        }
+        fogImages = new ArrayList<>();
+        deviceImages = new ArrayList<>();
+        for (SettingsReader.DockerName name: imageFile.FogImages) {
+        	fogImages.add(name.toString());
+        }
+        for (SettingsReader.DockerName name: imageFile.DeviceImages) {
+        	deviceImages.add(name.toString());
         }
     }
 }

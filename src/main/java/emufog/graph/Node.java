@@ -19,6 +19,7 @@ public abstract class Node {
 
     /* emulation settings for this node */
     EmulationSettings emulationSettings;
+    
 
     /**
      * Creates a node of the graph with the initial parameter given.
@@ -99,7 +100,21 @@ public abstract class Node {
         return as;
     }
 
-    /**
+    public String getImage() {
+		if (this.hasEmulationSettings()) {
+    		return this.emulationSettings.dockerType.dockerImage;
+    	} else {
+    		return "None";
+    	}
+	}
+
+	public void setImage(String image) {
+		if (this.hasEmulationSettings()) {
+			this.emulationSettings.dockerType.dockerImage = image;
+		}
+	}
+
+	/**
      * Adds an edge to the array of edges associated with this node. Grows the array by one to add an edge.
      *
      * @param edge edge to add to node
