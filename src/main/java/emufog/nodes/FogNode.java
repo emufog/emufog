@@ -12,6 +12,14 @@ public class FogNode extends Node {
     private List<Application> applications;
     private List<FogNode> dependencies;
 
+    /**
+     *
+     * @param memoryLimit
+     * @param cpuShare
+     * @param maxClients
+     * @param costs
+     */
+
     public FogNode(int memoryLimit, int cpuShare, int maxClients, double costs) {
         super(memoryLimit, cpuShare);
         this.maxClients = maxClients;

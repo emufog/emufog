@@ -11,6 +11,15 @@ public class DeviceNode extends Node{
 
     private List<Application> applications;
 
+    /**
+     *
+     * @param memoryLimit
+     * @param cpuShare
+     * @param scalingFactor
+     * @param averageDeviceCount
+     * @param applications
+     */
+
     public DeviceNode(int memoryLimit, int cpuShare, int scalingFactor, float averageDeviceCount, List<Application> applications) {
         super(memoryLimit, cpuShare);
         this.scalingFactor = scalingFactor;

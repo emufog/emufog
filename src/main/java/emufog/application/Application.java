@@ -1,15 +1,9 @@
 package emufog.application;
 
-import emufog.container.Docker;
-
 /**
- * Application object defining container, mounts, skipts.
+ * Application object defining container, mounts, scripts.
  */
 public class Application {
-
-    Docker container = new Docker();
-
-
 
 
 
