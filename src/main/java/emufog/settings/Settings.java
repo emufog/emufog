@@ -94,3 +94,11 @@ public class Settings {
         }
     }
 }
+
+/*
+TODO
+
+Why differentiate between fog and device Images?
+
+
+ */

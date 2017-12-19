@@ -6,7 +6,7 @@ import emufog.settings.Settings;
  * The UniqueIPProvider calculates IP address within the subnet
  * address space defined in the base address of the given settings.
  */
-class UniqueIPProvider {
+public class UniqueIPProvider {
 
     /* the last assigned IP in the network */
     private String lastIP;

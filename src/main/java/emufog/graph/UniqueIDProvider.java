@@ -6,7 +6,7 @@ import java.util.BitSet;
  * The UniqueIDProvider keeps track of all IDs in use and calculates based
  * on that data the next available ID such that all IDs are unique.
  */
-class UniqueIDProvider {
+public class UniqueIDProvider {
 
     /* the current ID is the last one in use */
     private int current;

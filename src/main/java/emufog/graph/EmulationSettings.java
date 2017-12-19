@@ -42,3 +42,11 @@ public class EmulationSettings {
         return dockerType;
     }
 }
+
+
+/* TODO
+*
+*  Change abstraction level. --> now EmulationSettings use DockerType use specific Application Object Instead.
+*
+*
+* */
