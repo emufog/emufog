@@ -24,9 +24,9 @@ public class SettingsDeserializer implements JsonDeserializer<Settings> {
         settings.setFogGraphParallel(jsonObject.get("ParalleledFogBuilding").getAsBoolean());
 
 
-        DeviceNode[] deviceNodes = context.deserialize(jsonObject.get("DeviceNodes"), DeviceNode[].class);
-        FogNode[] fogNodes = context.deserialize(jsonObject.get("FogNodes"), FogNode[].class);
-        Application[] applications = context.deserialize(jsonObject.get("Applications"), Application[].class);
+        DeviceNode[] deviceNodes = context.deserialize(jsonObject.get("DeviceNodes"), DeviceNode.class);
+        FogNode[] fogNodes = context.deserialize(jsonObject.get("FogNodes"), FogNode.class);
+        Application[] applications = context.deserialize(jsonObject.get("Applications"), Application.class);
 
         settings.setDeviceNodes(deviceNodes);
         settings.setFogNodes(fogNodes);

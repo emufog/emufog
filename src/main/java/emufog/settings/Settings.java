@@ -3,18 +3,14 @@ package emufog.settings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import emufog.application.Application;
-import emufog.docker.DeviceType;
-import emufog.docker.FogType;
 import emufog.nodes.DeviceNode;
 import emufog.nodes.FogNode;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 /**
  * The settings class contains all different settings used within the application.
@@ -54,55 +50,7 @@ public class Settings {
 
     public Settings(){}
 
-/*    *//**
-     * Creates a new instance of the Settings class using the JSON object.
-     * @param json
-     * @param imageFile
-     *//*
-    Settings(SettingsReader.JSONSettings json, SettingsReader.JSONImages imageFile) {
-
-        baseAddress = json.BaseAddress;
-        overwriteExperimentFile = json.OverWriteOutputFile;
-        maxFogNodes = json.MaxFogNodes;
-        costThreshold = json.CostThreshold;
-        edgeDeviceDelay = json.HostDeviceLatency;
-        edgeDeviceBandwidth = json.HostDeviceBandwidth;
-        threadCount = json.ThreadCount;
-        fogGraphParallel = json.ParalleledFogBuilding;
-
-        Map<Integer, FogType> fogTypes = new HashMap<>();
-        for (SettingsReader.FogType fogType : json.FogNodeTypes) {
-            fogTypes.put(fogType.ID, new FogType(*//*fogType.DockerImage.toString(),*//* fogType.MaximumConnections, fogType.Costs,
-                    fogType.MemoryLimit, fogType.CPUShare));
-        }
-        for (SettingsReader.FogType fogType : json.FogNodeTypes) {
-            FogType fogNodeType = fogTypes.get(fogType.ID);
-            if (fogType.Dependencies != null) {
-                for (int id : fogType.Dependencies) {
-                    fogNodeType.addDependency(fogTypes.get(id));
-                }
-            }
-        }
-        fogNodeTypes = new ArrayList<>(fogTypes.values());
-
-        deviceNodeTypes = new ArrayList<>();
-        for (SettingsReader.DeviceType deviceType : json.DeviceNodeTypes) {
-            deviceNodeTypes.add(new DeviceType(*//*deviceType.DockerImage.toString(),*//* deviceType.ScalingFactor,
-                    deviceType.AverageDeviceCount, deviceType.MemoryLimit, deviceType.CPUShare));
-        }
-        fogImages = new ArrayList<>();
-        deviceImages = new ArrayList<>();
-        for (SettingsReader.DockerName name: imageFile.FogImages) {
-        	fogImages.add(name.toString());
-        }
-        for (SettingsReader.DockerName name: imageFile.DeviceImages) {
-        	deviceImages.add(name.toString());
-        }
-    }*/
-
     public Settings read(Path settingsPath) throws FileNotFoundException {
-
-        Settings settings = null;
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(Settings.class, new SettingsDeserializer());
@@ -112,7 +60,7 @@ public class Settings {
 
         Gson gson = gsonBuilder.create();
 
-        settings = gson.fromJson(new FileReader(settingsPath.toFile()), Settings.class);
+        Settings settings = gson.fromJson(new FileReader(settingsPath.toFile()), Settings.class);
 
         return settings;
     }
@@ -194,15 +142,15 @@ public class Settings {
         return fogGraphParallel;
     }
 
-    public FogNode[] getFogNodes() {
-        return fogNodes;
+    public List<FogNode> getFogNodes() {
+        return Arrays.asList(fogNodes);
     }
 
-    public DeviceNode[] getDeviceNodes() {
-        return deviceNodes;
+    public List<DeviceNode> getDeviceNodes() {
+        return Arrays.asList(deviceNodes);
     }
 
-    public Application[] getApplications() {
-        return applications;
+    public List<Application> getApplications() {
+        return Arrays.asList(applications);
     }
 }
