@@ -1,3 +1,4 @@
+/*
 package emufog.settings;
 
 import com.google.gson.Gson;
@@ -14,12 +15,15 @@ import java.nio.file.PathMatcher;
 import java.util.Collection;
 import java.util.List;
 
+*/
 /**
  * This reader reads in JSON documents to build settings object for EmuFog.
- */
+ *//*
+
 public class SettingsReader {
 
-    /**
+    */
+/**
      * Reads in the given JSON file and parses the content.
      * Creates and returns a new settings object with it.
      *
@@ -27,7 +31,8 @@ public class SettingsReader {
      * @return settings object or null if impossible to read
      * @throws IllegalArgumentException if the given path is null
      * @throws FileNotFoundException    if the given path can not be found
-     */
+     *//*
+
     public static Settings read(Path settingsPath, Path imagesPath, Path applicationsPath) throws IllegalArgumentException, FileNotFoundException {
         if (settingsPath == null) {
             throw new IllegalArgumentException("The given settings file path is not initialized.");
@@ -63,9 +68,11 @@ public class SettingsReader {
         return settings;
     }
 
-    /**
+    */
+/**
      * Top level settings object of the JSON document.
-     */
+     *//*
+
     class JSONSettings {
         String BaseAddress;
         boolean OverWriteOutputFile;
@@ -92,27 +99,33 @@ public class SettingsReader {
     }
 
 
-    /**
+    */
+/**
      * Abstract docker type class for host devices and fog nodes.
-     */
+     *//*
+
     abstract class DockerType {
         //DockerName DockerImage;
         int MemoryLimit;
         float CPUShare;
     }
 
-    /**
+    */
+/**
      * Docker type for host devices extending the abstract docker type with scaling
      * factor and the device count.
-     */
+     *//*
+
     class DeviceType extends DockerType {
         int ScalingFactor;
         int AverageDeviceCount;
     }
 
-    /**
+    */
+/**
      * Name of a Docker container consisting of the name of the image and the version to use.
-     */
+     *//*
+
     class DockerName {
         String Name;
         String Version;
@@ -123,10 +136,12 @@ public class SettingsReader {
         }
     }
 
-    /**
+    */
+/**
      * Docker type for fog nodes with their respective dependencies and properties for
      * the placement algorithm.
-     */
+     *//*
+
     class FogType extends DockerType {
         int ID;
         int MaximumConnections;
@@ -134,3 +149,4 @@ public class SettingsReader {
         int[] Dependencies;
     }
 }
+*/
