@@ -1,9 +1,6 @@
 package emufog.settings;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
+import com.google.gson.*;
 import emufog.nodes.DeviceNode;
 
 import java.lang.reflect.Type;
@@ -11,6 +8,16 @@ import java.lang.reflect.Type;
 public class DeviceNodeDeserializer implements JsonDeserializer<DeviceNode>{
     @Override
     public DeviceNode deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        return null;
+
+        final JsonObject jsonObject = json.getAsJsonObject();
+
+        final
+
+        final DeviceNode deviceNode = new DeviceNode(
+
+        )
+
+
+        return deviceNode;
     }
 }

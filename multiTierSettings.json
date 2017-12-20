@@ -1,17 +1,14 @@
 {
-  "BaseSettings": {
-      "BaseAddress": "10.0.0.0",
-      "OverWriteOutputFile": true,
-      "MaxFogNodes": 100,
-      "CostThreshold": 6,
-      "HostDeviceLatency": 0,
-      "HostDeviceBandwidth": 1000,
-      "ThreadCount": 1,
-      "ParalleledFogBuilding": false
-    },
+  "BaseAddress": "10.0.0.0",
+  "OverWriteOutputFile": true,
+  "MaxFogNodes": 100,
+  "CostThreshold": 6,
+  "HostDeviceLatency": 0,
+  "HostDeviceBandwidth": 1000,
+  "ThreadCount": 1,
+  "ParalleledFogBuilding": false,
 
-  "ResourceSettings":{
-
+  "ResourceSettings": {
   },
 
   "DeviceNodes": [
@@ -50,6 +47,4 @@
       }
     }
   ]
-
-
 }

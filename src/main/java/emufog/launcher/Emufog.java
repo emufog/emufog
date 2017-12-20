@@ -1,10 +1,6 @@
 package emufog.launcher;
 
-import java.io.IOException;
-import java.nio.file.Paths;
-
 import com.beust.jcommander.JCommander;
-
 import emufog.backbone.BackboneClassifier;
 import emufog.docker.FogType;
 import emufog.export.CoupledMaxiNetExporter;
@@ -19,10 +15,12 @@ import emufog.reader.BriteFormatReader;
 import emufog.reader.CaidaFormatReader;
 import emufog.reader.GraphReader;
 import emufog.settings.Settings;
-import emufog.settings.SettingsReader;
 import emufog.util.Logger;
 import emufog.util.LoggerLevel;
 import emufog.util.Tuple;
+
+import java.io.IOException;
+import java.nio.file.Paths;
 
 /**
  * The EmuFog main launcher class. Starts a new instance of the application with the given parameters
@@ -48,8 +46,7 @@ public class Emufog {
             // parse the command line arguments
             JCommander.newBuilder().addObject(arguments).build().parse(args);
 
-            // read in the settings file
-            Settings settings = SettingsReader.read(arguments.settingsPath, arguments.imagesPath);
+            Settings settings = new Settings().read(arguments.settingsPath);
 
             // determines the respective format reader
             GraphReader reader = getReader(arguments.inputType, settings);
