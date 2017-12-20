@@ -1,0 +1,17 @@
+{
+  "Applications": [
+    {
+      "Name": "serviceA",
+      "ApplicationType": ""
+      "Image": {
+        "Name": "ubuntu",
+        "Version": "latest"
+      },
+      ""
+
+    },
+    {
+      "Name": "serviceB"
+    }
+  ]
+}

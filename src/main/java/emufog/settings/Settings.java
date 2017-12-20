@@ -49,12 +49,14 @@ public class Settings {
 
 	public final List<String> deviceImages;
 
+
     /**
      * Creates a new instance of the Settings class using the JSON object.
-     *
-     * @param json JSON object containing the required information
+     * @param json
+     * @param imageFile
      */
     Settings(SettingsReader.JSONSettings json, SettingsReader.JSONImages imageFile) {
+
         baseAddress = json.BaseAddress;
         overwriteExperimentFile = json.OverWriteOutputFile;
         maxFogNodes = json.MaxFogNodes;
@@ -94,11 +96,3 @@ public class Settings {
         }
     }
 }
-
-/*
-TODO
-
-Why differentiate between fog and device Images?
-
-
- */

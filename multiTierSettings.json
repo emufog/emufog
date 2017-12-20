@@ -1,0 +1,55 @@
+{
+  "BaseSettings": {
+      "BaseAddress": "10.0.0.0",
+      "OverWriteOutputFile": true,
+      "MaxFogNodes": 100,
+      "CostThreshold": 6,
+      "HostDeviceLatency": 0,
+      "HostDeviceBandwidth": 1000,
+      "ThreadCount": 1,
+      "ParalleledFogBuilding": false
+    },
+
+  "ResourceSettings":{
+
+  },
+
+  "DeviceNodes": [
+    {
+      "ScalingFactor": 1,
+      "AverageDeviceCount": 1,
+      "MemoryLimit": 524288000,
+      "CPUShare": 1
+    }
+  ],
+
+  "FogNodes": [
+    {
+      "ID": 1,
+      "MaximumConnections": 1,
+      "Costs": 1,
+      "MemoryLimit": 1048576000,
+      "CPUShare": 1
+    },
+    {
+      "ID": 2,
+      "MaximumConnections": 5,
+      "Costs": 2.5,
+      "MemoryLimit": 1048576000,
+      "CPUShare": 1.5
+    }
+  ],
+
+  "Applications": [
+    {
+      "Name": "serviceA",
+      "ApplicationType": "",
+      "Image": {
+        "Name": "ubuntu",
+        "Version": "latest"
+      }
+    }
+  ]
+
+
+}

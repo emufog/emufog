@@ -3,6 +3,9 @@ package emufog.container;
 
 public abstract class Container {
 
-    abstract void setImageSpecifications();
-     abstract void setRuntimeSpecifications();
+    public abstract void image(String img);
+
+    public abstract void memoryLimit(int memoryLimit);
+
+    public abstract void cpuShare(float cpuShare);
 }

@@ -1,18 +1,12 @@
 package emufog.images;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
-import emufog.docker.DeviceType;
 import emufog.docker.DockerType;
 import emufog.docker.FogType;
 import emufog.graph.Graph;
 import emufog.graph.Node;
 import emufog.settings.Settings;
+
+import java.util.*;
 
 public class RandomImageAssignmentPolicy implements IApplicationImageAssignmentPolicy {
 

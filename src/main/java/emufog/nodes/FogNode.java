@@ -6,7 +6,7 @@ import java.util.List;
 
 public class FogNode extends Node {
 
-    private int maxClients;
+    private int maximumConnections;
     private double costs;
 
     private List<Application> applications;
@@ -16,13 +16,13 @@ public class FogNode extends Node {
      *
      * @param memoryLimit
      * @param cpuShare
-     * @param maxClients
+     * @param maximumConnections
      * @param costs
      */
 
-    public FogNode(int memoryLimit, int cpuShare, int maxClients, double costs) {
+    public FogNode(int memoryLimit, int cpuShare, int maximumConnections, double costs) {
         super(memoryLimit, cpuShare);
-        this.maxClients = maxClients;
+        this.maximumConnections = maximumConnections;
         this.costs = costs;
     }
 
