@@ -1,11 +1,11 @@
 package emufog.placement;
 
-import emufog.graph.Graph;
+import emufog.topology.Topology;
 
 public class MultiTierEdgeIdentifier extends EdgeIdentifier{
 
     @Override
-    public Graph identifyEdge(Graph graph) {
-        return graph;
+    public Topology identifyEdge(Topology topology, float delay, float bandwidth) {
+        return null;
     }
 }
