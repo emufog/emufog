@@ -48,6 +48,7 @@ public class Emufog {
 
             Settings settings = new Settings().read(arguments.settingsPath);
 
+
             // determines the respective format reader
             GraphReader reader = getReader(arguments.inputType, settings);
 

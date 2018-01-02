@@ -42,8 +42,8 @@ public class FogNodeClassifier {
         }
 
         fogTypes = settings.fogNodeTypes;
-        remainingNodes = new AtomicInteger(settings.maxFogNodes);
-        threshold = settings.costThreshold;
+        remainingNodes = new AtomicInteger(settings.getMaxFogNodes());
+        threshold = settings.getCostThreshold();
     }
 
     /**
@@ -65,7 +65,7 @@ public class FogNodeClassifier {
         // init result object to
         FogResult result = new FogResult();
 
-        ExecutorService pool = Executors.newFixedThreadPool(graph.getSettings().threadCount);
+        ExecutorService pool = Executors.newFixedThreadPool(graph.getSettings().getThreadCount());
 
         Collection<AS> ASs = graph.getSystems();
         Tuple<AS, Future<FogResult>>[] workers = new Tuple[ASs.size()];

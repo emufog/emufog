@@ -18,7 +18,7 @@ public class UniqueIPProvider {
      * @param settings settings for the subnet
      */
     UniqueIPProvider(Settings settings) {
-        lastIP = settings.baseAddress;
+        lastIP = settings.getBaseAddress();
     }
 
     /**
