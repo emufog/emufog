@@ -40,11 +40,21 @@
   "Applications": [
     {
       "Name": "serviceA",
-      "ApplicationType": "",
-      "Image": {
-        "Name": "ubuntu",
-        "Version": "latest"
-      }
+      "ApplicationType": "FOG_APPLICATION",
+      "Image": "ubuntu",
+      "ImageVersion": "latest"
+    },
+    {
+      "Name": "serviceB",
+      "ApplicationType": "FOG_APPLICATION",
+      "Image": "ubuntu",
+      "ImageVersion": "latest"
+    },
+    {
+      "Name": "serviceC",
+      "ApplicationType": "DEVICE_APPLICATION",
+      "Image": "ubuntu",
+      "ImageVersion": "latest"
     }
   ]
 }
