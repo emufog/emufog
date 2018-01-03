@@ -35,7 +35,7 @@ public class CoupledMaxiNetExporter extends MaxiNetExporter {
         // check if file exists and can be overwritten
         Settings settings = graph.getSettings();
         File file = path.toFile();
-        if (!settings.overwriteExperimentFile && file.exists()) {
+        if (!settings.isOverwriteExperimentFile() && file.exists()) {
             throw new IllegalArgumentException("The given file already exist. Please provide a valid path");
         }
 
@@ -61,7 +61,7 @@ public class CoupledMaxiNetExporter extends MaxiNetExporter {
         setupExperiment();
 
         // set the overwrite option if feature is set in the settings file
-        StandardOpenOption overwrite = settings.overwriteExperimentFile
+        StandardOpenOption overwrite = settings.isOverwriteExperimentFile()
                 ? StandardOpenOption.TRUNCATE_EXISTING : StandardOpenOption.APPEND;
         // write output in UTF-8 to the specified file
         Files.write(file.toPath(), lines, StandardCharsets.UTF_8, StandardOpenOption.CREATE, overwrite);
