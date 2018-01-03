@@ -3,11 +3,11 @@ package emufog.placement;
 import emufog.application.Application;
 import emufog.nodes.FogNode;
 import emufog.settings.Settings;
-import emufog.topology.Topology;
+import emufog.topology.Graph;
 
 public abstract class FogLayout {
 
-    public abstract Topology createFogLayout(Topology topology, Settings settings, FogNode[] fogNodes);
+    public abstract Graph createFogLayout(Graph topology, Settings settings, FogNode[] fogNodes);
 
     public abstract void applicationMapping(Application[] applications);
 

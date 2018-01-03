@@ -1,4 +1,4 @@
 package emufog.topology;
 
-public class Topology {
+public class Graph {
 }

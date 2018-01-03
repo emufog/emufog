@@ -46,7 +46,7 @@ public class BackboneClassifier {
         Collection<AS> ASs = graph.getSystems();
         Tuple<AS, Future<?>>[] workers = new Tuple[ASs.size()];
 
-        ExecutorService pool = newFixedThreadPool(graph.getSettings().threadCount);
+        ExecutorService pool = newFixedThreadPool(graph.getSettings().getThreadCount());
         int count = 0;
         for (AS as : ASs) {
             BackboneWorker worker = new BackboneWorker(as);
