@@ -11,18 +11,18 @@ import java.util.List;
  */
 class Arguments {
 
-    @Parameter(names = {"-Settings", "-s"}, description = "settings file to use")
+    @Parameter(names = {"--settings", "-s"}, description = "settings file to use")
     Path settingsPath;
-    
-    @Parameter(names = {"-Images", "-i"}, description = "file with list of images to use")
-    Path imagesPath;
 
-    @Parameter(names = {"-Type", "-t"}, description = "input format to read in")
+    @Parameter(names = {"--type", "-t"}, description = "input format to read in")
     String inputType;
 
-    @Parameter(names = {"-Output", "-o"}, description = "path to the output file")
+    @Parameter(names = {"--output", "-o"}, description = "path to the output file")
     String output;
 
-    @Parameter(names = {"-File", "-f"}, description = "files to read in")
+    @Parameter(names = {"--fogLayout", "-l"}, description = "selector for desired fog layout type")
+    String fogLayout;
+
+    @Parameter(names = {"--file", "-f"}, description = "files to read in")
     List<Path> files = new ArrayList<>();
 }
