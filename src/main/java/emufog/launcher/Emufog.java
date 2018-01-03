@@ -11,8 +11,6 @@ import emufog.graph.Graph;
 import emufog.graph.Node;
 import emufog.images.IApplicationImageAssignmentPolicy;
 import emufog.images.MongoCaseAssignmentPolicy;
-import emufog.reader.BriteFormatReader;
-import emufog.reader.CaidaFormatReader;
 import emufog.reader.GraphReader;
 import emufog.settings.Settings;
 import emufog.util.Logger;
@@ -21,6 +19,8 @@ import emufog.util.Tuple;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+
+import static emufog.launcher.ArgumentHelpers.getReader;
 
 /**
  * The EmuFog main launcher class. Starts a new instance of the application with the given parameters
@@ -46,8 +46,9 @@ public class Emufog {
             // parse the command line arguments
             JCommander.newBuilder().addObject(arguments).build().parse(args);
 
-            Settings settings = new Settings().read(arguments.settingsPath);
 
+
+            Settings settings = new Settings().read(arguments.settingsPath);
 
             // determines the respective format reader
             GraphReader reader = getReader(arguments.inputType, settings);
@@ -100,25 +101,4 @@ public class Emufog {
         }
     }
 
-    /**
-     * Returns the reader matching the given type from the command line.
-     *
-     * @param type     topology type to read in
-     * @param settings settings object to use for the reader
-     * @return graph reader matching the type or null if not found
-     */
-    private static GraphReader getReader(String type, Settings settings) {
-        GraphReader reader = null;
-
-        switch (type.toLowerCase()) {
-            case "brite":
-                reader = new BriteFormatReader(settings);
-                break;
-            case "caida":
-                reader = new CaidaFormatReader(settings);
-                break;
-        }
-
-        return reader;
-    }
 }
