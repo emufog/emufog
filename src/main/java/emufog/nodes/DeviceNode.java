@@ -4,7 +4,7 @@ import emufog.application.Application;
 
 import java.util.List;
 
-public class DeviceNode extends Node{
+public class DeviceNode extends ApplicationNode {
 
     private int scalingFactor;
     private float averageDeviceCount;

@@ -13,24 +13,20 @@ public class Graph {
     public static Graph readInputGraph(GraphReader reader, List<Path> paths){ return null;}
 
     public static Graph identifyEdge(EdgeIdentifier edgeIdentifier, Graph graph) throws EdgeError{
-        return null;
+
+        return graph;
     }
 
     public static Graph createFogLayout(FogLayout fogLayout, Graph graph){
-        return null;
+        return graph;
     }
 
-    public Graph assignApplications(){
-        return null;
+    public static Graph assignApplications(Graph graph){
+        return graph;
     }
 
     private Graph identifyBackbone(){
         return null;
     }
-
-    private Graph assignEdgeDevices(){
-        return null;
-    }
-
 
 }

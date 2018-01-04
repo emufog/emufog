@@ -3,7 +3,6 @@ package emufog.launcher;
 import com.beust.jcommander.JCommander;
 import emufog.backbone.BackboneClassifier;
 import emufog.docker.FogType;
-import emufog.exceptions.EdgeError;
 import emufog.export.CoupledMaxiNetExporter;
 import emufog.export.IGraphExporter;
 import emufog.fog.FogNodeClassifier;
@@ -18,16 +17,10 @@ import emufog.util.Logger;
 import emufog.util.LoggerLevel;
 import emufog.util.Tuple;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Paths;
 
-import static emufog.launcher.ArgumentHelpers.getEdgeIdentifierStrategy;
-import static emufog.launcher.ArgumentHelpers.getFogLayoutStrategy;
 import static emufog.launcher.ArgumentHelpers.getReader;
-import static emufog.topology.Graph.createFogLayout;
-import static emufog.topology.Graph.identifyEdge;
-import static emufog.topology.Graph.readInputGraph;
 
 /**
  * The EmuFog main launcher class. Starts a new instance of the application with the given parameters
@@ -47,34 +40,7 @@ public class Emufog {
         logger.log("Welcome to EmuFog");
         logger.logSeparator();
         Arguments arguments = new Arguments();
-        Arguments arg = new Arguments();
         Graph graph;
-
-
-        try{
-            JCommander.newBuilder().addObject(arg).build().parse(args);
-
-            Settings s = new Settings().read(arg.settingsPath);
-
-            emufog.topology.Graph g = readInputGraph(getReader(arguments.inputType, s), arg.files);
-
-            try {
-               g = identifyEdge(getEdgeIdentifierStrategy(s),g);
-            } catch (EdgeError edgeError) {
-                edgeError.printStackTrace();
-            } finally {
-
-            }
-
-            try {
-                createFogLayout(getFogLayoutStrategy(arg.fogLayout), g);
-            }
-
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
 
         try {
             // parse the command line arguments

@@ -120,7 +120,7 @@ public class FogNodeClassifier {
      * @return worker class according to settings
      */
     private Worker getWorker(AS as, Settings settings) {
-        if (settings.fogGraphParallel) {
+        if (settings.isFogGraphParallel()) {
             return new ParallelFogWorker(as, this);
         } else {
             return new SequentialFogWorker(as, this);

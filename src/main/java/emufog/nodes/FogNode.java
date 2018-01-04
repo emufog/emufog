@@ -4,7 +4,7 @@ import emufog.application.Application;
 
 import java.util.List;
 
-public class FogNode extends Node {
+public class FogNode extends ApplicationNode {
 
     private int maximumConnections;
     private double costs;
