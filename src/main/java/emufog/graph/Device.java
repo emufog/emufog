@@ -24,7 +24,7 @@ public class Device extends Node{
 
     @Override
     public String getName() {
-        return "d: " + id;
+        return "d: " + getID();
     }
 
     public DeviceNodeConfiguration getConfiguration() {

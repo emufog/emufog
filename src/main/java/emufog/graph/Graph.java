@@ -259,7 +259,7 @@ public class Graph {
      * @param id identifier of the host device
      * @return host device with the given ID
      */
-    public HostDevice getHostDevice(int id) {
+    public Device getDevice(int id) {
         return nodes.containsKey(id) ? getASforNode(id).getDevice(id) : null;
     }
 
@@ -307,8 +307,8 @@ public class Graph {
      *
      * @return host devices of the graph
      */
-    public Collection<HostDevice> getHostDevices() {
-        List<HostDevice> devices = new ArrayList<>();
+    public Collection<Device> getHostDevices() {
+        List<Device> devices = new ArrayList<>();
 
         for (AS as : systems.values()) {
             devices.addAll(as.getDevices());

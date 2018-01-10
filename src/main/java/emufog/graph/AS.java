@@ -23,7 +23,7 @@ public class AS {
     private final Map<Integer, Switch> switches;
 
     /* mapping of devices in the autonomous system */
-    private final Map<Integer, HostDevice> devices;
+    private final Map<Integer, Device> devices;
 
     /**
      * Creates a new instance
@@ -89,7 +89,7 @@ public class AS {
      * @param id the device's ID
      * @return node object or null if not found
      */
-    HostDevice getDevice(int id) {
+    Device getDevice(int id) {
         return devices.get(id);
     }
 
@@ -116,7 +116,7 @@ public class AS {
      *
      * @return devices of the AS
      */
-    public Collection<HostDevice> getDevices() {
+    public Collection<Device> getDevices() {
         return devices.values();
     }
 
@@ -126,7 +126,7 @@ public class AS {
      * @param r router to add
      */
     void addRouter(Router r) {
-        routers.put(r.id, r);
+        routers.put(r.getID(), r);
     }
 
     /**
@@ -135,7 +135,7 @@ public class AS {
      * @param s switch to add
      */
     void addSwitch(Switch s) {
-        switches.put(s.id, s);
+        switches.put(s.getID(), s);
     }
 
     /**
@@ -143,8 +143,8 @@ public class AS {
      *
      * @param d device to add
      */
-    void addDevice(HostDevice d) {
-        devices.put(d.id, d);
+    void addDevice(Device d) {
+        devices.put(d.getID(), d);
     }
 
     /**
@@ -154,13 +154,13 @@ public class AS {
      * @return true if node could be deleted, false if not
      */
     boolean removeNode(Node node) {
-        boolean result = routers.remove(node.id) != null;
+        boolean result = routers.remove(node.getID()) != null;
 
         if (!result) {
-            result = switches.remove(node.id) != null;
+            result = switches.remove(node.getID()) != null;
         }
         if (!result) {
-            result = devices.remove(node.id) != null;
+            result = devices.remove(node.getID()) != null;
         }
 
         return result;

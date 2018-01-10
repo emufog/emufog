@@ -1,6 +1,5 @@
 package emufog.graph;
 
-import emufog.docker.DeviceType;
 import emufog.settings.Settings;
 import emufog.util.LoggerLevel;
 
@@ -61,7 +60,7 @@ public class CoordinateGraph extends Graph {
         return createSwitch(id, as);
     }
 
-    /**
+/*    *//**
      * Creates a new host device in the graph.
      *
      * @param id    unique identifier
@@ -71,13 +70,13 @@ public class CoordinateGraph extends Graph {
      * @param image docker image to use for the host device
      * @return the newly created host device
      * @throws IllegalArgumentException if the id already in use or the image object is null
-     */
+     *//*
     public HostDevice createHostDevice(int id, int as, float xPos, float yPos, DeviceType image)
             throws IllegalArgumentException {
         coordinates.put(id, new NodeCoordinates(xPos, yPos));
 
         return createHostDevice(id, as, image);
-    }
+    }*/
 
     /**
      * Creates a new edge using a latency calculator by using the coordinates passed initially.

@@ -1,6 +1,7 @@
 package emufog.placement;
 
 import emufog.application.Application;
+import emufog.graph.FogNode;
 import emufog.settings.Settings;
 import emufog.topology.Graph;
 
