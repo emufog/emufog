@@ -46,6 +46,10 @@ public class Topology {
         return topology.edges();
     }
 
+    private Topology(TopologyBuilder builder){
+
+    }
+
     public final MutableNetwork<Node, Link> build(){
 
         identifyEdge();
@@ -66,7 +70,7 @@ public class Topology {
 
         topology = NetworkBuilder.undirected().allowsParallelEdges(true).build();
 
-        reader.read();
+
 
 
     }
@@ -80,4 +84,22 @@ public class Topology {
 
     private void assignApplications(){}
 
+    public static class TopologyBuilder{
+
+        public Topology build(){
+
+            return new Topology(this);
+        }
+
+        private void setup(){}
+
+        private void read(){}
+
+        private void identifyEdge(){}
+
+        private void placeFogNodes(){}
+
+        private void assignApplications(){}
+
+    }
 }
