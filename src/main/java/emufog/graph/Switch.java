@@ -18,11 +18,11 @@ public class Switch extends Node {
 
     @Override
     void addToAS() {
-        as.addSwitch(this);
+        getAS().addSwitch(this);
     }
 
     @Override
     public String getName() {
-        return "s" + id;
+        return "s" + getID();
     }
 }

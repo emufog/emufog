@@ -7,12 +7,12 @@ public class SwitchConverter extends NodeConverter {
 
     @Override
     protected Node createNewNode(Node node) {
-        return new Switch(node.id, node.as);
+        return new Switch(node.getID(), node.getAS());
     }
 
     @Override
     protected void addNodeToGraph(Node newNode) {
-        newNode.as.addSwitch((Switch) newNode);
+        newNode.getAS().addSwitch((Switch) newNode);
     }
 
     @Override

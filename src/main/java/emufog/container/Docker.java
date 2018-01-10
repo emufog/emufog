@@ -38,14 +38,6 @@ public class Docker extends Container{
         this.cpuShare = cpuShare;
     }
 
-    public void setMemoryLimit(int memoryLimit) {
-        this.memoryLimit = memoryLimit;
-    }
-
-    public void setCpuShare(float cpuShare) {
-        this.cpuShare = cpuShare;
-    }
-
     public void setContainerName(String containerName) {
         this.containerName = containerName;
     }
@@ -56,14 +48,6 @@ public class Docker extends Container{
 
     public void setEnvironment(List<String> environment) {
         this.environment = environment;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public void setImageVersion(String imageVersion) {
-        this.imageVersion = imageVersion;
     }
 
     public void setLabels(List<String> labels) {

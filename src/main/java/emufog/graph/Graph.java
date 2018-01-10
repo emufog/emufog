@@ -199,7 +199,7 @@ public class Graph {
 
                 for(int i = 0; i < count; ++i){
                     Device d = new Device(nodeIDprovider.getNextID(), r.getAS() , type);
-                    createEdge(edgeIDprovider.getNextID(), r , d, settings.getEdgeDeviceDelay(), settings.getEdgeDeviceBandwidth())
+                    createEdge(edgeIDprovider.getNextID(), r , d, settings.getEdgeDeviceDelay(), settings.getEdgeDeviceBandwidth());
                 }
             }
 
@@ -227,6 +227,9 @@ public class Graph {
 
         node.emulationSettings = new EmulationSettings(IPprovider.getNextIPV4Address(), type);
     }
+
+
+
 
 
     /**

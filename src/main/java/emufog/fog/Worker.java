@@ -2,6 +2,7 @@ package emufog.fog;
 
 import emufog.docker.FogType;
 import emufog.graph.*;
+import emufog.nodeconfig.FogNodeType;
 import emufog.util.Logger;
 import emufog.util.LoggerLevel;
 import emufog.util.Tuple;
@@ -18,13 +19,13 @@ abstract class Worker implements Callable<FogResult> {
     /* AS associated for this worker */
     private final AS as;
 
-    /* master classifier class synchronizing the remaining nodeconfig to place */
+    /* master classifier class synchronizing the remaining nodes to place */
     private final FogNodeClassifier classifier;
 
     /* logger for advanced logging */
     private final Logger logger;
 
-    /* mapping of fog types to all nodeconfig with this type */
+    /* mapping of fog types to all nodes with this type */
     private final Map<FogType, List<FogNode>> fogPlacements;
 
     /**
@@ -111,7 +112,7 @@ abstract class Worker implements Callable<FogResult> {
                     Node neighbor = e.getDestinationForSource(current.oldNode);
 
                     // ignore host devices as they are not considered to be possible nodeconfig
-                    if (!(neighbor instanceof HostDevice)) {
+                    if (!(neighbor instanceof Device)) {
                         float nextCosts = currentCosts + calculateCosts(e);
                         if (nextCosts <= threshold) {
                             FogNode neighborNode = g.getNode(neighbor);
@@ -143,12 +144,12 @@ abstract class Worker implements Callable<FogResult> {
      * @throws Exception
      */
     private FogLevel getFirstLevel() throws Exception {
-        List<FogType> remainingTypes = new ArrayList<>(classifier.fogTypes);
+        List<FogNodeType> remainingTypes = classifier.getFogTypes();
         Map<FogType, FogLevel> levelMap = new HashMap<>();
 
         // build first level
         List<FogType> startLevel = new ArrayList<>();
-        for (FogType type : remainingTypes) {
+        for (FogNodeType type : remainingTypes) {
             if (!type.hasDependencies()) {
                 startLevel.add(type);
             }
@@ -164,7 +165,7 @@ abstract class Worker implements Callable<FogResult> {
         while (!remainingTypes.isEmpty()) {
             List<FogType> possibleNextLevels = new ArrayList<>();
 
-            for (FogType type : remainingTypes) {
+            for (FogNodeType type : remainingTypes) {
 
                 boolean valid = true;
                 for (int i = 0; i < type.dependencies.size() && valid; ++i) {

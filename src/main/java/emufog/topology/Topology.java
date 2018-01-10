@@ -1,83 +1,83 @@
 package emufog.topology;
 
-import com.google.common.graph.AbstractNetwork;
-import com.google.common.graph.ElementOrder;
-import com.google.common.graph.EndpointPair;
+import com.google.common.graph.MutableNetwork;
+import com.google.common.graph.NetworkBuilder;
+import emufog.reader.BriteReader;
+import emufog.reader.ITopologyReader;
+import emufog.settings.Settings;
 
 import java.util.Set;
 
-public abstract class Topology extends AbstractNetwork {
+import static com.google.common.base.Preconditions.checkNotNull;
 
+public class Topology {
 
+    private MutableNetwork<Node,Link> topology;
 
+    private static Settings settings;
 
-    @Override
-    public Set nodes() {
-        return null;
+    private void addNode(Node node){
+        topology.addNode(node);
     }
 
-    @Override
-    public Set edges() {
-        return null;
+    private void removeNode(Node node) {topology.removeNode(node);}
+
+    private void addLink(Node nodeU, Node nodeV, Link link){
+        topology.addEdge(nodeU,nodeV,link);
     }
 
-    @Override
-    public boolean isDirected() {
-        return false;
+    private void removeLink(Link link){ topology.removeEdge(link);}
+
+    private void addFogNode(FogNode fogNode){
+        topology.addNode(fogNode);
     }
 
-    @Override
-    public boolean allowsParallelEdges() {
-        return false;
+    private void addDeviceNode(Device device){
+        topology.addNode(device);
     }
 
-    @Override
-    public boolean allowsSelfLoops() {
-        return false;
+    private void addRouter(Router router){
+        topology.addNode(router);
     }
 
-    @Override
-    public ElementOrder nodeOrder() {
-        return null;
+    public Set<Node> nodes(){ return topology.nodes(); }
+
+    public Set<Link> links(){
+        return topology.edges();
     }
 
-    @Override
-    public ElementOrder edgeOrder() {
-        return null;
+    public final MutableNetwork<Node, Link> build(){
+
+        identifyEdge();
+        placeFogNodes();
+        assignApplications();
+
+        return topology;
+    };
+
+
+    public void setup(Settings settings){
+        this.settings = checkNotNull(settings);
     }
 
-    @Override
-    public Set adjacentNodes(Object node) {
-        return null;
+    public void read(){
+
+        ITopologyReader reader = new BriteReader();
+
+        topology = NetworkBuilder.undirected().allowsParallelEdges(true).build();
+
+        reader.read();
+
+
     }
 
-    @Override
-    public Set predecessors(Object node) {
-        return null;
+    private void identifyEdge(){
+
+
     }
 
-    @Override
-    public Set successors(Object node) {
-        return null;
-    }
+    private void placeFogNodes(){}
 
-    @Override
-    public Set incidentEdges(Object node) {
-        return null;
-    }
+    private void assignApplications(){}
 
-    @Override
-    public Set inEdges(Object node) {
-        return null;
-    }
-
-    @Override
-    public Set outEdges(Object node) {
-        return null;
-    }
-
-    @Override
-    public EndpointPair incidentNodes(Object edge) {
-        return null;
-    }
 }

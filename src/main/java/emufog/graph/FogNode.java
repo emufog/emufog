@@ -23,6 +23,6 @@ public class FogNode extends Node{
 
     @Override
     public String getName() {
-        return "fn: " + id;
+        return "fn: " + getID();
     }
 }

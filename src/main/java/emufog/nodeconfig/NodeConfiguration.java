@@ -17,4 +17,8 @@ public abstract class NodeConfiguration {
     public void setApplications(List<Application> applications) {
         this.applications = applications;
     }
+
+    public String getIP() {
+        return IP;
+    }
 }

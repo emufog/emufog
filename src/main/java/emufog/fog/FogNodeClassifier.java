@@ -127,11 +127,16 @@ public class FogNodeClassifier {
         }
     }
 
+    public List<FogNodeType> getFogTypes() {
+        return fogTypes;
+    }
+
     /**
      * Indicates if there are still fog nodeconfig to place available.
      *
      * @return true if there are, none if 0
      */
+
     boolean fogNodesLeft() {
         return remainingNodes.get() > 0;
     }
