@@ -2,8 +2,6 @@ package emufog.settings;
 
 import com.google.gson.*;
 import emufog.application.Application;
-import emufog.nodes.DeviceNode;
-import emufog.nodes.FogNode;
 
 import java.lang.reflect.Type;
 
@@ -23,6 +21,7 @@ public class SettingsDeserializer implements JsonDeserializer<Settings> {
         settings.setThreadCount(jsonObject.get("ThreadCount").getAsInt());
         settings.setFogGraphParallel(jsonObject.get("ParalleledFogBuilding").getAsBoolean());
 
+        //TODO: Repair Device and Fog node deserializers.
 
         DeviceNode[] deviceNodes = context.deserialize(jsonObject.get("DeviceNodes"), DeviceNode[].class);
         FogNode[] fogNodes = context.deserialize(jsonObject.get("FogNodes"), FogNode[].class);

@@ -1,7 +1,6 @@
 package emufog.settings;
 
 import com.google.gson.*;
-import emufog.nodes.FogNode;
 
 import java.lang.reflect.Type;
 

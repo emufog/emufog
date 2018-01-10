@@ -3,8 +3,6 @@ package emufog.settings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import emufog.application.Application;
-import emufog.nodes.DeviceNode;
-import emufog.nodes.FogNode;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;

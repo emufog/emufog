@@ -13,6 +13,7 @@ repositories {
 dependencies {
     compile 'com.beust:jcommander:1.69'
     compile 'com.google.code.gson:gson:2.8.1'
+    compile 'com.google.guava:guava:23.6-jre'
 }
 
 version = '1.0'

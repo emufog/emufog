@@ -42,6 +42,7 @@ public class Emufog {
         Arguments arguments = new Arguments();
         Graph graph;
 
+
         try {
             // parse the command line arguments
             JCommander.newBuilder().addObject(arguments).build().parse(args);
