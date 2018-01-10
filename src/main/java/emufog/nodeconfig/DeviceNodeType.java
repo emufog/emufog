@@ -1,4 +1,4 @@
-package emufog.nodes;
+package emufog.nodeconfig;
 
 public class DeviceNodeType extends NodeType{
 
@@ -10,5 +10,13 @@ public class DeviceNodeType extends NodeType{
         super(memoryLimit, cpuShare);
         this.scalingFactor = scalingFactor;
         this.averageDeviceCount = averageDeviceCount;
+    }
+
+    public int getScalingFactor() {
+        return scalingFactor;
+    }
+
+    public float getAverageDeviceCount() {
+        return averageDeviceCount;
     }
 }

@@ -1,7 +1,7 @@
 package emufog.graph;
 
 /**
- * Coordinate structure to map nodes to their respective coordinates on the 2D plane.
+ * Coordinate structure to map nodeconfig to their respective coordinates on the 2D plane.
  */
 public class NodeCoordinates {
 

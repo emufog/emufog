@@ -22,9 +22,8 @@ public class Router extends Node {
 
     @Override
     void addToAS() {
-        as.addRouter(this);
+        getAS().addRouter(this);
     }
-
     /**
      * Returns indication whether this router has devices connected.
      *
@@ -55,6 +54,6 @@ public class Router extends Node {
 
     @Override
     public String getName() {
-        return "r" + id;
+        return "r" + getID();
     }
 }

@@ -18,7 +18,7 @@ class BackboneWorker implements Runnable {
     /* AS associated with this worker */
     private final AS as;
 
-    /* converter to mark backbone nodes */
+    /* converter to mark backbone nodeconfig */
     private final SwitchConverter converter;
 
     /**
@@ -54,7 +54,7 @@ class BackboneWorker implements Runnable {
     }
 
     /**
-     * Converts nodes with an above average degree to a backbone node.
+     * Converts nodeconfig with an above average degree to a backbone node.
      */
     private void convertHighDegrees() {
         float averageDegree = calculateAverageDegree() * BACKBONE_DEGREE_PERCENTAGE;
@@ -75,11 +75,11 @@ class BackboneWorker implements Runnable {
      * Creates a single connected backbone by using the Breadth-First-Algorithm.
      */
     private void buildSingleBackbone() {
-        // bit sets to check for visited nodes and nodes in the queue
+        // bit sets to check for visited nodeconfig and nodeconfig in the queue
         BitSet visited = new BitSet();
         BitSet seen = new BitSet();
         Queue<Node> queue = new ArrayDeque<>();
-        // map nodes to their respective predecessors
+        // map nodeconfig to their respective predecessors
         Map<Node, Node> predecessors = new HashMap<>();
 
         // start with any backbone node
@@ -129,7 +129,7 @@ class BackboneWorker implements Runnable {
     }
 
     /**
-     * Returns the average degree of the autonomous system based on the router and switch nodes.
+     * Returns the average degree of the autonomous system based on the router and switch nodeconfig.
      *
      * @return the average degree
      */

@@ -9,17 +9,15 @@ import java.util.Arrays;
 public abstract class Node {
 
     /* unique identifier of the node */
-    final int id;
+    private final int id;
 
     /* autonomous system this node belongs to */
-    final AS as;
+    private final AS as;
+
+    //TODO: Change list to set?
 
     /* list of edges associated with the node */
     Edge[] edges;
-
-    /* emulation settings for this node */
-    EmulationSettings emulationSettings;
-    
 
     /**
      * Creates a node of the graph with the initial parameter given.
@@ -38,24 +36,6 @@ public abstract class Node {
      * Adds this node to the respective AS.
      */
     abstract void addToAS();
-
-    /**
-     * Returns the emulation settings associated. If there are none returns null.
-     *
-     * @return emulation  settings or null
-     */
-    public EmulationSettings getEmulationNode() {
-        return emulationSettings;
-    }
-
-    /**
-     * Returns identification if this node can be emulated with existing settings.
-     *
-     * @return true if it can be emulated, false otherwise
-     */
-    public boolean hasEmulationSettings() {
-        return emulationSettings != null;
-    }
 
     /**
      * Returns the unique identifier of the node.
@@ -99,20 +79,6 @@ public abstract class Node {
     public AS getAS() {
         return as;
     }
-
-    public String getImage() {
-		if (this.hasEmulationSettings()) {
-    		return this.emulationSettings.dockerType.dockerImage;
-    	} else {
-    		return "None";
-    	}
-	}
-
-	public void setImage(String image) {
-		if (this.hasEmulationSettings()) {
-			this.emulationSettings.dockerType.dockerImage = image;
-		}
-	}
 
 	/**
      * Adds an edge to the array of edges associated with this node. Grows the array by one to add an edge.

@@ -56,7 +56,7 @@ public class FogResult {
     }
 
     /**
-     * Returns a list of mappings from nodes to their respective fog type.
+     * Returns a list of mappings from nodeconfig to their respective fog type.
      *
      * @return list of node to type mappings
      */
@@ -65,7 +65,7 @@ public class FogResult {
     }
 
     /**
-     * Clears the list of fog nodes currently stored in this object.
+     * Clears the list of fog nodeconfig currently stored in this object.
      */
     void clearFogNodes() {
         nodes.clear();

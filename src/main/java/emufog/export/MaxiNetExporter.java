@@ -50,7 +50,7 @@ public abstract class MaxiNetExporter implements IGraphExporter {
     abstract boolean validateGraph(Graph graph);
 
     /**
-     * Writes all docker host nodes of the graph to the output file.
+     * Writes all docker host nodeconfig of the graph to the output file.
      *
      * @param graph graph to export
      */
@@ -102,7 +102,7 @@ public abstract class MaxiNetExporter implements IGraphExporter {
     }
 
     /**
-     * Established the connections between two nodes based on the edges of the graph.
+     * Established the connections between two nodeconfig based on the edges of the graph.
      *
      * @param graph graph to export
      */
@@ -122,7 +122,7 @@ public abstract class MaxiNetExporter implements IGraphExporter {
     }
 
     /**
-     * Adds a new link between two nodes to the document.
+     * Adds a new link between two nodeconfig to the document.
      *
      * @param source      source of the link
      * @param destination destination of the link

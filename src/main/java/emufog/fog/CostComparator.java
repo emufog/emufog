@@ -3,7 +3,7 @@ package emufog.fog;
 import java.util.Comparator;
 
 /**
- * The cost comparator compares fog nodes based on their associated costs for a given edge node.
+ * The cost comparator compares fog nodeconfig based on their associated costs for a given edge node.
  */
 class CostComparator implements Comparator<FogNode> {
 
@@ -11,7 +11,7 @@ class CostComparator implements Comparator<FogNode> {
     private final EdgeNode edge;
 
     /**
-     * Creates a new comparator to compare fog nodes based on their cost from the given edge.
+     * Creates a new comparator to compare fog nodeconfig based on their cost from the given edge.
      *
      * @param edge edge node to sort for
      */

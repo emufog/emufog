@@ -101,7 +101,7 @@ public class SettingsReader {
 
     */
 /**
-     * Abstract docker type class for host devices and fog nodes.
+     * Abstract docker type class for host devices and fog nodeconfig.
      *//*
 
     abstract class DockerType {
@@ -138,7 +138,7 @@ public class SettingsReader {
 
     */
 /**
-     * Docker type for fog nodes with their respective dependencies and properties for
+     * Docker type for fog nodeconfig with their respective dependencies and properties for
      * the placement algorithm.
      *//*
 

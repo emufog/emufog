@@ -50,7 +50,7 @@ public class CaidaFormatReader extends GraphReader {
     /* charset to read in the caida files */
     private final Charset charset;
 
-    /* mapping from ID's to coordinates of the nodes */
+    /* mapping from ID's to coordinates of the nodeconfig */
     private Map<Integer, Coordinates> nodeCoordinates;
 
     /**
@@ -67,13 +67,13 @@ public class CaidaFormatReader extends GraphReader {
 
     @Override
     public Graph readGraph(List<Path> files) throws IOException, IllegalArgumentException {
-        Path nodesFile = getPathForEnding(files, ".nodes.geo");
+        Path nodesFile = getPathForEnding(files, ".nodeconfig.geo");
         if (nodesFile == null) {
-            throw new IllegalArgumentException("The given files do not contain a .nodes.geo file.");
+            throw new IllegalArgumentException("The given files do not contain a .nodeconfig.geo file.");
         }
-        Path asFile = getPathForEnding(files, ".nodes.as");
+        Path asFile = getPathForEnding(files, ".nodeconfig.as");
         if (asFile == null) {
-            throw new IllegalArgumentException("The given files do not contain a .nodes.as file.");
+            throw new IllegalArgumentException("The given files do not contain a .nodeconfig.as file.");
         }
         Path linkFile = getPathForEnding(files, ".links");
         if (linkFile == null) {
@@ -99,7 +99,7 @@ public class CaidaFormatReader extends GraphReader {
         CoordinateGraph graph = new CoordinateGraph(settings);
         ILatencyCalculator calculator = new CaidaLatencyCalculator();
 
-        // read in the nodes
+        // read in the nodeconfig
         try (Stream<String> lines = Files.lines(nodesFile, charset)) {
             lines.forEach(this::processNodeLine);
         }
@@ -130,8 +130,8 @@ public class CaidaFormatReader extends GraphReader {
         logger.log("ID out of Integer range: " + idOutOfRange, LoggerLevel.ADVANCED);
         logger.log("AS out of Integer range: " + asOutOfRange, LoggerLevel.ADVANCED);
         logger.log("Coordinates out of Float range: " + coordinatesOutOfRange, LoggerLevel.ADVANCED);
-        logger.log("Number of times no nodes were found to assign an AS: " + noNodeFoundForAS, LoggerLevel.ADVANCED);
-        logger.log("Number of times no nodes were found to build an edge: " + noNodeFoundForEdge, LoggerLevel.ADVANCED);
+        logger.log("Number of times no nodeconfig were found to assign an AS: " + noNodeFoundForAS, LoggerLevel.ADVANCED);
+        logger.log("Number of times no nodeconfig were found to build an edge: " + noNodeFoundForEdge, LoggerLevel.ADVANCED);
         logger.log("Nodes read without an AS: " + nodeCoordinates.size(), LoggerLevel.ADVANCED);
         logger.logSeparator();
         logger.log("Number of node lines skipped: " + nodeLineSkipped, LoggerLevel.ADVANCED);
@@ -207,7 +207,7 @@ public class CaidaFormatReader extends GraphReader {
     /**
      * Adapts the AS field of the node identified in the current line.
      *
-     * @param graph graph to modify the nodes from
+     * @param graph graph to modify the nodeconfig from
      * @param line  current line to process
      */
     private void processASLine(CoordinateGraph graph, String line) {

@@ -27,9 +27,9 @@ public class BriteFormatReader extends GraphReader {
     }
 
     /**
-     * Reads in all the nodes from the BRITE file and adds them to the given graph.
+     * Reads in all the nodeconfig from the BRITE file and adds them to the given graph.
      *
-     * @param graph  graph to add the nodes to
+     * @param graph  graph to add the nodeconfig to
      * @param reader reader at the position to start
      * @throws IOException in case of an I/O error
      */
@@ -52,7 +52,7 @@ public class BriteFormatReader extends GraphReader {
 
     /**
      * Reads in all the edges from the BRITE file and adds them to the given graph.
-     * The required nodes have to present in the given graph.
+     * The required nodeconfig have to present in the given graph.
      *
      * @param graph  graph to add the edges to
      * @param reader reader at the position to start
@@ -71,7 +71,7 @@ public class BriteFormatReader extends GraphReader {
                 float delay = Float.parseFloat(values[4]);
                 float bandwidth = Float.parseFloat(values[5]);
 
-                // get the source and destination nodes from the existing graph
+                // get the source and destination nodeconfig from the existing graph
                 Router fromNode = graph.getRouter(from);
                 Router toNode = graph.getRouter(to);
                 if (fromNode != null && toNode != null) {
@@ -95,7 +95,7 @@ public class BriteFormatReader extends GraphReader {
 
         String currentLine = reader.readLine();
         while (currentLine != null) {
-            // read in the nodes of the graph
+            // read in the nodeconfig of the graph
             if (currentLine.startsWith("Nodes:")) {
                 extractNodes(graph, reader);
             }

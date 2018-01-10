@@ -12,25 +12,25 @@ import emufog.util.Tuple;
 import java.util.*;
 
 /**
- * The graph represents a sub graph for the fog placement algorithm. It maps the nodes
- * of the underlying graph to the fog nodes.
+ * The graph represents a sub graph for the fog placement algorithm. It maps the nodeconfig
+ * of the underlying graph to the fog nodeconfig.
  */
 class FogGraph {
 
-    /* list of possible Docker types for fog nodes */
+    /* list of possible Docker types for fog nodeconfig */
     final List<FogType> servers;
 
-    /* list of all edge nodes still to cover */
+    /* list of all edge nodeconfig still to cover */
     private final List<EdgeNode> edgeNodes;
 
-    /* mapping of nodes of the underlying graph to their respective fog nodes equivalent */
+    /* mapping of nodeconfig of the underlying graph to their respective fog nodeconfig equivalent */
     private final Map<Node, FogNode> nodeMapping;
 
-    /* fog comparator to sort the possible fog nodes optimal */
+    /* fog comparator to sort the possible fog nodeconfig optimal */
     private final Comparator<FogNode> comparator;
 
     /**
-     * Creates a new sub graph with the given list of possible Docker images for fog nodes.
+     * Creates a new sub graph with the given list of possible Docker images for fog nodeconfig.
      *
      * @param servers list of Docker images
      */
@@ -55,7 +55,7 @@ class FogGraph {
     /**
      * Initializes the node equivalents of the given AS and adds them to the mapping.
      *
-     * @param startNodes list of nodes with their respective edge nodes
+     * @param startNodes list of nodeconfig with their respective edge nodeconfig
      * @param as         AS instance to work on
      */
     void initNodes(List<Tuple<Node, List<EdgeNode>>> startNodes, AS as) {
@@ -89,7 +89,7 @@ class FogGraph {
     }
 
     /**
-     * Removes all unused nodes from the graph.
+     * Removes all unused nodeconfig from the graph.
      */
     void trimNodes() {
         for (FogNode node : new ArrayList<>(nodeMapping.values())) {
@@ -100,9 +100,9 @@ class FogGraph {
     }
 
     /**
-     * Indicates if there are edge nodes to cover in the fog graph left.
+     * Indicates if there are edge nodeconfig to cover in the fog graph left.
      *
-     * @return true if there are still nodes, false otherwise
+     * @return true if there are still nodeconfig, false otherwise
      */
     boolean hasEdgeNodes() {
         return !edgeNodes.isEmpty();
@@ -110,7 +110,7 @@ class FogGraph {
 
     /**
      * Returns the nextLevels node of the fog placement algorithm.
-     * Possible nodes get sorted with the FogComparator and the graph updated according to the node picked.
+     * Possible nodeconfig get sorted with the FogComparator and the graph updated according to the node picked.
      *
      * @return nextLevels node picked
      */
@@ -119,7 +119,7 @@ class FogGraph {
         logger.log("Remaining Edge Nodes to cover: " + edgeNodes.size());
         long start = System.nanoTime();
         List<FogNode> fogNodes = new ArrayList<>(nodeMapping.values());
-        assert !fogNodes.isEmpty() : "there are no more possible fog nodes available";
+        assert !fogNodes.isEmpty() : "there are no more possible fog nodeconfig available";
 
         for (FogNode n : fogNodes) {
             n.findFogType();
@@ -134,7 +134,7 @@ class FogGraph {
         }
 
         start = System.nanoTime();
-        // sort the possible fog nodes with a FogComparator
+        // sort the possible fog nodeconfig with a FogComparator
         fogNodes.sort(comparator);
         end = System.nanoTime();
         logger.log("Sort Time: " + Logger.convertToMs(start, end), LoggerLevel.ADVANCED);
@@ -142,37 +142,37 @@ class FogGraph {
         // retrieve the nextLevels optimal node
         FogNode next = fogNodes.get(0);
 
-        // get covered nodes by the fog node placement
+        // get covered nodeconfig by the fog node placement
         Collection<EdgeNode> coveredNodes = next.getCoveredEdgeNodes();
 
         //TODO debug
         if (next instanceof EdgeNode && edgeNodes.contains(next)) {
-            assert coveredNodes.contains(next) : "covered nodes set doesn't contain nextLevels node";
+            assert coveredNodes.contains(next) : "covered nodeconfig set doesn't contain nextLevels node";
         }
 
         start = System.nanoTime();
         // remove the nextLevels node from the mapping
         nodeMapping.remove(next.oldNode);
 
-        // update all edge nodes connected to nextLevels
+        // update all edge nodeconfig connected to nextLevels
         for (EdgeNode edgeNode : next.getConnectedEdgeNodes()) {
             edgeNode.removePossibleNode(next);
         }
         next.clearAllEdgeNodes();
 
-        // update all fog nodes connected to the selected node set
+        // update all fog nodeconfig connected to the selected node set
         for (EdgeNode coveredNode : coveredNodes) {
             coveredNode.notifyPossibleNodes();
             coveredNode.clearPossibleNodes();
             nodeMapping.remove(coveredNode.oldNode);
         }
 
-        // remove all covered nodes from the edge nodes set
+        // remove all covered nodeconfig from the edge nodeconfig set
         edgeNodes.removeAll(coveredNodes);
         end = System.nanoTime();
-        logger.log("remove nodes Time: " + Logger.convertToMs(start, end), LoggerLevel.ADVANCED);
+        logger.log("remove nodeconfig Time: " + Logger.convertToMs(start, end), LoggerLevel.ADVANCED);
 
-        assert edgeNodes.size() <= nodeMapping.size() : "weniger edge nodes als gesamt";
+        assert edgeNodes.size() <= nodeMapping.size() : "weniger edge nodeconfig als gesamt";
 
         end = System.nanoTime();
         logger.log("GetNext() Time: " + Logger.convertToMs(start, end), LoggerLevel.ADVANCED);

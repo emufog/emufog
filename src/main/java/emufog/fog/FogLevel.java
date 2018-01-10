@@ -12,11 +12,11 @@ import java.util.Map;
 
 /**
  * This class represents a level or iteration of the fog placement algorithm. Each level starts with an initial
- * set of nodes and produces an output. Via dependencies the order of levels can be calculated.
+ * set of nodeconfig and produces an output. Via dependencies the order of levels can be calculated.
  */
 class FogLevel {
 
-    /* mapping of fog types to a list of all nodes using this type */
+    /* mapping of fog types to a list of all nodeconfig using this type */
     private final Map<FogType, List<FogNode>> placements;
 
     /* list of possible fog types for this level */
@@ -30,9 +30,9 @@ class FogLevel {
 
     /**
      * Creates a new instance of a fog level. This requires information of previously
-     * identified fog levels and information of placed fog nodes so far.
+     * identified fog levels and information of placed fog nodeconfig so far.
      *
-     * @param placements   placement of fog nodes and their respective type
+     * @param placements   placement of fog nodeconfig and their respective type
      * @param fogTypes     possible fog types to chose from
      * @param predecessors collection of predecessor levels
      */
@@ -58,10 +58,10 @@ class FogLevel {
     }
 
     /**
-     * Returns a list of nodes to start for this fog level. The list consists of pairs of
-     * nodes with their respective edge nodes.
+     * Returns a list of nodeconfig to start for this fog level. The list consists of pairs of
+     * nodeconfig with their respective edge nodeconfig.
      *
-     * @return list of nodes to start this fog level
+     * @return list of nodeconfig to start this fog level
      */
     List<Tuple<Node, List<EdgeNode>>> getStartNodes() {
         List<Tuple<Node, List<EdgeNode>>> result = new ArrayList<>();
@@ -74,7 +74,7 @@ class FogLevel {
                 }
             }
         } else {
-            // or from an existing set of placed fog nodes
+            // or from an existing set of placed fog nodeconfig
             for (FogType dependency : fogTypes.get(0).dependencies) {
                 List<FogNode> placedFogNodes = placements.get(dependency);
                 if (placedFogNodes != null) {

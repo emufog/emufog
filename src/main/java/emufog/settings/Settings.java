@@ -3,6 +3,8 @@ package emufog.settings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import emufog.application.Application;
+import emufog.nodeconfig.DeviceNodeType;
+import emufog.nodeconfig.FogNodeType;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -22,7 +24,7 @@ public class Settings {
     /* indicates whether the output file can be overwritten or not */
     private  boolean overwriteExperimentFile;
 
-    /* maximal number of fog nodes to place in the network */
+    /* maximal number of fog nodeconfig to place in the network */
     private  int maxFogNodes;
 
     /* upper threshold of the cost function to limit the fog node placement */
@@ -140,11 +142,11 @@ public class Settings {
         return fogGraphParallel;
     }
 
-    public List<FogNode> getFogNodes() {
+    public List<FogNodeType> getFogNodes() {
         return Arrays.asList(fogNodes);
     }
 
-    public List<DeviceNode> getDeviceNodes() {
+    public List<DeviceNodeType> getDeviceNodes() {
         return Arrays.asList(deviceNodes);
     }
 

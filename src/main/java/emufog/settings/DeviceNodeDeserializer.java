@@ -1,14 +1,15 @@
 package emufog.settings;
 
 import com.google.gson.*;
+import emufog.nodeconfig.DeviceNodeType;
 
 import java.lang.reflect.Type;
 
-public class DeviceNodeDeserializer implements JsonDeserializer<DeviceNode> {
+public class DeviceNodeDeserializer implements JsonDeserializer<DeviceNodeType> {
     @Override
-    public DeviceNode deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public DeviceNodeType deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
 
-        final DeviceNode deviceNode;
+        final DeviceNodeType deviceNode;
 
         final JsonObject jsonObject = json.getAsJsonObject();
 
@@ -17,7 +18,7 @@ public class DeviceNodeDeserializer implements JsonDeserializer<DeviceNode> {
         final int scalingFactor = jsonObject.get("ScalingFactor").getAsInt();
         final float averageDeviceCount = jsonObject.get("AverageDeviceCount").getAsFloat();
 
-        deviceNode = new DeviceNode(memoryLimit,cpuShare,scalingFactor,averageDeviceCount);
+        deviceNode = new DeviceNodeType(memoryLimit,cpuShare,scalingFactor,averageDeviceCount);
 
         return deviceNode;
     }

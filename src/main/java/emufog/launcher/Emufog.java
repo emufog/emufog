@@ -61,7 +61,7 @@ public class Emufog {
             logger.log("Time to read in the graph: " + Logger.convertToMs(start, end));
             logger.logSeparator();
             // print graph details for information purposes
-            logger.log("Number of nodes in the graph: " + graph.getRouters().size());
+            logger.log("Number of nodeconfig in the graph: " + graph.getRouters().size());
             logger.log("Number of edges in the graph: " + graph.getEdges().size());
             logger.logSeparator();
 
@@ -71,7 +71,7 @@ public class Emufog {
             end = System.nanoTime();
             logger.log("Time to determine the backbone of the topology: " + Logger.convertToMs(start, end));
             logger.logSeparator();
-            logger.log("Number of backbone nodes identified: " + graph.getSwitches().size());
+            logger.log("Number of backbone nodeconfig identified: " + graph.getSwitches().size());
             logger.logSeparator();
 
             // assign devices to the edge

@@ -11,10 +11,10 @@ import java.util.Collection;
 class ParallelFogWorker extends Worker {
 
     /**
-     * Creates a new parallel worker to identify fog nodes in the given AS.
+     * Creates a new parallel worker to identify fog nodeconfig in the given AS.
      *
      * @param as         AS to cover by this worker
-     * @param classifier master classifier synchronizing the remaining nodes to place
+     * @param classifier master classifier synchronizing the remaining nodeconfig to place
      */
     ParallelFogWorker(AS as, FogNodeClassifier classifier) {
         super(as, classifier);

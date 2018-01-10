@@ -71,7 +71,7 @@ public class BackboneClassifier {
     }
 
     /**
-     * This methods marks all cross-AS edge's endpoints as backbone nodes.
+     * This methods marks all cross-AS edge's endpoints as backbone nodeconfig.
      */
     private static void markASEdgeNodes(Graph graph) {
         SwitchConverter converter = new SwitchConverter();

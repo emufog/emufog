@@ -6,7 +6,7 @@ import java.util.Map;
 
 /**
  * This class represents an autonomous system of the network graph. Hence it's a sub graph of
- * the total graph providing access to its nodes.
+ * the total graph providing access to its nodeconfig.
  */
 public class AS {
 

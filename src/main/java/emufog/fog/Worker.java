@@ -10,28 +10,28 @@ import java.util.*;
 import java.util.concurrent.Callable;
 
 /**
- * The worker class identifies fog nodes on the given AS. Therefore the worker uses a partly
- * sub graph to identify the fog nodes in a greedy algorithm.
+ * The worker class identifies fog nodeconfig on the given AS. Therefore the worker uses a partly
+ * sub graph to identify the fog nodeconfig in a greedy algorithm.
  */
 abstract class Worker implements Callable<FogResult> {
 
     /* AS associated for this worker */
     private final AS as;
 
-    /* master classifier class synchronizing the remaining nodes to place */
+    /* master classifier class synchronizing the remaining nodeconfig to place */
     private final FogNodeClassifier classifier;
 
     /* logger for advanced logging */
     private final Logger logger;
 
-    /* mapping of fog types to all nodes with this type */
+    /* mapping of fog types to all nodeconfig with this type */
     private final Map<FogType, List<FogNode>> fogPlacements;
 
     /**
-     * Creates a new worker to identify fog nodes in the given AS.
+     * Creates a new worker to identify fog nodeconfig in the given AS.
      *
      * @param as         AS to cover by this worker
-     * @param classifier master classifier synchronizing the remaining nodes to place
+     * @param classifier master classifier synchronizing the remaining nodeconfig to place
      */
     Worker(AS as, FogNodeClassifier classifier) {
         this.as = as;
@@ -53,7 +53,7 @@ abstract class Worker implements Callable<FogResult> {
 
     /**
      * Calculates a graph by using breadth-first starting from the given
-     * starting nodes up to the threshold specified in the settings.
+     * starting nodeconfig up to the threshold specified in the settings.
      *
      * @param level current level to build a fog graph for
      * @return sub graph based on the AS
@@ -110,7 +110,7 @@ abstract class Worker implements Callable<FogResult> {
 
                     Node neighbor = e.getDestinationForSource(current.oldNode);
 
-                    // ignore host devices as they are not considered to be possible nodes
+                    // ignore host devices as they are not considered to be possible nodeconfig
                     if (!(neighbor instanceof HostDevice)) {
                         float nextCosts = currentCosts + calculateCosts(e);
                         if (nextCosts <= threshold) {

@@ -9,7 +9,7 @@ import java.util.Map;
 
 /**
  * The graph represents the topology of the network. The coordinate graph provides the option to associate
- * the nodes with coordinates to calculate the latency based on them.
+ * the nodeconfig with coordinates to calculate the latency based on them.
  */
 public class CoordinateGraph extends Graph {
 
@@ -89,13 +89,13 @@ public class CoordinateGraph extends Graph {
      * @param latencyEstimator latency calculator to use
      * @param bandwidth        bandwidth of the edge
      * @return the newly created edge
-     * @throws IllegalArgumentException if any of the objects is null or the nodes are not
+     * @throws IllegalArgumentException if any of the objects is null or the nodeconfig are not
      *                                  associated with coordinates
      */
     public Edge createEdge(int id, Node from, Node to, ILatencyCalculator latencyEstimator,
                            float bandwidth) throws IllegalArgumentException {
         if (from == null || to == null) {
-            throw new IllegalArgumentException("The source and destination nodes cannot be null.");
+            throw new IllegalArgumentException("The source and destination nodeconfig cannot be null.");
         }
         if (latencyEstimator == null) {
             throw new IllegalArgumentException("The latency estimator object in not initialized.");

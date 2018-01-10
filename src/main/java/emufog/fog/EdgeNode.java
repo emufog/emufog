@@ -12,7 +12,7 @@ import java.util.List;
  */
 class EdgeNode extends FogNode {
 
-    /* list of possible fog nodes in range of the threshold */
+    /* list of possible fog nodeconfig in range of the threshold */
     private final List<FogNode> possibleNodes;
 
     /* number of devices to cover for this edge node */
@@ -36,14 +36,14 @@ class EdgeNode extends FogNode {
      *
      * @param graph         original graph instance
      * @param node          node representing the edge for the iteration
-     * @param assignedNodes collection of all edge nodes covered in the original graph
+     * @param assignedNodes collection of all edge nodeconfig covered in the original graph
      */
     EdgeNode(FogGraph graph, Node node, Collection<EdgeNode> assignedNodes) {
         super(graph, node);
 
         possibleNodes = new ArrayList<>();
 
-        assert !assignedNodes.isEmpty() : "no nodes assigned";
+        assert !assignedNodes.isEmpty() : "no nodeconfig assigned";
         deviceCount = 0;
         for (EdgeNode e : assignedNodes) {
             deviceCount += e.getDeviceCount();
@@ -51,7 +51,7 @@ class EdgeNode extends FogNode {
     }
 
     /**
-     * Adds a node to the list of possible nodes for this edge node.
+     * Adds a node to the list of possible nodeconfig for this edge node.
      *
      * @param node possible fog node
      */
@@ -61,7 +61,7 @@ class EdgeNode extends FogNode {
     }
 
     /**
-     * Removes a fog node from the list of possible nodes if it's not available any more.
+     * Removes a fog node from the list of possible nodeconfig if it's not available any more.
      *
      * @param node fog node to remove
      */
@@ -74,7 +74,7 @@ class EdgeNode extends FogNode {
     }
 
     /**
-     * Notifies all possible nodes of this edge node that the node does not have to be covered any more.
+     * Notifies all possible nodeconfig of this edge node that the node does not have to be covered any more.
      */
     void notifyPossibleNodes() {
         for (FogNode node : possibleNodes) {
@@ -83,7 +83,7 @@ class EdgeNode extends FogNode {
     }
 
     /**
-     * Clears the list of possible fog nodes.
+     * Clears the list of possible fog nodeconfig.
      */
     void clearPossibleNodes() {
         possibleNodes.clear();

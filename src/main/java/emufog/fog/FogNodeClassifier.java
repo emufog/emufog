@@ -1,8 +1,8 @@
 package emufog.fog;
 
-import emufog.docker.FogType;
 import emufog.graph.AS;
 import emufog.graph.Graph;
+import emufog.nodeconfig.FogNodeType;
 import emufog.settings.Settings;
 import emufog.util.Logger;
 import emufog.util.LoggerLevel;
@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class FogNodeClassifier {
 
     /* list of all available types of fog nodes */
-    final List<FogType> fogTypes;
+    final List<FogNodeType> fogTypes;
 
     /* remaining number of nodes to place in the graph */
     private final AtomicInteger remainingNodes;
@@ -41,18 +41,18 @@ public class FogNodeClassifier {
             throw new IllegalArgumentException("No settings object given.");
         }
 
-        fogTypes = settings.fogNodeTypes;
+        fogTypes = settings.getFogNodes();
         remainingNodes = new AtomicInteger(settings.getMaxFogNodes());
         threshold = settings.getCostThreshold();
     }
 
     /**
-     * This method identifies the fog nodes in the given graph. The settings passed to
+     * This method identifies the fog nodeconfig in the given graph. The settings passed to
      * the constructor are used for the algorithm. The result might not be optimal as the
      * method uses a greedy algorithm to approximate the optimal solution.
      *
-     * @param graph graph to find fog nodes in
-     * @return result object with the list of fog nodes or failure state
+     * @param graph graph to find fog nodeconfig in
+     * @return result object with the list of fog nodeconfig or failure state
      * @throws IllegalArgumentException throws exception if the graph parameter is null
      */
     public FogResult findFogNodes(Graph graph) throws IllegalArgumentException {
@@ -78,7 +78,7 @@ public class FogNodeClassifier {
             count++;
         }
 
-        // add all nodes of the partial result to the final list
+        // add all nodeconfig of the partial result to the final list
         boolean stop = false;
         Tuple<AS, Future<FogResult>> t = null;
         try {
@@ -128,7 +128,7 @@ public class FogNodeClassifier {
     }
 
     /**
-     * Indicates if there are still fog nodes to place available.
+     * Indicates if there are still fog nodeconfig to place available.
      *
      * @return true if there are, none if 0
      */

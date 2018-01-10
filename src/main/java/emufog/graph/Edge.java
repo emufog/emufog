@@ -1,7 +1,7 @@
 package emufog.graph;
 
 /**
- * This class represents an edge in the network graph. The connection between the two nodes is bidirectional.
+ * This class represents an edge in the network graph. The connection between the two nodeconfig is bidirectional.
  * Latency and bandwidth apply to both directions.
  */
 public class Edge {
@@ -10,10 +10,10 @@ public class Edge {
     final int id;
 
     /* latency delay on this edge in ms */
-    final float delay;
+    private final float delay;
 
     /* bandwidth of the connection on Mbit/s */
-    final float bandwidth;
+    private final float bandwidth;
 
     /* one end of the connection */
     Node from;
@@ -22,7 +22,7 @@ public class Edge {
     Node to;
 
     /**
-     * Creates a new edge instance connecting two nodes of the graph.
+     * Creates a new edge instance connecting two ndoes of the graph.
      * The connection is based on the delay and the bandwidth given.
      *
      * @param id        unique identifier

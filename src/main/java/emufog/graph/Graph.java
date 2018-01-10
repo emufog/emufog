@@ -2,6 +2,7 @@ package emufog.graph;
 
 import emufog.docker.DeviceType;
 import emufog.docker.FogType;
+import emufog.nodeconfig.DeviceNodeType;
 import emufog.settings.Settings;
 import emufog.util.Logger;
 import emufog.util.LoggerLevel;
@@ -36,10 +37,6 @@ public class Graph {
 
     /* logger instance to log warnings */
     protected final Logger logger;
-    
-    private final Map<Integer, String> nodeToImageMap;
-    
-    private final Map<Integer, List<String>> nodeToCommandsMap;
 
     /**
      * Creates a new basic graph instance.
@@ -60,8 +57,6 @@ public class Graph {
         IPprovider = new UniqueIPProvider(settings);
         nodeIDprovider = new UniqueIDProvider();
         edgeIDprovider = new UniqueIDProvider();
-        nodeToImageMap = new HashMap<>();
-        nodeToCommandsMap = new HashMap<>();
         logger = Logger.getInstance();
     }
 
@@ -119,7 +114,6 @@ public class Graph {
      * @param image docker image to use for the host device
      * @return the newly created host device
      * @throws IllegalArgumentException if the id already in use or the image object is null
-     */
     public HostDevice createHostDevice(int id, int as, DeviceType image) throws IllegalArgumentException {
         checkNodeID(id);
         if (image == null) {
@@ -132,7 +126,7 @@ public class Graph {
         nodes.put(id, as);
 
         return device;
-    }
+    }**/
 
     /**
      * Check the node's ID if it's already in use.
@@ -157,12 +151,12 @@ public class Graph {
      * @param delay     delay of the edge
      * @param bandwidth bandwidth of the edge
      * @return the newly created edge
-     * @throws IllegalArgumentException if any of the objects is null or the nodes are not
+     * @throws IllegalArgumentException if any of the objects is null or the nodeconfig are not
      *                                  associated with coordinates
      */
     public Edge createEdge(int id, Node from, Node to, float delay, float bandwidth) throws IllegalArgumentException {
         if (from == null || to == null) {
-            throw new IllegalArgumentException("The source and destination nodes cannot be null.");
+            throw new IllegalArgumentException("The source and destination nodeconfig cannot be null.");
         }
 
         if (edgeIDprovider.isUsed(id)) {
@@ -175,16 +169,17 @@ public class Graph {
         edgeIDprovider.markIDused(id);
         edges.add(edge);
 
-        if (from.as.equals(to.as)) {
-            from.as.incrementDegree();
-            to.as.incrementDegree();
+        if (from.getAS().equals(to.getAS())) {
+            from.getAS().incrementDegree();
+            to.getAS().incrementDegree();
         }
 
-        if (from instanceof Router && to instanceof HostDevice) {
-            ((Router) from).incrementDeviceCount(((HostDevice) to).getDockerType().scalingFactor);
+        if ( from instanceof Router && to instanceof Device){
+            ((Router) from).incrementDeviceCount(((Device) to).getDeviceNodeType().getScalingFactor());
         }
-        if (from instanceof HostDevice && to instanceof Router) {
-            ((Router) to).incrementDeviceCount(((HostDevice) from).getDockerType().scalingFactor);
+
+        if (from instanceof Device && to instanceof Router){
+            ((Router) from).incrementDeviceCount(((Device) to).getDeviceNodeType().getScalingFactor());
         }
 
         return edge;
@@ -193,23 +188,21 @@ public class Graph {
     /**
      * Assigns the devices specified in the settings to the edge nodes on a random base.
      */
-    public void assignEdgeDevices() {
+    public void assignEdgeDevices(){
         Random random = new Random();
 
-        for (DeviceType type : settings.deviceNodeTypes) {
-            float upper = Math.abs(type.averageDeviceCount) * 2;
+        for(DeviceNodeType type : settings.getDeviceNodes()){
+            float upper = Math.abs(type.getAverageDeviceCount()) * 2;
 
-            for (Router r : getRouters()) {
-                // random distribution within the interval from 0 to count * 2
+            for (Router r : getRouters()){
                 int count = (int) (random.nextFloat() * upper);
 
-                for (int i = 0; i < count; ++i) {
-                    HostDevice device = createHostDevice(nodeIDprovider.getNextID(), r.as.id, type);
-
-                    createEdge(edgeIDprovider.getNextID(), r, device, settings.edgeDeviceDelay,
-                            settings.edgeDeviceBandwidth);
+                for(int i = 0; i < count; ++i){
+                    Device d = new Device(nodeIDprovider.getNextID(), r.getAS() , type);
+                    createEdge(edgeIDprovider.getNextID(), r , d, settings.getEdgeDeviceDelay(), settings.getEdgeDeviceBandwidth())
                 }
             }
+
         }
     }
 
@@ -235,6 +228,7 @@ public class Graph {
         node.emulationSettings = new EmulationSettings(IPprovider.getNextIPV4Address(), type);
     }
 
+
     /**
      * Returns the settings the graph object uses.
      *
@@ -245,9 +239,9 @@ public class Graph {
     }
 
     /**
-     * Returns all nodes of the graph.
+     * Returns all nodeconfig of the graph.
      *
-     * @return nodes of the graph
+     * @return nodeconfig of the graph
      */
     public Collection<Node> getNodes() {
         //TODO
@@ -371,20 +365,4 @@ public class Graph {
         return systems.values();
     }
 
-	public Map<Integer, String> getImages() {
-		return nodeToImageMap;
-	}
-
-	public Map<Integer, List<String>> getCommands() {
-		return nodeToCommandsMap;
-	}
-	
-	public void setImages(Map<? extends Integer, ? extends String> map) {
-		nodeToImageMap.clear();
-		nodeToImageMap.putAll(map);
-	}
-	public void setCommands(Map<? extends Integer, ? extends List<String>> map) {
-		nodeToCommandsMap.clear();
-		nodeToCommandsMap.putAll(map);
-	}
 }

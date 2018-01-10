@@ -1,4 +1,4 @@
-package emufog.nodes;
+package emufog.nodeconfig;
 
 public class FogNodeType extends NodeType{
 
