@@ -23,6 +23,10 @@ public abstract class Node {
         return as;
     }
 
+    public int getAsID(){
+        return asID;
+    }
+
     public void setAs(AS as) {
         this.as = as;
     }

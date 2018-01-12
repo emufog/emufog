@@ -23,4 +23,5 @@ public class Link {
     public float getBandwidth() {
         return bandwidth;
     }
+
 }

@@ -42,16 +42,15 @@ public class AS {
     }
 
     public Collection<Router> getRouters(){
-
-        return (Collection<Router>) nodeMap.entrySet().stream().filter(node -> node.getValue() instanceof Router);
+        return (Collection<Router>) nodeMap.values().stream().filter(node -> node instanceof Router);
     }
 
     public Collection<Device> getDevices(){
-        return (Collection<Device>) nodeMap.entrySet().stream().filter(node -> node.getValue() instanceof Device);
+        return (Collection<Device>) nodeMap.values().stream().filter(node -> node instanceof Device);
     }
 
     public Collection<FogNode> getFogNodes(){
-        return (Collection<FogNode>) nodeMap.entrySet().stream().filter(node -> node.getValue() instanceof FogNode);
+        return (Collection<FogNode>) nodeMap.values().stream().filter(node -> node instanceof FogNode);
     }
 
 

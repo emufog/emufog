@@ -75,11 +75,11 @@ class BackboneWorker implements Runnable {
      * Creates a single connected backbone by using the Breadth-First-Algorithm.
      */
     private void buildSingleBackbone() {
-        // bit sets to check for visited nodeconfig and nodeconfig in the queue
+        // bit sets to check for visited nodes and ndoes in the queue
         BitSet visited = new BitSet();
         BitSet seen = new BitSet();
         Queue<Node> queue = new ArrayDeque<>();
-        // map nodeconfig to their respective predecessors
+        // map nodes to their respective predecessors
         Map<Node, Node> predecessors = new HashMap<>();
 
         // start with any backbone node

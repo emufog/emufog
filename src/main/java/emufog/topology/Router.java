@@ -2,11 +2,8 @@ package emufog.topology;
 
 public class Router extends Node{
 
-    enum RouterType {
-        EDGE_ROUTER, BACKBONE_ROUTER
-    }
 
-    private RouterType type;
+    private Types.RouterType type;
 
     private int deviceCount;
 
@@ -15,8 +12,12 @@ public class Router extends Node{
         this.deviceCount = 0;
     }
 
-    public void setType(RouterType type) {
+    public void setType(Types.RouterType type) {
         this.type = type;
+    }
+
+    public Types.RouterType getType() {
+        return type;
     }
 
     public boolean hasDevices(){ return deviceCount > 0;}
@@ -24,5 +25,7 @@ public class Router extends Node{
     public void incrementDeviceCount(int n){ deviceCount += n;}
 
     public int getDeviceCount() { return deviceCount;}
+
+
 
 }

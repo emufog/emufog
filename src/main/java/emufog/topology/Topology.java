@@ -9,12 +9,15 @@ import emufog.settings.Settings;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Map;
 
 public class Topology {
 
     private MutableNetwork<Node,Link> topology;
 
     private Settings settings;
+
+    private Map<Integer, AS> systems;
 
 
     private Topology(TopologyBuilder builder) throws IOException {
