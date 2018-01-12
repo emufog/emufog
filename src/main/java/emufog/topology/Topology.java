@@ -5,6 +5,7 @@ import emufog.reader.BriteReader;
 import emufog.reader.TopologyReader;
 import emufog.settings.Settings;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Set;
 
@@ -46,7 +47,7 @@ public class Topology {
         return topology.edges();
     }
 
-    private Topology(TopologyBuilder builder){
+    private Topology(TopologyBuilder builder) throws IOException {
 
         this.settings = builder.settings;
 
@@ -57,7 +58,7 @@ public class Topology {
 
     }
 
-    private void read(){
+    private void read() throws IOException {
         reader = new BriteReader();
 
         this.topology = reader.parse(settings.getInputGraphFilePath());
@@ -76,7 +77,7 @@ public class Topology {
 
         private Settings settings;
 
-        public Topology build(){
+        public Topology build() throws IOException {
             return new Topology(this);
         }
 
