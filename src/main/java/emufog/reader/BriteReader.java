@@ -11,11 +11,37 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import static emufog.topology.Types.RouterType.ROUTER;
+
 public class BriteReader extends TopologyReader{
 
     MutableNetwork<Node,Link> topology = NetworkBuilder.undirected().allowsParallelEdges(true).build();
 
     private BufferedReader reader;
+
+    /**
+     * Parses given input topology and returns MutableNetwork topology.
+     *
+     * @param path
+     * @return
+     * @throws IOException
+     */
+    @Override
+    public MutableNetwork parse(Path path) throws IOException{
+
+        reader = new BufferedReader(new FileReader(path.toFile()));
+
+        String currentLine = reader.readLine();
+
+        while (currentLine != null) {
+            if(currentLine.startsWith("Nodes:")) extractNodes(reader);
+            if(currentLine.startsWith("Edges:")) extractEdges(reader);
+
+            currentLine = reader.readLine();
+        }
+
+        return topology;
+    }
 
     /**
      * Creates a new topology node from detected BRITE node.
@@ -34,6 +60,7 @@ public class BriteReader extends TopologyReader{
                 int id = Integer.parseInt(values[0]);
                 int asID = Integer.parseInt(values[5]);
                 Router router = new Router(id, asID);
+                router.setType(ROUTER);
                 topology.addNode(router);
             }
 
@@ -75,20 +102,4 @@ public class BriteReader extends TopologyReader{
         }
     }
 
-    @Override
-    public MutableNetwork parse(Path path) throws IOException{
-
-        reader = new BufferedReader(new FileReader(path.toFile()));
-
-        String currentLine = reader.readLine();
-
-        while (currentLine != null) {
-            if(currentLine.startsWith("Nodes:")) extractNodes(reader);
-            if(currentLine.startsWith("Edges:")) extractEdges(reader);
-
-            currentLine = reader.readLine();
-        }
-
-        return topology;
-    }
 }
