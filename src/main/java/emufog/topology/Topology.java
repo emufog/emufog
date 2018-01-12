@@ -1,75 +1,70 @@
 package emufog.topology;
 
 import com.google.common.graph.MutableNetwork;
-import emufog.reader.BriteReader;
-import emufog.reader.TopologyReader;
+import emufog.export.ITopologyExporter;
+import emufog.export.MaxinetExporter;
+import emufog.placement.*;
+import emufog.reader.*;
 import emufog.settings.Settings;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Set;
 
 public class Topology {
 
     private MutableNetwork<Node,Link> topology;
 
-    private static TopologyReader reader;
-
     private Settings settings;
 
-    private void addNode(Node node){
-        topology.addNode(node);
-    }
-
-    private void removeNode(Node node) {topology.removeNode(node);}
-
-    private void addLink(Node nodeU, Node nodeV, Link link){
-        topology.addEdge(nodeU,nodeV,link);
-    }
-
-    private void removeLink(Link link){ topology.removeEdge(link);}
-
-    private void addFogNode(FogNode fogNode){
-        topology.addNode(fogNode);
-    }
-
-    private void addDeviceNode(Device device){
-        topology.addNode(device);
-    }
-
-    private void addRouter(Router router){
-        topology.addNode(router);
-    }
-
-    public Set<Node> nodes(){ return topology.nodes(); }
-
-    public Set<Link> links(){
-        return topology.edges();
-    }
 
     private Topology(TopologyBuilder builder) throws IOException {
 
         this.settings = builder.settings;
+        try {
+            read();
+            identifyEdge();
+            placeFogNodes();
+            assignApplications();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
 
-        read();
-        identifyEdge();
-        placeFogNodes();
-        assignApplications();
 
     }
 
     private void read() throws IOException {
-        reader = new BriteReader();
+
+        TopologyReader reader = new BriteReader();
 
         this.topology = reader.parse(settings.getInputGraphFilePath());
 
     }
 
-    private void identifyEdge(){}
+    private void identifyEdge(){
 
-    private void placeFogNodes(){}
+        IEdgeIdentifier edgeIdentifier = new DefaultEdgeIdentifier();
 
-    private void assignApplications(){}
+        edgeIdentifier.identifyEdge(topology);
+
+    }
+
+    private void placeFogNodes(){
+
+        IFogLayout fogLayout = new DefaultFogLayout();
+
+        fogLayout.identifyFogNodes(topology);
+        fogLayout.placeFogNodes(topology);
+
+    }
+
+    private void assignApplications(){
+
+        IApplicationAssignmentPolicy applicationAssignmentPolicy = new DefaultApplicationAssignment();
+
+        applicationAssignmentPolicy.generateDeviceApplicationMapping(topology);
+        applicationAssignmentPolicy.generateFogApplicationMapping(topology);
+
+    }
 
 
 
@@ -88,14 +83,14 @@ public class Topology {
 
     }
 
-    public void export(){
+    public void export() throws IOException {
 
-        Path exportPath = settings.getExportFilePath();
+        final Path exportPath = settings.getExportFilePath();
 
+        ITopologyExporter exporter = new MaxinetExporter();
+
+        exporter.exportTopology(topology, exportPath);
 
     }
 
-    private MutableNetwork<Node, Link> getTopology() {
-        return topology;
-    }
 }

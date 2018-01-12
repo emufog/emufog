@@ -1,6 +1,5 @@
 package emufog.topology;
 
-import emufog.graph.AS;
 import emufog.nodeconfig.DeviceNodeConfiguration;
 import emufog.nodeconfig.DeviceNodeType;
 
@@ -9,8 +8,8 @@ public class Device extends Node{
     private DeviceNodeType deviceNodeType;
     private DeviceNodeConfiguration configuration;
 
-    public Device(int id, AS as, DeviceNodeType deviceNodeType) {
-        super(id, as);
+    public Device(int id, int asID, DeviceNodeType deviceNodeType) {
+        super(id, asID);
         this.deviceNodeType = deviceNodeType;
     }
 

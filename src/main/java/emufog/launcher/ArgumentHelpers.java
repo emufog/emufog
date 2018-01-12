@@ -1,7 +1,7 @@
 package emufog.launcher;
 
 import emufog.placement.EdgeIdentifier;
-import emufog.placement.FogLayout;
+import emufog.placement.IFogLayout;
 import emufog.reader.BriteFormatReader;
 import emufog.reader.CaidaFormatReader;
 import emufog.reader.GraphReader;
@@ -18,7 +18,7 @@ public class ArgumentHelpers {
      * @param cliInput
      * @return
      */
-    protected static FogLayout getFogLayoutStrategy(String cliInput){
+    protected static IFogLayout getFogLayoutStrategy(String cliInput){
         //TODO: Implement getFogLayout logic.
         return null;
     }

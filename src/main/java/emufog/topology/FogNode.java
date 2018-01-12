@@ -1,6 +1,5 @@
 package emufog.topology;
 
-import emufog.graph.AS;
 import emufog.nodeconfig.FogNodeConfiguration;
 import emufog.nodeconfig.FogNodeType;
 
@@ -9,8 +8,8 @@ public class FogNode extends Node{
     private FogNodeType fogNodeType;
     private FogNodeConfiguration configuration;
 
-    public FogNode(int id, AS as, FogNodeType fogNodeType) {
-        super(id, as);
+    public FogNode(int id, int asID, FogNodeType fogNodeType) {
+        super(id, asID);
         this.fogNodeType = fogNodeType;
     }
 

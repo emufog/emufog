@@ -14,4 +14,15 @@ public class Router extends Node{
         super(id, asID);
         this.deviceCount = 0;
     }
+
+    public void setType(RouterType type) {
+        this.type = type;
+    }
+
+    public boolean hasDevices(){ return deviceCount > 0;}
+
+    public void incrementDeviceCount(int n){ deviceCount += n;}
+
+    public int getDeviceCount() { return deviceCount;}
+
 }

@@ -7,7 +7,6 @@ import emufog.topology.Node;
 import emufog.topology.Router;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -77,7 +76,7 @@ public class BriteReader extends TopologyReader{
     }
 
     @Override
-    public MutableNetwork parse(Path path) throws FileNotFoundException, IOException{
+    public MutableNetwork parse(Path path) throws IOException{
 
         reader = new BufferedReader(new FileReader(path.toFile()));
 
