@@ -1,12 +1,20 @@
 package emufog.topology;
 
 import com.google.common.graph.MutableNetwork;
+import emufog.reader.BriteReader;
+import emufog.reader.TopologyReader;
+import emufog.settings.Settings;
 
+import java.nio.file.Path;
 import java.util.Set;
 
 public class Topology {
 
     private MutableNetwork<Node,Link> topology;
+
+    private static TopologyReader reader;
+
+    private Settings settings;
 
     private void addNode(Node node){
         topology.addNode(node);
@@ -40,6 +48,8 @@ public class Topology {
 
     private Topology(TopologyBuilder builder){
 
+        this.settings = builder.settings;
+
         read();
         identifyEdge();
         placeFogNodes();
@@ -47,7 +57,12 @@ public class Topology {
 
     }
 
-    private void read(){}
+    private void read(){
+        reader = new BriteReader();
+
+        this.topology = reader.parse(settings.getInputGraphFilePath());
+
+    }
 
     private void identifyEdge(){}
 
@@ -59,16 +74,27 @@ public class Topology {
 
     public static class TopologyBuilder{
 
+        private Settings settings;
+
         public Topology build(){
             return new Topology(this);
         }
 
-        public TopologyBuilder setup(){
+        public TopologyBuilder setup(Settings settings){
+            this.settings = settings;
             return this;
         }
 
     }
 
-    public void export(){}
+    public void export(){
 
+        Path exportPath = settings.getExportFilePath();
+
+
+    }
+
+    private MutableNetwork<Node, Link> getTopology() {
+        return topology;
+    }
 }

@@ -42,11 +42,20 @@ public class Settings {
     /* indicator whether the fog graph should be build in parallel */
     private  boolean fogGraphParallel;
 
-    private  FogNode[] fogNodes;
+    private  FogNodeType[] fogNodes;
 
-    private  DeviceNode[] deviceNodes;
+    private  DeviceNodeType[] deviceNodes;
+
 
     private  Application[] applications;
+
+    private Path inputGraphFilePath;
+
+    public Path getExportFilePath() {
+        return exportFilePath;
+    }
+
+    private Path exportFilePath;
 
     public Settings(){}
 
@@ -54,8 +63,8 @@ public class Settings {
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(Settings.class, new SettingsDeserializer());
-        gsonBuilder.registerTypeAdapter(FogNode.class, new FogNodeDeserializer());
-        gsonBuilder.registerTypeAdapter(DeviceNode.class, new DeviceNodeDeserializer());
+        gsonBuilder.registerTypeAdapter(FogNodeType.class, new FogNodeDeserializer());
+        gsonBuilder.registerTypeAdapter(DeviceNodeType.class, new DeviceNodeDeserializer());
         gsonBuilder.registerTypeAdapter(Application.class, new ApplicationDeserializer());
 
         Gson gson = gsonBuilder.create();
@@ -98,11 +107,11 @@ public class Settings {
         this.fogGraphParallel = fogGraphParallel;
     }
 
-    protected void setFogNodes(FogNode[] fogNodes) {
+    protected void setFogNodes(FogNodeType[] fogNodes) {
         this.fogNodes = fogNodes;
     }
 
-    protected void setDeviceNodes(DeviceNode[] deviceNodes) {
+    protected void setDeviceNodes(DeviceNodeType[] deviceNodes) {
         this.deviceNodes = deviceNodes;
     }
 
@@ -153,4 +162,9 @@ public class Settings {
     public List<Application> getApplications() {
         return Arrays.asList(applications);
     }
+
+    public Path getInputGraphFilePath() {
+        return inputGraphFilePath;
+    }
 }
+

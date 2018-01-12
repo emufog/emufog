@@ -50,7 +50,7 @@ public class Emufog {
 
             Settings settings = new Settings().read(arguments.settingsPath);
 
-            Topology topology = new Topology.TopologyBuilder().setup().build();
+            Topology topology = new Topology.TopologyBuilder().setup(settings).build();
 
 
 

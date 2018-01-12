@@ -4,12 +4,18 @@ import emufog.graph.AS;
 
 public abstract class Node {
 
-    private final int id;
+    private int ID;
 
-    private final AS as;
+    private final int asID;
 
-    public Node(int id, AS as) {
-        this.id = id;
-        this.as = as;
+    private AS as;
+
+    public Node(int id, int as) {
+        this.ID = id;
+        this.asID = as;
+    }
+
+    public int getID() {
+        return ID;
     }
 }

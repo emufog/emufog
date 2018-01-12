@@ -1,8 +1,5 @@
 package emufog.topology;
 
-import emufog.graph.AS;
-
-
 public class Router extends Node{
 
     enum RouterType {
@@ -13,9 +10,8 @@ public class Router extends Node{
 
     private int deviceCount;
 
-    public Router(int id, AS as, RouterType type, int deviceCount) {
-        super(id, as);
-        this.type = type;
-        this.deviceCount = deviceCount;
+    public Router(int id, int asID) {
+        super(id, asID);
+        this.deviceCount = 0;
     }
 }
