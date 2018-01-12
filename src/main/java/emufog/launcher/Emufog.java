@@ -13,6 +13,7 @@ import emufog.images.IApplicationImageAssignmentPolicy;
 import emufog.images.MongoCaseAssignmentPolicy;
 import emufog.reader.GraphReader;
 import emufog.settings.Settings;
+import emufog.topology.Topology;
 import emufog.util.Logger;
 import emufog.util.LoggerLevel;
 import emufog.util.Tuple;
@@ -47,8 +48,11 @@ public class Emufog {
             // parse the command line arguments
             JCommander.newBuilder().addObject(arguments).build().parse(args);
 
-
             Settings settings = new Settings().read(arguments.settingsPath);
+
+            Topology topology = new Topology.TopologyBuilder().setup().build();
+
+
 
             // determines the respective format reader
             GraphReader reader = getReader(arguments.inputType, settings);

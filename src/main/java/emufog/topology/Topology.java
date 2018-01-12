@@ -1,20 +1,12 @@
 package emufog.topology;
 
 import com.google.common.graph.MutableNetwork;
-import com.google.common.graph.NetworkBuilder;
-import emufog.reader.BriteReader;
-import emufog.reader.ITopologyReader;
-import emufog.settings.Settings;
 
 import java.util.Set;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class Topology {
 
     private MutableNetwork<Node,Link> topology;
-
-    private static Settings settings;
 
     private void addNode(Node node){
         topology.addNode(node);
@@ -48,58 +40,35 @@ public class Topology {
 
     private Topology(TopologyBuilder builder){
 
-    }
-
-    public final MutableNetwork<Node, Link> build(){
-
+        read();
         identifyEdge();
         placeFogNodes();
         assignApplications();
 
-        return topology;
-    };
-
-
-    public void setup(Settings settings){
-        this.settings = checkNotNull(settings);
     }
 
-    public void read(){
+    private void read(){}
 
-        ITopologyReader reader = new BriteReader();
-
-        topology = NetworkBuilder.undirected().allowsParallelEdges(true).build();
-
-
-
-
-    }
-
-    private void identifyEdge(){
-
-
-    }
+    private void identifyEdge(){}
 
     private void placeFogNodes(){}
 
     private void assignApplications(){}
 
+
+
     public static class TopologyBuilder{
 
         public Topology build(){
-
             return new Topology(this);
         }
 
-        private void setup(){}
-
-        private void read(){}
-
-        private void identifyEdge(){}
-
-        private void placeFogNodes(){}
-
-        private void assignApplications(){}
+        public TopologyBuilder setup(){
+            return this;
+        }
 
     }
+
+    public void export(){}
+
 }
