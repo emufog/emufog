@@ -52,6 +52,7 @@ public class Emufog {
 
             Topology topology = new Topology.TopologyBuilder().setup(settings).build();
 
+            topology.export();
 
 
             // determines the respective format reader
