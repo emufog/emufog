@@ -1,11 +1,14 @@
 package emufog.topology;
 
 import com.google.common.graph.MutableNetwork;
+
+import com.google.common.graph.NetworkBuilder;
 import emufog.export.ITopologyExporter;
 import emufog.export.MaxinetExporter;
 import emufog.placement.*;
 import emufog.reader.*;
 import emufog.settings.Settings;
+import emufog.util.Logger;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -13,33 +16,55 @@ import java.util.Map;
 
 public class Topology {
 
-    private MutableNetwork<Node,Link> topology;
+
+    private static MutableNetwork<Node, Link> INSTANCE;
 
     private Settings settings;
 
     private Map<Integer, AS> systems;
 
+    public static MutableNetwork<Node, Link> getTopology(){
+        if (INSTANCE == null) {
+            INSTANCE = NetworkBuilder.undirected().allowsParallelEdges(true).build();
+        }
+        return INSTANCE;
+    }
 
     private Topology(TopologyBuilder builder) throws IOException {
 
+        Logger logger = Logger.getInstance();
+
         this.settings = builder.settings;
         try {
+            long start = System.nanoTime();
             read();
+            long end = System.nanoTime();
+            logger.log("It took " + Logger.convertToMs(start,end) + "ms to read the topology");
+            logger.log("Number of nodes: " + getTopology().nodes().size());
+            logger.log("Number of edges: " + getTopology().edges().size());
+
+            start = System.nanoTime();
             identifyEdge();
+            end = System.nanoTime();
+            logger.log("It took " + Logger.convertToMs(start,end) + "ms to identify the Edge");
+
+            start = System.nanoTime();
+            assignEdgeDevices();
+            end = System.nanoTime();
+            logger.log("It took " + Logger.convertToMs(start,end) + "ms to place the Devices");
+
             placeFogNodes();
             assignApplications();
         } catch (Exception e){
             e.printStackTrace();
         }
 
-
     }
 
     private void read() throws IOException {
 
         TopologyReader reader = new BriteReader();
-
-        this.topology = reader.parse(settings.getInputGraphFilePath());
+        this.INSTANCE = reader.parse(settings.getInputGraphFilePath());
 
     }
 
@@ -47,7 +72,15 @@ public class Topology {
 
         IEdgeIdentifier edgeIdentifier = new DefaultEdgeIdentifier();
 
-        edgeIdentifier.identifyEdge(topology);
+        edgeIdentifier.identifyEdge(getTopology());
+
+    }
+
+    private void assignEdgeDevices(){
+
+        IDevicePlacement devicePlacement = new DefaultDevicePlacement();
+
+        devicePlacement.assignEdgeDevices(getTopology(), settings.getDeviceNodes());
 
     }
 
@@ -55,8 +88,8 @@ public class Topology {
 
         IFogLayout fogLayout = new DefaultFogLayout();
 
-        fogLayout.identifyFogNodes(topology);
-        fogLayout.placeFogNodes(topology);
+        fogLayout.identifyFogNodes(getTopology());
+        fogLayout.placeFogNodes(getTopology());
 
     }
 
@@ -64,8 +97,8 @@ public class Topology {
 
         IApplicationAssignmentPolicy applicationAssignmentPolicy = new DefaultApplicationAssignment();
 
-        applicationAssignmentPolicy.generateDeviceApplicationMapping(topology);
-        applicationAssignmentPolicy.generateFogApplicationMapping(topology);
+        applicationAssignmentPolicy.generateDeviceApplicationMapping(getTopology());
+        applicationAssignmentPolicy.generateFogApplicationMapping(getTopology());
 
     }
 
@@ -92,7 +125,7 @@ public class Topology {
 
         ITopologyExporter exporter = new MaxinetExporter();
 
-        exporter.exportTopology(topology, exportPath);
+        exporter.exportTopology(getTopology(), exportPath);
 
     }
 
