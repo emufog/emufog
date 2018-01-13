@@ -89,6 +89,7 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
             for(Node neighbor : neighbors){
                 if(isCrossASEdge(node, neighbor)){
                     if(node instanceof Router){
+                        // TODO: Debug if statement feels wrong.
                         if(!isRouter((Router) node)){ ((Router) node).setType(BACKBONE_ROUTER);}
                     }
                 }
