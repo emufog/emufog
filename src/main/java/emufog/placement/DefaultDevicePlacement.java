@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class DefaultDevicePlacement implements IDevicePlacement {
 
-    private List<Router> edgeRouters;
+    private List<Router> edgeRouters = null;
 
     @Override
     /**
@@ -25,7 +25,12 @@ public class DefaultDevicePlacement implements IDevicePlacement {
 
         Settings settings = Settings.getInstance();
 
-        edgeRouters = (List<Router>) topology.nodes().stream().filter(node -> node instanceof Router).filter(node -> ((Router) node).getType().equals(ROUTER)).collect(Collectors.toList());
+        //get stream of nodes filter for edge routers and add them to edgeRouters list.
+        topology.nodes()
+                .stream()
+                .filter(n -> n instanceof Router)
+                .filter(n -> ((Router) n).getType().equals(ROUTER))
+                .forEach(n -> edgeRouters.add((Router)n));
 
         Random random = new Random();
 
