@@ -8,8 +8,13 @@ import emufog.topology.Router;
 import emufog.util.Logger;
 import emufog.util.LoggerLevel;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static emufog.topology.Types.RouterType.BACKBONE_ROUTER;
 import static emufog.topology.Types.RouterType.ROUTER;
@@ -19,7 +24,7 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
     /* percentage of the average degree to compare to */
     private static final float BACKBONE_DEGREE_PERCENTAGE = 0.6f;
 
-    private List<Router> routers;
+    private List<Router> routers = null;
 
     @Override
     public MutableNetwork identifyEdge(MutableNetwork<Node, Link> topology) {
@@ -52,7 +57,7 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
 
         Logger logger = Logger.getInstance();
 
-        routers = (List<Router>) t.nodes().stream().filter(node -> node instanceof Router);
+        t.nodes().stream().filter(node -> node instanceof Router).forEach(node -> routers.add((Router) node));
 
         long start = System.nanoTime();
         markASEdgeNodes(t);
@@ -138,17 +143,20 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
 
         Traverser<Node> traverser = Traverser.forGraph(t);
 
-        List<Router> backboneRouters = (List<Router>) routers.stream().filter(node -> node.getType().equals(BACKBONE_ROUTER));
+        List<Router> backboneRouters = routers.stream().filter(node -> node.getType().equals(BACKBONE_ROUTER)).collect(Collectors.toList());
 
         for(Node node : traverser.breadthFirst(backboneRouters.get(1))){
 
             if(node instanceof Router){
 
-                List<Router> predecessors = (List<Router>)t.predecessors(node).stream().filter(n -> n instanceof Router);
+                List<Router> adjacentNodes = null;
+
+                // add
+                t.adjacentNodes(node).stream().filter(n-> n instanceof Router).forEach(n -> adjacentNodes.add(((Router) n)));
 
                 if(isBackboneRouter((Router) node)){
-                    if(!predecessors.isEmpty()){
-                        for(Router predecessor : predecessors){
+                    if(!adjacentNodes.isEmpty()){
+                        for(Router predecessor : adjacentNodes){
                             predecessor.setType(BACKBONE_ROUTER);
                         }
                     }
