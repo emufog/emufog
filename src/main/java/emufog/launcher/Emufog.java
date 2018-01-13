@@ -18,6 +18,7 @@ import emufog.util.Logger;
 import emufog.util.LoggerLevel;
 import emufog.util.Tuple;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Paths;
 
@@ -35,7 +36,37 @@ public class Emufog {
      * @param args arguments of the command line
      */
     public static void main(String[] args) {
-        // logger to write to log file and command line
+
+        /**
+         * Alternative main implementation using new Topology representation.
+         *
+         */
+
+        Logger logger = Logger.getInstance();
+        logger.logSeparator();
+        logger.log("Welcome to EmuFog - MultiTierApplication");
+        logger.logSeparator();
+
+        Arguments arguments = new Arguments();
+
+        try {
+            //parse the command line arguments
+            JCommander.newBuilder().addObject(arguments).build().parse(args);
+
+            //initialize Settings.
+            Settings.read(arguments.settingsPath);
+
+            Topology topology = new Topology.TopologyBuilder().build();
+
+            topology.export();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        /*// logger to write to log file and command line
         Logger logger = Logger.getInstance();
         logger.logSeparator();
         logger.log("Welcome to EmuFog");
@@ -51,11 +82,6 @@ public class Emufog {
             Settings.read(arguments.settingsPath);
 
             Settings settings = Settings.getInstance();
-
-            Topology topology = new Topology.TopologyBuilder().setup(Settings.getInstance()).build();
-
-            topology.export();
-
 
             // determines the respective format reader
             GraphReader reader = getReader(arguments.inputType, settings);
@@ -108,7 +134,7 @@ public class Emufog {
             e.printStackTrace();
         } finally {
             logger.log("Closing EmuFog");
-        }
+        }*/
     }
 
 }

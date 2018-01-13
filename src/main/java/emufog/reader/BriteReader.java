@@ -5,6 +5,7 @@ import com.google.common.graph.NetworkBuilder;
 import emufog.topology.Link;
 import emufog.topology.Node;
 import emufog.topology.Router;
+import emufog.util.UniqueIDProvider;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -62,6 +63,9 @@ public class BriteReader extends TopologyReader{
                 Router router = new Router(id, asID);
                 router.setType(ROUTER);
                 topology.addNode(router);
+
+                //avoid ID duplicates
+                UniqueIDProvider.getInstance().markIDused(id);
             }
 
             line = reader.readLine();
@@ -87,6 +91,9 @@ public class BriteReader extends TopologyReader{
                 int to = Integer.parseInt(values[2]);
                 float delay = Float.parseFloat(values[4]);
                 float bandwidth = Float.parseFloat(values[5]);
+
+                //avoid ID duplicates.
+                UniqueIDProvider.getInstance().markIDused(id);
 
                 Link l = new Link(id,delay,bandwidth);
 
