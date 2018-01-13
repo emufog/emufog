@@ -1,4 +1,4 @@
-package emufog.graph;
+package emufog.util;
 
 import emufog.settings.Settings;
 
@@ -11,6 +11,8 @@ public class UniqueIPProvider {
     /* the last assigned IP in the network */
     private String lastIP;
 
+    private static UniqueIPProvider INSTANCE;
+
     /**
      * Creates a new IP provider with the base address of the
      * subnet from the given settings.
@@ -21,12 +23,28 @@ public class UniqueIPProvider {
         lastIP = settings.getBaseAddress();
     }
 
+
+    /**
+     * Returns the UniqueIPProvider instance. If not yet instantiated creates new instance.
+     * @return singleton instance of UniqueIPProvider
+     */
+    public static UniqueIPProvider getInstance(){
+        if(INSTANCE == null){
+            try {
+                INSTANCE = new UniqueIPProvider(Settings.getInstance());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return INSTANCE;
+    }
+
     /**
      * Calculates and returns the next available IP address in the subnet.
      *
      * @return IP address
      */
-    String getNextIPV4Address() {
+    public String getNextIPV4Address() {
         String[] nums = lastIP.split("\\.");
         int i = (Integer.parseInt(nums[0]) << 24 | Integer.parseInt(nums[2]) << 8
                 | Integer.parseInt(nums[1]) << 16 | Integer.parseInt(nums[3])) + 1;

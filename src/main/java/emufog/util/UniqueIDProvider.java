@@ -25,7 +25,7 @@ public class UniqueIDProvider {
     }
 
     /**
-     * Returns the unique IDProvider instance. In not yet instantiated the method creates a new instance of IDProvider.
+     * Returns the unique IDProvider instance. If not yet instantiated the method creates a new instance of IDProvider.
      * @return instance of UniqueIDProvider
      */
     public static UniqueIDProvider getInstance(){

@@ -6,6 +6,7 @@ import emufog.settings.Settings;
 import emufog.util.Logger;
 import emufog.util.LoggerLevel;
 import emufog.util.UniqueIDProvider;
+import emufog.util.UniqueIPProvider;
 
 import java.util.*;
 

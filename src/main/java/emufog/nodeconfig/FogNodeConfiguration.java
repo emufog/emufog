@@ -1,25 +1,26 @@
 package emufog.nodeconfig;
 
+import emufog.topology.FogNode;
+
 import java.util.List;
 
 public class FogNodeConfiguration extends NodeConfiguration {
 
-    //TODO: Change Type to correct Fog Node datatype.
-    private List<String> dependencies;
+    private List<FogNode> dependencies;
 
     public FogNodeConfiguration(String IP) {
         super(IP);
     }
 
-    public void setDependencies(List<String> dependencies) {
+    public void setDependencies(List<FogNode> dependencies) {
         this.dependencies = dependencies;
     }
 
-    public void addDependency(String fogNode){
+    public void addDependency(FogNode fogNode){
         dependencies.add(fogNode);
     }
 
-    public List<String> getDependencies() {
+    public List<FogNode> getDependencies() {
         return dependencies;
     }
 }
