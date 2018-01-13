@@ -1,6 +1,7 @@
 package emufog.application;
 
 import emufog.container.Docker;
+import emufog.topology.Types.ApplicationType;
 
 /**
  * Application object defining container, mounts, scripts.
@@ -11,11 +12,7 @@ public class Application {
 
     private String type;
 
-/*    private ApplicationType type;*/
-
-/*    private enum ApplicationType {
-        DEVICE_APPLICATION, FOG_APPLICATION
-    }*/
+    private ApplicationType applicationType;
 
     Docker container = new Docker();
 
@@ -46,4 +43,11 @@ public class Application {
 
     }
 
+    public void setApplicationType(ApplicationType applicationType) {
+        this.applicationType = applicationType;
+    }
+
+    public ApplicationType getApplicationType() {
+        return applicationType;
+    }
 }

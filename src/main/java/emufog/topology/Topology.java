@@ -57,10 +57,10 @@ public class Topology {
             end = System.nanoTime();
             logger.log("It took " + Logger.convertToMs(start,end) + "ms to create the FogLayout");
 
-            start = System.nanoTime();
+           /* start = System.nanoTime();
             placeFogNodes();
             end = System.nanoTime();
-            logger.log("It took " + Logger.convertToMs(start,end) + "ms to place the FogNodes");
+            logger.log("It took " + Logger.convertToMs(start,end) + "ms to place the FogNodes");*/
 
             start = System.nanoTime();
             assignApplications();
@@ -96,7 +96,7 @@ public class Topology {
 
     }
 
-    private void createFogLayout(){
+    private void createFogLayout() throws Exception {
         IFogLayout fogLayout = new DefaultFogLayout();
         fogLayout.identifyFogNodes(getTopology());
     }
