@@ -28,7 +28,7 @@ public class DefaultDevicePlacement implements IDevicePlacement {
                 int count = (int) (random.nextFloat() * upper);
 
                 for(int i = 0; i < count; ++i){
-                    Device device = new Device(, router.getAsID(), type);
+                    Device device = new Device(count, router.getAsID(), type);
                     topology.addNode(device);
 
                 }

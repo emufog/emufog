@@ -14,12 +14,25 @@ public class UniqueIDProvider {
     /* set to keep track of all used IDs */
     private final BitSet bitSet;
 
+    private static UniqueIDProvider INSTANCE;
+
     /**
      * Creates a new ID provider.
      */
     UniqueIDProvider() {
         current = 0;
         bitSet = new BitSet();
+    }
+
+    /**
+     * Returns the unique IDProvider instance. In not yet instantiated the method creates a new instance of IDProvider.
+     * @return
+     */
+    public static UniqueIDProvider getInstance(){
+        if(INSTANCE == null){
+            INSTANCE = new UniqueIDProvider();
+        }
+        return INSTANCE;
     }
 
     /**
