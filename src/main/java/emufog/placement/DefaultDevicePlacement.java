@@ -39,9 +39,6 @@ public class DefaultDevicePlacement implements IDevicePlacement {
                     topology.addNode(device);
                     Link link = new Link(idProvider.getNextID(), settings.getEdgeDeviceDelay(),settings.getEdgeDeviceBandwidth());
                     topology.addEdge(device, router, link);
-
-
-
                 }
             }
         }
