@@ -6,7 +6,7 @@ import emufog.graph.Node;
 import java.util.*;
 
 /**
- * This node represents a node of the sub graph used to identify fog nodeconfig.
+ * This node represents a node of the sub graph used to identify fog nodes.
  * The original node of the underlying graph identifies this node.
  */
 abstract class FogNode {
@@ -20,10 +20,10 @@ abstract class FogNode {
     /* mapping the connected edge node to a tuple of <predecessor, costs> */
     final Map<EdgeNode, Connection> connectedNodes;
 
-    /* number of nodeconfig covered with the current associated type */
+    /* number of nodes covered with the current associated type */
     private int coveredCount;
 
-    /* list of edge nodeconfig that are covered by this node */
+    /* list of edge nodes that are covered by this node */
     private List<EdgeNode> coveredNodes;
 
     /* average connection costs for  */
@@ -78,8 +78,8 @@ abstract class FogNode {
     }
 
     /**
-     * Removes the given edge node from the connected nodeconfig.
-     * Deletes the node from the graph if there are no connected nodeconfig left.
+     * Removes the given edge node from the connected nodes.
+     * Deletes the node from the graph if there are no connected nodes left.
      *
      * @param start covered edge node
      */
@@ -113,19 +113,19 @@ abstract class FogNode {
     }
 
     /**
-     * Returns a collection of all connected edge nodeconfig.
+     * Returns a collection of all connected edge nodes.
      *
-     * @return collection of edge nodeconfig
+     * @return collection of edge nodes
      */
     Collection<EdgeNode> getConnectedEdgeNodes() {
         return connectedNodes.keySet();
     }
 
     /**
-     * Returns the list of covered nodeconfig if this node is picked as a placement.
+     * Returns the list of covered nodes if this node is picked as a placement.
      * Result is sorted based on their connection costs.
      *
-     * @return list of covered edge nodeconfig
+     * @return list of covered edge nodes
      */
     List<EdgeNode> getCoveredEdgeNodes() {
         if (coveredNodes == null) {
@@ -145,7 +145,7 @@ abstract class FogNode {
 
             //TODO debug
             if (this instanceof EdgeNode) {
-                assert coveredNodes.contains((EdgeNode) this) : "edge node is not part of its own covered nodeconfig set";
+                assert coveredNodes.contains((EdgeNode) this) : "edge node is not part of its own covered nodes set";
             }
         }
 
@@ -175,7 +175,7 @@ abstract class FogNode {
     }
 
     /**
-     * Returns the average connection costs for all edge nodeconfig connected to this node.
+     * Returns the average connection costs for all edge nodes connected to this node.
      *
      * @return average connection costs
      */
@@ -232,7 +232,7 @@ abstract class FogNode {
     }
 
     /**
-     * Returns the average deployment costs for all edge nodeconfig connected to this node.
+     * Returns the average deployment costs for all edge nodes connected to this node.
      *
      * @return average deployment costs
      */

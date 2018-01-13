@@ -47,12 +47,12 @@ public class FogNodeClassifier {
     }
 
     /**
-     * This method identifies the fog nodeconfig in the given graph. The settings passed to
+     * This method identifies the fog nodes in the given graph. The settings passed to
      * the constructor are used for the algorithm. The result might not be optimal as the
      * method uses a greedy algorithm to approximate the optimal solution.
      *
-     * @param graph graph to find fog nodeconfig in
-     * @return result object with the list of fog nodeconfig or failure state
+     * @param graph graph to find fog nodes in
+     * @return result object with the list of fog nodes or failure state
      * @throws IllegalArgumentException throws exception if the graph parameter is null
      */
     public FogResult findFogNodes(Graph graph) throws IllegalArgumentException {
@@ -78,7 +78,7 @@ public class FogNodeClassifier {
             count++;
         }
 
-        // add all nodeconfig of the partial result to the final list
+        // add all nodes of the partial result to the final list
         boolean stop = false;
         Tuple<AS, Future<FogResult>> t = null;
         try {
@@ -132,7 +132,7 @@ public class FogNodeClassifier {
     }
 
     /**
-     * Indicates if there are still fog nodeconfig to place available.
+     * Indicates if there are still fog nodes to place available.
      *
      * @return true if there are, none if 0
      */

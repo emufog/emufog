@@ -72,6 +72,10 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
 
     }
 
+    /**
+     * This method marks all cross-AS edge's endpoints as BACKBONE_ROUTER's
+     * @param t
+     */
     private void markASEdgeNodes(MutableNetwork<Node, Link> t){
 
         for (Node node : t.nodes()){
@@ -101,6 +105,16 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
                 router.setType(BACKBONE_ROUTER);
             }
         }
+    }
+
+    /**
+     * Checks if the neighbor of the given node is member of another AS.
+     * @param node
+     * @param neighbor
+     * @return true if neighbor is member in another AS
+     */
+    private boolean isCrossASEdge(Node node, Node neighbor){
+        return node.getAsID() != neighbor.getAsID();
     }
 
 
@@ -140,20 +154,24 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
                     }
                 }
             }
-
-
         }
 
     }
 
-    private boolean isCrossASEdge(Node node, Node neighbor){
-        return node.getAsID() != neighbor.getAsID();
-    }
-
+    /**
+     * Simple Router enum type check.
+     * @param router
+     * @return true if Router is of type ROUTER
+     */
     private boolean isRouter(Router router){
         return ROUTER.equals(router.getType());
     }
 
+    /**
+     * Simple Router enum type check.
+     * @param router
+     * @return true if Router is of type BACKBONE_ROUTER
+     */
     private boolean isBackboneRouter(Router router){
         return router.getType().equals(BACKBONE_ROUTER);
     }

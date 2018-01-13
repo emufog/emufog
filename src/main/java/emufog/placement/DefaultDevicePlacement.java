@@ -17,6 +17,9 @@ public class DefaultDevicePlacement implements IDevicePlacement {
     private List<Router> edgeRouters;
 
     @Override
+    /**
+     * Assigns the devices specified in the settings to the edge nodes on a random base.
+     */
     public void assignEdgeDevices(MutableNetwork topology, List<DeviceNodeType> deviceNodeTypes) throws Exception {
 
         Settings settings = Settings.getInstance();
