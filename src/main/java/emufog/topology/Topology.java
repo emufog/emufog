@@ -16,7 +16,6 @@ import java.util.Map;
 
 public class Topology {
 
-
     private static MutableNetwork<Node, Link> INSTANCE;
 
     private Settings settings;
@@ -53,11 +52,20 @@ public class Topology {
             end = System.nanoTime();
             logger.log("It took " + Logger.convertToMs(start,end) + "ms to place the Devices");
 
+            start = System.nanoTime();
             createFogLayout();
+            end = System.nanoTime();
+            logger.log("It took " + Logger.convertToMs(start,end) + "ms to create the FogLayout");
 
+            start = System.nanoTime();
             placeFogNodes();
+            end = System.nanoTime();
+            logger.log("It took " + Logger.convertToMs(start,end) + "ms to place the FogNodes");
 
+            start = System.nanoTime();
             assignApplications();
+            end = System.nanoTime();
+            logger.log("It took " + Logger.convertToMs(start,end) + "ms to assignApplications to devices and fog nodes");
 
         } catch (Exception e){
             e.printStackTrace();
@@ -108,7 +116,6 @@ public class Topology {
         applicationAssignmentPolicy.generateFogApplicationMapping(getTopology());
 
     }
-
 
 
     public static class TopologyBuilder{
