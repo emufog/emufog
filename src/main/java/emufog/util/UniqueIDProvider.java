@@ -1,4 +1,4 @@
-package emufog.graph;
+package emufog.util;
 
 import java.util.BitSet;
 
@@ -19,14 +19,14 @@ public class UniqueIDProvider {
     /**
      * Creates a new ID provider.
      */
-    UniqueIDProvider() {
+    private UniqueIDProvider() {
         current = 0;
         bitSet = new BitSet();
     }
 
     /**
      * Returns the unique IDProvider instance. In not yet instantiated the method creates a new instance of IDProvider.
-     * @return
+     * @return instance of UniqueIDProvider
      */
     public static UniqueIDProvider getInstance(){
         if(INSTANCE == null){
@@ -41,7 +41,7 @@ public class UniqueIDProvider {
      *
      * @return the new ID
      */
-    int getNextID() {
+    public int getNextID() {
         current = bitSet.nextClearBit(current);
 
         return current;
@@ -52,7 +52,7 @@ public class UniqueIDProvider {
      *
      * @param id the ID already in use
      */
-    void markIDused(int id) {
+    public void markIDused(int id) {
         bitSet.set(id, true);
     }
 
@@ -62,7 +62,7 @@ public class UniqueIDProvider {
      * @param id ID to check
      * @return true if the ID already used, false otherwise
      */
-    boolean isUsed(int id) {
+    public boolean isUsed(int id) {
         return bitSet.get(id);
     }
 }

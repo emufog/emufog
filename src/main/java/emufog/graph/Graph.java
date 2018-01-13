@@ -1,11 +1,11 @@
 package emufog.graph;
 
-import emufog.docker.DeviceType;
 import emufog.docker.FogType;
 import emufog.nodeconfig.DeviceNodeType;
 import emufog.settings.Settings;
 import emufog.util.Logger;
 import emufog.util.LoggerLevel;
+import emufog.util.UniqueIDProvider;
 
 import java.util.*;
 

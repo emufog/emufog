@@ -18,13 +18,15 @@ import java.util.List;
  */
 public class Settings {
 
+    private static Settings INSTANCE;
+
     /* base IPv4 address of the network's subnet */
     private String baseAddress;
 
     /* indicates whether the output file can be overwritten or not */
     private  boolean overwriteExperimentFile;
 
-    /* maximal number of fog nodeconfig to place in the network */
+    /* maximal number of fog nodes to place in the network */
     private  int maxFogNodes;
 
     /* upper threshold of the cost function to limit the fog node placement */
@@ -59,7 +61,7 @@ public class Settings {
 
     public Settings(){}
 
-    public Settings read(Path settingsPath) throws FileNotFoundException {
+    public static void read(Path settingsPath) throws FileNotFoundException {
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(Settings.class, new SettingsDeserializer());
@@ -69,9 +71,13 @@ public class Settings {
 
         Gson gson = gsonBuilder.create();
 
-        Settings settings = gson.fromJson(new FileReader(settingsPath.toFile()), Settings.class);
+        INSTANCE = gson.fromJson(new FileReader(settingsPath.toFile()), Settings.class);
+    }
 
-        return settings;
+    public static Settings getInstance() throws Exception {
+        if(INSTANCE == null) throw new Exception("There is no Settings file instantiated yet!");
+
+        return INSTANCE;
     }
 
 

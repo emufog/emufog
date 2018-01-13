@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface IDevicePlacement {
 
-    void assignEdgeDevices(MutableNetwork topology, List<DeviceNodeType> deviceNodeTypes);
+    void assignEdgeDevices(MutableNetwork topology, List<DeviceNodeType> deviceNodeTypes) throws Exception;
 }

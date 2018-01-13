@@ -48,9 +48,11 @@ public class Emufog {
             // parse the command line arguments
             JCommander.newBuilder().addObject(arguments).build().parse(args);
 
-            Settings settings = new Settings().read(arguments.settingsPath);
+            Settings.read(arguments.settingsPath);
 
-            Topology topology = new Topology.TopologyBuilder().setup(settings).build();
+            Settings settings = Settings.getInstance();
+
+            Topology topology = new Topology.TopologyBuilder().setup(Settings.getInstance()).build();
 
             topology.export();
 
@@ -102,6 +104,8 @@ public class Emufog {
             e.printStackTrace();
             logger.log("An exception stopped EmuFog!", LoggerLevel.ERROR);
             logger.log("Error message: " + e.getMessage(), LoggerLevel.ERROR);
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             logger.log("Closing EmuFog");
         }

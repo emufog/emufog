@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 
 import static emufog.topology.Types.RouterType.BACKBONE_ROUTER;
-import static emufog.topology.Types.RouterType.EDGE_ROUTER;
 import static emufog.topology.Types.RouterType.ROUTER;
 
 public class DefaultEdgeIdentifier implements IEdgeIdentifier {
@@ -120,6 +119,7 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
 
     }
 
+    //TODO: Finish implementation of buildSingleBackbone method.
     private void buildSingleBackbone(MutableNetwork<Node, Link> t){
 
         Traverser<Node> traverser = Traverser.forGraph(t);

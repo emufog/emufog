@@ -2,7 +2,6 @@ package emufog.topology;
 
 public class Router extends Node{
 
-
     private Types.RouterType type;
 
     private int deviceCount;
