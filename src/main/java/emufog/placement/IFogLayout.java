@@ -6,6 +6,4 @@ public interface IFogLayout {
 
     void identifyFogNodes(MutableNetwork topology);
 
-    void placeFogNodes(MutableNetwork topology);
-
 }

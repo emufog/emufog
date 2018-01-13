@@ -1,7 +1,6 @@
 package emufog.placement;
 
 import com.google.common.graph.MutableNetwork;
-import emufog.graph.UniqueIPProvider;
 import emufog.settings.Settings;
 import emufog.topology.Link;
 import emufog.util.UniqueIDProvider;

@@ -10,8 +10,4 @@ public class DefaultFogLayout implements IFogLayout{
 
     }
 
-    @Override
-    public void placeFogNodes(MutableNetwork topology) {
-
-    }
 }

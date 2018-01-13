@@ -53,8 +53,12 @@ public class Topology {
             end = System.nanoTime();
             logger.log("It took " + Logger.convertToMs(start,end) + "ms to place the Devices");
 
+            createFogLayout();
+
             placeFogNodes();
+
             assignApplications();
+
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -76,7 +80,7 @@ public class Topology {
 
     }
 
-    private void assignEdgeDevices(){
+    private void assignEdgeDevices() throws Exception {
 
         IDevicePlacement devicePlacement = new DefaultDevicePlacement();
 
@@ -84,12 +88,15 @@ public class Topology {
 
     }
 
+    private void createFogLayout(){
+        IFogLayout fogLayout = new DefaultFogLayout();
+        fogLayout.identifyFogNodes(getTopology());
+    }
+
     private void placeFogNodes(){
 
-        IFogLayout fogLayout = new DefaultFogLayout();
-
-        fogLayout.identifyFogNodes(getTopology());
-        fogLayout.placeFogNodes(getTopology());
+        IFogPlacement fogPlacement = new DefaultFogPlacement();
+        fogPlacement.placeFogNodes(getTopology());
 
     }
 
