@@ -88,6 +88,7 @@ public class Settings {
         INSTANCE = gson.fromJson(new FileReader(settingsPath.toFile()), Settings.class);*/
 
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+
         try {
             INSTANCE = mapper.readValue(new File(settingsPath.toString()), Settings.class);
             Logger logger = Logger.getInstance();

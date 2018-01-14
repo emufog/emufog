@@ -1,14 +1,15 @@
 package emufog.settings;
 
 import com.google.gson.*;
+import emufog.nodeconfig.FogNodeType;
 
 import java.lang.reflect.Type;
 
-public class FogNodeDeserializer implements JsonDeserializer<FogNode>{
+public class FogNodeDeserializer implements JsonDeserializer<FogNodeType>{
     @Override
-    public FogNode deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public FogNodeType deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
 
-        final FogNode fogNode;
+        final FogNodeType fogNode;
 
         final JsonObject jsonObject = json.getAsJsonObject();
 
@@ -17,7 +18,7 @@ public class FogNodeDeserializer implements JsonDeserializer<FogNode>{
         final int maximumConnections = jsonObject.get("MaximumConnections").getAsInt();
         final double costs = jsonObject.get("Costs").getAsDouble();
 
-        fogNode = new FogNode(memoryLimit,cpuShare,maximumConnections,costs);
+        fogNode = new FogNodeType(memoryLimit,cpuShare,maximumConnections,costs);
 
         return fogNode;
     }

@@ -2,6 +2,8 @@ package emufog.settings;
 
 import com.google.gson.*;
 import emufog.application.Application;
+import emufog.nodeconfig.DeviceNodeType;
+import emufog.nodeconfig.FogNodeType;
 
 import java.lang.reflect.Type;
 
@@ -23,13 +25,13 @@ public class SettingsDeserializer implements JsonDeserializer<Settings> {
 
         //TODO: Repair Device and Fog node deserializers.
 
-        DeviceNode[] deviceNodes = context.deserialize(jsonObject.get("DeviceNodes"), DeviceNode[].class);
-        FogNode[] fogNodes = context.deserialize(jsonObject.get("FogNodes"), FogNode[].class);
+        DeviceNodeType[] deviceNodeTypes = context.deserialize(jsonObject.get("DeviceNodes"), DeviceNodeType[].class);
+        FogNodeType[] fogNodeTypes = context.deserialize(jsonObject.get("FogNodes"), FogNodeType[].class);
         Application[] applications = context.deserialize(jsonObject.get("Applications"), Application[].class);
 
-        settings.setDeviceNodeTypes(deviceNodes);
-        settings.setFogNodeTypes(fogNodes);
-        settings.setApplications(applications);
+        settings.setDeviceNodeTypes(deviceNodeTypes);
+        settings.setFogNodeTypes(fogNodeTypes);
+        settings.setFogApplications(applications);
 
         return settings;
     }
