@@ -20,9 +20,6 @@ class Arguments {
     @Parameter(names = {"--output", "-o"}, description = "path to the output file")
     String output;
 
-    @Parameter(names = {"--fogLayout", "-l"}, description = "selector for desired fog layout type")
-    String fogLayout;
-
     @Parameter(names = {"--file", "-f"}, description = "files to read in")
     List<Path> files = new ArrayList<>();
 }

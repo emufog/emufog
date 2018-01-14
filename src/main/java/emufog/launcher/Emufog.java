@@ -1,6 +1,8 @@
 package emufog.launcher;
 
 import com.beust.jcommander.JCommander;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import emufog.backbone.BackboneClassifier;
 import emufog.docker.FogType;
 import emufog.export.CoupledMaxiNetExporter;
@@ -113,7 +115,7 @@ public class Emufog {
             // find the fog node placements
             FogResult result = new FogNodeClassifier(settings).findFogNodes(graph);
             if (result.getStatus()) {
-                for (Tuple<Node, FogType> tuple : result.getFogNodes()) {
+                for (Tuple<Node, FogType> tuple : result.getFogNodeTypes()) {
                     graph.placeFogNode(tuple.getKey(), tuple.getValue());
                 }
                 IApplicationImageAssignmentPolicy policy = new MongoCaseAssignmentPolicy();

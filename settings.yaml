@@ -13,8 +13,8 @@ maxFogNodes: 100
 costThreshold: 6
 
 # TODO: Make this FogNode type specific.
-hostDeviceLatency: 0
-hostDeviceBandwidth: 1000
+edgeDeviceLatency: 0
+edgeDeviceBandwidth: 1000
 
 # Settings for Parallel building:
 threadCount: 1
@@ -64,6 +64,7 @@ fogNodeTypes:
 ###################################################################
 
 fogApplications:
+  # TODO: Main idea behind using yaml as settings file is possibility to copy "service" definitions from docker-compose files to emuFog.
   serviceA:
     name: serviceA
     image: alpine
@@ -76,7 +77,7 @@ fogApplications:
     name: serviceC
     image: alpine
 
-DeviceApplications:
+deviceApplications:
   serviceA:
     name: serviceA
     image: alpine

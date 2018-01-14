@@ -19,7 +19,7 @@ public class SettingsDeserializer implements JsonDeserializer<Settings> {
         settings.setCostThreshold(jsonObject.get("CostThreshold").getAsFloat());
         settings.setEdgeDeviceDelay(jsonObject.get("EdgeDeviceDelay").getAsFloat());
         settings.setThreadCount(jsonObject.get("ThreadCount").getAsInt());
-        settings.setFogGraphParallel(jsonObject.get("ParalleledFogBuilding").getAsBoolean());
+        settings.setParallelFogBuilding(jsonObject.get("ParalleledFogBuilding").getAsBoolean());
 
         //TODO: Repair Device and Fog node deserializers.
 
@@ -27,8 +27,8 @@ public class SettingsDeserializer implements JsonDeserializer<Settings> {
         FogNode[] fogNodes = context.deserialize(jsonObject.get("FogNodes"), FogNode[].class);
         Application[] applications = context.deserialize(jsonObject.get("Applications"), Application[].class);
 
-        settings.setDeviceNodes(deviceNodes);
-        settings.setFogNodes(fogNodes);
+        settings.setDeviceNodeTypes(deviceNodes);
+        settings.setFogNodeTypes(fogNodes);
         settings.setApplications(applications);
 
         return settings;

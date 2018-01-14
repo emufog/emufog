@@ -41,7 +41,7 @@ public class FogNodeClassifier {
             throw new IllegalArgumentException("No settings object given.");
         }
 
-        fogTypes = settings.getFogNodes();
+        fogTypes = settings.getFogNodeTypes();
         remainingNodes = new AtomicInteger(settings.getMaxFogNodes());
         threshold = settings.getCostThreshold();
     }
@@ -120,7 +120,7 @@ public class FogNodeClassifier {
      * @return worker class according to settings
      */
     private Worker getWorker(AS as, Settings settings) {
-        if (settings.isFogGraphParallel()) {
+        if (settings.isParallelFogBuilding()) {
             return new ParallelFogWorker(as, this);
         } else {
             return new SequentialFogWorker(as, this);

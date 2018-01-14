@@ -192,7 +192,7 @@ public class Graph {
     public void assignEdgeDevices(){
         Random random = new Random();
 
-        for(DeviceNodeType type : settings.getDeviceNodes()){
+        for(DeviceNodeType type : settings.getDeviceNodeTypes()){
             float upper = Math.abs(type.getAverageDeviceCount()) * 2;
 
             for (Router r : getRouters()){

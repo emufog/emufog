@@ -1,16 +1,20 @@
 package emufog.settings;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import emufog.application.Application;
 import emufog.nodeconfig.DeviceNodeType;
 import emufog.nodeconfig.FogNodeType;
+import emufog.util.Logger;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
+import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.List;
 
 // TODO: Complete settings class needs to be reworked.
 
@@ -24,52 +28,56 @@ public class Settings {
 
     private static Settings INSTANCE;
 
-    /* base IPv4 address of the network's subnet */
-    private String baseAddress;
-
-    /* indicates whether the output file can be overwritten or not */
-    private  boolean overwriteExperimentFile;
-
-    /* maximal number of fog nodes to place in the network */
-    private  int maxFogNodes;
-
-    /* upper threshold of the cost function to limit the fog node placement */
-    private  float costThreshold;
-
-    /* latency delay between a host device and the edge node */
-    private  float edgeDeviceDelay;
-
-    /* bandwidth between a host device and the edge node */
-    private  float edgeDeviceBandwidth;
-
-    /* number of threads to use for the backbone and fog placement */
-    private  int threadCount;
-
-    /* indicator whether the fog graph should be build in parallel */
-    private  boolean fogGraphParallel;
-
-    private  FogNodeType[] fogNodes;
-
-    private  DeviceNodeType[] deviceNodes;
-
-
-    private  Application[] applications;
-
+    /****************************
+     *  Input/Output Settings   *
+     ****************************/
+    // path to input topology
     private Path inputGraphFilePath;
 
+    // path to export experiment to
     private Path exportFilePath;
 
-    public Path getExportFilePath() {
-        return exportFilePath;
-    }
+    //indicates whether the output file can be overwritten or not
+    private  boolean overwriteExperimentFile;
 
+    /****************************
+     *  Basic Settings          *
+     ****************************/
+    //base IPv4 address of the network's subnet
+    private String baseAddress;
+
+    //maximal number of fog nodes to place in the network
+    private  int maxFogNodes;
+
+    // upper threshold of the cost function to limit the fog node placement
+    private  float costThreshold;
+
+    // latency delay between a host device and the edge node
+    private  float edgeDeviceDelay;
+
+    // bandwidth between a host device and the edge node
+    private  float edgeDeviceBandwidth;
+
+    // number of threads to use for the backbone and fog placement
+    private  int threadCount;
+
+    // indicator whether the fog graph should be build in parallel
+    private  boolean parallelFogBuilding;
+
+    private  DeviceNodeType[] deviceNodeTypes;
+
+    private  FogNodeType[] fogNodeTypes;
+
+    private  Application[] fogApplications;
+
+    private  Application[] deviceApplications;
 
 
     public Settings(){}
 
     public static void read(Path settingsPath) throws FileNotFoundException {
 
-        GsonBuilder gsonBuilder = new GsonBuilder();
+/*        GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(Settings.class, new SettingsDeserializer());
         gsonBuilder.registerTypeAdapter(FogNodeType.class, new FogNodeDeserializer());
         gsonBuilder.registerTypeAdapter(DeviceNodeType.class, new DeviceNodeDeserializer());
@@ -77,7 +85,23 @@ public class Settings {
 
         Gson gson = gsonBuilder.create();
 
-        INSTANCE = gson.fromJson(new FileReader(settingsPath.toFile()), Settings.class);
+        INSTANCE = gson.fromJson(new FileReader(settingsPath.toFile()), Settings.class);*/
+
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        try {
+            INSTANCE = mapper.readValue(new File(settingsPath.toString()), Settings.class);
+            Logger logger = Logger.getInstance();
+            //Print Settings Object as String to check if parsing was successful.
+            logger.log(ReflectionToStringBuilder.toString(INSTANCE, ToStringStyle.MULTI_LINE_STYLE));
+        } catch (JsonParseException e) {
+            e.printStackTrace();
+        } catch (JsonMappingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     /**
@@ -91,99 +115,116 @@ public class Settings {
         return INSTANCE;
     }
 
-
-    //TODO: Rework complete getter und setting logic.
-
-    protected void setBaseAddress(String baseAddress) {
-        this.baseAddress = baseAddress;
+    public Path getInputGraphFilePath() {
+        return inputGraphFilePath;
     }
 
-    protected void setOverwriteExperimentFile(boolean overwriteExperimentFile) {
-        this.overwriteExperimentFile = overwriteExperimentFile;
+    public void setInputGraphFilePath(Path inputGraphFilePath) {
+        this.inputGraphFilePath = inputGraphFilePath;
     }
 
-    protected void setMaxFogNodes(int maxFogNodes) {
-        this.maxFogNodes = maxFogNodes;
+    public Path getExportFilePath() {
+        return exportFilePath;
     }
 
-    protected void setCostThreshold(float costThreshold) {
-        this.costThreshold = costThreshold;
-    }
-
-    protected void setEdgeDeviceDelay(float edgeDeviceDelay) {
-        this.edgeDeviceDelay = edgeDeviceDelay;
-    }
-
-    protected void setEdgeDeviceBandwidth(float edgeDeviceBandwidth) {
-        this.edgeDeviceBandwidth = edgeDeviceBandwidth;
-    }
-
-    protected void setThreadCount(int threadCount) {
-        this.threadCount = threadCount;
-    }
-
-    protected void setFogGraphParallel(boolean fogGraphParallel) {
-        this.fogGraphParallel = fogGraphParallel;
-    }
-
-    protected void setFogNodes(FogNodeType[] fogNodes) {
-        this.fogNodes = fogNodes;
-    }
-
-    protected void setDeviceNodes(DeviceNodeType[] deviceNodes) {
-        this.deviceNodes = deviceNodes;
-    }
-
-    protected void setApplications(Application[] applications) {
-        this.applications = applications;
-    }
-
-    public String getBaseAddress() {
-        return baseAddress;
+    public void setExportFilePath(Path exportFilePath) {
+        this.exportFilePath = exportFilePath;
     }
 
     public boolean isOverwriteExperimentFile() {
         return overwriteExperimentFile;
     }
 
+    public void setOverwriteExperimentFile(boolean overwriteExperimentFile) {
+        this.overwriteExperimentFile = overwriteExperimentFile;
+    }
+
+    public String getBaseAddress() {
+        return baseAddress;
+    }
+
+    public void setBaseAddress(String baseAddress) {
+        this.baseAddress = baseAddress;
+    }
+
     public int getMaxFogNodes() {
         return maxFogNodes;
+    }
+
+    public void setMaxFogNodes(int maxFogNodes) {
+        this.maxFogNodes = maxFogNodes;
     }
 
     public float getCostThreshold() {
         return costThreshold;
     }
 
+    public void setCostThreshold(float costThreshold) {
+        this.costThreshold = costThreshold;
+    }
+
     public float getEdgeDeviceDelay() {
         return edgeDeviceDelay;
+    }
+
+    public void setEdgeDeviceDelay(float edgeDeviceDelay) {
+        this.edgeDeviceDelay = edgeDeviceDelay;
     }
 
     public float getEdgeDeviceBandwidth() {
         return edgeDeviceBandwidth;
     }
 
+    public void setEdgeDeviceBandwidth(float edgeDeviceBandwidth) {
+        this.edgeDeviceBandwidth = edgeDeviceBandwidth;
+    }
+
     public int getThreadCount() {
         return threadCount;
     }
 
-    public boolean isFogGraphParallel() {
-        return fogGraphParallel;
+    public void setThreadCount(int threadCount) {
+        this.threadCount = threadCount;
     }
 
-    public List<FogNodeType> getFogNodes() {
-        return Arrays.asList(fogNodes);
+    public boolean isParallelFogBuilding() {
+        return parallelFogBuilding;
     }
 
-    public List<DeviceNodeType> getDeviceNodes() {
-        return Arrays.asList(deviceNodes);
+    public void setParallelFogBuilding(boolean parallelFogBuilding) {
+        this.parallelFogBuilding = parallelFogBuilding;
     }
 
-    public List<Application> getApplications() {
-        return Arrays.asList(applications);
+    public DeviceNodeType[] getDeviceNodeTypes() {
+        return deviceNodeTypes;
     }
 
-    public Path getInputGraphFilePath() {
-        return inputGraphFilePath;
+    public void setDeviceNodeTypes(DeviceNodeType[] deviceNodeTypes) {
+        this.deviceNodeTypes = deviceNodeTypes;
+    }
+
+    public FogNodeType[] getFogNodeTypes() {
+        return fogNodeTypes;
+    }
+
+    public void setFogNodeTypes(FogNodeType[] fogNodeTypes) {
+        this.fogNodeTypes = fogNodeTypes;
+    }
+
+    public Application[] getFogApplications() {
+        return fogApplications;
+    }
+
+    public void setFogApplications(Application[] fogApplications) {
+        this.fogApplications = fogApplications;
+    }
+
+    public Application[] getDeviceApplications() {
+        return deviceApplications;
+    }
+
+    public void setDeviceApplications(Application[] deviceApplications) {
+        this.deviceApplications = deviceApplications;
     }
 }
 

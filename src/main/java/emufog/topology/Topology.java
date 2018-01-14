@@ -92,7 +92,7 @@ public class Topology {
 
         IDevicePlacement devicePlacement = new DefaultDevicePlacement();
 
-        devicePlacement.assignEdgeDevices(getTopology(), settings.getDeviceNodes());
+        devicePlacement.assignEdgeDevices(getTopology(), settings.getDeviceNodeTypes());
 
     }
 

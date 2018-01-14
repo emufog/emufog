@@ -22,7 +22,7 @@ public class DefaultFogLayout implements IFogLayout{
     public void identifyFogNodes(MutableNetwork topology) throws Exception {
 
         // get fog types from settings
-        fogNodeTypes.addAll(Settings.getInstance().getFogNodes());
+        fogNodeTypes.addAll(Settings.getInstance().getFogNodeTypes());
 
         //get edgeRouters from stream of nodes
         topology.nodes()
