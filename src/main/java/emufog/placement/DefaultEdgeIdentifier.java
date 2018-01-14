@@ -152,10 +152,10 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
 
                 List<Router> adjacentNodes = null;
 
-                // add
                 t.adjacentNodes(node).stream().filter(n-> n instanceof Router).forEach(n -> adjacentNodes.add(((Router) n)));
 
                 if(isBackboneRouter((Router) node)){
+                    //TODO: Check this statement could be unsafe.
                     if(!adjacentNodes.isEmpty()){
                         for(Router predecessor : adjacentNodes){
                             predecessor.setType(BACKBONE_ROUTER);

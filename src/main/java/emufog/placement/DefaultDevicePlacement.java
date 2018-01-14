@@ -25,11 +25,11 @@ public class DefaultDevicePlacement implements IDevicePlacement {
 
         Settings settings = Settings.getInstance();
 
+        // TODO: Validate stream performance could be slow. Eventually experiment with parallelStreams.
         //get stream of nodes filter for edge routers and add them to edgeRouters list.
         topology.nodes()
                 .stream()
-                .filter(n -> n instanceof Router)
-                .filter(n -> ((Router) n).getType().equals(ROUTER))
+                .filter(n -> n instanceof Router && ((Router) n).getType().equals(ROUTER))
                 .forEach(n -> edgeRouters.add((Router)n));
 
         Random random = new Random();

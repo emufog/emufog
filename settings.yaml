@@ -1,0 +1,92 @@
+###################################################################
+#                  Input/Output Settings                          #
+###################################################################
+inputGraphFilePath: ""
+exportFilePath: ""
+
+overWriteOutputFile: true
+###################################################################
+#                         Basic Settings                          #
+###################################################################
+baseAdress: 10.0.0.0
+maxFogNodes: 100
+costThreshold: 6
+
+# TODO: Make this FogNode type specific.
+hostDeviceLatency: 0
+hostDeviceBandwidth: 1000
+
+# Settings for Parallel building:
+threadCount: 1
+parallelFogBuilding: false
+
+# TODO: Model Resource Settings.
+# TODO: Add fields to dynamic class loading.
+
+###################################################################
+#                         DeviceNodeTypes                         #
+###################################################################
+deviceNodeTypes:
+
+  deviceNodeType1:
+    scalingFactor: 1
+    averageDeviceCount: 1
+    memoryLimit: 524288000
+    cpuShare: 1
+
+  deviceNodeType2:
+    scalingFactor: 1
+    averageDeviceCount: 1
+    memoryLimit: 524288000
+    cpuShare: 1
+
+###################################################################
+#                         FogNodeTypes                            #
+###################################################################
+fogNodeTypes:
+
+  fogNodeType1:
+    id: 1
+    maximumConnections: 1
+    costs: 1
+    memoryLimit: 1048576000
+    cpuShare: 1
+
+  fogNodeType1:
+    id: 1
+    maximumConnections: 1
+    costs: 1
+    memoryLimit: 1048576000
+    cpuShare: 1
+
+###################################################################
+#                         Applications                            #
+###################################################################
+
+fogApplications:
+  serviceA:
+    name: serviceA
+    image: alpine
+
+  serviceB:
+    name: serviceB
+    image: alpine
+
+  serviceC:
+    name: serviceC
+    image: alpine
+
+DeviceApplications:
+  serviceA:
+    name: serviceA
+    image: alpine
+
+  serviceB:
+    name: serviceB
+    image: alpine
+
+  serviceC:
+    name: serviceC
+    image: alpine
+
+

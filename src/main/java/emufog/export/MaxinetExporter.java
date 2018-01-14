@@ -10,6 +10,6 @@ public class MaxinetExporter implements ITopologyExporter{
 
     @Override
     public void exportTopology(MutableNetwork topology, Path path) throws IOException {
-
+        //TODO: Implement exporter with new FogNode representation logic.
     }
 }

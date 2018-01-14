@@ -1,4 +1,8 @@
 {
+  "InputGraphFilePath": "",
+  "ExportFilePath": "",
+
+
   "BaseAddress": "10.0.0.0",
   "OverWriteOutputFile": true,
   "MaxFogNodes": 100,
@@ -8,10 +12,11 @@
   "ThreadCount": 1,
   "ParalleledFogBuilding": false,
 
+
   "ResourceSettings": {
   },
 
-  "DeviceNodes": [
+  "DeviceNodeTypes": [
     {
       "ScalingFactor": 1,
       "AverageDeviceCount": 1,
@@ -20,7 +25,7 @@
     }
   ],
 
-  "FogNodes": [
+  "FogNodeTypes": [
     {
       "ID": 1,
       "MaximumConnections": 1,
@@ -39,22 +44,34 @@
 
   "Applications": [
     {
-      "Name": "serviceA",
-      "ApplicationType": "FOG_APPLICATION",
-      "Image": "ubuntu",
-      "ImageVersion": "latest"
-    },
-    {
-      "Name": "serviceB",
-      "ApplicationType": "FOG_APPLICATION",
-      "Image": "ubuntu",
-      "ImageVersion": "latest"
-    },
-    {
-      "Name": "serviceC",
-      "ApplicationType": "DEVICE_APPLICATION",
-      "Image": "ubuntu",
-      "ImageVersion": "latest"
+      "CloutApplication": [
+        {
+          "Name": "serviceA",
+          "ApplicationType": "FOG_APPLICATION",
+          "Image": "ubuntu",
+          "ImageVersion": "latest"
+        }
+      ],
+      "FogApplications": [
+        {
+          "Name": "serviceB",
+          "ApplicationType": "FOG_APPLICATION",
+          "Image": "ubuntu",
+          "ImageVersion": "latest"
+        }
+      ],
+      "DeviceApplication": [
+        {
+          "Name": "serviceC",
+          "Image": "ubuntu",
+          "ImageVersion": "latest"
+        },
+        {
+          "Name": "serviceD",
+          "Image": "ubuntu",
+          "ImageVersion": "latest"
+        }
+      ]
     }
   ]
 }

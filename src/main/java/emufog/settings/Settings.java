@@ -12,6 +12,10 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
+// TODO: Complete settings class needs to be reworked.
+
+// TODO: Future work implement Field for Dynamic class loading to select desired placement algorithm for each step.
+
 /**
  * The settings class contains all different settings used within the application.
  * An instance of this class can be read in from a valid settings file.
@@ -53,11 +57,13 @@ public class Settings {
 
     private Path inputGraphFilePath;
 
+    private Path exportFilePath;
+
     public Path getExportFilePath() {
         return exportFilePath;
     }
 
-    private Path exportFilePath;
+
 
     public Settings(){}
 
@@ -74,12 +80,19 @@ public class Settings {
         INSTANCE = gson.fromJson(new FileReader(settingsPath.toFile()), Settings.class);
     }
 
+    /**
+     * Returns singleton settings instance. If settings is null throws Exception.
+     * @return
+     * @throws Exception
+     */
     public static Settings getInstance() throws Exception {
         if(INSTANCE == null) throw new Exception("There is no Settings file instantiated yet!");
 
         return INSTANCE;
     }
 
+
+    //TODO: Rework complete getter und setting logic.
 
     protected void setBaseAddress(String baseAddress) {
         this.baseAddress = baseAddress;

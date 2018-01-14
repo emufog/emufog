@@ -20,14 +20,14 @@ public class DefaultFogLayout implements IFogLayout{
 
     @Override
     public void identifyFogNodes(MutableNetwork topology) throws Exception {
+
         // get fog types from settings
         fogNodeTypes.addAll(Settings.getInstance().getFogNodes());
 
         //get edgeRouters from stream of nodes
         topology.nodes()
                 .stream()
-                .filter(n -> n instanceof Router)
-                .filter(n -> ((Router) n).getType().equals(ROUTER))
+                .filter(n -> n instanceof Router && ((Router) n).getType().equals(ROUTER))
                 .forEach(n -> edgeRouters.add((Router) n));
 
             //add fog node to each edgeRouter
