@@ -6,7 +6,6 @@ import emufog.topology.Link;
 import emufog.topology.Node;
 import emufog.topology.Router;
 import emufog.util.Logger;
-import emufog.util.UniqueIDProvider;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
@@ -14,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -69,8 +69,8 @@ public class BriteReader extends TopologyReader{
                 router.setType(ROUTER);
                 topology.addNode(router);
 
-                //avoid ID duplicates
-                UniqueIDProvider.getInstance().markIDused(id);
+                /*//avoid ID duplicates
+                UniqueIDProvider.getInstance().markIDused(id);*/
             }
 
             line = reader.readLine();
@@ -96,8 +96,6 @@ public class BriteReader extends TopologyReader{
         while (line !=null && !line.isEmpty()){
             String[] values = line.split("\t");
 
-            List<Node> incidentNodes = null;
-
             if(values.length >= 9){
                 int id = Integer.parseInt(values[0]);
                 int from = Integer.parseInt(values[1]);
@@ -105,19 +103,31 @@ public class BriteReader extends TopologyReader{
                 float delay = Float.parseFloat(values[4]);
                 float bandwidth = Float.parseFloat(values[5]);
 
-                //avoid ID duplicates.
-                UniqueIDProvider.getInstance().markIDused(id);
+                List<Node> incidentNodes = new ArrayList<>();
 
                 Link l = new Link(id,delay,bandwidth);
 
-                topology.nodes().stream().filter(node -> node.getID() == from).forEach(incidentNodes::add);
-                topology.nodes().stream().filter(node -> node.getID() == to).forEach(incidentNodes::add);
+                Logger.getInstance().log(ReflectionToStringBuilder.toString(l, ToStringStyle.MULTI_LINE_STYLE));
+
+                for(Node node : topology.nodes()){
+
+                    if(node.getID() == from){
+                        incidentNodes.add(node);
+                    }
+                    if(node.getID() == to){
+                        incidentNodes.add(node);
+                    }
+                }
+
+                for(Node node : incidentNodes){
+                    Logger.getInstance().log(ReflectionToStringBuilder.toString(node, ToStringStyle.MULTI_LINE_STYLE));
+                }
 
                 topology.addEdge(checkNotNull(incidentNodes.get(0)),checkNotNull(incidentNodes.get(1)),l);
             }
-        }
 
             line = reader.readLine();
+        }
 
         for(Link link: topology.edges()){
             Logger.getInstance().log(ReflectionToStringBuilder.toString(link, ToStringStyle.MULTI_LINE_STYLE));
