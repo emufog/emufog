@@ -16,8 +16,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 
-// TODO: Complete settings class needs to be reworked.
-
 // TODO: Future work implement Field for Dynamic class loading to select desired placement algorithm for each step.
 
 /**
