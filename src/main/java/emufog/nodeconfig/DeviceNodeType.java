@@ -1,15 +1,22 @@
 package emufog.nodeconfig;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class DeviceNodeType extends NodeType{
+
 
     private int scalingFactor;
     private float averageDeviceCount;
+    private String name;
 
 
-    public DeviceNodeType(int memoryLimit, int cpuShare, int scalingFactor, float averageDeviceCount) {
+    @JsonCreator
+    public DeviceNodeType(@JsonProperty("memoryLimit") int memoryLimit, @JsonProperty("cpuShare") int cpuShare, @JsonProperty("scalingFactor") int scalingFactor, @JsonProperty("averageDeviceCount") float averageDeviceCount, @JsonProperty("name") String name) {
         super(memoryLimit, cpuShare);
         this.scalingFactor = scalingFactor;
         this.averageDeviceCount = averageDeviceCount;
+        this.name = name;
     }
 
     public int getScalingFactor() {
@@ -18,5 +25,21 @@ public class DeviceNodeType extends NodeType{
 
     public float getAverageDeviceCount() {
         return averageDeviceCount;
+    }
+
+    public void setScalingFactor(int scalingFactor) {
+        this.scalingFactor = scalingFactor;
+    }
+
+    public void setAverageDeviceCount(float averageDeviceCount) {
+        this.averageDeviceCount = averageDeviceCount;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

@@ -22,7 +22,7 @@ public class DefaultDevicePlacement implements IDevicePlacement {
     /**
      * Assigns the devices specified in the settings to the edge nodes on a random base.
      */
-    public void assignEdgeDevices(MutableNetwork topology, DeviceNodeType[] deviceNodeTypes) throws Exception {
+    public void assignEdgeDevices(MutableNetwork topology, List<DeviceNodeType> deviceNodeTypes) throws Exception {
 
         Settings settings = Settings.getInstance();
 
@@ -32,6 +32,8 @@ public class DefaultDevicePlacement implements IDevicePlacement {
                 .stream()
                 .filter(n -> n instanceof Router && ((Router) n).getType().equals(ROUTER))
                 .forEach(n -> edgeRouters.add((Router)n));
+
+
 
         Random random = new Random();
 

@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 // TODO: Future work implement Field for Dynamic class loading to select desired placement algorithm for each step.
@@ -65,29 +66,19 @@ public class Settings {
     // indicator whether the fog graph should be build in parallel
     private boolean parallelFogBuilding;
 
-    private DeviceNodeType[] deviceNodeTypes;
+    private List<DeviceNodeType> deviceNodeTypes = new ArrayList<>();
 
-    private FogNodeType[] fogNodeTypes;
+    private List<FogNodeType>fogNodeTypes = new ArrayList<>();
 
-    private List<Application> fogApplications;
+    private List<Application> fogApplications = new ArrayList<>();
 
-    private List<Application> deviceApplications;
+    private List<Application> deviceApplications = new ArrayList<>();
 
 
     public Settings() {
     }
 
     public static void read(Path settingsPath) throws FileNotFoundException {
-
-/*        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(Settings.class, new SettingsDeserializer());
-        gsonBuilder.registerTypeAdapter(FogNodeType.class, new FogNodeDeserializer());
-        gsonBuilder.registerTypeAdapter(DeviceNodeType.class, new DeviceNodeDeserializer());
-        gsonBuilder.registerTypeAdapter(Application.class, new ApplicationDeserializer());
-
-        Gson gson = gsonBuilder.create();
-
-        INSTANCE = gson.fromJson(new FileReader(settingsPath.toFile()), Settings.class);*/
 
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 
@@ -200,19 +191,27 @@ public class Settings {
         this.parallelFogBuilding = parallelFogBuilding;
     }
 
-    public DeviceNodeType[] getDeviceNodeTypes() {
+    public boolean isOverWriteOutputFile() {
+        return overWriteOutputFile;
+    }
+
+    public void setOverWriteOutputFile(boolean overWriteOutputFile) {
+        this.overWriteOutputFile = overWriteOutputFile;
+    }
+
+    public List<DeviceNodeType> getDeviceNodeTypes() {
         return deviceNodeTypes;
     }
 
-    public void setDeviceNodeTypes(DeviceNodeType[] deviceNodeTypes) {
+    public void setDeviceNodeTypes(List<DeviceNodeType> deviceNodeTypes) {
         this.deviceNodeTypes = deviceNodeTypes;
     }
 
-    public FogNodeType[] getFogNodeTypes() {
+    public List<FogNodeType> getFogNodeTypes() {
         return fogNodeTypes;
     }
 
-    public void setFogNodeTypes(FogNodeType[] fogNodeTypes) {
+    public void setFogNodeTypes(List<FogNodeType> fogNodeTypes) {
         this.fogNodeTypes = fogNodeTypes;
     }
 

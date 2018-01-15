@@ -72,6 +72,8 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
         end = System.nanoTime();
         logger.log("It took " + Logger.convertToMs(start,end) + " to run the buildSingleBackbone method", LoggerLevel.ADVANCED);
 
+        routers.get(0).setType(ROUTER);
+
     }
 
     /**

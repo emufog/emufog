@@ -26,34 +26,33 @@ parallelFogBuilding: false
 ###################################################################
 #                         DeviceNodeTypes                         #
 ###################################################################
-deviceNodeType:
+deviceNodeTypes:
+    - name: deviceNode1
+      scalingFactor: 1
+      averageDeviceCount: 1
+      memoryLimit: 524288000
+      cpuShare: 1
 
-  deviceNodeType1:
-    scalingFactor: 1
-    averageDeviceCount: 1
-    memoryLimit: 524288000
-    cpuShare: 1
-
-  deviceNodeType2:
-    scalingFactor: 1
-    averageDeviceCount: 1
-    memoryLimit: 524288000
-    cpuShare: 1
+    - name: deviceNode2
+      scalingFactor: 1
+      averageDeviceCount: 1
+      memoryLimit: 524288000
+      cpuShare: 1
 
 ###################################################################
 #                         FogNodeTypes                            #
 ###################################################################
-fogNodeType:
+fogNodeTypes:
 
-  fogNodeType1:
+  - name: fogNodeType1
     id: 1
     maximumConnections: 1
     costs: 1
     memoryLimit: 1048576000
     cpuShare: 1
 
-  fogNodeType1:
-    id: 1
+  - name: fogNodeType2
+    id: 2
     maximumConnections: 1
     costs: 1
     memoryLimit: 1048576000
@@ -63,31 +62,32 @@ fogNodeType:
 #                         Applications                            #
 ###################################################################
 
-#fogApplications:
-#  # TODO: Main idea behind using yaml as settings file is possibility to copy "service" definitions from docker-compose files to emuFog.
-#  serviceA:
-#    name: serviceA
-#    image: alpine
-#
-#  serviceB:
-#    name: serviceB
-#    image: alpine
-#
-#  serviceC:
-#    name: serviceC
-#    image: alpine
-#
-#deviceApplications:
-#  serviceA:
-#    name: serviceA
-#    image: alpine
-#
-#  serviceB:
-#    name: serviceB
-#    image: alpine
-#
-# serviceC:
-#    name: serviceC
-#    image: alpine
+fogApplications:
+  # TODO: Main idea behind using yaml as settings file is possibility to copy "service" definitions from docker-compose files to emuFog.
+  - name: serviceA
+    container:
+      image: alpine
+
+  - name: serviceB
+    container:
+      image: alpine
+
+  - name: serviceC
+    container:
+      image: alpine
+
+deviceApplications:
+
+  - name: serviceA
+    container:
+      image: alpine
+
+  - name: serviceB
+    container:
+      image: alpine
+
+  - name: serviceC
+    container:
+      image: alpine
 
 

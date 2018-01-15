@@ -6,19 +6,20 @@ import emufog.settings.Settings;
 import emufog.topology.Device;
 import emufog.topology.FogNode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class DefaultApplicationAssignment implements IApplicationAssignmentPolicy {
 
-    private List<Device> deviceList = null;
+    private List<Device> deviceList = new ArrayList<>();
 
-    private List<FogNode> fogNodeList = null;
+    private List<FogNode> fogNodeList = new ArrayList<>();
 
-    private List<Application> fogApplications = null;
+    private List<Application> fogApplications = new ArrayList<>();
 
-    private List<Application> deviceApplications = null;
+    private List<Application> deviceApplications = new ArrayList<>();
 
     @Override
     public void generateDeviceApplicationMapping(MutableNetwork topology) {

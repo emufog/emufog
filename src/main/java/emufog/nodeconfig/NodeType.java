@@ -2,6 +2,7 @@ package emufog.nodeconfig;
 
 abstract class NodeType {
 
+
     private int memoryLimit;
     private int cpuShare;
 
@@ -16,5 +17,13 @@ abstract class NodeType {
 
     public int getCpuShare() {
         return cpuShare;
+    }
+
+    public void setMemoryLimit(int memoryLimit) {
+        this.memoryLimit = memoryLimit;
+    }
+
+    public void setCpuShare(int cpuShare) {
+        this.cpuShare = cpuShare;
     }
 }
