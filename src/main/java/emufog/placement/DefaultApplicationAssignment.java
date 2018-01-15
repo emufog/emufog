@@ -5,6 +5,9 @@ import emufog.application.Application;
 import emufog.settings.Settings;
 import emufog.topology.Device;
 import emufog.topology.FogNode;
+import emufog.util.Logger;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +31,16 @@ public class DefaultApplicationAssignment implements IApplicationAssignmentPolic
         try {
             deviceApplications = checkNotNull(Settings.getInstance().getDeviceApplications());
         } catch (Exception e) {
-            e.printStackTrace();
+            e.printStackTrace(
+            );
         }
+
+        for(Application application : deviceApplications){
+            Logger.getInstance().log(ReflectionToStringBuilder.toString(application, ToStringStyle.MULTI_LINE_STYLE));
+
+        }
+
+
 
         topology.nodes().stream().filter(n -> n instanceof Device).forEach(d -> deviceList.add(((Device) d)));
 

@@ -1,12 +1,17 @@
 package emufog.placement;
 
 import com.google.common.graph.MutableNetwork;
+import emufog.nodeconfig.DeviceNodeConfiguration;
 import emufog.nodeconfig.DeviceNodeType;
 import emufog.settings.Settings;
 import emufog.topology.Device;
 import emufog.topology.Link;
 import emufog.topology.Router;
+import emufog.util.Logger;
 import emufog.util.UniqueIDProvider;
+import emufog.util.UniqueIPProvider;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,13 +52,22 @@ public class DefaultDevicePlacement implements IDevicePlacement {
 
                 for(int i = 0; i < count; ++i){
                     Device device = new Device(idProvider.getNextID(), router.getAsID(), type);
+
+                    DeviceNodeConfiguration deviceNodeConfiguration = new DeviceNodeConfiguration(UniqueIPProvider.getInstance().getNextIPV4Address());
+
+                    device.setConfiguration(deviceNodeConfiguration);
+
                     topology.addNode(device);
                     Link link = new Link(idProvider.getNextID(), settings.getEdgeDeviceDelay(),settings.getEdgeDeviceBandwidth());
                     topology.addEdge(device, router, link);
+
+                    Logger.getInstance().log(ReflectionToStringBuilder.toString(device, ToStringStyle.MULTI_LINE_STYLE));
                 }
+
+
             }
+
+            Logger.getInstance().log(ReflectionToStringBuilder.toString(type, ToStringStyle.MULTI_LINE_STYLE));
         }
-
-
     }
 }
