@@ -8,6 +8,7 @@ import emufog.topology.Router;
 import emufog.util.Logger;
 import emufog.util.LoggerLevel;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,7 +21,7 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
     /* percentage of the average degree to compare to */
     private static final float BACKBONE_DEGREE_PERCENTAGE = 0.6f;
 
-    private List<Router> routers = null;
+    private List<Router> routers = new ArrayList<>();
 
     @Override
     public MutableNetwork identifyEdge(MutableNetwork<Node, Link> topology) {
@@ -58,18 +59,18 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
         long start = System.nanoTime();
         markASEdgeNodes(t);
         long end = System.nanoTime();
-        logger.log("It took " + Logger.convertToMs(start,end) + "ms to run the markASEdgeNodes method", LoggerLevel.ADVANCED);
+        logger.log("It took " + Logger.convertToMs(start,end) + " to run the markASEdgeNodes method", LoggerLevel.ADVANCED);
 
 
         start = System.nanoTime();
         convertHighDegrees(t);
         end = System.nanoTime();
-        logger.log("It took " + Logger.convertToMs(start,end) + "ms to run the convertHighDegrees method", LoggerLevel.ADVANCED);
+        logger.log("It took " + Logger.convertToMs(start,end) + " to run the convertHighDegrees method", LoggerLevel.ADVANCED);
 
         start = System.nanoTime();
         buildSingleBackbone(t);
         end = System.nanoTime();
-        logger.log("It took " + Logger.convertToMs(start,end) + "ms to run the buildSingleBackbone method", LoggerLevel.ADVANCED);
+        logger.log("It took " + Logger.convertToMs(start,end) + " to run the buildSingleBackbone method", LoggerLevel.ADVANCED);
 
     }
 
@@ -146,7 +147,7 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
 
             if(node instanceof Router){
 
-                List<Router> adjacentNodes = null;
+                List<Router> adjacentNodes = new ArrayList<>();
 
                 t.adjacentNodes(node).stream().filter(n-> n instanceof Router).forEach(n -> adjacentNodes.add(((Router) n)));
 

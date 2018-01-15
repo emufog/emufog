@@ -8,6 +8,7 @@ import emufog.topology.Link;
 import emufog.topology.Router;
 import emufog.util.UniqueIDProvider;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -15,7 +16,7 @@ import static emufog.topology.Types.RouterType.ROUTER;
 
 public class DefaultDevicePlacement implements IDevicePlacement {
 
-    private List<Router> edgeRouters = null;
+    private List<Router> edgeRouters = new ArrayList<>();
 
     @Override
     /**
