@@ -27,7 +27,7 @@ dependencies {
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
 }
 
-version = '1.0'
+version = '1.1'
 jar {
     manifest {
         attributes(
@@ -44,6 +44,7 @@ task fatJar(type: Jar) {
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
+
 
 artifacts {
     archives fatJar

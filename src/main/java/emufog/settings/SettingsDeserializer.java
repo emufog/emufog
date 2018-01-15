@@ -24,8 +24,6 @@ public class SettingsDeserializer implements JsonDeserializer<Settings> {
         settings.setThreadCount(jsonObject.get("ThreadCount").getAsInt());
         settings.setParallelFogBuilding(jsonObject.get("ParalleledFogBuilding").getAsBoolean());
 
-        //TODO: Repair Device and Fog node deserializers.
-
         DeviceNodeType[] deviceNodeTypes = context.deserialize(jsonObject.get("DeviceNodes"), DeviceNodeType[].class);
         FogNodeType[] fogNodeTypes = context.deserialize(jsonObject.get("FogNodes"), FogNodeType[].class);
         Application[] applications = context.deserialize(jsonObject.get("Applications"), Application[].class);

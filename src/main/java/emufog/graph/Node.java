@@ -21,8 +21,6 @@ public abstract class Node {
 
     private final AS as;
 
-    //TODO: Change list to set?
-
     */
 /* list of edges associated with the node *//*
 

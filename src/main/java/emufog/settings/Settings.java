@@ -1,5 +1,6 @@
 package emufog.settings;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,6 +24,7 @@ import java.util.List;
  * The settings class contains all different settings used within the application.
  * An instance of this class can be read in from a valid settings file.
  */
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class Settings {
 
     private static Settings INSTANCE;
@@ -37,7 +39,7 @@ public class Settings {
     private Path exportFilePath;
 
     //indicates whether the output file can be overwritten or not
-    private boolean overwriteExperimentFile;
+    private boolean overWriteOutputFile;
 
     /****************************
      *  Basic Settings          *
@@ -135,11 +137,11 @@ public class Settings {
     }
 
     public boolean isOverwriteExperimentFile() {
-        return overwriteExperimentFile;
+        return overWriteOutputFile;
     }
 
     public void setOverwriteExperimentFile(boolean overwriteExperimentFile) {
-        this.overwriteExperimentFile = overwriteExperimentFile;
+        this.overWriteOutputFile = overwriteExperimentFile;
     }
 
     public String getBaseAddress() {

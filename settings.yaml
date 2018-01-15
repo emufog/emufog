@@ -1,8 +1,8 @@
 ###################################################################
 #                  Input/Output Settings                          #
 ###################################################################
-inputGraphFilePath: ""
-exportFilePath: ""
+inputGraphFilePath: "5er.brite"
+exportFilePath: "out.py"
 
 overWriteOutputFile: true
 ###################################################################
