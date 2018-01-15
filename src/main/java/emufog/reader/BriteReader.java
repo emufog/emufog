@@ -11,12 +11,14 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static emufog.topology.Types.RouterType.ROUTER;
 
 public class BriteReader extends TopologyReader{
 
-    MutableNetwork<Node,Link> topology = NetworkBuilder.undirected().allowsParallelEdges(true).build();
+    MutableNetwork<Node,Link> topology = NetworkBuilder.undirected().allowsParallelEdges(false).build();
 
     private BufferedReader reader;
 
@@ -85,6 +87,8 @@ public class BriteReader extends TopologyReader{
         while (line !=null && !line.isEmpty()){
             String[] values = line.split("\t");
 
+            List<Node> incidentNodes = null;
+
             if(values.length >= 9){
                 int id = Integer.parseInt(values[0]);
                 int from = Integer.parseInt(values[1]);
@@ -97,16 +101,14 @@ public class BriteReader extends TopologyReader{
 
                 Link l = new Link(id,delay,bandwidth);
 
-                Node[] nodes;
-                nodes = new Node[]{
-                        (Node) topology.nodes().stream().filter(node -> node.getID() == from),
-                        (Node) topology.nodes().stream().filter(node -> node.getID() == to)};
+                topology.nodes().stream().filter(node -> node.getID() == from).forEach(incidentNodes::add);
+                topology.nodes().stream().filter(node -> node.getID() == to).forEach(incidentNodes::add);
 
-                topology.addEdge(nodes[0],nodes[1],l);
+                topology.addEdge(checkNotNull(incidentNodes.get(0)),checkNotNull(incidentNodes.get(1)),l);
             }
+        }
 
             line = reader.readLine();
         }
     }
 
-}

@@ -1,26 +1,23 @@
 package emufog.topology;
 
 import com.google.common.graph.MutableNetwork;
-
 import com.google.common.graph.NetworkBuilder;
 import emufog.export.ITopologyExporter;
 import emufog.export.MaxinetExporter;
 import emufog.placement.*;
-import emufog.reader.*;
+import emufog.reader.BriteReader;
+import emufog.reader.TopologyReader;
 import emufog.settings.Settings;
 import emufog.util.Logger;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Map;
 
 public class Topology {
 
     private static MutableNetwork<Node, Link> INSTANCE;
 
     private Settings settings;
-
-    private Map<Integer, AS> systems;
 
     public static MutableNetwork<Node, Link> getTopology(){
         if (INSTANCE == null) {
@@ -33,7 +30,12 @@ public class Topology {
 
         Logger logger = Logger.getInstance();
 
-        this.settings = builder.settings;
+        try {
+            settings = Settings.getInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         try {
             long start = System.nanoTime();
             read();
@@ -76,7 +78,8 @@ public class Topology {
     private void read() throws IOException {
 
         TopologyReader reader = new BriteReader();
-        this.INSTANCE = reader.parse(settings.getInputGraphFilePath());
+
+        INSTANCE = reader.parse(settings.getInputGraphFilePath());
 
     }
 
@@ -124,11 +127,6 @@ public class Topology {
 
         public Topology build() throws IOException {
             return new Topology(this);
-        }
-
-        public TopologyBuilder setup(Settings settings){
-            this.settings = settings;
-            return this;
         }
 
     }
