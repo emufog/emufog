@@ -30,4 +30,11 @@ public abstract class Node {
     public void setAs(AS as) {
         this.as = as;
     }
+
+    /**
+     * Returns the name of the node.
+     *
+     * @return name of the node
+     */
+    public abstract String getName();
 }

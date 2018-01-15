@@ -1,5 +1,6 @@
 package emufog.export;
 
+import com.google.common.graph.EndpointPair;
 import com.google.common.graph.MutableNetwork;
 import emufog.settings.Settings;
 import emufog.topology.*;
@@ -10,7 +11,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class MaxinetExporter implements ITopologyExporter{
 
@@ -36,9 +38,9 @@ public class MaxinetExporter implements ITopologyExporter{
     public void exportTopology(MutableNetwork<Node, Link> topology, Path path) throws IOException {
         //TODO: Implement exporter with new FogNode representation logic.
 
-        filterTopology(topology);
+        filterTopology(checkNotNull(topology));
 
-        File experimentFile = path.toFile();
+        File experimentFile = checkNotNull(path).toFile();
 
         try {
             //get configuration for overwrite permission
@@ -64,7 +66,7 @@ public class MaxinetExporter implements ITopologyExporter{
             addRouters(topology);
             addDevice(topology);
             addFogNode(topology);
-            addLinks();
+            addLinks(topology);
             setupExperiment();
 
             // set the overwrite option if feature is set in the settings file
@@ -104,7 +106,7 @@ public class MaxinetExporter implements ITopologyExporter{
         addBlankLine();
         lines.add("# add routers");
 
-        for(Router router : routerList){
+        for(Router router : checkNotNull(routerList)){
             lines.add("# " + router.getType().toString());
             lines.add(router.getID() + " = topo.addSwitch(\"" + router.getID() + "\")");
         }
@@ -123,7 +125,20 @@ public class MaxinetExporter implements ITopologyExporter{
         }
     }
 
-    private void addLinks(){}
+    private void addLinks(MutableNetwork<Node, Link> t){
+        addBlankLine();
+        lines.add("# add links");
+
+        for(Link link : t.edges()){
+
+            EndpointPair<Node> endpointPair = t.incidentNodes(link);
+
+            Node nodeU = endpointPair.nodeU();
+            Node nodeV = endpointPair.nodeV();
+
+            addLink(nodeU.getName(), nodeV.getName(), link.getDelay(), link.getBandwidth());
+        }
+    }
 
     /**
      * Adds a new link between two nodes to the document.

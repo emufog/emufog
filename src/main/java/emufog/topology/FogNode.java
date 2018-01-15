@@ -13,6 +13,9 @@ public class FogNode extends Node{
         this.fogNodeType = fogNodeType;
     }
 
+    @Override
+    public String getName() { return "h" + getID();}
+
     public void setConfiguration(FogNodeConfiguration configuration) {
         this.configuration = configuration;
     }

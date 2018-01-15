@@ -13,6 +13,10 @@ public class Device extends Node{
         this.deviceNodeType = deviceNodeType;
     }
 
+
+    @Override
+    public String getName() { return "h" + getID();}
+
     public DeviceNodeType getDeviceNodeType() {
         return deviceNodeType;
     }

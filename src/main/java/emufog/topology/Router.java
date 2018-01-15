@@ -11,6 +11,9 @@ public class Router extends Node{
         this.deviceCount = 0;
     }
 
+    @Override
+    public String getName() { return "r" + getID();}
+
     public void setType(Types.RouterType type) {
         this.type = type;
     }
