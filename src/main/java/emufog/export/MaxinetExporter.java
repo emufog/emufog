@@ -2,6 +2,9 @@ package emufog.export;
 
 import com.google.common.graph.EndpointPair;
 import com.google.common.graph.MutableNetwork;
+import emufog.application.Application;
+import emufog.container.Docker;
+import emufog.nodeconfig.DeviceNodeConfiguration;
 import emufog.settings.Settings;
 import emufog.topology.*;
 
@@ -112,19 +115,48 @@ public class MaxinetExporter implements ITopologyExporter{
         }
     }
 
-    private void addDevice(MutableNetwork<Node,Link> t){}
+    private void addDevice(MutableNetwork<Node,Link> t){
+        addBlankLine();
+        lines.add("# add devices");
+
+        for(Device device : deviceList){
+
+            DeviceNodeConfiguration configuration = device.getConfiguration();
+
+            List<Application> applications = configuration.getApplications();
+
+            for(Application application : applications){
+
+                Docker container = checkNotNull(application.getContainer());
+
+
+            }
+
+
+        }
+
+    }
+
+    private void addDockerHost(String nodeName, String ip, String dockerImage, String memoryLimit){
+        lines.add(nodeName + " = topo.addHost(\"" +nodeName + "\", cls=Docker, ip=\"" + ip +
+                "\", dimage=\"" + dockerImage + "\", mem_limit=" + memoryLimit + ")");
+    }
+
+    private void createMultiTierSwitch(){
+    }
+
+    private void createMultiTierApplicationHost(){
+
+    }
 
     private void addFogNode(MutableNetwork<Node,Link> t){}
 
-    private void addConnectors(MutableNetwork<Node,Link> t){
-        addBlankLine();
-        lines.add("# add links");
 
-        for(Link link : t.edges()){
-
-        }
-    }
-
+    /**
+     * Iterates over the edges of the given topology and retrieves the endpoint pair for
+     * each link and creates new link in experiment file.
+     * @param t
+     */
     private void addLinks(MutableNetwork<Node, Link> t){
         addBlankLine();
         lines.add("# add links");
@@ -133,10 +165,7 @@ public class MaxinetExporter implements ITopologyExporter{
 
             EndpointPair<Node> endpointPair = t.incidentNodes(link);
 
-            Node nodeU = endpointPair.nodeU();
-            Node nodeV = endpointPair.nodeV();
-
-            addLink(nodeU.getName(), nodeV.getName(), link.getDelay(), link.getBandwidth());
+            addLink(endpointPair.nodeU().getName(), endpointPair.nodeV().getName(), link.getDelay(), link.getBandwidth());
         }
     }
 

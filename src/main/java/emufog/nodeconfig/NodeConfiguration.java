@@ -18,6 +18,10 @@ public abstract class NodeConfiguration {
         this.applications = applications;
     }
 
+    public List<Application> getApplications() {
+        return applications;
+    }
+
     public String getIP() {
         return IP;
     }
