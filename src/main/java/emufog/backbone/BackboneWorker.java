@@ -1,3 +1,4 @@
+/*
 package emufog.backbone;
 
 import emufog.graph.*;
@@ -6,27 +7,37 @@ import emufog.util.LoggerLevel;
 
 import java.util.*;
 
+*/
 /**
  * This worker class operates on a single AS of the graph so it can used in parallel.
  * Executes the 2nd and 3rd step of the classification algorithm.
- */
+ *//*
+
 class BackboneWorker implements Runnable {
 
-    /* percentage of the average degree to compare to */
+    */
+/* percentage of the average degree to compare to *//*
+
     private static final float BACKBONE_DEGREE_PERCENTAGE = 0.6f;
 
-    /* AS associated with this worker */
+    */
+/* AS associated with this worker *//*
+
     private final AS as;
 
-    /* converter to mark backbone nodeconfig */
+    */
+/* converter to mark backbone nodeconfig *//*
+
     private final SwitchConverter converter;
 
-    /**
+    */
+/**
      * Creates a new worker instance to compute the backbone classification algorithms on a given AS.
      * Only converts the given as from the graph instance.
      *
      * @param as AS to operate on
-     */
+     *//*
+
     BackboneWorker(AS as) {
         this.as = as;
         converter = new SwitchConverter();
@@ -53,9 +64,11 @@ class BackboneWorker implements Runnable {
         logger.log("Edge Size: " + as.getRouters().size(), LoggerLevel.ADVANCED);
     }
 
-    /**
+    */
+/**
      * Converts nodeconfig with an above average degree to a backbone node.
-     */
+     *//*
+
     private void convertHighDegrees() {
         float averageDegree = calculateAverageDegree() * BACKBONE_DEGREE_PERCENTAGE;
         List<Router> toConvert = new ArrayList<>();
@@ -71,9 +84,11 @@ class BackboneWorker implements Runnable {
         }
     }
 
-    /**
+    */
+/**
      * Creates a single connected backbone by using the Breadth-First-Algorithm.
-     */
+     *//*
+
     private void buildSingleBackbone() {
         // bit sets to check for visited nodes and ndoes in the queue
         BitSet visited = new BitSet();
@@ -128,11 +143,13 @@ class BackboneWorker implements Runnable {
         }
     }
 
-    /**
+    */
+/**
      * Returns the average degree of the autonomous system based on the router and switch nodeconfig.
      *
      * @return the average degree
-     */
+     *//*
+
     private float calculateAverageDegree() {
         int sum = 0;
 
@@ -146,3 +163,4 @@ class BackboneWorker implements Runnable {
         return sum / (as.getSwitches().size() + as.getRouters().size());
     }
 }
+*/

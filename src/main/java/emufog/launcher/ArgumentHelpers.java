@@ -1,3 +1,4 @@
+/*
 package emufog.launcher;
 
 
@@ -6,9 +7,11 @@ import emufog.reader.CaidaFormatReader;
 import emufog.reader.GraphReader;
 import emufog.settings.Settings;
 
+*/
 /**
  * Small helper class providing serveral funktions mainly to retrieve information from input parameters.
- */
+ *//*
+
 
 public class ArgumentHelpers {
 
@@ -31,3 +34,4 @@ public class ArgumentHelpers {
     }
 
 }
+*/

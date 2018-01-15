@@ -1,3 +1,4 @@
+/*
 package emufog.graph;
 
 import emufog.settings.Settings;
@@ -6,29 +7,36 @@ import emufog.util.LoggerLevel;
 import java.util.HashMap;
 import java.util.Map;
 
+*/
 /**
  * The graph represents the topology of the network. The coordinate graph provides the option to associate
  * the nodeconfig with coordinates to calculate the latency based on them.
- */
+ *//*
+
 public class CoordinateGraph extends Graph {
 
-    /* mapping of node IDs to their respective coordinates */
+    */
+/* mapping of node IDs to their respective coordinates *//*
+
     private final Map<Integer, NodeCoordinates> coordinates;
 
-    /**
+    */
+/**
      * Creates a new graph using coordinates to calculate latency.
      * Uses the given settings for the classification algorithms.
      *
      * @param settings settings to use for the graph
      * @throws IllegalArgumentException if the settings object is null
-     */
+     *//*
+
     public CoordinateGraph(Settings settings) throws IllegalArgumentException {
         super(settings);
 
         coordinates = new HashMap<>();
     }
 
-    /**
+    */
+/**
      * Creates a new router in the graph
      *
      * @param id   unique identifier
@@ -37,14 +45,16 @@ public class CoordinateGraph extends Graph {
      * @param yPos y coordinate
      * @return the newly created router
      * @throws IllegalArgumentException throws an exception if the ID is already in use
-     */
+     *//*
+
     public Router createRouter(int id, int as, float xPos, float yPos) throws IllegalArgumentException {
         coordinates.put(id, new NodeCoordinates(xPos, yPos));
 
         return createRouter(id, as);
     }
 
-    /**
+    */
+/**
      * Creates a new switch in the graph.
      *
      * @param id   unique identifier
@@ -53,14 +63,18 @@ public class CoordinateGraph extends Graph {
      * @param yPos y coordinate
      * @return the newly created switch
      * @throws IllegalArgumentException throws an exception if the ID is already in use
-     */
+     *//*
+
     public Switch createSwitch(int id, int as, float xPos, float yPos) throws IllegalArgumentException {
         coordinates.put(id, new NodeCoordinates(xPos, yPos));
 
         return createSwitch(id, as);
     }
 
-/*    *//**
+*/
+/*    *//*
+*/
+/**
      * Creates a new host device in the graph.
      *
      * @param id    unique identifier
@@ -71,14 +85,18 @@ public class CoordinateGraph extends Graph {
      * @return the newly created host device
      * @throws IllegalArgumentException if the id already in use or the image object is null
      *//*
+*/
+/*
     public HostDevice createHostDevice(int id, int as, float xPos, float yPos, DeviceType image)
             throws IllegalArgumentException {
         coordinates.put(id, new NodeCoordinates(xPos, yPos));
 
         return createHostDevice(id, as, image);
-    }*/
+    }*//*
 
-    /**
+
+    */
+/**
      * Creates a new edge using a latency calculator by using the coordinates passed initially.
      * If there are no coordinates associated the method is unable to create a new edge.
      *
@@ -90,7 +108,8 @@ public class CoordinateGraph extends Graph {
      * @return the newly created edge
      * @throws IllegalArgumentException if any of the objects is null or the nodeconfig are not
      *                                  associated with coordinates
-     */
+     *//*
+
     public Edge createEdge(int id, Node from, Node to, ILatencyCalculator latencyEstimator,
                            float bandwidth) throws IllegalArgumentException {
         if (from == null || to == null) {
@@ -116,20 +135,25 @@ public class CoordinateGraph extends Graph {
         return createEdge(id, from, to, delay, bandwidth);
     }
 
-    /**
+    */
+/**
      * Removes all stored coordinates. This is optional.
-     */
+     *//*
+
     public void clearCoordinates() {
         coordinates.clear();
     }
 
-    /**
+    */
+/**
      * Returns the coordinates of the node with the given ID.
      *
      * @param id ID of the node
      * @return coordinates in the graph or null if not existent
-     */
+     *//*
+
     public NodeCoordinates getCoordinates(int id) {
         return coordinates.get(id);
     }
 }
+*/

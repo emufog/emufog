@@ -1,3 +1,4 @@
+/*
 package emufog.reader;
 
 import emufog.graph.Graph;
@@ -10,29 +11,35 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
+*/
 /**
  * The reader reads in a graph object from the BRITE file format specified
  * in the documentation (https://www.cs.bu.edu/brite/user_manual/node29.html).
- */
+ *//*
+
 public class BriteFormatReader extends GraphReader {
 
-    /**
+    */
+/**
      * Creates a new BriteFormatReader to read in the BRITE format.
      * The settings provided will be used for the read in graph.
      *
      * @param settings settings for the newly generated graph
-     */
+     *//*
+
     public BriteFormatReader(Settings settings) {
         super(settings);
     }
 
-    /**
+    */
+/**
      * Reads in all the nodeconfig from the BRITE file and adds them to the given graph.
      *
      * @param graph  graph to add the nodeconfig to
      * @param reader reader at the position to start
      * @throws IOException in case of an I/O error
-     */
+     *//*
+
     private static void extractNodes(Graph graph, BufferedReader reader) throws IOException {
         String line = reader.readLine();
 
@@ -50,14 +57,16 @@ public class BriteFormatReader extends GraphReader {
         }
     }
 
-    /**
+    */
+/**
      * Reads in all the edges from the BRITE file and adds them to the given graph.
      * The required nodeconfig have to present in the given graph.
      *
      * @param graph  graph to add the edges to
      * @param reader reader at the position to start
      * @throws IOException in case of an I/O error
-     */
+     *//*
+
     private static void extractEdges(Graph graph, BufferedReader reader) throws IOException {
         String line = reader.readLine();
 
@@ -111,3 +120,4 @@ public class BriteFormatReader extends GraphReader {
         return graph;
     }
 }
+*/

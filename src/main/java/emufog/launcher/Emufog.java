@@ -1,30 +1,11 @@
 package emufog.launcher;
 
 import com.beust.jcommander.JCommander;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import emufog.backbone.BackboneClassifier;
-import emufog.docker.FogType;
-import emufog.export.CoupledMaxiNetExporter;
-import emufog.export.IGraphExporter;
-import emufog.fog.FogNodeClassifier;
-import emufog.fog.FogResult;
-import emufog.graph.Graph;
-import emufog.graph.Node;
-import emufog.images.IApplicationImageAssignmentPolicy;
-import emufog.images.MongoCaseAssignmentPolicy;
-import emufog.reader.GraphReader;
 import emufog.settings.Settings;
 import emufog.topology.Topology;
 import emufog.util.Logger;
-import emufog.util.LoggerLevel;
-import emufog.util.Tuple;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Paths;
-
-import static emufog.launcher.ArgumentHelpers.getReader;
 
 /**
  * The EmuFog main launcher class. Starts a new instance of the application with the given parameters

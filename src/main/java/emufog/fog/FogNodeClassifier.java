@@ -1,3 +1,4 @@
+/*
 package emufog.fog;
 
 import emufog.graph.AS;
@@ -16,26 +17,36 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
+*/
 /**
  * This classifier identifies a list of possible fog node placements in the given graph.
- */
+ *//*
+
 public class FogNodeClassifier {
 
-    /* list of all available types of fog nodes */
+    */
+/* list of all available types of fog nodes *//*
+
     final List<FogNodeType> fogTypes;
 
-    /* remaining number of nodes to place in the graph */
+    */
+/* remaining number of nodes to place in the graph *//*
+
     private final AtomicInteger remainingNodes;
 
-    /* threshold for the cost function to limit the search */
+    */
+/* threshold for the cost function to limit the search *//*
+
     final float threshold;
 
-    /**
+    */
+/**
      * Creates a new FogNodeClassifier using the given settings.
      *
      * @param settings settings to use for classification
      * @throws IllegalArgumentException throws exception if the settings object is null
-     */
+     *//*
+
     public FogNodeClassifier(Settings settings) throws IllegalArgumentException {
         if (settings == null) {
             throw new IllegalArgumentException("No settings object given.");
@@ -46,7 +57,8 @@ public class FogNodeClassifier {
         threshold = settings.getCostThreshold();
     }
 
-    /**
+    */
+/**
      * This method identifies the fog nodes in the given graph. The settings passed to
      * the constructor are used for the algorithm. The result might not be optimal as the
      * method uses a greedy algorithm to approximate the optimal solution.
@@ -54,7 +66,8 @@ public class FogNodeClassifier {
      * @param graph graph to find fog nodes in
      * @return result object with the list of fog nodes or failure state
      * @throws IllegalArgumentException throws exception if the graph parameter is null
-     */
+     *//*
+
     public FogResult findFogNodes(Graph graph) throws IllegalArgumentException {
         if (graph == null) {
             throw new IllegalArgumentException("The graph object is not initialized.");
@@ -112,13 +125,15 @@ public class FogNodeClassifier {
         return result;
     }
 
-    /**
+    */
+/**
      * Returns a new worker class depending on the settings given.
      *
      * @param as       as to work on
      * @param settings settings to determine parallel or sequential
      * @return worker class according to settings
-     */
+     *//*
+
     private Worker getWorker(AS as, Settings settings) {
         if (settings.isParallelFogBuilding()) {
             return new ParallelFogWorker(as, this);
@@ -131,20 +146,25 @@ public class FogNodeClassifier {
         return fogTypes;
     }
 
-    /**
+    */
+/**
      * Indicates if there are still fog nodes to place available.
      *
      * @return true if there are, none if 0
-     */
+     *//*
+
 
     boolean fogNodesLeft() {
         return remainingNodes.get() > 0;
     }
 
-    /**
+    */
+/**
      * Decrements the remaining fog node to place by 1.
-     */
+     *//*
+
     void reduceRemainingNodes() {
         remainingNodes.decrementAndGet();
     }
 }
+*/

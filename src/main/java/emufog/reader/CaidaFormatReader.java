@@ -1,3 +1,4 @@
+/*
 package emufog.reader;
 
 import emufog.graph.CoordinateGraph;
@@ -18,46 +19,70 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+*/
 /**
  * This reader can read in the CAIDA topology an build a graph based on that data.
- */
+ *//*
+
 public class CaidaFormatReader extends GraphReader {
 
-    /* number of times AS field exceeds the Integer range */
+    */
+/* number of times AS field exceeds the Integer range *//*
+
     private int asOutOfRange;
 
-    /* number of times no node has been found with an ID to assign an AS */
+    */
+/* number of times no node has been found with an ID to assign an AS *//*
+
     private int noNodeFoundForAS;
 
-    /* number of times no node has been found with an ID to establish a connection */
+    */
+/* number of times no node has been found with an ID to establish a connection *//*
+
     private int noNodeFoundForEdge;
 
-    /* number of times ID field exceeds the Integer range */
+    */
+/* number of times ID field exceeds the Integer range *//*
+
     private int idOutOfRange;
 
-    /* number of times a node line was skipped */
+    */
+/* number of times a node line was skipped *//*
+
     private int nodeLineSkipped;
 
-    /* number of times a AS line was skipped */
+    */
+/* number of times a AS line was skipped *//*
+
     private int asLineSkipped;
 
-    /* number of times a link line was skipped */
+    */
+/* number of times a link line was skipped *//*
+
     private int linkLineSkipped;
 
-    /* number of times coordinate field exceeds the Float range */
+    */
+/* number of times coordinate field exceeds the Float range *//*
+
     private int coordinatesOutOfRange;
 
-    /* charset to read in the caida files */
+    */
+/* charset to read in the caida files *//*
+
     private final Charset charset;
 
-    /* mapping from ID's to coordinates of the nodeconfig */
+    */
+/* mapping from ID's to coordinates of the nodeconfig *//*
+
     private Map<Integer, Coordinates> nodeCoordinates;
 
-    /**
+    */
+/**
      * Creates a new reader for the Caida topology. The given settings are used to create a new graph.
      *
      * @param settings settings to use for the read in graph.
-     */
+     *//*
+
     public CaidaFormatReader(Settings settings) {
         super(settings);
 
@@ -120,9 +145,11 @@ public class CaidaFormatReader extends GraphReader {
         return graph;
     }
 
-    /**
+    */
+/**
      * Logs the errors and not matching IDs while reading.
-     */
+     *//*
+
     private void logResults() {
         Logger logger = Logger.getInstance();
 
@@ -139,12 +166,14 @@ public class CaidaFormatReader extends GraphReader {
         logger.log("Number of link lines skipped: " + linkLineSkipped, LoggerLevel.ADVANCED);
     }
 
-    /**
+    */
+/**
      * Reads in an edge of the graph.
      *
      * @param graph graph to add the edge to
      * @param line  current line to process
-     */
+     *//*
+
     private void processLinkLine(CoordinateGraph graph, String line, ILatencyCalculator calculator) {
         if (line.startsWith("link ")) {
             String[] values = line.split(" ");
@@ -204,12 +233,14 @@ public class CaidaFormatReader extends GraphReader {
         }
     }
 
-    /**
+    */
+/**
      * Adapts the AS field of the node identified in the current line.
      *
      * @param graph graph to modify the nodeconfig from
      * @param line  current line to process
-     */
+     *//*
+
     private void processASLine(CoordinateGraph graph, String line) {
         if (line.startsWith("node.AS ")) {
             String[] values = line.split(" ");
@@ -249,11 +280,13 @@ public class CaidaFormatReader extends GraphReader {
         }
     }
 
-    /**
+    */
+/**
      * Reads in and process a line of the input file to add a node to the graph given.
      *
      * @param line current line to process
-     */
+     *//*
+
     private void processNodeLine(String line) {
         if (line.startsWith("node.geo ")) {
             String[] values = line.split("\t");
@@ -284,45 +317,57 @@ public class CaidaFormatReader extends GraphReader {
         }
     }
 
-    /**
+    */
+/**
      * Returns the path of the file matching the giving file extension at the end.
      *
      * @param files         list of possible files
      * @param fileExtension file extension to match
      * @return the file of the list matching the extension or null if not found
-     */
+     *//*
+
     private static Path getPathForEnding(List<Path> files, String fileExtension) {
         Optional<Path> query = files.stream().filter(x -> x.toString().endsWith(fileExtension)).findFirst();
 
         return query.orElse(null);
     }
 
-    /**
+    */
+/**
      * Coordinates of a node in the graph. This class gets mapped to the respective ID of the node.
-     */
+     *//*
+
     class Coordinates {
 
-        /* x coordinate */
+        */
+/* x coordinate *//*
+
         final float xPos;
 
-        /* y coordinate */
+        */
+/* y coordinate *//*
+
         final float yPos;
 
-        /**
+        */
+/**
          * Creates a new coordinate object in a 2D coordinate system.
          *
          * @param x x coordinate
          * @param y y coordinate
-         */
+         *//*
+
         Coordinates(float x, float y) {
             xPos = x;
             yPos = y;
         }
     }
 
-    /**
+    */
+/**
      * Latency calculator for the Caida topology.
-     */
+     *//*
+
     class CaidaLatencyCalculator implements ILatencyCalculator {
 
         @Override
@@ -331,3 +376,4 @@ public class CaidaFormatReader extends GraphReader {
         }
     }
 }
+*/

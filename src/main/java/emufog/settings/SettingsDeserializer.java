@@ -1,3 +1,4 @@
+/*
 package emufog.settings;
 
 import com.google.gson.*;
@@ -36,3 +37,4 @@ public class SettingsDeserializer implements JsonDeserializer<Settings> {
         return settings;
     }
 }
+*/

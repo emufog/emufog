@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 
 // TODO: Future work implement Field for Dynamic class loading to select desired placement algorithm for each step.
 
@@ -36,7 +37,7 @@ public class Settings {
     private Path exportFilePath;
 
     //indicates whether the output file can be overwritten or not
-    private  boolean overwriteExperimentFile;
+    private boolean overwriteExperimentFile;
 
     /****************************
      *  Basic Settings          *
@@ -45,33 +46,34 @@ public class Settings {
     private String baseAddress;
 
     //maximal number of fog nodes to place in the network
-    private  int maxFogNodes;
+    private int maxFogNodes;
 
     // upper threshold of the cost function to limit the fog node placement
-    private  float costThreshold;
+    private float costThreshold;
 
     // latency delay between a host device and the edge node
-    private  float edgeDeviceDelay;
+    private float edgeDeviceDelay;
 
     // bandwidth between a host device and the edge node
-    private  float edgeDeviceBandwidth;
+    private float edgeDeviceBandwidth;
 
     // number of threads to use for the backbone and fog placement
-    private  int threadCount;
+    private int threadCount;
 
     // indicator whether the fog graph should be build in parallel
-    private  boolean parallelFogBuilding;
+    private boolean parallelFogBuilding;
 
-    private  DeviceNodeType[] deviceNodeTypes;
+    private DeviceNodeType[] deviceNodeTypes;
 
-    private  FogNodeType[] fogNodeTypes;
+    private FogNodeType[] fogNodeTypes;
 
-    private  Application[] fogApplications;
+    private List<Application> fogApplications;
 
-    private  Application[] deviceApplications;
+    private List<Application> deviceApplications;
 
 
-    public Settings(){}
+    public Settings() {
+    }
 
     public static void read(Path settingsPath) throws FileNotFoundException {
 
@@ -105,14 +107,16 @@ public class Settings {
 
     /**
      * Returns singleton settings instance. If settings is null throws Exception.
+     *
      * @return
      * @throws Exception
      */
     public static Settings getInstance() throws Exception {
-        if(INSTANCE == null) throw new Exception("There is no Settings file instantiated yet!");
+        if (INSTANCE == null) throw new Exception("There is no Settings file instantiated yet!");
 
         return INSTANCE;
     }
+
 
     public Path getInputGraphFilePath() {
         return inputGraphFilePath;
@@ -210,19 +214,19 @@ public class Settings {
         this.fogNodeTypes = fogNodeTypes;
     }
 
-    public Application[] getFogApplications() {
+    public List<Application> getFogApplications() {
         return fogApplications;
     }
 
-    public void setFogApplications(Application[] fogApplications) {
+    public void setFogApplications(List<Application> fogApplications) {
         this.fogApplications = fogApplications;
     }
 
-    public Application[] getDeviceApplications() {
+    public List<Application> getDeviceApplications() {
         return deviceApplications;
     }
 
-    public void setDeviceApplications(Application[] deviceApplications) {
+    public void setDeviceApplications(List<Application> deviceApplications) {
         this.deviceApplications = deviceApplications;
     }
 }

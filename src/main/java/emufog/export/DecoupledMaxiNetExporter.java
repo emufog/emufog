@@ -1,3 +1,4 @@
+/*
 package emufog.export;
 
 import emufog.docker.DockerType;
@@ -13,11 +14,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+*/
 /**
  * This class exports a graph object to a valid python file usable with the
  * MaxiNet (https://maxinet.github.io/) network emulation framework. The
  * input graph object will have the FogType coupled with DockerImage.
- */
+ *//*
+
 public class DecoupledMaxiNetExporter extends MaxiNetExporter {
 
     private static final String PYTHON_HELPERS_FILEPATH = "./src/main/java/emufog/export/MaxiNetPythonHelpers.py";
@@ -101,11 +104,13 @@ public class DecoupledMaxiNetExporter extends MaxiNetExporter {
         }
     }
 
-    /**
+    */
+/**
      * Writes the commands of each node to the python file.
      *
      * @param graph graph to export
-     */
+     *//*
+
     private void addCommands(Graph graph) {
         addBlankLine();
         lines.add("# add commands");
@@ -121,12 +126,14 @@ public class DecoupledMaxiNetExporter extends MaxiNetExporter {
         }
     }
 
-    /**
+    */
+/**
      * Replaces targets in the given command with python function calls.
      *
      * @param command command to parse
      * @return command string with targets replaced
-     */
+     *//*
+
     private String parseCommand(String command) {
         int currentIndex = -1;
         boolean lastFound = false;
@@ -147,11 +154,13 @@ public class DecoupledMaxiNetExporter extends MaxiNetExporter {
         return command;
     }
 
-    /**
+    */
+/**
      * Writes the helper functions from python helper file to exported maxinet file.
      *
      * @throws IOException  throws exception if file cannot be opened or read from.
-     */
+     *//*
+
     private void setupPythonHelpers() throws IOException {
         addBlankLine();
         FileReader fileReader = new FileReader(PYTHON_HELPERS_FILEPATH);
@@ -163,3 +172,4 @@ public class DecoupledMaxiNetExporter extends MaxiNetExporter {
         }
     }
 }
+*/

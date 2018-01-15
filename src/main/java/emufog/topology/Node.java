@@ -1,7 +1,5 @@
 package emufog.topology;
 
-import emufog.graph.AS;
-
 public abstract class Node {
 
     private int ID;

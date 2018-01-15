@@ -1,3 +1,4 @@
+/*
 package emufog.backbone;
 
 import emufog.graph.AS;
@@ -15,17 +16,21 @@ import java.util.concurrent.Future;
 
 import static java.util.concurrent.Executors.newFixedThreadPool;
 
+*/
 /**
  * This class runs the backbone classification algorithm on a graph instance.
- */
+ *//*
+
 public class BackboneClassifier {
 
-    /**
+    */
+/**
      * Starts the backbone classification algorithm on the given graph.
      * Returns the graph including backbone and edge of the network.
      *
      * @return the modified graph
-     */
+     *//*
+
     public static Graph identifyBackbone(Graph graph) {
         if (graph == null) {
             throw new IllegalArgumentException("The graph object is not initialized.");
@@ -70,9 +75,11 @@ public class BackboneClassifier {
         return graph;
     }
 
-    /**
+    */
+/**
      * This methods marks all cross-AS edge's endpoints as backbone nodeconfig.
-     */
+     *//*
+
     private static void markASEdgeNodes(Graph graph) {
         SwitchConverter converter = new SwitchConverter();
 
@@ -83,4 +90,4 @@ public class BackboneClassifier {
             }
         }
     }
-}
+}*/

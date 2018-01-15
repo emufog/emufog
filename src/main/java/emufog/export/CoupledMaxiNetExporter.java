@@ -1,3 +1,4 @@
+/*
 package emufog.export;
 
 import emufog.docker.DockerType;
@@ -12,11 +13,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.stream.Collectors;
 
+*/
 /**
  * This class exports a graph object to a valid python file usable with the
  * MaxiNet (https://maxinet.github.io/) network emulation framework. The
  * input graph object will have the FogType coupled with DockerImage.
- */
+ *//*
+
 public class CoupledMaxiNetExporter extends MaxiNetExporter {
 
     @Override
@@ -89,3 +92,4 @@ public class CoupledMaxiNetExporter extends MaxiNetExporter {
         }
     }
 }
+*/

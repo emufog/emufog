@@ -8,21 +8,21 @@ import emufog.topology.Link;
 import emufog.topology.Router;
 import emufog.util.UniqueIDProvider;
 
-import static emufog.topology.Types.RouterType.ROUTER;
-
 import java.util.List;
+
+import static emufog.topology.Types.RouterType.ROUTER;
 
 public class DefaultFogLayout implements IFogLayout{
 
     private List<Router> edgeRouters = null;
 
-    private List<FogNodeType> fogNodeTypes = null;
+    private FogNodeType[] fogNodeTypes = null;
 
     @Override
     public void identifyFogNodes(MutableNetwork topology) throws Exception {
 
         // get fog types from settings
-        fogNodeTypes.addAll(Settings.getInstance().getFogNodeTypes());
+        fogNodeTypes = (Settings.getInstance().getFogNodeTypes());
 
         //get edgeRouters from stream of nodes
         topology.nodes()
@@ -32,7 +32,7 @@ public class DefaultFogLayout implements IFogLayout{
 
             //add fog node to each edgeRouter
             for(Router edgeRouter : edgeRouters){
-                FogNode fogNode = new FogNode(UniqueIDProvider.getInstance().getNextID(), edgeRouter.getAsID(), fogNodeTypes.get(0));
+                FogNode fogNode = new FogNode(UniqueIDProvider.getInstance().getNextID(), edgeRouter.getAsID(), fogNodeTypes[0]);
                 topology.addNode(fogNode);
                 //TODO: Maybe introduce FogLink Bandwidth?
                 Link link = new Link(UniqueIDProvider.getInstance().getNextID(), Settings.getInstance().getEdgeDeviceDelay(), Settings.getInstance().getEdgeDeviceBandwidth());

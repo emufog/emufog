@@ -1,8 +1,11 @@
+/*
 package emufog.graph;
 
+*/
 /**
  * This class convert an existing node to a switch node in the graph.
- */
+ *//*
+
 public class SwitchConverter extends NodeConverter {
 
     @Override
@@ -25,3 +28,4 @@ public class SwitchConverter extends NodeConverter {
         return (Switch) super.convert(node);
     }
 }
+*/

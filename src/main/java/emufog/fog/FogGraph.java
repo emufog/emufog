@@ -1,3 +1,4 @@
+/*
 package emufog.fog;
 
 import emufog.docker.FogType;
@@ -11,29 +12,41 @@ import emufog.util.Tuple;
 
 import java.util.*;
 
+*/
 /**
  * The graph represents a sub graph for the fog placement algorithm. It maps the nodeconfig
  * of the underlying graph to the fog nodeconfig.
- */
+ *//*
+
 class FogGraph {
 
-    /* list of possible Docker types for fog nodeconfig */
+    */
+/* list of possible Docker types for fog nodeconfig *//*
+
     final List<FogType> servers;
 
-    /* list of all edge nodeconfig still to cover */
+    */
+/* list of all edge nodeconfig still to cover *//*
+
     private final List<EdgeNode> edgeNodes;
 
-    /* mapping of nodeconfig of the underlying graph to their respective fog nodeconfig equivalent */
+    */
+/* mapping of nodeconfig of the underlying graph to their respective fog nodeconfig equivalent *//*
+
     private final Map<Node, FogNode> nodeMapping;
 
-    /* fog comparator to sort the possible fog nodeconfig optimal */
+    */
+/* fog comparator to sort the possible fog nodeconfig optimal *//*
+
     private final Comparator<FogNode> comparator;
 
-    /**
+    */
+/**
      * Creates a new sub graph with the given list of possible Docker images for fog nodeconfig.
      *
      * @param servers list of Docker images
-     */
+     *//*
+
     FogGraph(List<FogType> servers) {
         this.servers = servers;
         edgeNodes = new ArrayList<>();
@@ -41,23 +54,27 @@ class FogGraph {
         comparator = new FogComparator();
     }
 
-    /**
+    */
+/**
      * Returns the node of the sub graph for the given node. In case there is none so far
      * a new SwitchNode will be created and returned instead.
      *
      * @param node node of the original graph
      * @return sub graph equivalent
-     */
+     *//*
+
     FogNode getNode(Node node) {
         return nodeMapping.get(node);
     }
 
-    /**
+    */
+/**
      * Initializes the node equivalents of the given AS and adds them to the mapping.
      *
      * @param startNodes list of nodeconfig with their respective edge nodeconfig
      * @param as         AS instance to work on
-     */
+     *//*
+
     void initNodes(List<Tuple<Node, List<EdgeNode>>> startNodes, AS as) {
         for (Router r : as.getRouters()) {
             nodeMapping.put(r, new SwitchNode(this, r));
@@ -79,18 +96,22 @@ class FogGraph {
         }
     }
 
-    /**
+    */
+/**
      * Removes the given node from the graph.
      *
      * @param node node to remove
-     */
+     *//*
+
     void removeNode(FogNode node) {
         nodeMapping.remove(node.oldNode);
     }
 
-    /**
+    */
+/**
      * Removes all unused nodeconfig from the graph.
-     */
+     *//*
+
     void trimNodes() {
         for (FogNode node : new ArrayList<>(nodeMapping.values())) {
             if (node.getConnectedEdgeNodes().isEmpty()) {
@@ -99,21 +120,25 @@ class FogGraph {
         }
     }
 
-    /**
+    */
+/**
      * Indicates if there are edge nodeconfig to cover in the fog graph left.
      *
      * @return true if there are still nodeconfig, false otherwise
-     */
+     *//*
+
     boolean hasEdgeNodes() {
         return !edgeNodes.isEmpty();
     }
 
-    /**
+    */
+/**
      * Returns the nextLevels node of the fog placement algorithm.
      * Possible nodeconfig get sorted with the FogComparator and the graph updated according to the node picked.
      *
      * @return nextLevels node picked
-     */
+     *//*
+
     FogNode getNext() {
         Logger logger = Logger.getInstance();
         logger.log("Remaining Edge Nodes to cover: " + edgeNodes.size());
@@ -180,3 +205,4 @@ class FogGraph {
         return next;
     }
 }
+*/

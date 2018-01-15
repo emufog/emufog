@@ -1,3 +1,4 @@
+/*
 package emufog.graph;
 
 import emufog.nodeconfig.FogNodeConfiguration;
@@ -26,3 +27,4 @@ public class FogNode extends Node{
         return "fn: " + getID();
     }
 }
+*/

@@ -1,8 +1,11 @@
+/*
 package emufog.graph;
 
+*/
 /**
  * This class convert an existing node to a router node in the graph.
- */
+ *//*
+
 public class RouterConverter extends NodeConverter {
 
     @Override
@@ -25,3 +28,4 @@ public class RouterConverter extends NodeConverter {
         return (Router) super.convert(node);
     }
 }
+*/

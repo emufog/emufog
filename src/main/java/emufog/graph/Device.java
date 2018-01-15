@@ -1,3 +1,4 @@
+/*
 package emufog.graph;
 
 import emufog.nodeconfig.DeviceNodeConfiguration;
@@ -35,3 +36,4 @@ public class Device extends Node{
         return deviceNodeType;
     }
 }
+*/

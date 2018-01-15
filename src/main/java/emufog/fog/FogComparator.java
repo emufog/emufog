@@ -1,13 +1,16 @@
+/*
 package emufog.fog;
 
 import java.util.Comparator;
 
+*/
 /**
  * Custom comparator to sort a list of FogNodes.
  * The comparator uses two properties. First the comparator sorts descending
  * according to the average deployment costs and in case they are equal
  * the comparator sorts descending to the average connection costs.
- */
+ *//*
+
 class FogComparator implements Comparator<FogNode> {
 
     @Override
@@ -37,3 +40,4 @@ class FogComparator implements Comparator<FogNode> {
         return 0;
     }
 }
+*/

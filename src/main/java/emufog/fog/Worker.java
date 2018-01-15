@@ -1,3 +1,4 @@
+/*
 package emufog.fog;
 
 import emufog.docker.FogType;
@@ -10,30 +11,42 @@ import emufog.util.Tuple;
 import java.util.*;
 import java.util.concurrent.Callable;
 
+*/
 /**
  * The worker class identifies fog nodeconfig on the given AS. Therefore the worker uses a partly
  * sub graph to identify the fog nodeconfig in a greedy algorithm.
- */
+ *//*
+
 abstract class Worker implements Callable<FogResult> {
 
-    /* AS associated for this worker */
+    */
+/* AS associated for this worker *//*
+
     private final AS as;
 
-    /* master classifier class synchronizing the remaining nodes to place */
+    */
+/* master classifier class synchronizing the remaining nodes to place *//*
+
     private final FogNodeClassifier classifier;
 
-    /* logger for advanced logging */
+    */
+/* logger for advanced logging *//*
+
     private final Logger logger;
 
-    /* mapping of fog types to all nodes with this type */
+    */
+/* mapping of fog types to all nodes with this type *//*
+
     private final Map<FogType, List<FogNode>> fogPlacements;
 
-    /**
+    */
+/**
      * Creates a new worker to identify fog nodeconfig in the given AS.
      *
      * @param as         AS to cover by this worker
      * @param classifier master classifier synchronizing the remaining nodeconfig to place
-     */
+     *//*
+
     Worker(AS as, FogNodeClassifier classifier) {
         this.as = as;
         this.classifier = classifier;
@@ -41,24 +54,28 @@ abstract class Worker implements Callable<FogResult> {
         fogPlacements = new HashMap<>();
     }
 
-    /**
+    */
+/**
      * Calculates the costs for a given edge of the graph.
      *
      * @param edge edge to calculate the costs for
      * @return costs of the given edge
-     */
+     *//*
+
     private static float calculateCosts(Edge edge) {
         // currently using delay as a cost function
         return edge.getDelay();
     }
 
-    /**
+    */
+/**
      * Calculates a graph by using breadth-first starting from the given
      * starting nodeconfig up to the threshold specified in the settings.
      *
      * @param level current level to build a fog graph for
      * @return sub graph based on the AS
-     */
+     *//*
+
     private FogGraph buildFogGraph(FogLevel level) {
         FogGraph g = new FogGraph(level.fogTypes);
 
@@ -74,22 +91,26 @@ abstract class Worker implements Callable<FogResult> {
         return g;
     }
 
-    /**
+    */
+/**
      * Iterates over the collection of startingNodes and calls the processRouter function on each of them.
      *
      * @param g             graph to apply changes to
      * @param startingNodes collection of startingNodes to process
      * @param t             threshold of cost function
-     */
+     *//*
+
     abstract void iterateNodes(FogGraph g, Collection<Node> startingNodes, float t);
 
-    /**
+    */
+/**
      * Calculates the costs and predecessors for the given node object.
      *
      * @param g         fog graph to set costs and predecessors in
      * @param n         current node to process
      * @param threshold cost function threshold
-     */
+     *//*
+
     void processNode(FogGraph g, Node n, float threshold) {
         long start = System.nanoTime();
 
@@ -137,12 +158,14 @@ abstract class Worker implements Callable<FogResult> {
                 LoggerLevel.ADVANCED);
     }
 
-    /**
+    */
+/**
      * Calculates the dependencies of fog levels and returns the first level to start with.
      *
      * @return first fog level to start with
      * @throws Exception
-     */
+     *//*
+
     private FogLevel getFirstLevel() throws Exception {
         List<FogNodeType> remainingTypes = classifier.getFogTypes();
         Map<FogType, FogLevel> levelMap = new HashMap<>();
@@ -207,13 +230,15 @@ abstract class Worker implements Callable<FogResult> {
         return firstLevel;
     }
 
-    /**
+    */
+/**
      * This methods checks whether two fog types a and b have the exact same dependencies.
      *
      * @param a first fog type to check
      * @param b second fog type to check
      * @return true if the dependencies are equal, false otherwise
-     */
+     *//*
+
     private static boolean haveSameDependencies(FogType a, FogType b) {
         return a.dependencies.containsAll(b.dependencies) && b.dependencies.containsAll(a.dependencies);
     }
@@ -269,3 +294,4 @@ abstract class Worker implements Callable<FogResult> {
         return partResult;
     }
 }
+*/
