@@ -5,7 +5,10 @@ import com.google.common.graph.NetworkBuilder;
 import emufog.topology.Link;
 import emufog.topology.Node;
 import emufog.topology.Router;
+import emufog.util.Logger;
 import emufog.util.UniqueIDProvider;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -72,6 +75,12 @@ public class BriteReader extends TopologyReader{
 
             line = reader.readLine();
         }
+
+        for(Node node: topology.nodes()){
+            Logger.getInstance().log(ReflectionToStringBuilder.toString(node, ToStringStyle.MULTI_LINE_STYLE));
+        }
+
+
     }
 
     /**
@@ -109,6 +118,12 @@ public class BriteReader extends TopologyReader{
         }
 
             line = reader.readLine();
+
+        for(Link link: topology.edges()){
+            Logger.getInstance().log(ReflectionToStringBuilder.toString(link, ToStringStyle.MULTI_LINE_STYLE));
+
         }
+
     }
+}
 
