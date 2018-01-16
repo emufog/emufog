@@ -40,6 +40,7 @@ public class MaxinetExporter implements ITopologyExporter{
 
     @Override
     public void exportTopology(MutableNetwork<Node, Link> topology, Path path) throws IOException {
+
         //TODO: Implement exporter with new FogNode representation logic.
 
         filterTopology(checkNotNull(topology));
@@ -69,11 +70,11 @@ public class MaxinetExporter implements ITopologyExporter{
 
             lines.add("topo = Topo()");
 
-            addRouters(topology);
+            addRouters();
 
-            addDevice(topology);
+            addDevices(topology);
 
-            addFogNode(topology);
+            addFogNodes(topology);
 
             addLinks(topology);
 
@@ -109,13 +110,9 @@ public class MaxinetExporter implements ITopologyExporter{
         }
     }
 
-    private void addBlankLine(){
-        lines.add(blankLine);
-    }
-
-    private void addRouters(MutableNetwork<Node,Link> t){
+    private void addRouters(){
         addBlankLine();
-        lines.add("# add routers");
+        lines.add("# add routers:");
 
         for(Router router : checkNotNull(routerList)){
             lines.add("# " + router.getType().toString());
@@ -123,7 +120,7 @@ public class MaxinetExporter implements ITopologyExporter{
         }
     }
 
-    private void addDevice(MutableNetwork<Node,Link> t){
+    private void addDevices(MutableNetwork<Node,Link> t){
         addBlankLine();
         lines.add("# add devices");
 
@@ -137,13 +134,13 @@ public class MaxinetExporter implements ITopologyExporter{
                 }
             }
 
-            createMultiTierDeviceNode(device, accessPoint);
+            createMultiTierDeviceNode(device, checkNotNull(accessPoint));
 
         }
 
     }
 
-    private void addFogNode(MutableNetwork<Node,Link> t){
+    private void addFogNodes(MutableNetwork<Node,Link> t){
         addBlankLine();
         lines.add("# add fogNodes");
 
@@ -193,9 +190,6 @@ public class MaxinetExporter implements ITopologyExporter{
         lines.add( "r" + node.getName() + " = topo.addSwitch(\"" + "r" + node.getName() + "\")");
         //connect to original topology router.
         addLink(node.getName(), accessPoint.getName(), 0, 1000);
-
-
-
     }
 
     private void connectApplicationToSwitch(Node node, String name){
@@ -203,7 +197,6 @@ public class MaxinetExporter implements ITopologyExporter{
         lines.add("# connect application to " + "r" + node.getName());
         addLink(name, "r" + node.getName(), 0, 1000);
     }
-
 
     private void createMultiTierFogNode(FogNode fogNode, Router accessPoint){
 
@@ -228,12 +221,17 @@ public class MaxinetExporter implements ITopologyExporter{
 
     }
 
-
+    /**
+     * Create a new docker host in experiment.
+     * @param nodeName
+     * @param ip
+     * @param dockerImage
+     * @param memoryLimit
+     */
     private void addDockerHost(String nodeName, String ip, String dockerImage, int memoryLimit){
         lines.add(nodeName + " = topo.addHost(\"" +nodeName + "\", cls=Docker, ip=\"" + ip +
                 "\", dimage=\"" + dockerImage + "\", mem_limit=" + memoryLimit + ")");
     }
-
 
     /**
      * Iterates over the edges of the given topology and retrieves the endpoint pair for
@@ -288,5 +286,9 @@ public class MaxinetExporter implements ITopologyExporter{
         lines.add("cluster = maxinet.Cluster()");
         lines.add("exp = maxinet.Experiment(cluster, topo, switch=OVSSwitch)");
         lines.add("exp.setup()");
+    }
+
+    private void addBlankLine(){
+        lines.add(blankLine);
     }
 }

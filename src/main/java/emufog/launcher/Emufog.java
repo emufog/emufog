@@ -15,6 +15,8 @@ import java.io.FileNotFoundException;
  */
 public class Emufog {
 
+    //TODO: Take some time to implement clean and helpful logging.
+
     /**
      * Main function call to start EmuFog.
      *
