@@ -21,16 +21,16 @@ import static emufog.topology.Types.RouterType.ROUTER;
 
 public class BriteReader extends TopologyReader{
 
-    MutableNetwork<Node,Link> topology = NetworkBuilder.undirected().allowsParallelEdges(false).build();
+    private MutableNetwork<Node,Link> topology = NetworkBuilder.undirected().allowsParallelEdges(false).build();
 
     private BufferedReader reader;
 
     /**
      * Parses given input topology and returns MutableNetwork topology.
      *
-     * @param path
-     * @return
-     * @throws IOException
+     * @param path to input topology
+     * @return MutableNetwork topology
+     * @throws IOException if input doesnt exist.
      */
     @Override
     public MutableNetwork parse(Path path) throws IOException{
@@ -50,15 +50,14 @@ public class BriteReader extends TopologyReader{
     }
 
     /**
-     * Creates a new topology node from detected BRITE node.
-     * @param reader
-     * @throws IOException
+     * Creates a new topology node from parsed BRITE node.
+     * @param reader Buffered reader to read lines from input file.
+     * @throws IOException if input file doesnt exist.
      */
 
     private void extractNodes(BufferedReader reader) throws IOException {
 
         String line = reader.readLine();
-
         while (line != null && !line.isEmpty()){
             String[] values = line.split("\t");
 
@@ -68,9 +67,6 @@ public class BriteReader extends TopologyReader{
                 Router router = new Router(id, asID);
                 router.setType(ROUTER);
                 topology.addNode(router);
-
-                /*//avoid ID duplicates
-                UniqueIDProvider.getInstance().markIDused(id);*/
             }
 
             line = reader.readLine();
@@ -84,9 +80,9 @@ public class BriteReader extends TopologyReader{
     }
 
     /**
-     * Creates a new link in the topology from detected BRITE edge;
-     * @param reader
-     * @throws IOException
+     * Creates a new link in the topology from parsed BRITE edge;
+     * @param reader Buffered reader to read lines from input file.
+     * @throws IOException if input file doesnt exist.
      */
 
     private void extractEdges(BufferedReader reader) throws IOException {

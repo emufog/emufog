@@ -4,9 +4,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+//TODO: Maybe remove AS implementation as it serves no purpose so far.
 public class AS {
 
-    final int id;
+    private final int id;
 
     private int degree;
 

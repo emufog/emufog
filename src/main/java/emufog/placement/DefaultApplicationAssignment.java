@@ -27,7 +27,7 @@ public class DefaultApplicationAssignment implements IApplicationAssignmentPolic
     @Override
     public void generateDeviceApplicationMapping(MutableNetwork topology) {
 
-
+        //TODO: Work with subnets.
         try {
             deviceApplications = checkNotNull(Settings.getInstance().getDeviceApplications());
         } catch (Exception e) {

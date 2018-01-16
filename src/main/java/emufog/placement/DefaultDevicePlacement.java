@@ -23,21 +23,21 @@ public class DefaultDevicePlacement implements IDevicePlacement {
 
     private List<Router> edgeRouters = new ArrayList<>();
 
-    @Override
+
     /**
      * Assigns the devices specified in the settings to the edge nodes on a random base.
      */
+    @Override
     public void assignEdgeDevices(MutableNetwork topology, List<DeviceNodeType> deviceNodeTypes) throws Exception {
 
         Settings settings = Settings.getInstance();
 
-        // TODO: Validate stream performance could be slow. Eventually experiment with parallelStreams.
+        // TODO: Validate stream performance, could be slow. Eventually experiment with parallelStreams.
         //get stream of nodes filter for edge routers and add them to edgeRouters list.
         topology.nodes()
                 .stream()
                 .filter(n -> n instanceof Router && ((Router) n).getType().equals(ROUTER))
                 .forEach(n -> edgeRouters.add((Router)n));
-
 
 
         Random random = new Random();

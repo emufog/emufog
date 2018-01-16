@@ -93,7 +93,7 @@ public class MaxinetExporter implements ITopologyExporter{
 
     /**
      * Iterate over topology and sort nodes into corresponding list.
-     * @param t
+     * @param t topology to work on.
      */
     private void filterTopology(MutableNetwork<Node,Link> t){
         for(Node node : t.nodes()) {
@@ -129,7 +129,15 @@ public class MaxinetExporter implements ITopologyExporter{
 
         for(Device device : deviceList){
 
-            createMultiTierDeviceNode(device);
+            Router accessPoint = null;
+
+            for(Node node : t.adjacentNodes(device)){
+                if(node instanceof Router){
+                    accessPoint = (Router) node;
+                }
+            }
+
+            createMultiTierDeviceNode(device, accessPoint);
 
         }
 
@@ -141,15 +149,23 @@ public class MaxinetExporter implements ITopologyExporter{
 
         for(FogNode fogNode : fogNodeList){
 
-            createMultiTierFogNode(fogNode);
+            Router accessPoint = null;
+
+            for(Node node : t.adjacentNodes(fogNode)){
+                if(node instanceof Router){
+                    accessPoint = (Router) node;
+                }
+            }
+
+            createMultiTierFogNode(fogNode, accessPoint);
         }
 
     }
 
-    private void createMultiTierDeviceNode(Device device){
+    private void createMultiTierDeviceNode(Device device, Router accessPoint){
 
 
-        createMultiTierSwitch(device);
+        createMultiTierSwitch(device, accessPoint);
 
         DeviceNodeConfiguration configuration = device.getConfiguration();
 
@@ -171,10 +187,15 @@ public class MaxinetExporter implements ITopologyExporter{
 
     }
 
-    private void createMultiTierSwitch(Node node){
+    private void createMultiTierSwitch(Node node, Router accessPoint){
         addBlankLine();
         lines.add("# createMultiTierSwitch for " + node.getName());
         lines.add( "r" + node.getName() + " = topo.addSwitch(\"" + "r" + node.getName() + "\")");
+        //connect to original topology router.
+        addLink(node.getName(), accessPoint.getName(), 0, 1000);
+
+
+
     }
 
     private void connectApplicationToSwitch(Node node, String name){
@@ -184,9 +205,9 @@ public class MaxinetExporter implements ITopologyExporter{
     }
 
 
-    private void createMultiTierFogNode(FogNode fogNode){
+    private void createMultiTierFogNode(FogNode fogNode, Router accessPoint){
 
-        createMultiTierSwitch(fogNode);
+        createMultiTierSwitch(fogNode, accessPoint);
 
         FogNodeConfiguration configuration = fogNode.getConfiguration();
 
@@ -217,7 +238,7 @@ public class MaxinetExporter implements ITopologyExporter{
     /**
      * Iterates over the edges of the given topology and retrieves the endpoint pair for
      * each link and creates new link in experiment file.
-     * @param t
+     * @param t topology to work on.
      */
     private void addLinks(MutableNetwork<Node, Link> t){
         addBlankLine();

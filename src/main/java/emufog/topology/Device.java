@@ -3,6 +3,10 @@ package emufog.topology;
 import emufog.nodeconfig.DeviceNodeConfiguration;
 import emufog.nodeconfig.DeviceNodeType;
 
+/**
+ * Device Node implementation.
+ * Every device has a DeviceNodeType and a DeviceNodeConfiguration.
+ */
 public class Device extends Node{
 
     private DeviceNodeType deviceNodeType;

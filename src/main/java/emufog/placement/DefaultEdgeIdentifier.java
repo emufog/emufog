@@ -23,6 +23,9 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
 
     private List<Router> routers = new ArrayList<>();
 
+    /*
+    TODO: Change naming convention. Initially every router parsed from the input topology is of type ROUTER. After the edge identification edge routers should have the type EDGE_ROUTER and Backbone Router the type BACKBONE_ROUTER.
+     */
     @Override
     public MutableNetwork identifyEdge(MutableNetwork<Node, Link> topology) {
 
@@ -50,7 +53,7 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
         return topology;
     }
 
-    void identifyBackbone(MutableNetwork<Node, Link> t){
+    private void identifyBackbone(MutableNetwork<Node, Link> t){
 
         Logger logger = Logger.getInstance();
 
@@ -78,7 +81,7 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
 
     /**
      * This method marks all cross-AS edge's endpoints as BACKBONE_ROUTER's
-     * @param t
+     * @param t topology to work on.
      */
     private void markASEdgeNodes(MutableNetwork<Node, Link> t){
 
@@ -99,7 +102,7 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
 
     /**
      * Converts router nodes with an above average degree to a BACKBONE_ROUTER
-     * @param t
+     * @param t topology to work on.
      */
     private void convertHighDegrees(MutableNetwork<Node, Link> t){
         float averageDegree = calculateAverageDegree(t) * BACKBONE_DEGREE_PERCENTAGE;
@@ -114,8 +117,8 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
 
     /**
      * Checks if the neighbor of the given node is member of another AS.
-     * @param node
-     * @param neighbor
+     * @param node current node
+     * @param neighbor Neighbor node
      * @return true if neighbor is member in another AS
      */
     private boolean isCrossASEdge(Node node, Node neighbor){
@@ -125,7 +128,7 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
 
     /**
      * Returns the average degree of the system based on the # of router nodes.
-     * @param t
+     * @param t topology to work on.
      * @return the average degree
      */
     private float calculateAverageDegree(MutableNetwork<Node, Link> t){
@@ -154,7 +157,7 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
                 t.adjacentNodes(node).stream().filter(n-> n instanceof Router).forEach(n -> adjacentNodes.add(((Router) n)));
 
                 if(isBackboneRouter((Router) node)){
-                    //TODO: Check this statement could be unsafe.
+                    //TODO: Check this statement. Could be unsafe.
                     if(!adjacentNodes.isEmpty()){
                         for(Router predecessor : adjacentNodes){
                             predecessor.setType(BACKBONE_ROUTER);
@@ -168,7 +171,7 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
 
     /**
      * Simple Router enum type check.
-     * @param router
+     * @param router to check.
      * @return true if Router is of type ROUTER
      */
     private boolean isRouter(Router router){
@@ -177,7 +180,7 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
 
     /**
      * Simple Router enum type check.
-     * @param router
+     * @param router to check.
      * @return true if Router is of type BACKBONE_ROUTER
      */
     private boolean isBackboneRouter(Router router){

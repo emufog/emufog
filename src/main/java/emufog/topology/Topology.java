@@ -103,7 +103,6 @@ public class Topology {
         IFogLayout fogLayout = new DefaultFogLayout();
         fogLayout.identifyFogNodes(getTopology());
     }
-
     private void placeFogNodes(){
 
         IFogPlacement fogPlacement = new DefaultFogPlacement();
@@ -119,7 +118,6 @@ public class Topology {
         applicationAssignmentPolicy.generateFogApplicationMapping(getTopology());
 
     }
-
 
     public static class TopologyBuilder{
 
