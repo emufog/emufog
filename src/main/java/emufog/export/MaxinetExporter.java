@@ -5,6 +5,7 @@ import com.google.common.graph.MutableNetwork;
 import emufog.application.Application;
 import emufog.container.Docker;
 import emufog.nodeconfig.DeviceNodeConfiguration;
+import emufog.nodeconfig.FogNodeConfiguration;
 import emufog.settings.Settings;
 import emufog.topology.*;
 
@@ -65,15 +66,22 @@ public class MaxinetExporter implements ITopologyExporter{
             setupImports();
 
             addBlankLine();
+
             lines.add("topo = Topo()");
+
             addRouters(topology);
+
             addDevice(topology);
+
             addFogNode(topology);
+
             addLinks(topology);
+
             setupExperiment();
 
             // set the overwrite option if feature is set in the settings file
             StandardOpenOption overwrite = Settings.getInstance().isOverwriteExperimentFile() ? StandardOpenOption.TRUNCATE_EXISTING : StandardOpenOption.APPEND;
+
             // write output in UTF-8 to the specified file
             Files.write(experimentFile.toPath(), lines, StandardCharsets.UTF_8, StandardOpenOption.CREATE, overwrite);
 
@@ -111,7 +119,7 @@ public class MaxinetExporter implements ITopologyExporter{
 
         for(Router router : checkNotNull(routerList)){
             lines.add("# " + router.getType().toString());
-            lines.add(router.getID() + " = topo.addSwitch(\"" + router.getID() + "\")");
+            lines.add(router.getName() + " = topo.addSwitch(\"" + router.getName() + "\")");
         }
     }
 
@@ -121,35 +129,89 @@ public class MaxinetExporter implements ITopologyExporter{
 
         for(Device device : deviceList){
 
-            DeviceNodeConfiguration configuration = device.getConfiguration();
-
-            List<Application> applications = configuration.getApplications();
-
-            for(Application application : applications){
-
-                Docker container = checkNotNull(application.getContainer());
-
-
-            }
-
+            createMultiTierDeviceNode(device);
 
         }
 
     }
 
-    private void addDockerHost(String nodeName, String ip, String dockerImage, String memoryLimit){
+    private void addFogNode(MutableNetwork<Node,Link> t){
+        addBlankLine();
+        lines.add("# add fogNodes");
+
+        for(FogNode fogNode : fogNodeList){
+
+            createMultiTierFogNode(fogNode);
+        }
+
+    }
+
+    private void createMultiTierDeviceNode(Device device){
+
+
+        createMultiTierSwitch(device);
+
+        DeviceNodeConfiguration configuration = device.getConfiguration();
+
+        List<Application> applications = configuration.getApplications();
+
+        for(Application application : applications){
+
+            Docker container = checkNotNull(application.getContainer());
+
+            String name = device.getName() + "_" + application.getName();
+
+            addBlankLine();
+            lines.add("# " + application.getName());
+            addDockerHost(name, configuration.getIP(), container.getImage(), device.getDeviceNodeType().getMemoryLimit());
+
+            connectApplicationToSwitch(device, name);
+
+        }
+
+    }
+
+    private void createMultiTierSwitch(Node node){
+        addBlankLine();
+        lines.add("# createMultiTierSwitch for " + node.getName());
+        lines.add( "r" + node.getName() + " = topo.addSwitch(\"" + "r" + node.getName() + "\")");
+    }
+
+    private void connectApplicationToSwitch(Node node, String name){
+        addBlankLine();
+        lines.add("# connect application to " + "r" + node.getName());
+        addLink(name, "r" + node.getName(), 0, 1000);
+    }
+
+
+    private void createMultiTierFogNode(FogNode fogNode){
+
+        createMultiTierSwitch(fogNode);
+
+        FogNodeConfiguration configuration = fogNode.getConfiguration();
+
+        List<Application> applications = configuration.getApplications();
+
+        for(Application application : applications){
+
+            Docker container = checkNotNull(application.getContainer());
+
+            String name = fogNode.getName() + "_" + application.getName();
+
+            addBlankLine();
+            lines.add("# " + application.getName());
+
+            addDockerHost(name, configuration.getIP(), container.getImage(), fogNode.getFogNodeType().getMemoryLimit());
+
+        }
+
+    }
+
+
+    private void addDockerHost(String nodeName, String ip, String dockerImage, int memoryLimit){
         lines.add(nodeName + " = topo.addHost(\"" +nodeName + "\", cls=Docker, ip=\"" + ip +
                 "\", dimage=\"" + dockerImage + "\", mem_limit=" + memoryLimit + ")");
     }
-
-    private void createMultiTierSwitch(){
-    }
-
-    private void createMultiTierApplicationHost(){
-
-    }
-
-    private void addFogNode(MutableNetwork<Node,Link> t){}
 
 
     /**

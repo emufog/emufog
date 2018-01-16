@@ -21,7 +21,7 @@ public class Topology {
 
     public static MutableNetwork<Node, Link> getTopology(){
         if (INSTANCE == null) {
-            INSTANCE = NetworkBuilder.undirected().allowsParallelEdges(true).build();
+            INSTANCE = NetworkBuilder.undirected().allowsParallelEdges(false).build();
         }
         return INSTANCE;
     }
@@ -122,8 +122,6 @@ public class Topology {
 
 
     public static class TopologyBuilder{
-
-        private Settings settings;
 
         public Topology build() throws IOException {
             return new Topology(this);

@@ -37,4 +37,8 @@ public class Application {
     public Docker getContainer() {
         return container;
     }
+
+    public String getName() {
+        return name;
+    }
 }

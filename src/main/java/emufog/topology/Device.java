@@ -15,7 +15,7 @@ public class Device extends Node{
 
 
     @Override
-    public String getName() { return "h" + getID();}
+    public String getName() { return "d" + getID();}
 
     public DeviceNodeType getDeviceNodeType() {
         return deviceNodeType;

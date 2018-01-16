@@ -59,9 +59,14 @@ public class DefaultApplicationAssignment implements IApplicationAssignmentPolic
 
         topology.nodes().stream().filter(n -> n instanceof FogNode).forEach(f -> fogNodeList.add((FogNode) f));
 
+        Logger logger = Logger.getInstance();
+        logger.log(ReflectionToStringBuilder.toString(fogNodeList, ToStringStyle.MULTI_LINE_STYLE));
+
         //assign all fogNodeApplications to each fog node.
         for(FogNode fogNode : fogNodeList){
             fogNode.getConfiguration().setApplications(fogApplications);
+
+            logger.log(ReflectionToStringBuilder.toString(fogNode, ToStringStyle.MULTI_LINE_STYLE));
         }
 
     }
