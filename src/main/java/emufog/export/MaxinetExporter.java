@@ -77,7 +77,7 @@ public class MaxinetExporter implements ITopologyExporter{
 
             addFogNodes(topology);
 
-            addLinks(topology);
+            addLinksBetweenRouters(topology);
 
             setupExperiment();
 
@@ -114,6 +114,7 @@ public class MaxinetExporter implements ITopologyExporter{
     private void addRouters(){
         addBlankLine();
         lines.add("# add routers:");
+        addCommentSeparatorLine();
 
         for(Router router : checkNotNull(routerList)){
             lines.add("# " + router.getType().toString());
@@ -124,6 +125,7 @@ public class MaxinetExporter implements ITopologyExporter{
     private void addDevices(MutableNetwork<Node,Link> t){
         addBlankLine();
         lines.add("# add devices");
+        addCommentSeparatorLine();
 
         for(Device device : deviceList){
 
@@ -144,6 +146,7 @@ public class MaxinetExporter implements ITopologyExporter{
     private void addFogNodes(MutableNetwork<Node,Link> t){
         addBlankLine();
         lines.add("# add fogNodes");
+        addCommentSeparatorLine();
 
         for(FogNode fogNode : fogNodeList){
 
@@ -218,6 +221,7 @@ public class MaxinetExporter implements ITopologyExporter{
 
             addDockerHost(name, UniqueIPProvider.getInstance().getNextIPV4Address(), container.getImage(), fogNode.getFogNodeType().getMemoryLimit());
 
+            connectApplicationToSwitch(fogNode, name);
         }
 
     }
@@ -241,15 +245,20 @@ public class MaxinetExporter implements ITopologyExporter{
      * each link and creates new link in experiment file.
      * @param t topology to work on.
      */
-    private void addLinks(MutableNetwork<Node, Link> t){
+    private void addLinksBetweenRouters(MutableNetwork<Node, Link> t){
         addBlankLine();
-        lines.add("# add links");
+        lines.add("# add links between routers");
+        addCommentSeparatorLine();
 
         for(Link link : t.edges()){
 
             EndpointPair<Node> endpointPair = t.incidentNodes(link);
 
-            addLink(endpointPair.nodeU().getName(), endpointPair.nodeV().getName(), link.getDelay(), link.getBandwidth());
+            //only add subset of links that connects routers to each other. Device and FogNode connections are set in their respective Methods.
+            if(endpointPair.nodeU() instanceof  Router && endpointPair.nodeV() instanceof Router){
+                addLink(endpointPair.nodeU().getName(), endpointPair.nodeV().getName(), link.getDelay(), link.getBandwidth());
+            }
+
         }
     }
 
@@ -293,5 +302,9 @@ public class MaxinetExporter implements ITopologyExporter{
 
     private void addBlankLine(){
         lines.add(blankLine);
+    }
+
+    private void addCommentSeparatorLine(){
+        lines.add("################################");
     }
 }
