@@ -42,8 +42,16 @@ public class Settings {
     //indicates whether the output file can be overwritten or not
     private boolean overWriteOutputFile;
 
+    private String applicationAssignmentPolicy;
+
+    private String devicePlacement;
+
+    private String edgeIdentifier;
+
+    private String fogPlacement;
+
     /****************************
-     *  Basic Settings          *
+     *  Basic Settings          *;
      ****************************/
     //base IPv4 address of the network's subnet
     private String baseAddress;
@@ -110,6 +118,37 @@ public class Settings {
         return INSTANCE;
     }
 
+    public String getApplicationAssignmentPolicy() {
+        return applicationAssignmentPolicy;
+    }
+
+    public void setApplicationAssignmentPolicy(String applicationAssignmentPolicy) {
+        this.applicationAssignmentPolicy = applicationAssignmentPolicy;
+    }
+
+    public String getDevicePlacement() {
+        return devicePlacement;
+    }
+
+    public void setDevicePlacement(String devicePlacement) {
+        this.devicePlacement = devicePlacement;
+    }
+
+    public String getEdgeIdentifier() {
+        return edgeIdentifier;
+    }
+
+    public void setEdgeIdentifier(String edgeIdentifier) {
+        this.edgeIdentifier = edgeIdentifier;
+    }
+
+    public String getFogPlacement() {
+        return fogPlacement;
+    }
+
+    public void setFogPlacement(String fogPlacement) {
+        this.fogPlacement = fogPlacement;
+    }
 
     public Path getInputGraphFilePath() {
         return inputGraphFilePath;

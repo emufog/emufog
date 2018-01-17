@@ -169,7 +169,6 @@ public class MaxinetExporter implements ITopologyExporter{
 
     private void createMultiTierDeviceNode(Device device, Router accessPoint){
 
-
         createMultiTierSwitch(device, accessPoint);
 
         DeviceNodeConfiguration configuration = device.getConfiguration();
@@ -246,7 +245,7 @@ public class MaxinetExporter implements ITopologyExporter{
 
     /**
      * Iterates over the edges of the given topology and retrieves the endpoint pair for
-     * each link and creates new link in experiment file.
+     * each link and creates new link in experiment file if the link connects to routers.
      * @param t topology to work on.
      */
     private void addLinksBetweenRouters(MutableNetwork<Node, Link> t){
