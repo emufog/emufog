@@ -8,6 +8,7 @@ import emufog.nodeconfig.DeviceNodeConfiguration;
 import emufog.nodeconfig.FogNodeConfiguration;
 import emufog.settings.Settings;
 import emufog.topology.*;
+import emufog.util.UniqueIPProvider;
 
 import java.io.File;
 import java.io.IOException;
@@ -176,7 +177,7 @@ public class MaxinetExporter implements ITopologyExporter{
 
             addBlankLine();
             lines.add("# " + application.getName());
-            addDockerHost(name, application.getIP(), container.getImage(), device.getDeviceNodeType().getMemoryLimit());
+            addDockerHost(name, UniqueIPProvider.getInstance().getNextIPV4Address(), container.getImage(), device.getDeviceNodeType().getMemoryLimit());
 
             connectApplicationToSwitch(device, name);
 
@@ -215,7 +216,7 @@ public class MaxinetExporter implements ITopologyExporter{
             addBlankLine();
             lines.add("# " + application.getName());
 
-            addDockerHost(name, application.getIP(), container.getImage(), fogNode.getFogNodeType().getMemoryLimit());
+            addDockerHost(name, UniqueIPProvider.getInstance().getNextIPV4Address(), container.getImage(), fogNode.getFogNodeType().getMemoryLimit());
 
         }
 

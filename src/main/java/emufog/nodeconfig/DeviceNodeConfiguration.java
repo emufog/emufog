@@ -6,5 +6,6 @@ public class DeviceNodeConfiguration extends NodeConfiguration{
         super(IP);
     }
 
-    public DeviceNodeConfiguration(){};
+    public DeviceNodeConfiguration(){}
+
 }
