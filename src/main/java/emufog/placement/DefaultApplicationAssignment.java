@@ -11,6 +11,7 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+// now also responsible to assign ip addresses. may be improved in the future as this is not a beautiful solution.
 public class DefaultApplicationAssignment implements IApplicationAssignmentPolicy {
 
     private List<Device> deviceList = new ArrayList<>();

@@ -9,6 +9,8 @@ public class Application {
 
     private String name;
 
+    private String IP;
+
     Docker container = new Docker();
 
     /**
@@ -25,7 +27,16 @@ public class Application {
         container.cpuShare(cpuShare);
     }
 
+    public String getIP() {
+        return IP;
+    }
+
+    public void setIP(String IP) {
+        this.IP = IP;
+    }
+
     public void setName(String name) {
+
         this.name = name;
         container.setContainerName(name);
     }

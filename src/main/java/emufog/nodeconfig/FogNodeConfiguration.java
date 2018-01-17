@@ -12,6 +12,8 @@ public class FogNodeConfiguration extends NodeConfiguration {
         super(IP);
     }
 
+    public FogNodeConfiguration(){};
+
     public void setDependencies(List<FogNode> dependencies) {
         this.dependencies = dependencies;
     }

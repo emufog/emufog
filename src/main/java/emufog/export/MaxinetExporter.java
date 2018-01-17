@@ -176,7 +176,7 @@ public class MaxinetExporter implements ITopologyExporter{
 
             addBlankLine();
             lines.add("# " + application.getName());
-            addDockerHost(name, configuration.getIP(), container.getImage(), device.getDeviceNodeType().getMemoryLimit());
+            addDockerHost(name, application.getIP(), container.getImage(), device.getDeviceNodeType().getMemoryLimit());
 
             connectApplicationToSwitch(device, name);
 
@@ -215,7 +215,7 @@ public class MaxinetExporter implements ITopologyExporter{
             addBlankLine();
             lines.add("# " + application.getName());
 
-            addDockerHost(name, configuration.getIP(), container.getImage(), fogNode.getFogNodeType().getMemoryLimit());
+            addDockerHost(name, application.getIP(), container.getImage(), fogNode.getFogNodeType().getMemoryLimit());
 
         }
 

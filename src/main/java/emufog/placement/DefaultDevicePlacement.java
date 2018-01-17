@@ -8,7 +8,6 @@ import emufog.topology.Device;
 import emufog.topology.Link;
 import emufog.topology.Router;
 import emufog.util.UniqueIDProvider;
-import emufog.util.UniqueIPProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +52,7 @@ public class DefaultDevicePlacement implements IDevicePlacement {
                     //very important! mark each generated id as used. The UniqueIDProvider doesnt take care of this.
                     UniqueIDProvider.getInstance().markIDused(device.getID());
 
-                    DeviceNodeConfiguration deviceNodeConfiguration = new DeviceNodeConfiguration(UniqueIPProvider.getInstance().getNextIPV4Address());
+                    DeviceNodeConfiguration deviceNodeConfiguration = new DeviceNodeConfiguration();
 
                     device.setConfiguration(deviceNodeConfiguration);
 

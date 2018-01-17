@@ -8,7 +8,6 @@ import emufog.topology.FogNode;
 import emufog.topology.Link;
 import emufog.topology.Router;
 import emufog.util.UniqueIDProvider;
-import emufog.util.UniqueIPProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +39,7 @@ public class DefaultFogLayout implements IFogLayout{
 
                 UniqueIDProvider.getInstance().markIDused(fogNode.getID());
 
-                FogNodeConfiguration fogNodeConfiguration = new FogNodeConfiguration(UniqueIPProvider.getInstance().getNextIPV4Address());
+                FogNodeConfiguration fogNodeConfiguration = new FogNodeConfiguration();
                 fogNode.setConfiguration(fogNodeConfiguration);
 
 
