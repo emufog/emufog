@@ -4,8 +4,6 @@ import com.beust.jcommander.JCommander;
 import emufog.settings.Settings;
 import emufog.topology.Topology;
 import emufog.util.Logger;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.io.FileNotFoundException;
 
@@ -38,12 +36,8 @@ public class Emufog {
             //initialize settings
             Settings.read(arguments.settingsPath);
 
-            Logger.getInstance().log(Settings.getInstance().getInputGraphFilePath().toString());
-
             // build topology
             Topology topology = new Topology.TopologyBuilder().build();
-
-            Logger.getInstance().log(ReflectionToStringBuilder.toString(topology, ToStringStyle.MULTI_LINE_STYLE));
 
             topology.export();
 

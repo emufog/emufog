@@ -189,7 +189,7 @@ public class MaxinetExporter implements ITopologyExporter{
         lines.add("# createMultiTierSwitch for " + node.getName());
         lines.add( "r" + node.getName() + " = topo.addSwitch(\"" + "r" + node.getName() + "\")");
         //connect to original topology router.
-        addLink(node.getName(), accessPoint.getName(), 0, 1000);
+        addLink( "r" + node.getName(), accessPoint.getName(), 0, 1000);
     }
 
     private void connectApplicationToSwitch(Node node, String name){

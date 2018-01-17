@@ -7,11 +7,8 @@ import emufog.settings.Settings;
 import emufog.topology.Device;
 import emufog.topology.Link;
 import emufog.topology.Router;
-import emufog.util.Logger;
 import emufog.util.UniqueIDProvider;
 import emufog.util.UniqueIPProvider;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,29 +42,30 @@ public class DefaultDevicePlacement implements IDevicePlacement {
         for(DeviceNodeType type : deviceNodeTypes){
             float upper = Math.abs(type.getAverageDeviceCount() * 2);
 
-            UniqueIDProvider idProvider = UniqueIDProvider.getInstance();
-
             for(Router router : edgeRouters){
                 int count = (int) (random.nextFloat() * upper);
 
                 for(int i = 0; i < count; ++i){
-                    Device device = new Device(idProvider.getNextID(), router.getAsID(), type);
+
+                    Device device = new Device(UniqueIDProvider.getInstance().getNextID(), router.getAsID(), type);
+
+                    //TODO: Implement auto mark as used in UniqueIDProvider. Architectural problem: Due to singleton id's are assigned to nodes are increasing globally. FogNodes not starting at 0 but at lowest avail id. Maybe confusing.
+                    //very important! mark each generated id as used. The UniqueIDProvider doesnt take care of this.
+                    UniqueIDProvider.getInstance().markIDused(device.getID());
 
                     DeviceNodeConfiguration deviceNodeConfiguration = new DeviceNodeConfiguration(UniqueIPProvider.getInstance().getNextIPV4Address());
 
                     device.setConfiguration(deviceNodeConfiguration);
 
                     topology.addNode(device);
-                    Link link = new Link(idProvider.getNextID(), settings.getEdgeDeviceDelay(),settings.getEdgeDeviceBandwidth());
+                    Link link = new Link(UniqueIDProvider.getInstance().getNextID(), settings.getEdgeDeviceDelay(),settings.getEdgeDeviceBandwidth());
                     topology.addEdge(device, router, link);
 
-                    Logger.getInstance().log(ReflectionToStringBuilder.toString(device, ToStringStyle.MULTI_LINE_STYLE));
+                    //Logger.getInstance().log(ReflectionToStringBuilder.toString(device, ToStringStyle.MULTI_LINE_STYLE));
                 }
 
 
             }
-
-            Logger.getInstance().log(ReflectionToStringBuilder.toString(type, ToStringStyle.MULTI_LINE_STYLE));
         }
     }
 }

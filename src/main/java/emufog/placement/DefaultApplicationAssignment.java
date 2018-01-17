@@ -5,9 +5,6 @@ import emufog.application.Application;
 import emufog.settings.Settings;
 import emufog.topology.Device;
 import emufog.topology.FogNode;
-import emufog.util.Logger;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,9 +49,6 @@ public class DefaultApplicationAssignment implements IApplicationAssignmentPolic
 
         topology.nodes().stream().filter(n -> n instanceof FogNode).forEach(f -> fogNodeList.add((FogNode) f));
 
-        Logger logger = Logger.getInstance();
-        logger.log(ReflectionToStringBuilder.toString(fogNodeList, ToStringStyle.MULTI_LINE_STYLE));
-
         // get List of fogApplications
         try {
             fogApplications = checkNotNull(Settings.getInstance().getFogApplications());
@@ -65,8 +59,6 @@ public class DefaultApplicationAssignment implements IApplicationAssignmentPolic
         //assign all fogNodeApplications to each fog node.
         for(FogNode fogNode : fogNodeList){
             fogNode.getConfiguration().setApplications(fogApplications);
-
-            logger.log(ReflectionToStringBuilder.toString(fogNode, ToStringStyle.MULTI_LINE_STYLE));
         }
 
     }

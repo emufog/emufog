@@ -7,11 +7,8 @@ import emufog.settings.Settings;
 import emufog.topology.FogNode;
 import emufog.topology.Link;
 import emufog.topology.Router;
-import emufog.util.Logger;
 import emufog.util.UniqueIDProvider;
 import emufog.util.UniqueIPProvider;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,11 +38,11 @@ public class DefaultFogLayout implements IFogLayout{
 
                 FogNode fogNode = new FogNode(UniqueIDProvider.getInstance().getNextID(), edgeRouter.getAsID(), fogNodeTypes.get(0));
 
+                UniqueIDProvider.getInstance().markIDused(fogNode.getID());
+
                 FogNodeConfiguration fogNodeConfiguration = new FogNodeConfiguration(UniqueIPProvider.getInstance().getNextIPV4Address());
                 fogNode.setConfiguration(fogNodeConfiguration);
 
-                Logger logger = Logger.getInstance();
-                logger.log(ReflectionToStringBuilder.toString(fogNode, ToStringStyle.MULTI_LINE_STYLE));
 
                 topology.addNode(fogNode);
                 //TODO: Maybe introduce FogLink Bandwidth?
