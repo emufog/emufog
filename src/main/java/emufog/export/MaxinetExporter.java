@@ -42,8 +42,6 @@ public class MaxinetExporter implements ITopologyExporter{
     @Override
     public void exportTopology(MutableNetwork<Node, Link> topology, Path path) throws IOException {
 
-        //TODO: Implement exporter with new FogNode representation logic.
-
         filterTopology(checkNotNull(topology));
 
         File experimentFile = checkNotNull(path).toFile();
@@ -137,6 +135,9 @@ public class MaxinetExporter implements ITopologyExporter{
                 }
             }
 
+            addBlankLine();
+            lines.add("# " + device.getName());
+            addCommentSeparatorLine();
             createMultiTierDeviceNode(device, checkNotNull(accessPoint));
 
         }
@@ -158,6 +159,9 @@ public class MaxinetExporter implements ITopologyExporter{
                 }
             }
 
+            addBlankLine();
+            lines.add("# " + fogNode.getName());
+            addCommentSeparatorLine();
             createMultiTierFogNode(fogNode, accessPoint);
         }
 
