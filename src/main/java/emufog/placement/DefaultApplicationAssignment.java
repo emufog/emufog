@@ -35,13 +35,6 @@ public class DefaultApplicationAssignment implements IApplicationAssignmentPolic
             );
         }
 
-        for(Application application : deviceApplications){
-            Logger.getInstance().log(ReflectionToStringBuilder.toString(application, ToStringStyle.MULTI_LINE_STYLE));
-
-        }
-
-
-
         topology.nodes().stream().filter(n -> n instanceof Device).forEach(d -> deviceList.add(((Device) d)));
 
         //assign all deviceApplications to each device node
@@ -61,6 +54,13 @@ public class DefaultApplicationAssignment implements IApplicationAssignmentPolic
 
         Logger logger = Logger.getInstance();
         logger.log(ReflectionToStringBuilder.toString(fogNodeList, ToStringStyle.MULTI_LINE_STYLE));
+
+        // get List of fogApplications
+        try {
+            fogApplications = checkNotNull(Settings.getInstance().getFogApplications());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         //assign all fogNodeApplications to each fog node.
         for(FogNode fogNode : fogNodeList){

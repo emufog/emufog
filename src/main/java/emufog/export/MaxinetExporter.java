@@ -221,6 +221,7 @@ public class MaxinetExporter implements ITopologyExporter{
 
     }
 
+    //TODO: Generalize addDockerHost method. Pass in complete Node object instead of specific fields.
     /**
      * Create a new docker host in experiment.
      * @param nodeName
@@ -229,6 +230,7 @@ public class MaxinetExporter implements ITopologyExporter{
      * @param memoryLimit
      */
     private void addDockerHost(String nodeName, String ip, String dockerImage, int memoryLimit){
+
         lines.add(nodeName + " = topo.addHost(\"" +nodeName + "\", cls=Docker, ip=\"" + ip +
                 "\", dimage=\"" + dockerImage + "\", mem_limit=" + memoryLimit + ")");
     }

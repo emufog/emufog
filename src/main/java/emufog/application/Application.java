@@ -30,10 +30,6 @@ public class Application {
         container.setContainerName(name);
     }
 
-    public void containerSettings(){
-
-    }
-
     public Docker getContainer() {
         return container;
     }
