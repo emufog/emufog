@@ -1,5 +1,6 @@
 package emufog.container;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Docker extends Container{
@@ -25,23 +26,22 @@ public class Docker extends Container{
 
     private String entrypoint;
 
-    private List<String> environment;
+    private List<String> environmentList = new ArrayList<>();
 
     private String image;
 
     private String imageVersion;
 
-    private List<String> labels;
+    private List<String> labelList = new ArrayList<>();
 
-    private List<String> portBindings;
+    private List<String> portBindings = new ArrayList<>();
 
     /*List of volumes: ["/home/user1/:/mnt/vol2:rw"]*/
-    private List<String> volumes;
+    private List<String> volumesList = new ArrayList<>();
 
-    private boolean publishAllPorts;
+    private boolean publishAllPorts = true;
 
-    private String restartPolicy;
-
+    private List<String> dns = new ArrayList<>();
 
     @Override
     public void image(String img) {
@@ -95,12 +95,22 @@ public class Docker extends Container{
         this.entrypoint = entrypoint;
     }
 
-    public List<String> getEnvironment() {
-        return environment;
+    public String getEnvironment() {
+        String environment = "{";
+
+        if(environmentList.size() == 0){
+            return environment + "}";
+        } else {
+            for(String env : environmentList){
+                environment = environment + env;
+            }
+
+            return environment + "}";
+        }
     }
 
     public void setEnvironment(List<String> environment) {
-        this.environment = environment;
+        this.environmentList = environment;
     }
 
     public String getImage() {
@@ -119,32 +129,51 @@ public class Docker extends Container{
         this.imageVersion = imageVersion;
     }
 
-    public List<String> getLabels() {
-        return labels;
+    public String getLabelList() {
+        String labels = "[";
+
+        if(labelList.size() == 0){
+            return labels + "]";
+        } else {
+            for(String label : labelList){
+                labels = labels + label;
+            }
+
+            return labels + "]";
+        }
+
     }
 
-    public void setLabels(List<String> labels) {
-        this.labels = labels;
+    public void setLabelList(List<String> labelList) {
+        this.labelList = labelList;
     }
 
-    public List<String> getVolumes() {
-        return volumes;
+    public String getVolumesList() {
+        String volumes = "[";
+
+        if(volumesList.size() == 0){
+            return volumes + "]";
+        } else {
+            for(String volume : volumesList){
+                volumes = volumes + volume;
+            }
+
+            return volumes + "]";
+        }
     }
 
-    public void setVolumes(List<String> volumes) {
-        this.volumes = volumes;
+    public void setVolumesList(List<String> volumesList) {
+        this.volumesList = volumesList;
     }
 
-    public String getRestartPolicy() {
-        return restartPolicy;
-    }
+    public String isPublishAllPorts() {
 
-    public void setRestartPolicy(String restartPolicy) {
-        this.restartPolicy = restartPolicy;
-    }
+        if(publishAllPorts){
+            return "True";
+        } else {
+            return "False";
+        }
 
-    public boolean isPublishAllPorts() {
-        return publishAllPorts;
     }
 
     public void setPublishAllPorts(boolean publishAllPorts) {
@@ -175,9 +204,34 @@ public class Docker extends Container{
         this.cpuQuota = cpuQuota;
     }
 
-    public List<String> getPortBindings() {
-        return portBindings;
+    public String getPortBindings() {
+
+        StringBuilder portbindings = new StringBuilder();
+
+        portbindings.append("{");
+
+        if(portBindings.size() == 0){
+            return portbindings.append("}").toString();
+        } else {
+            for(String portbinding : portBindings){
+
+                /*boolean lastItemInList = (portbindings.indexOf(portbinding) == (portBindings.size() -1));
+
+                if(!lastItemInList){
+                    portbindings.append(portbinding);
+                    portbindings.append(",");
+                } else {
+                    portbindings.append(portbinding);
+
+                }*/
+
+                portbindings.append(portbinding);
+            }
+
+            return portbindings.append("}").toString();
+        }
     }
+
 
     public void setPortBindings(List<String> portBindings) {
         this.portBindings = portBindings;

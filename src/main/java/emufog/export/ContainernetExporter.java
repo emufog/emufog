@@ -210,7 +210,7 @@ public class ContainernetExporter implements ITopologyExporter{
             addBlankLine();
 
             lines.add("# " + application.getName());
-            addDockerHost(name, UniqueIPProvider.getInstance().getNextIPV4Address(), container.getImage(), device.getDeviceNodeType().getMemoryLimit());
+            addDockerHost(container, name, UniqueIPProvider.getInstance().getNextIPV4Address(), device.getDeviceNodeType().getMemoryLimit());
 
             connectApplicationToSwitch(device, name);
         }
@@ -239,7 +239,7 @@ public class ContainernetExporter implements ITopologyExporter{
 
 
             lines.add("# " + application.getName());
-            addDockerHost(name, UniqueIPProvider.getInstance().getNextIPV4Address(), container.getImage(), fogNode.getFogNodeType().getMemoryLimit());
+            addDockerHost(container, name, UniqueIPProvider.getInstance().getNextIPV4Address(), fogNode.getFogNodeType().getMemoryLimit());
 
             connectApplicationToSwitch(fogNode, name);
         }
@@ -269,10 +269,29 @@ public class ContainernetExporter implements ITopologyExporter{
      * @param dockerImage
      * @param memoryLimit
      */
-    private void addDockerHost(String nodeName, String ip, String dockerImage, int memoryLimit){
+  /*  private void addDockerHost(String nodeName, String ip, String dockerImage, int memoryLimit){
         lines.add("info('*** Adding docker container "+ nodeName + " with " + dockerImage +"\\n')");
         lines.add(nodeName + " = net.addDocker(" + "'" + nodeName + "', ip='" + ip +"', dimage=\"" + dockerImage + "\", mem_limit=" + memoryLimit + ")");
+    }*/
+
+    private void addDockerHost(Docker container, String nodeName, String ip, int memoryLimit){
+
+        lines.add("info('*** Adding docker container "+ nodeName + " with " + container.getImage() +"\\n')");
+        lines.add( nodeName
+                + " = net.addDocker("
+                + "'" + nodeName
+                + "', ip='" + ip
+                +"', dimage=\"" + container.getImage()
+                + "\", mem_limit=" + memoryLimit
+                + ", volumes=" + container.getVolumesList()
+                + ", environment=" + container.getEnvironment()
+                + ", publish_all_ports=" + container.isPublishAllPorts()
+                + ", port_bindings=" + container.getPortBindings()
+                + ", labels=" + container.getLabelList()
+                + ")");
+
     }
+
 
     private void addLinksBetweenRouters(MutableNetwork<Node, Link> t){
         addBlankLine();

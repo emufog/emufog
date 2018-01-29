@@ -5,6 +5,11 @@ inputGraphFilePath: "/home/renderfehler/IdeaProjects/emufog/5er.brite"
 exportFilePath: "out.py"
 
 overWriteOutputFile: true
+
+applicationAssignmentPolicy: "DefaultApplicationAssignment"
+devicePlacement: "DefaultDevicePlacement"
+edgeIdentifier: "DefaultEdgeIdentifier"
+fogPlacement: "DefaultFogLayout"
 ###################################################################
 #                         Basic Settings                          #
 ###################################################################
@@ -27,17 +32,18 @@ parallelFogBuilding: false
 #                         DeviceNodeTypes                         #
 ###################################################################
 deviceNodeTypes:
+
     - name: deviceNode1
       scalingFactor: 1
       averageDeviceCount: 1
       memoryLimit: 524288000
-      cpuShares: 1
+      cpuShare: 1
 
     - name: deviceNode2
       scalingFactor: 1
       averageDeviceCount: 1
       memoryLimit: 524288000
-      cpuShares: 1
+      cpuShare: 1
 
 ###################################################################
 #                         FogNodeTypes                            #
@@ -49,14 +55,14 @@ fogNodeTypes:
     maximumConnections: 1
     costs: 1
     memoryLimit: 1048576000
-    cpuShares: 1
+    cpuShare: 1
 
   - name: fogNodeType2
     id: 2
     maximumConnections: 1
     costs: 1
     memoryLimit: 1048576000
-    cpuShares: 1
+    cpuShare: 1
 
 ###################################################################
 #                         Applications                            #
@@ -66,28 +72,28 @@ fogApplications:
   # TODO: Main idea behind using yaml as settings file is possibility to copy "service" definitions from docker-compose files to emuFog.
   - name: serviceA
     container:
-      image: alpine
+      image: ubuntu:trusty
 
   - name: serviceB
     container:
-      image: alpine
+      image: ubuntu:trusty
 
   - name: serviceC
     container:
-      image: alpine
+      image: ubuntu:trusty
 
 deviceApplications:
 
   - name: serviceA
     container:
-      image: alpine
+      image: ubuntu:trusty
 
   - name: serviceB
     container:
-      image: alpine
+      image: ubuntu:trusty
 
   - name: serviceC
     container:
-      image: alpine
+      image: ubuntu:trusty
 
 
