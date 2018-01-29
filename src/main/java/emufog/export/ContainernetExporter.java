@@ -20,7 +20,7 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class MaxinetExporter implements ITopologyExporter{
+public class ContainernetExporter implements ITopologyExporter{
 
     private final List<String> lines;
 
@@ -32,12 +32,12 @@ public class MaxinetExporter implements ITopologyExporter{
 
     private List<FogNode> fogNodeList;
 
-    public MaxinetExporter() {
-       lines = new ArrayList<>();
-       routerList = new ArrayList<>();
-       deviceList = new ArrayList<>();
-       fogNodeList = new ArrayList<>();
-       blankLine = "";
+    public ContainernetExporter(){
+        lines = new ArrayList<>();
+        routerList = new ArrayList<>();
+        deviceList = new ArrayList<>();
+        fogNodeList = new ArrayList<>();
+        blankLine = "";
     }
 
     @Override
@@ -64,11 +64,13 @@ public class MaxinetExporter implements ITopologyExporter{
             lines.clear();
 
             // begin to write the python file
-            setupImports();
+            setupContainernetImports("info");
 
             addBlankLine();
 
-            lines.add("topo = Topo()");
+            setupContainernetExperiment();
+
+            addBlankLine();
 
             addRouters();
 
@@ -78,7 +80,7 @@ public class MaxinetExporter implements ITopologyExporter{
 
             addLinksBetweenRouters(topology);
 
-            setupExperiment();
+            startContainernetExperiment();
 
             // set the overwrite option if feature is set in the settings file
             StandardOpenOption overwrite = Settings.getInstance().isOverwriteExperimentFile() ? StandardOpenOption.TRUNCATE_EXISTING : StandardOpenOption.APPEND;
@@ -90,8 +92,10 @@ public class MaxinetExporter implements ITopologyExporter{
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
+    //TODO: Generalize. Method is used in more than one class.
     /**
      * Iterate over topology and sort nodes into corresponding list.
      * @param t topology to work on.
@@ -110,46 +114,63 @@ public class MaxinetExporter implements ITopologyExporter{
         }
     }
 
+    /**
+     *
+     * @param logLevel
+     */
+    private void setupContainernetImports(String logLevel){
+        lines.add("#!/usr/bin/python");
+        lines.add("from mininet.net import Containernet");
+        lines.add("from mininet.node import Controller");
+        lines.add("from mininet.cli import CLI");
+        lines.add("from mininet.link import TCLink");
+        lines.add("from mininet.log import info, setLogLevel");
+        lines.add("setLogLevel('"+ logLevel +"')");
+
+    }
+
+    private void setupContainernetExperiment(){
+        addBlankLine();
+        lines.add("net = Containernet(controller=Controller)");
+        lines.add("info('*** Adding controller')");
+        lines.add("net.addController('c0')");
+    }
+
     private void addRouters(){
         addBlankLine();
-        lines.add("# add routers:");
-        addCommentSeparatorLine();
+        lines.add("info('*** Adding switches')");
 
         for(Router router : checkNotNull(routerList)){
             lines.add("# " + router.getType().toString());
-            lines.add(router.getName() + " = topo.addSwitch(\"" + router.getName() + "\")");
+            lines.add(router.getName() + " = net.addSwitch('"+ router.getName() +"')");
         }
     }
 
     private void addDevices(MutableNetwork<Node,Link> t){
         addBlankLine();
-        lines.add("# add devices");
-        addCommentSeparatorLine();
+        lines.add("info('*** Adding devices')");
 
         for(Device device : deviceList){
 
             Router accessPoint = null;
 
-            //TODO: Debug iteration over adjacentNodes what happens if device is connected to multiple routers?
+            //TODO: Check iteration. What happens if device is connected to multiple routers?
             for(Node node : t.adjacentNodes(device)){
                 if(node instanceof Router){
                     accessPoint = (Router) node;
                 }
             }
 
-            addBlankLine();
             lines.add("# " + device.getName());
             addCommentSeparatorLine();
             createMultiTierDeviceNode(device, checkNotNull(accessPoint));
 
         }
-
     }
 
-    private void addFogNodes(MutableNetwork<Node,Link> t){
+    private void addFogNodes(MutableNetwork<Node, Link> t){
         addBlankLine();
-        lines.add("# add fogNodes");
-        addCommentSeparatorLine();
+        lines.add("info('*** Adding Fog Nodes')");
 
         for(FogNode fogNode : fogNodeList){
 
@@ -164,9 +185,8 @@ public class MaxinetExporter implements ITopologyExporter{
             addBlankLine();
             lines.add("# " + fogNode.getName());
             addCommentSeparatorLine();
-            createMultiTierFogNode(fogNode, accessPoint);
+            createMultiTierFogNode(fogNode, checkNotNull(accessPoint));
         }
-
     }
 
     private void createMultiTierDeviceNode(Device device, Router accessPoint){
@@ -187,29 +207,14 @@ public class MaxinetExporter implements ITopologyExporter{
             UniqueIDProvider.getInstance().markIDused(applicationId);
 
             String name = device.getName() + applicationId;
-
             addBlankLine();
+
             lines.add("# " + application.getName());
             addDockerHost(name, UniqueIPProvider.getInstance().getNextIPV4Address(), container.getImage(), device.getDeviceNodeType().getMemoryLimit());
 
             connectApplicationToSwitch(device, name);
-
         }
 
-    }
-
-    private void createMultiTierSwitch(Node node, Router accessPoint){
-        addBlankLine();
-        lines.add("# createMultiTierSwitch for " + node.getName());
-        lines.add( "r" + node.getName() + " = topo.addSwitch(\"" + "r" + node.getName() + "\")");
-        //connect to original topology router.
-        addLink( "r" + node.getName(), accessPoint.getName(), 0, 1000);
-    }
-
-    private void connectApplicationToSwitch(Node node, String name){
-        addBlankLine();
-        lines.add("# connect application to " + "r" + node.getName());
-        addLink(name, "r" + node.getName(), 0, 1000);
     }
 
     private void createMultiTierFogNode(FogNode fogNode, Router accessPoint){
@@ -224,15 +229,16 @@ public class MaxinetExporter implements ITopologyExporter{
 
             Docker container = checkNotNull(application.getContainer());
 
+            //TODO: Assign unique ids to each application.
             //get unique id for application node
             int applicationId = UniqueIDProvider.getInstance().getNextID();
             UniqueIDProvider.getInstance().markIDused(applicationId);
 
             String name = fogNode.getName() + applicationId;
-
             addBlankLine();
-            lines.add("# " + application.getName());
 
+
+            lines.add("# " + application.getName());
             addDockerHost(name, UniqueIPProvider.getInstance().getNextIPV4Address(), container.getImage(), fogNode.getFogNodeType().getMemoryLimit());
 
             connectApplicationToSwitch(fogNode, name);
@@ -240,7 +246,22 @@ public class MaxinetExporter implements ITopologyExporter{
 
     }
 
-    //TODO: Generalize addDockerHost method. Pass in complete Node object instead of specific fields.
+    private void createMultiTierSwitch(Node node, Router accessPoint){
+        addBlankLine();
+        lines.add("# createMultitierSwitch for " + node.getName());
+        lines.add("info('*** Create multi tier switch for "+ node.getName() +" ')");
+        lines.add("r" + node.getName() + " = net.addSwitch(\"" + "r" + node.getName() + "\")");
+        //connect to original topology router
+        addLink("r" + node.getName(), accessPoint.getName(), 0, 1000);
+    }
+
+    private void connectApplicationToSwitch(Node node, String name){
+        addBlankLine();
+        lines.add("# connect application to " + " r" + node.getName());
+        lines.add("info('*** connect application to "  + " r" + node.getName()+"')");
+        addLink(name, "r" + node.getName(), 0, 1000);
+    }
+
     /**
      * Create a new docker host in experiment.
      * @param nodeName
@@ -249,20 +270,15 @@ public class MaxinetExporter implements ITopologyExporter{
      * @param memoryLimit
      */
     private void addDockerHost(String nodeName, String ip, String dockerImage, int memoryLimit){
-
-        lines.add(nodeName + " = topo.addHost(\"" +nodeName + "\", cls=Docker, ip=\"" + ip +
-                "\", dimage=\"" + dockerImage + "\", mem_limit=" + memoryLimit + ")");
+        lines.add("info('*** Adding docker container "+ nodeName + " with " + dockerImage +"')");
+        lines.add(nodeName + " = net.addDocker(" + "'" + nodeName + "', ip='" + ip +"', dimage=\"" + dockerImage + "\", mem_limit=" + memoryLimit + ")");
     }
 
-    /**
-     * Iterates over the edges of the given topology and retrieves the endpoint pair for
-     * each link and creates new link in experiment file if the link connects to routers.
-     * @param t topology to work on.
-     */
     private void addLinksBetweenRouters(MutableNetwork<Node, Link> t){
         addBlankLine();
         lines.add("# add links between routers");
         addCommentSeparatorLine();
+        lines.add("info('*** Creating links between routers')");
 
         for(Link link : t.edges()){
 
@@ -274,44 +290,24 @@ public class MaxinetExporter implements ITopologyExporter{
             }
 
         }
+
     }
 
-    /**
-     * Adds a new link between two nodes to the document.
-     *
-     * @param source      source of the link
-     * @param destination destination of the link
-     * @param latency     latency applied to this link
-     * @param bandwidth   bandwidth limitations of this link
-     */
-    private void addLink(String source, String destination, float latency, float bandwidth) {
-        lines.add("topo.addLink(" + source + ", " + destination +
-                ", delay='" + latency + "ms', bw=" + bandwidth + ")");
+    private void startContainernetExperiment(){
+        addBlankLine();
+        lines.add("info('*** Starting network')");
+        lines.add("net.start()");
+        lines.add("info('*** Running CLI')");
+        lines.add("CLI(net)");
+        lines.add("info('*** Stopping network')");
+        lines.add("net.stop()");
     }
 
-    /**
-     *  Writes the necessary imports at the top of the output file.
-     */
-    private void setupImports(){
-        lines.add("#!/usr/bin/env python2");
-        addBlankLine();
-        lines.add("import time");
-        addBlankLine();
-        lines.add("from MaxiNet.Frontend import maxinet");
-        lines.add("from MaxiNet.Frontend.container import Docker");
-        lines.add("from mininet.topo import Topo");
-        lines.add("from mininet.node import OVSSwitch");
-    }
 
-    /**
-     * Writes the lines to setup and start an experiment in MaxiNet.
-     */
-    private void setupExperiment(){
-        addBlankLine();
-        lines.add("# create experiment");
-        lines.add("cluster = maxinet.Cluster()");
-        lines.add("exp = maxinet.Experiment(cluster, topo, switch=OVSSwitch)");
-        lines.add("exp.setup()");
+
+    private void addLink(String source, String destination, float latency, float bandwidth){
+        lines.add("info('*** Adding link from " + source + " to " + destination+ "')");
+        lines.add("net.addLink(" + source + ", " + destination + ", cls=TCLink, delay='" + latency + "ms', bw=" + bandwidth + ")");
     }
 
     private void addBlankLine(){

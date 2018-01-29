@@ -42,6 +42,7 @@ public class AS {
         nodeMap.remove(node.getID(), node);
     }
 
+    //TODO: Correct this wrong stream implementation.
     public Collection<Router> getRouters(){
         return (Collection<Router>) nodeMap.values().stream().filter(node -> node instanceof Router);
     }

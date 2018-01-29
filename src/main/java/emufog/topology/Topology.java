@@ -2,8 +2,8 @@ package emufog.topology;
 
 import com.google.common.graph.MutableNetwork;
 import com.google.common.graph.NetworkBuilder;
+import emufog.export.ContainernetExporter;
 import emufog.export.ITopologyExporter;
-import emufog.export.MaxinetExporter;
 import emufog.placement.*;
 import emufog.reader.BriteReader;
 import emufog.reader.TopologyReader;
@@ -131,7 +131,7 @@ public class Topology {
 
         final Path exportPath = settings.getExportFilePath();
 
-        ITopologyExporter exporter = new MaxinetExporter();
+        ITopologyExporter exporter = new ContainernetExporter();
 
         exporter.exportTopology(getTopology(), exportPath);
 
