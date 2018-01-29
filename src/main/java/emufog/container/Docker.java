@@ -95,6 +95,10 @@ public class Docker extends Container{
         this.entrypoint = entrypoint;
     }
 
+    /**
+     * Return formated environment string.
+     * @return
+     */
     public String getEnvironment() {
         String environment = "{";
 
