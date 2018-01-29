@@ -250,7 +250,7 @@ public class ContainernetExporter implements ITopologyExporter{
         addBlankLine();
         lines.add("# createMultitierSwitch for " + node.getName());
         lines.add("info('*** Create multi tier switch for "+ node.getName() +" '\n)");
-        lines.add("mts" + node.getName() + " = net.addSwitch(\"" + "r" + node.getName() + "\")");
+        lines.add("mts" + node.getName() + " = net.addSwitch(\"" + "mts" + node.getName() + "\")");
         //connect to original topology router
         addLink("mts" + node.getName(), accessPoint.getName(), 0, 1000);
     }
