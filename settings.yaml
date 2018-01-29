@@ -31,13 +31,13 @@ deviceNodeTypes:
       scalingFactor: 1
       averageDeviceCount: 1
       memoryLimit: 524288000
-      cpuShare: 1
+      cpuShares: 1
 
     - name: deviceNode2
       scalingFactor: 1
       averageDeviceCount: 1
       memoryLimit: 524288000
-      cpuShare: 1
+      cpuShares: 1
 
 ###################################################################
 #                         FogNodeTypes                            #
@@ -49,14 +49,14 @@ fogNodeTypes:
     maximumConnections: 1
     costs: 1
     memoryLimit: 1048576000
-    cpuShare: 1
+    cpuShares: 1
 
   - name: fogNodeType2
     id: 2
     maximumConnections: 1
     costs: 1
     memoryLimit: 1048576000
-    cpuShare: 1
+    cpuShares: 1
 
 ###################################################################
 #                         Applications                            #

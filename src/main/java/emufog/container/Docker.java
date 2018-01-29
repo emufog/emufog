@@ -4,17 +4,42 @@ import java.util.List;
 
 public class Docker extends Container{
 
+    /* mem_limit: Memory limit*/
     private int memoryLimit;
-    private float cpuShare;
+
+    /* Relative amount of max. avail CPU for container.
+    * not a hard limit, e.g if only one container is busy the rest idle)
+    * usage: d1=4 d2=6 <=> 40% 60% CPU*/
+    private float cpuShares;
+
+    /*the total available runtime within a period in 10^-6s*/
+    private float cpuQuota;
+
+    /*the length of a period in 10^-6s*/
+    private float cpuPeriod;
+
+    /*cpuset_cpus: Bind container to CPU 0 = cpu_1 ... n-1 = cpu_n (string: '0,2')*/
+    private String cpuSet;
 
     private String containerName;
+
     private String entrypoint;
+
     private List<String> environment;
+
     private String image;
+
     private String imageVersion;
+
     private List<String> labels;
-    private String ports;
+
+    private List<String> portBindings;
+
+    /*List of volumes: ["/home/user1/:/mnt/vol2:rw"]*/
     private List<String> volumes;
+
+    private boolean publishAllPorts;
+
     private String restartPolicy;
 
 
@@ -35,7 +60,7 @@ public class Docker extends Container{
 
     @Override
     public void cpuShare(float cpuShare) {
-        this.cpuShare = cpuShare;
+        this.cpuShares = cpuShare;
     }
 
     public int getMemoryLimit() {
@@ -46,12 +71,12 @@ public class Docker extends Container{
         this.memoryLimit = memoryLimit;
     }
 
-    public float getCpuShare() {
-        return cpuShare;
+    public float getCpuShares() {
+        return cpuShares;
     }
 
-    public void setCpuShare(float cpuShare) {
-        this.cpuShare = cpuShare;
+    public void setCpuShares(float cpuShares) {
+        this.cpuShares = cpuShares;
     }
 
     public String getContainerName() {
@@ -102,14 +127,6 @@ public class Docker extends Container{
         this.labels = labels;
     }
 
-    public String getPorts() {
-        return ports;
-    }
-
-    public void setPorts(String ports) {
-        this.ports = ports;
-    }
-
     public List<String> getVolumes() {
         return volumes;
     }
@@ -124,5 +141,45 @@ public class Docker extends Container{
 
     public void setRestartPolicy(String restartPolicy) {
         this.restartPolicy = restartPolicy;
+    }
+
+    public boolean isPublishAllPorts() {
+        return publishAllPorts;
+    }
+
+    public void setPublishAllPorts(boolean publishAllPorts) {
+        this.publishAllPorts = publishAllPorts;
+    }
+
+    public String getCpuSet() {
+        return cpuSet;
+    }
+
+    public void setCpuSet(String cpuSet) {
+        this.cpuSet = cpuSet;
+    }
+
+    public float getCpuPeriod() {
+        return cpuPeriod;
+    }
+
+    public void setCpuPeriod(float cpuPeriod) {
+        this.cpuPeriod = cpuPeriod;
+    }
+
+    public float getCpuQuota() {
+        return cpuQuota;
+    }
+
+    public void setCpuQuota(float cpuQuota) {
+        this.cpuQuota = cpuQuota;
+    }
+
+    public List<String> getPortBindings() {
+        return portBindings;
+    }
+
+    public void setPortBindings(List<String> portBindings) {
+        this.portBindings = portBindings;
     }
 }
