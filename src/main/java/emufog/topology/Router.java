@@ -28,6 +28,4 @@ public class Router extends Node{
 
     public int getDeviceCount() { return deviceCount;}
 
-
-
 }
