@@ -5,6 +5,7 @@ import com.google.common.graph.NetworkBuilder;
 import emufog.topology.Link;
 import emufog.topology.Node;
 import emufog.topology.Router;
+import emufog.util.UniqueIDProvider;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -62,6 +63,8 @@ public class BriteReader extends TopologyReader{
                 int id = Integer.parseInt(values[0]);
                 int asID = Integer.parseInt(values[5]);
                 Router router = new Router(id, asID);
+                // mark parsed id as used to avoid naming problems in exporter.
+                UniqueIDProvider.getInstance().markIDused(id);
                 router.setType(ROUTER);
                 topology.addNode(router);
             }

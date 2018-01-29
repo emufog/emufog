@@ -132,13 +132,13 @@ public class ContainernetExporter implements ITopologyExporter{
     private void setupContainernetExperiment(){
         addBlankLine();
         lines.add("net = Containernet(controller=Controller)");
-        lines.add("info('*** Adding controller'\n)");
+        lines.add("info('*** Adding controller\\n')");
         lines.add("net.addController('c0')");
     }
 
     private void addRouters(){
         addBlankLine();
-        lines.add("info('*** Adding switches'\n)");
+        lines.add("info('*** Adding switches\\n')");
 
         for(Router router : checkNotNull(routerList)){
             lines.add("# " + router.getType().toString());
@@ -148,7 +148,7 @@ public class ContainernetExporter implements ITopologyExporter{
 
     private void addDevices(MutableNetwork<Node,Link> t){
         addBlankLine();
-        lines.add("info('*** Adding devices'\n)");
+        lines.add("info('*** Adding devices\\n')");
 
         for(Device device : deviceList){
 
@@ -170,7 +170,7 @@ public class ContainernetExporter implements ITopologyExporter{
 
     private void addFogNodes(MutableNetwork<Node, Link> t){
         addBlankLine();
-        lines.add("info('*** Adding Fog Nodes'\n)");
+        lines.add("info('*** Adding Fog Nodes\\n')");
 
         for(FogNode fogNode : fogNodeList){
 
@@ -249,17 +249,17 @@ public class ContainernetExporter implements ITopologyExporter{
     private void createMultiTierSwitch(Node node, Router accessPoint){
         addBlankLine();
         lines.add("# createMultitierSwitch for " + node.getName());
-        lines.add("info('*** Create multi tier switch for "+ node.getName() +" '\n)");
-        lines.add("mts" + node.getName() + " = net.addSwitch(\"" + "mts" + node.getName() + "\")");
+        lines.add("info('*** Create multi tier switch for "+ node.getName() +"\\n')");
+        lines.add("mts" + node.getName() + " = net.addSwitch(\'" + "mts" + node.getName() + "\')");
         //connect to original topology router
         addLink("mts" + node.getName(), accessPoint.getName(), 0, 1000);
     }
 
     private void connectApplicationToSwitch(Node node, String name){
         addBlankLine();
-        lines.add("# connect application to " + " r" + node.getName());
-        lines.add("info('*** connect application to "  + " r" + node.getName()+"'\n)");
-        addLink(name, "r" + node.getName(), 0, 1000);
+        lines.add("# connect application to " + "mts" + node.getName());
+        lines.add("info('*** connect application to "  + " mts" + node.getName()+"\\n')");
+        addLink(name, "mts" + node.getName(), 0, 1000);
     }
 
     /**
@@ -270,7 +270,7 @@ public class ContainernetExporter implements ITopologyExporter{
      * @param memoryLimit
      */
     private void addDockerHost(String nodeName, String ip, String dockerImage, int memoryLimit){
-        lines.add("info('*** Adding docker container "+ nodeName + " with " + dockerImage +"'\n)");
+        lines.add("info('*** Adding docker container "+ nodeName + " with " + dockerImage +"\\n')");
         lines.add(nodeName + " = net.addDocker(" + "'" + nodeName + "', ip='" + ip +"', dimage=\"" + dockerImage + "\", mem_limit=" + memoryLimit + ")");
     }
 
@@ -278,7 +278,7 @@ public class ContainernetExporter implements ITopologyExporter{
         addBlankLine();
         lines.add("# add links between routers");
         addCommentSeparatorLine();
-        lines.add("info('*** Creating links between routers'\n)");
+        lines.add("info('*** Creating links between routers\\n')");
 
         for(Link link : t.edges()){
 
@@ -295,18 +295,18 @@ public class ContainernetExporter implements ITopologyExporter{
 
     private void startContainernetExperiment(){
         addBlankLine();
-        lines.add("info('*** Starting network'\n)");
+        lines.add("info('*** Starting network\\n')");
         lines.add("net.start()");
-        lines.add("info('*** Running CLI'\n)");
+        lines.add("info('*** Running CLI\\n')");
         lines.add("CLI(net)");
-        lines.add("info('*** Stopping network'\n)");
+        lines.add("info('*** Stopping network\\n')");
         lines.add("net.stop()");
     }
 
 
 
     private void addLink(String source, String destination, float latency, float bandwidth){
-        lines.add("info('*** Adding link from " + source + " to " + destination+ "'\n)");
+        lines.add("info('*** Adding link from " + source + " to " + destination+ "\\n')");
         lines.add("net.addLink(" + source + ", " + destination + ", cls=TCLink, delay='" + latency + "ms', bw=" + bandwidth + ")");
     }
 
