@@ -213,6 +213,8 @@ public class ContainernetExporter implements ITopologyExporter{
             addDockerHost(container, name, UniqueIPProvider.getInstance().getNextIPV4Address(), device.getDeviceNodeType().getMemoryLimit());
 
             connectApplicationToSwitch(device, name);
+
+            executeCommands(container,name);
         }
 
     }
@@ -242,6 +244,8 @@ public class ContainernetExporter implements ITopologyExporter{
             addDockerHost(container, name, UniqueIPProvider.getInstance().getNextIPV4Address(), fogNode.getFogNodeType().getMemoryLimit());
 
             connectApplicationToSwitch(fogNode, name);
+
+            executeCommands(container,name);
         }
 
     }
@@ -266,14 +270,8 @@ public class ContainernetExporter implements ITopologyExporter{
      * Create a new docker host in experiment.
      * @param nodeName
      * @param ip
-     * @param dockerImage
      * @param memoryLimit
      */
-  /*  private void addDockerHost(String nodeName, String ip, String dockerImage, int memoryLimit){
-        lines.add("info('*** Adding docker container "+ nodeName + " with " + dockerImage +"\\n')");
-        lines.add(nodeName + " = net.addDocker(" + "'" + nodeName + "', ip='" + ip +"', dimage=\"" + dockerImage + "\", mem_limit=" + memoryLimit + ")");
-    }*/
-
     private void addDockerHost(Docker container, String nodeName, String ip, int memoryLimit){
 
         lines.add("info('*** Adding docker container "+ nodeName + " with " + container.getImage() +"\\n')");
@@ -286,10 +284,22 @@ public class ContainernetExporter implements ITopologyExporter{
                 + ", volumes=" + container.getVolumesList()
                 + ", environment=" + container.getEnvironment()
                 + ", publish_all_ports=" + container.isPublishAllPorts()
-                + ", port_bindings=" + container.getPortBindings()
-                + ", labels=" + container.getLabelList()
+                + ", port_bindings=" + container.getPorts()
+                + ", labels=" + container.getLabels()
                 + ")");
 
+    }
+
+    private void executeCommands(Docker container, String nodeName){
+        List<String> commands = container.getCommands();
+
+        if(container.getCommands().size() != 0){
+            lines.add("info('*** Run commands for " + nodeName + "\\n')");
+
+            for(String command : commands){
+                lines.add(nodeName + ".cmd(\""+command+"\", verbose=True)");
+            }
+        }
     }
 
 
@@ -321,8 +331,6 @@ public class ContainernetExporter implements ITopologyExporter{
         lines.add("info('*** Stopping network\\n')");
         lines.add("net.stop()");
     }
-
-
 
     private void addLink(String source, String destination, float latency, float bandwidth){
         lines.add("info('*** Adding link from " + source + " to " + destination+ "\\n')");

@@ -5,6 +5,8 @@ import java.util.List;
 
 public class Docker extends Container{
 
+    //TODO: Implement Log config log_config(dict) docker-py - only possible if containernet is updated.
+
     /* mem_limit: Memory limit*/
     private int memoryLimit;
 
@@ -26,15 +28,15 @@ public class Docker extends Container{
 
     private String entrypoint;
 
-    private List<String> environmentList = new ArrayList<>();
+    private List<String> environment = new ArrayList<>();
 
     private String image;
 
     private String imageVersion;
 
-    private List<String> labelList = new ArrayList<>();
+    private List<String> labels = new ArrayList<>();
 
-    private List<String> portBindings = new ArrayList<>();
+    private List<String> ports = new ArrayList<>();
 
     /*List of volumes: ["/home/user1/:/mnt/vol2:rw"]*/
     private List<String> volumesList = new ArrayList<>();
@@ -42,6 +44,8 @@ public class Docker extends Container{
     private boolean publishAllPorts = true;
 
     private List<String> dns = new ArrayList<>();
+
+    private List<String> commands = new ArrayList<>();
 
     @Override
     public void image(String img) {
@@ -96,25 +100,28 @@ public class Docker extends Container{
     }
 
     /**
-     * Return formated environment string.
-     * @return
+     * Return formatted environment string. The docker-py api is able to consume either dicts or lists.
+     * Implemented is list formatting.
+     * @return environment string in the format ["SOMEVARIABLE=xxx"].
      */
     public String getEnvironment() {
-        String environment = "{";
 
-        if(environmentList.size() == 0){
-            return environment + "}";
+        StringBuilder environment = new StringBuilder();
+        environment.append("[");
+
+        if(this.environment.size() == 0){
+            return environment.append("]").toString();
         } else {
-            for(String env : environmentList){
-                environment = environment + env;
+            for(String env : this.environment){
+                environment.append(env);
             }
 
-            return environment + "}";
+            return environment.append("]").toString();
         }
     }
 
     public void setEnvironment(List<String> environment) {
-        this.environmentList = environment;
+        this.environment = environment;
     }
 
     public String getImage() {
@@ -133,36 +140,45 @@ public class Docker extends Container{
         this.imageVersion = imageVersion;
     }
 
-    public String getLabelList() {
-        String labels = "[";
+    /**
+     * Return formatted label string. The docker-py api is able to consume either dicts or lists.
+     * Implemented is list formatting.
+     * @return labels string in the format ["label1", "label2"]
+     */
+    public String getLabels() {
 
-        if(labelList.size() == 0){
-            return labels + "]";
+        StringBuilder labels = new StringBuilder();
+        labels.append("[");
+
+        if(this.labels.size() == 0){
+            return labels.append("]").toString();
         } else {
-            for(String label : labelList){
-                labels = labels + label;
+            for(String label : this.labels){
+                labels.append(label);
             }
 
-            return labels + "]";
+            return labels.append("]").toString();
         }
 
     }
 
-    public void setLabelList(List<String> labelList) {
-        this.labelList = labelList;
+    public void setLabels(List<String> labels) {
+        this.labels = labels;
     }
 
     public String getVolumesList() {
-        String volumes = "[";
+
+        StringBuilder volumes = new StringBuilder();
+        volumes.append("[");
 
         if(volumesList.size() == 0){
-            return volumes + "]";
+            return volumes.append("]").toString();
         } else {
             for(String volume : volumesList){
-                volumes = volumes + volume;
+                volumes.append(volume);
             }
 
-            return volumes + "]";
+            return volumes.append("]").toString();
         }
     }
 
@@ -208,18 +224,18 @@ public class Docker extends Container{
         this.cpuQuota = cpuQuota;
     }
 
-    public String getPortBindings() {
+    public String getPorts() {
 
         StringBuilder portbindings = new StringBuilder();
 
         portbindings.append("{");
 
-        if(portBindings.size() == 0){
+        if(ports.size() == 0){
             return portbindings.append("}").toString();
         } else {
-            for(String portbinding : portBindings){
+            for(String portbinding : ports){
 
-                /*boolean lastItemInList = (portbindings.indexOf(portbinding) == (portBindings.size() -1));
+                /*boolean lastItemInList = (portbindings.indexOf(portbinding) == (ports.size() -1));
 
                 if(!lastItemInList){
                     portbindings.append(portbinding);
@@ -237,7 +253,15 @@ public class Docker extends Container{
     }
 
 
-    public void setPortBindings(List<String> portBindings) {
-        this.portBindings = portBindings;
+    public void setPorts(List<String> ports) {
+        this.ports = ports;
+    }
+
+    public List<String> getCommands() {
+        return commands;
+    }
+
+    public void setCommands(List<String> commands) {
+        this.commands = commands;
     }
 }
