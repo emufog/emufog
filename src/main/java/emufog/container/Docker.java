@@ -38,8 +38,10 @@ public class Docker extends Container{
 
     private List<String> ports = new ArrayList<>();
 
+    private List<String> portBindings = new ArrayList<>();
+
     /*List of volumes: ["/home/user1/:/mnt/vol2:rw"]*/
-    private List<String> volumesList = new ArrayList<>();
+    private List<String> volumes = new ArrayList<>();
 
     private boolean publishAllPorts = true;
 
@@ -106,17 +108,21 @@ public class Docker extends Container{
      */
     public String getEnvironment() {
 
-        StringBuilder environment = new StringBuilder();
-        environment.append("[");
+        StringBuilder environmentString = new StringBuilder();
+        environmentString.append("[");
 
         if(this.environment.size() == 0){
-            return environment.append("]").toString();
+            return environmentString.append("]").toString();
         } else {
-            for(String env : this.environment){
-                environment.append(env);
-            }
+            int size = environment.size();
+            for(String env : environment){
+                if(size != 1){
+                    environmentString.append(env + ",");
+                    size--;
+                }else environmentString.append(env);
 
-            return environment.append("]").toString();
+            }
+            return environmentString.append("]").toString();
         }
     }
 
@@ -147,17 +153,24 @@ public class Docker extends Container{
      */
     public String getLabels() {
 
-        StringBuilder labels = new StringBuilder();
-        labels.append("[");
+        StringBuilder labelsString = new StringBuilder();
+        labelsString.append("[");
 
         if(this.labels.size() == 0){
-            return labels.append("]").toString();
+            return labelsString.append("]").toString();
         } else {
+            int size = labels.size();
+
             for(String label : this.labels){
-                labels.append(label);
+
+                if(size != 1){
+                    labelsString.append(label + ",");
+                    size--;
+                }else labelsString.append(label);
+
             }
 
-            return labels.append("]").toString();
+            return labelsString.append("]").toString();
         }
 
     }
@@ -166,24 +179,29 @@ public class Docker extends Container{
         this.labels = labels;
     }
 
-    public String getVolumesList() {
+    public String getVolumes() {
 
-        StringBuilder volumes = new StringBuilder();
-        volumes.append("[");
+        StringBuilder volumesString = new StringBuilder();
+        volumesString.append("[");
 
-        if(volumesList.size() == 0){
-            return volumes.append("]").toString();
+        if(volumes.size() == 0){
+            return volumesString.append("]").toString();
         } else {
-            for(String volume : volumesList){
-                volumes.append(volume);
+            int size = volumes.size();
+
+            for(String volume : volumes){
+                if(size != 1){
+                    volumesString.append(volume + ",");
+                    size--;
+                }else volumesString.append(volume);
             }
 
-            return volumes.append("]").toString();
+            return volumesString.append("]").toString();
         }
     }
 
-    public void setVolumesList(List<String> volumesList) {
-        this.volumesList = volumesList;
+    public void setVolumes(List<String> volumes) {
+        this.volumes = volumes;
     }
 
     public String isPublishAllPorts() {
@@ -226,29 +244,22 @@ public class Docker extends Container{
 
     public String getPorts() {
 
-        StringBuilder portbindings = new StringBuilder();
+        StringBuilder portString = new StringBuilder();
 
-        portbindings.append("{");
+        portString.append("[");
 
         if(ports.size() == 0){
-            return portbindings.append("}").toString();
+            return portString.append("]").toString();
         } else {
-            for(String portbinding : ports){
-
-                /*boolean lastItemInList = (portbindings.indexOf(portbinding) == (ports.size() -1));
-
-                if(!lastItemInList){
-                    portbindings.append(portbinding);
-                    portbindings.append(",");
-                } else {
-                    portbindings.append(portbinding);
-
-                }*/
-
-                portbindings.append(portbinding);
+            int size = ports.size();
+            for(String port : ports){
+                if(size != 1) {
+                    portString.append(port + ",");
+                    size--;
+                }else portString.append(port);
             }
 
-            return portbindings.append("}").toString();
+            return portString.append("]").toString();
         }
     }
 
@@ -263,5 +274,32 @@ public class Docker extends Container{
 
     public void setCommands(List<String> commands) {
         this.commands = commands;
+    }
+
+    public String getPortBindings() {
+
+        StringBuilder portBindingString = new StringBuilder();
+
+        portBindingString.append("{");
+
+        if(portBindings.size() == 0){
+            return portBindingString.append("}").toString();
+        } else {
+            int size = portBindings.size();
+            for(String portBinding : portBindings){
+                if(size != 1){
+                    portBindingString.append(portBinding + ",");
+                    size--;
+                } else portBindingString.append(portBinding);
+            }
+
+            return portBindingString.append("}").toString();
+        }
+
+
+    }
+
+    public void setPortBindings(List<String> portBindings) {
+        this.portBindings = portBindings;
     }
 }
