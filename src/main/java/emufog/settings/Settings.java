@@ -50,6 +50,8 @@ public class Settings {
 
     private String fogPlacement;
 
+    private String exporter;
+
     /****************************
      *  Basic Settings          *;
      ****************************/
@@ -268,6 +270,14 @@ public class Settings {
 
     public void setDeviceApplications(List<Application> deviceApplications) {
         this.deviceApplications = deviceApplications;
+    }
+
+    public String getExporter() {
+        return exporter;
+    }
+
+    public void setExporter(String exporter) {
+        this.exporter = exporter;
     }
 }
 
