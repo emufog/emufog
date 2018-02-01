@@ -1,298 +1,181 @@
+/*
 package emufog.export;
 
-import com.google.common.graph.EndpointPair;
-import com.google.common.graph.MutableNetwork;
-import emufog.application.Application;
-import emufog.container.Docker;
-import emufog.nodeconfig.DeviceNodeConfiguration;
-import emufog.nodeconfig.FogNodeConfiguration;
-import emufog.settings.Settings;
-import emufog.topology.*;
-import emufog.util.UniqueIDProvider;
-import emufog.util.UniqueIPProvider;
+import emufog.graph.Edge;
+import emufog.graph.Graph;
+import emufog.graph.Node;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+*/
+/**
+ * This class is a framework with helper methods for classes that export a
+ * graph object to a valid python file usable with the MaxiNet
+ * (https://maxinet.github.io/) network emulation framework.
+ *//*
 
-public class MaxinetExporter implements ITopologyExporter{
+public abstract class MaxiNetExporter implements IGraphExporter {
 
-    private final List<String> lines;
+    */
+/* list of all lines of the respective file in top down order *//*
+
+    final List<String> lines;
+
+    */
+/* blank line object to reuse for all blank lines *//*
 
     private final String blankLine;
 
-    private List<Router> routerList;
+    */
+/* mapping of edges to their respective connector *//*
 
-    private List<Device> deviceList;
+    final Map<Edge, String> connectors;
 
-    private List<FogNode> fogNodeList;
+    */
+/**
+     * Creates a new MaxiNet exporter instance.
+     *//*
 
-    public MaxinetExporter() {
-       lines = new ArrayList<>();
-       routerList = new ArrayList<>();
-       deviceList = new ArrayList<>();
-       fogNodeList = new ArrayList<>();
-       blankLine = "";
+    MaxiNetExporter() {
+        lines = new ArrayList<>();
+        blankLine = "";
+        connectors = new HashMap<>();
     }
 
     @Override
-    public void exportTopology(MutableNetwork<Node, Link> topology, Path path) throws IOException {
+    public abstract void exportGraph(Graph graph, Path path) throws IllegalArgumentException, IOException;
 
-        filterTopology(checkNotNull(topology));
+    */
+/**
+     * Validates graph's relevant data to ensure that it will be able to
+     * generate the appropriate python file.
+     *
+     * @param graph graph to validate
+     * @return graph validity
+     *//*
 
-        File experimentFile = checkNotNull(path).toFile();
+    abstract boolean validateGraph(Graph graph);
 
-        try {
-            //get configuration for overwrite permission
-            boolean isOverwirteAllowed = Settings.getInstance().isOverwriteExperimentFile();
-            if(!isOverwirteAllowed && experimentFile.exists()){
-                throw new IllegalArgumentException("The given file already exist. Please provide a valid path");
-            }
+    */
+/**
+     * Writes all docker host nodeconfig of the graph to the output file.
+     *
+     * @param graph graph to export
+     *//*
 
-            // check the file ending of the given path
-            PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.py");
-            if (!matcher.matches(path)) {
-                throw new IllegalArgumentException("The file name for MaxiNet has to be a python file (.py)");
-            }
+    abstract void addHosts(Graph graph);
 
-            // initialize empty sets to start the writing
-            lines.clear();
+    */
+/**
+     * Adds a blank line to the output file.
+     *//*
 
-            // begin to write the python file
-            setupImports();
-
-            addBlankLine();
-
-            lines.add("topo = Topo()");
-
-            addRouters();
-
-            addDevices(topology);
-
-            addFogNodes(topology);
-
-            addLinksBetweenRouters(topology);
-
-            setupExperiment();
-
-            // set the overwrite option if feature is set in the settings file
-            StandardOpenOption overwrite = Settings.getInstance().isOverwriteExperimentFile() ? StandardOpenOption.TRUNCATE_EXISTING : StandardOpenOption.APPEND;
-
-            // write output in UTF-8 to the specified file
-            Files.write(experimentFile.toPath(), lines, StandardCharsets.UTF_8, StandardOpenOption.CREATE, overwrite);
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    void addBlankLine() {
+        lines.add(blankLine);
     }
 
-    /**
-     * Iterate over topology and sort nodes into corresponding list.
-     * @param t topology to work on.
-     */
-    private void filterTopology(MutableNetwork<Node,Link> t){
-        for(Node node : t.nodes()) {
-            if (node instanceof emufog.topology.Router) {
-                routerList.add((Router) node);
-            }
-            if (node instanceof Device) {
-                deviceList.add((Device) node);
-            }
-            if (node instanceof FogNode) {
-                fogNodeList.add((FogNode) node);
-            }
-        }
-    }
 
-    private void addRouters(){
+    */
+/**
+     * Writes all switches that do not require docker to the output file.
+     *
+     * @param graph graph to export
+     *//*
+
+    void addSwitches(Graph graph) {
         addBlankLine();
-        lines.add("# add routers:");
-        addCommentSeparatorLine();
+        lines.add("# add switches");
 
-        for(Router router : checkNotNull(routerList)){
-            lines.add("# " + router.getType().toString());
-            lines.add(router.getName() + " = topo.addSwitch(\"" + router.getName() + "\")");
+        List<Node> nodes = new ArrayList<>();
+        nodes.addAll(graph.getRouters());
+        nodes.addAll(graph.getSwitches());
+        for (Node n : nodes.stream().filter(n -> !n.hasEmulationSettings()).collect(Collectors.toList())) {
+            lines.add(n.getName() + " = topo.addSwitch(\"" + n.getName() + "\")");
         }
     }
 
-    private void addDevices(MutableNetwork<Node,Link> t){
+    */
+/**
+     * Creates connectors between two hosts to run in MaxiNet.
+     *
+     * @param graph graph to export
+     *//*
+
+    void addConnectors(Graph graph) {
         addBlankLine();
-        lines.add("# add devices");
-        addCommentSeparatorLine();
+        lines.add("# add connectors");
 
-        for(Device device : deviceList){
-
-            Router accessPoint = null;
-
-            //TODO: Debug iteration over adjacentNodes what happens if device is connected to multiple routers?
-            for(Node node : t.adjacentNodes(device)){
-                if(node instanceof Router){
-                    accessPoint = (Router) node;
-                }
+        int counter = 0;
+        for (Edge e : graph.getEdges()) {
+            if (e.getSource().hasEmulationSettings() && e.getDestination().hasEmulationSettings()) {
+                String name = "c" + counter;
+                lines.add(name + " = topo.addSwitch(\"" + name + "\")");
+                connectors.put(e, name);
+                counter++;
             }
-
-            addBlankLine();
-            lines.add("# " + device.getName());
-            addCommentSeparatorLine();
-            createMultiTierDeviceNode(device, checkNotNull(accessPoint));
-
         }
-
     }
 
-    private void addFogNodes(MutableNetwork<Node,Link> t){
+    */
+/**
+     * Established the connections between two nodeconfig based on the edges of the graph.
+     *
+     * @param graph graph to export
+     *//*
+
+    void addLinks(Graph graph) {
         addBlankLine();
-        lines.add("# add fogNodes");
-        addCommentSeparatorLine();
+        lines.add("# add links");
 
-        for(FogNode fogNode : fogNodeList){
-
-            Router accessPoint = null;
-
-            for(Node node : t.adjacentNodes(fogNode)){
-                if(node instanceof Router){
-                    accessPoint = (Router) node;
-                }
+        for (Edge e : graph.getEdges()) {
+            if (connectors.containsKey(e)) {
+                String connector = connectors.get(e);
+                addLink(e.getSource().getName(), connector, e.getDelay() / 2, e.getBandwidth());
+                addLink(connector, e.getDestination().getName(), e.getDelay() / 2, e.getBandwidth());
+            } else {
+                addLink(e.getSource().getName(), e.getDestination().getName(), e.getDelay(), e.getBandwidth());
             }
-
-            addBlankLine();
-            lines.add("# " + fogNode.getName());
-            addCommentSeparatorLine();
-            createMultiTierFogNode(fogNode, accessPoint);
-        }
-
-    }
-
-    private void createMultiTierDeviceNode(Device device, Router accessPoint){
-
-        createMultiTierSwitch(device, accessPoint);
-
-        DeviceNodeConfiguration configuration = device.getConfiguration();
-
-        List<Application> applications = configuration.getApplications();
-
-        for(Application application : applications){
-
-            Docker container = checkNotNull(application.getContainer());
-
-            //TODO: Assign unique ids to each application.
-            //get unique id for application node
-            int applicationId = UniqueIDProvider.getInstance().getNextID();
-            UniqueIDProvider.getInstance().markIDused(applicationId);
-
-            String name = device.getName() + applicationId;
-
-            addBlankLine();
-            lines.add("# " + application.getName());
-            addDockerHost(name, UniqueIPProvider.getInstance().getNextIPV4Address(), container.getImage(), device.getDeviceNodeType().getMemoryLimit());
-
-            connectApplicationToSwitch(device, name);
-
-        }
-
-    }
-
-    private void createMultiTierSwitch(Node node, Router accessPoint){
-        addBlankLine();
-        lines.add("# createMultiTierSwitch for " + node.getName());
-        lines.add( "mts" + node.getName() + " = topo.addSwitch(\"" + "mts" + node.getName() + "\")");
-        //connect to original topology router.
-        addLink( "mts" + node.getName(), accessPoint.getName(), 0, 1000);
-    }
-
-    private void connectApplicationToSwitch(Node node, String name){
-        addBlankLine();
-        lines.add("# connect application to " + "r" + node.getName());
-        addLink(name, "r" + node.getName(), 0, 1000);
-    }
-
-    private void createMultiTierFogNode(FogNode fogNode, Router accessPoint){
-
-        createMultiTierSwitch(fogNode, accessPoint);
-
-        FogNodeConfiguration configuration = fogNode.getConfiguration();
-
-        List<Application> applications = configuration.getApplications();
-
-        for(Application application : applications){
-
-            Docker container = checkNotNull(application.getContainer());
-
-            //get unique id for application node
-            int applicationId = UniqueIDProvider.getInstance().getNextID();
-            UniqueIDProvider.getInstance().markIDused(applicationId);
-
-            String name = fogNode.getName() + applicationId;
-
-            addBlankLine();
-            lines.add("# " + application.getName());
-
-            addDockerHost(name, UniqueIPProvider.getInstance().getNextIPV4Address(), container.getImage(), fogNode.getFogNodeType().getMemoryLimit());
-
-            connectApplicationToSwitch(fogNode, name);
-        }
-
-    }
-
-    //TODO: Generalize addDockerHost method. Pass in complete Node object instead of specific fields.
-    /**
-     * Create a new docker host in experiment.
-     * @param nodeName
-     * @param ip
-     * @param dockerImage
-     * @param memoryLimit
-     */
-    private void addDockerHost(String nodeName, String ip, String dockerImage, int memoryLimit){
-
-        lines.add(nodeName + " = topo.addHost(\"" +nodeName + "\", cls=Docker, ip=\"" + ip +
-                "\", dimage=\"" + dockerImage + "\", mem_limit=" + memoryLimit + ")");
-    }
-
-    /**
-     * Iterates over the edges of the given topology and retrieves the endpoint pair for
-     * each link and creates new link in experiment file if the link connects to routers.
-     * @param t topology to work on.
-     */
-    private void addLinksBetweenRouters(MutableNetwork<Node, Link> t){
-        addBlankLine();
-        lines.add("# add links between routers");
-        addCommentSeparatorLine();
-
-        for(Link link : t.edges()){
-
-            EndpointPair<Node> endpointPair = t.incidentNodes(link);
-
-            //only add subset of links that connects routers to each other. Device and FogNode connections are set in their respective Methods.
-            if(endpointPair.nodeU() instanceof  Router && endpointPair.nodeV() instanceof Router){
-                addLink(endpointPair.nodeU().getName(), endpointPair.nodeV().getName(), link.getDelay(), link.getBandwidth());
-            }
-
         }
     }
 
-    /**
-     * Adds a new link between two nodes to the document.
+    */
+/**
+     * Adds a new link between two nodeconfig to the document.
      *
      * @param source      source of the link
      * @param destination destination of the link
      * @param latency     latency applied to this link
      * @param bandwidth   bandwidth limitations of this link
-     */
+     *//*
+
     private void addLink(String source, String destination, float latency, float bandwidth) {
         lines.add("topo.addLink(" + source + ", " + destination +
                 ", delay='" + latency + "ms', bw=" + bandwidth + ")");
     }
 
-    /**
-     *  Writes the necessary imports at the top of the output file.
-     */
-    private void setupImports(){
+    */
+/**
+     * Adds a new link between MininetHosts inside a multiApplication Fog node.
+     * @param source
+     * @param destination
+     *//*
+
+    private void addFogLink(String source, String destination) {
+        lines.add("topo.addLink(" + source + ", " + destination + ", delay='0ms', bw='10000')");
+    }
+
+    */
+/**
+     * Writes the necessary imports at the top of the output file.
+     *//*
+
+    void setupImports() {
         lines.add("#!/usr/bin/env python2");
         addBlankLine();
         lines.add("import time");
@@ -303,22 +186,16 @@ public class MaxinetExporter implements ITopologyExporter{
         lines.add("from mininet.node import OVSSwitch");
     }
 
-    /**
+    */
+/**
      * Writes the lines to setup and start an experiment in MaxiNet.
-     */
-    private void setupExperiment(){
+     *//*
+
+    void setupExperiment() {
         addBlankLine();
         lines.add("# create experiment");
         lines.add("cluster = maxinet.Cluster()");
         lines.add("exp = maxinet.Experiment(cluster, topo, switch=OVSSwitch)");
         lines.add("exp.setup()");
     }
-
-    private void addBlankLine(){
-        lines.add(blankLine);
-    }
-
-    private void addCommentSeparatorLine(){
-        lines.add("################################");
-    }
-}
+}*/

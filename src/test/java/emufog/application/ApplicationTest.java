@@ -1,33 +1,28 @@
 package emufog.application;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.*;
 
-class ApplicationTest {
+public class ApplicationTest {
 
     @Test
-    void image() {
-        System.out.println("test image works.");
+    public void image() {
     }
 
     @Test
-    void resources() {
-        System.out.println("test image works.");
+    public void resources() {
     }
 
     @Test
-    void setName() {
-        System.out.println("test image works.");
+    public void setName() {
     }
 
     @Test
-    void getContainer() {
-        System.out.println("test image works.");
+    public void getContainer() {
     }
 
     @Test
-    void getName() {
-        System.out.println("test image works.");
+    public void getName() {
     }
 }
