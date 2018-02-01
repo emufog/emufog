@@ -2,14 +2,14 @@
 #                  Input/Output Settings                          #
 ###################################################################
 inputGraphFilePath: "/home/renderfehler/IdeaProjects/emufog/5er.brite"
-exportFilePath: "out.py"
+exportFilePath: "containernet_out.py"
 
 overWriteOutputFile: true
 
-applicationAssignmentPolicy: "DefaultApplicationAssignment"
-devicePlacement: "DefaultDevicePlacement"
-edgeIdentifier: "DefaultEdgeIdentifier"
-fogPlacement: "DefaultFogLayout"
+applicationAssignmentPolicy: "emufog.placement.DefaultApplicationAssignment"
+devicePlacement: "emufog.placement.DefaultDevicePlacement"
+edgeIdentifier: "emufog.placement.DefaultEdgeIdentifier"
+fogPlacement: "emufog.placement.DefaultFogLayout"
 ###################################################################
 #                         Basic Settings                          #
 ###################################################################
@@ -60,7 +60,7 @@ fogNodeTypes:
   - name: fogNodeType2
     id: 2
     maximumConnections: 1
-    costs: 1
+    costs: 2
     memoryLimit: 1048576000
     cpuShare: 1
 
@@ -69,31 +69,45 @@ fogNodeTypes:
 ###################################################################
 
 fogApplications:
-  # TODO: Main idea behind using yaml as settings file is possibility to copy "service" definitions from docker-compose files to emuFog.
+  # Main idea behind using yaml as settings file is possibility to "copy" service definitions from docker-compose files to emuFog.
   - name: serviceA
     container:
       image: ubuntu:trusty
+      # TODO: Try to represent labels as python dict instead of list.
+      labels:
+        - "'com.emufog'"
+      commands:
+        - "ls"
+        - "ls"
+      volumes:
+        - "'settings.yaml:/home/settings.yaml'"
 
   - name: serviceB
     container:
-      image: ubuntu:trusty
+      image: heron/heron
+      ports:
+        - "8888"
+        - "8889"
+      publishAllPorts: true
+      portBindings:
+        - "8888:8888"
+        - "8889:8889"
 
-  - name: serviceC
+
+  - name: nginx
     container:
-      image: ubuntu:trusty
+      image: nginx
+      ports:
+        - "8080"
+        - "80"
+      publishAllPorts: true
+      portBindings:
+        - "80:8080"
+      environment:
+        - "'NGINX_HOST=0.0.0.0'"
 
 deviceApplications:
 
   - name: serviceA
     container:
-      image: ubuntu:trusty
-
-  - name: serviceB
-    container:
-      image: ubuntu:trusty
-
-  - name: serviceC
-    container:
-      image: ubuntu:trusty
-
-
+      image: heron/heron

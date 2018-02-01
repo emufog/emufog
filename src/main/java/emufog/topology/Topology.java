@@ -83,26 +83,40 @@ public class Topology {
 
     }
 
-    private void identifyEdge(){
+    private void identifyEdge() throws Exception {
 
-        IEdgeIdentifier edgeIdentifier = new DefaultEdgeIdentifier();
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        Class edgeIdentifierClass = classLoader.loadClass(settings.getEdgeIdentifier());
 
-        edgeIdentifier.identifyEdge(getTopology());
+        Object edgeIdentiferObject = edgeIdentifierClass.newInstance();
+
+        ((IEdgeIdentifier) edgeIdentiferObject).identifyEdge(getTopology());
 
     }
 
     private void assignEdgeDevices() throws Exception {
 
-        IDevicePlacement devicePlacement = new DefaultDevicePlacement();
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        Class devicePlacementClass = classLoader.loadClass(settings.getDevicePlacement());
 
-        devicePlacement.assignEdgeDevices(getTopology(), settings.getDeviceNodeTypes());
+        Object devicePlacementObject = devicePlacementClass.newInstance();
+
+        ((IDevicePlacement) devicePlacementObject).assignEdgeDevices(getTopology(), settings.getDeviceNodeTypes());
 
     }
 
     private void createFogLayout() throws Exception {
-        IFogLayout fogLayout = new DefaultFogLayout();
-        fogLayout.identifyFogNodes(getTopology());
+
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        Class fogLayoutClass = classLoader.loadClass(settings.getFogPlacement());
+
+        Object fogPlacementObject = fogLayoutClass.newInstance();
+
+        ((IFogLayout) fogPlacementObject).identifyFogNodes(getTopology());
+
     }
+
+    //TODO: Remove this unused method.
     private void placeFogNodes(){
 
         IFogPlacement fogPlacement = new DefaultFogPlacement();
@@ -110,13 +124,15 @@ public class Topology {
 
     }
 
-    private void assignApplications(){
+    private void assignApplications() throws Exception {
 
-        IApplicationAssignmentPolicy applicationAssignmentPolicy = new DefaultApplicationAssignment();
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        Class assignApplicationsClass = classLoader.loadClass(settings.getApplicationAssignmentPolicy());
 
-        applicationAssignmentPolicy.generateDeviceApplicationMapping(getTopology());
-        applicationAssignmentPolicy.generateFogApplicationMapping(getTopology());
+        Object assignApplicationsObject = assignApplicationsClass.newInstance();
 
+        ((IApplicationAssignmentPolicy) assignApplicationsObject).generateFogApplicationMapping(getTopology());
+        ((IApplicationAssignmentPolicy) assignApplicationsObject).generateDeviceApplicationMapping(getTopology());
     }
 
     public static class TopologyBuilder{
