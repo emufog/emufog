@@ -2,7 +2,7 @@
 # Created by https://www.gitignore.io/api/intellij,java,gradle
 
 
-*.brite
+.brite
 *.py
 tests/
 .idea/

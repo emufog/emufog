@@ -33,7 +33,7 @@ public class Docker extends Container{
 
     private String image;
 
-    // TODO: Implement separation of image and version to allow verion specifications via settigns file.
+    // TODO: Implement separation of image and version to allow version specifications via settings file.
     private String imageVersion;
 
     /*List of docker labels*/
