@@ -8,8 +8,9 @@ overWriteOutputFile: true
 
 applicationAssignmentPolicy: "emufog.placement.DefaultApplicationAssignment"
 devicePlacement: "emufog.placement.DefaultDevicePlacement"
-edgeIdentifier: "emufog.placement.DefaultEdgeIdentifier"
+#edgeIdentifier: "emufog.placement.DefaultEdgeIdentifier"
 fogPlacement: "emufog.placement.DefaultFogLayout"
+#exporter: "emufog.export.ContainernetExporter"
 ###################################################################
 #                         Basic Settings                          #
 ###################################################################
@@ -26,7 +27,9 @@ threadCount: 1
 parallelFogBuilding: false
 
 # TODO: Model Resource Settings.
-# TODO: Add fields to dynamic class loading.
+###################################################################
+#                         Resource Settings                       #
+###################################################################
 
 ###################################################################
 #                         DeviceNodeTypes                         #
