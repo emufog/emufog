@@ -28,25 +28,31 @@ public class Docker extends Container{
 
     private String entrypoint;
 
+    /*List of environment variables*/
     private List<String> environment = new ArrayList<>();
 
     private String image;
 
+    // TODO: Implement separation of image and version to allow verion specifications via settigns file.
     private String imageVersion;
 
+    /*List of docker labels*/
     private List<String> labels = new ArrayList<>();
 
+    /*List of ports*/
     private List<String> ports = new ArrayList<>();
 
+    /*List of port bindings from container to hostmachine*/
     private List<String> portBindings = new ArrayList<>();
 
-    /*List of volumes: ["/home/user1/:/mnt/vol2:rw"]*/
+    /*List of volumes: ['/home/user1/:/mnt/vol2:rw']*/
     private List<String> volumes = new ArrayList<>();
 
     private boolean publishAllPorts = true;
 
     private List<String> dns = new ArrayList<>();
 
+    /*List of commands*/
     private List<String> commands = new ArrayList<>();
 
     @Override
@@ -104,7 +110,7 @@ public class Docker extends Container{
     /**
      * Return formatted environment string. The docker-py api is able to consume either dicts or lists.
      * Implemented is list formatting.
-     * @return environment string in the format ["SOMEVARIABLE=xxx"].
+     * @return environment string in the format ['SOMEVARIABLE=xxx'].
      */
     public String getEnvironment() {
 
@@ -179,6 +185,10 @@ public class Docker extends Container{
         this.labels = labels;
     }
 
+    /**
+     * Returns formatted volumes string. Implemented as python list syntax.
+     * @return volumes string in the format ['/home/user1/:/mnt/vol2:rw', ... , /home/user1/:/mnt/vol2:rw]
+     */
     public String getVolumes() {
 
         StringBuilder volumesString = new StringBuilder();
@@ -242,6 +252,10 @@ public class Docker extends Container{
         this.cpuQuota = cpuQuota;
     }
 
+    /**
+     * Returns formatted ports sting. Implemented as python list syntax.
+     * @return ports string in the format [8080,80, ... , 1235]
+     */
     public String getPorts() {
 
         StringBuilder portString = new StringBuilder();
@@ -276,6 +290,10 @@ public class Docker extends Container{
         this.commands = commands;
     }
 
+    /**
+     * Retrurns formatted port binding string implemented in as python dict syntax.
+     * @return port binding string in the format {8080:8080, 80:80, ..., 1235:443}
+     */
     public String getPortBindings() {
 
         StringBuilder portBindingString = new StringBuilder();
