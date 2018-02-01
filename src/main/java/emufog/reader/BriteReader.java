@@ -17,6 +17,9 @@ import java.util.List;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static emufog.topology.Types.RouterType.ROUTER;
 
+/**
+ * Default Reader implementation reads brite topologies.
+ */
 public class BriteReader extends TopologyReader{
 
     private MutableNetwork<Node,Link> topology = NetworkBuilder.undirected().allowsParallelEdges(false).build();

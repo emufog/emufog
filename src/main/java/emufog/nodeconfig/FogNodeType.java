@@ -3,6 +3,11 @@ package emufog.nodeconfig;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+
+/**
+ * The FogNodeType models the node specific limitations
+ * e.g resource limitations, maximumConnections, placement costs etc.
+ */
 public class FogNodeType extends NodeType{
 
     private int maximumConnections;

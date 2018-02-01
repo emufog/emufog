@@ -3,6 +3,10 @@ package emufog.nodeconfig;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * The DeviceNodeType models the device specific limitations
+ * e.g resource limitations, scaling factor, number of devices etc.
+ */
 public class DeviceNodeType extends NodeType{
 
 

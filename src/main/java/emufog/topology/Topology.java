@@ -75,11 +75,22 @@ public class Topology {
 
     }
 
-    private void read() throws IOException {
+    private void read() throws Exception {
 
-        TopologyReader reader = new BriteReader();
+        if(settings.getReader() == null) {
 
-        INSTANCE = reader.parse(settings.getInputGraphFilePath());
+            TopologyReader reader = new BriteReader();
+
+            INSTANCE = reader.parse(settings.getInputGraphFilePath());
+        } else {
+
+            ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+            Class readerClass = classLoader.loadClass(settings.getReader());
+
+            Object readerObject = readerClass.newInstance();
+
+            INSTANCE = ((TopologyReader)readerObject).parse(settings.getInputGraphFilePath());
+        }
 
     }
 

@@ -18,9 +18,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-
-// TODO: Future work implement Field for Dynamic class loading to select desired placement algorithm for each step.
-
 /**
  * The settings class contains all different settings used within the application.
  * An instance of this class can be read in from a valid settings file.
@@ -49,6 +46,8 @@ public class Settings {
     private String edgeIdentifier;
 
     private String fogPlacement;
+
+    private String reader;
 
     private String exporter;
 
@@ -278,6 +277,14 @@ public class Settings {
 
     public void setExporter(String exporter) {
         this.exporter = exporter;
+    }
+
+    public String getReader() {
+        return reader;
+    }
+
+    public void setReader(String reader) {
+        this.reader = reader;
     }
 }
 
