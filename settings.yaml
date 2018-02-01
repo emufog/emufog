@@ -1,16 +1,18 @@
 ###################################################################
 #                  Input/Output Settings                          #
 ###################################################################
-inputGraphFilePath: "/home/renderfehler/IdeaProjects/emufog/5er.brite"
+inputGraphFilePath: "5er.brite"
 exportFilePath: "containernet_out.py"
 
 overWriteOutputFile: true
 
 applicationAssignmentPolicy: "emufog.placement.DefaultApplicationAssignment"
 devicePlacement: "emufog.placement.DefaultDevicePlacement"
-#edgeIdentifier: "emufog.placement.DefaultEdgeIdentifier"
+edgeIdentifier: "emufog.placement.DefaultEdgeIdentifier"
 fogPlacement: "emufog.placement.DefaultFogLayout"
-#exporter: "emufog.export.ContainernetExporter"
+
+exporter: "emufog.export.ContainernetExporter"
+reader: "emufog.reader.BriteReader"
 ###################################################################
 #                         Basic Settings                          #
 ###################################################################
@@ -22,6 +24,7 @@ costThreshold: 6
 edgeDeviceLatency: 0
 edgeDeviceBandwidth: 1000
 
+# TODO: Remoove settings for Parallel builing. Not used anymore.
 # Settings for Parallel building:
 threadCount: 1
 parallelFogBuilding: false
@@ -95,7 +98,6 @@ fogApplications:
       portBindings:
         - "8888:8888"
         - "8889:8889"
-
 
   - name: nginx
     container:

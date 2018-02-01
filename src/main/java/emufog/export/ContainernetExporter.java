@@ -303,7 +303,6 @@ public class ContainernetExporter implements ITopologyExporter{
         }
     }
 
-
     private void addLinksBetweenRouters(MutableNetwork<Node, Link> t){
         addBlankLine();
         lines.add("# add links between routers");

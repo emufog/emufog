@@ -59,11 +59,6 @@ public class Topology {
             end = System.nanoTime();
             logger.log("It took " + Logger.convertToMs(start,end) + "ms to create the FogLayout");
 
-           /* start = System.nanoTime();
-            placeFogNodes();
-            end = System.nanoTime();
-            logger.log("It took " + Logger.convertToMs(start,end) + "ms to place the FogNodes");*/
-
             start = System.nanoTime();
             assignApplications();
             end = System.nanoTime();
