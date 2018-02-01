@@ -2,6 +2,7 @@ package emufog.topology;
 
 import com.google.common.graph.MutableNetwork;
 import com.google.common.graph.NetworkBuilder;
+import emufog.export.ContainernetExporter;
 import emufog.export.ITopologyExporter;
 import emufog.placement.*;
 import emufog.reader.BriteReader;
@@ -82,36 +83,80 @@ public class Topology {
 
     }
 
+    /**
+     * Edge identification policy. Desired implementation is loaded dynamically from settings file.
+     * Fallback is DefaultEdgeIdentifier.
+     * @throws Exception
+     */
     private void identifyEdge() throws Exception {
 
-        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        Class edgeIdentifierClass = classLoader.loadClass(settings.getEdgeIdentifier());
+        // fall back to default policy if no preference is set in the settings.
+        if(settings.getEdgeIdentifier() == null){
 
-        Object edgeIdentiferObject = edgeIdentifierClass.newInstance();
+            IEdgeIdentifier edgeIdentifier = new DefaultEdgeIdentifier();
 
-        ((IEdgeIdentifier) edgeIdentiferObject).identifyEdge(getTopology());
+            edgeIdentifier.identifyEdge(getTopology());
+
+
+        } else {
+            ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+            Class edgeIdentifierClass = classLoader.loadClass(settings.getEdgeIdentifier());
+
+            Object edgeIdentiferObject = edgeIdentifierClass.newInstance();
+
+            ((IEdgeIdentifier) edgeIdentiferObject).identifyEdge(getTopology());
+        }
+
 
     }
 
+    /**
+     * Device placement policy. Desired implementation is loaded dynamically from settings file.
+     * Fallback is DefaultDevicePlacement.
+     * @throws Exception
+     */
     private void assignEdgeDevices() throws Exception {
 
-        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        Class devicePlacementClass = classLoader.loadClass(settings.getDevicePlacement());
+        if(settings.getEdgeIdentifier() == null){
 
-        Object devicePlacementObject = devicePlacementClass.newInstance();
+            IDevicePlacement devicePlacement = new DefaultDevicePlacement();
 
-        ((IDevicePlacement) devicePlacementObject).assignEdgeDevices(getTopology(), settings.getDeviceNodeTypes());
+            devicePlacement.assignEdgeDevices(getTopology(), settings.getDeviceNodeTypes());
 
+        } else {
+            ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+            Class devicePlacementClass = classLoader.loadClass(settings.getDevicePlacement());
+
+            Object devicePlacementObject = devicePlacementClass.newInstance();
+
+            ((IDevicePlacement) devicePlacementObject).assignEdgeDevices(getTopology(), settings.getDeviceNodeTypes());
+        }
     }
 
+    /**
+     * Fog node placement policy. Desired implementation is dynamically loaded from settings file.
+     * Fallback is DefaultFogLayout.
+     * @throws Exception
+     */
     private void createFogLayout() throws Exception {
 
-        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        Class fogLayoutClass = classLoader.loadClass(settings.getFogPlacement());
+        if(settings.getFogPlacement() == null){
 
-        Object fogPlacementObject = fogLayoutClass.newInstance();
+            IFogLayout fogLayout = new DefaultFogLayout();
 
-        ((IFogLayout) fogPlacementObject).identifyFogNodes(getTopology());
+            fogLayout.identifyFogNodes(getTopology());
+
+        } else {
+
+            ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+            Class fogLayoutClass = classLoader.loadClass(settings.getFogPlacement());
+
+            Object fogPlacementObject = fogLayoutClass.newInstance();
+
+            ((IFogLayout) fogPlacementObject).identifyFogNodes(getTopology());
+        }
+
+
 
     }
 
@@ -123,15 +168,32 @@ public class Topology {
 
     }
 
+    /**
+     * Application assignment policy. Desired implementation is loaded from settings file.
+     * Fallback implementation is DefaultApplicationAssignment.
+     * @throws Exception
+     */
     private void assignApplications() throws Exception {
 
-        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        Class assignApplicationsClass = classLoader.loadClass(settings.getApplicationAssignmentPolicy());
+        if(settings.getApplicationAssignmentPolicy() == null){
 
-        Object assignApplicationsObject = assignApplicationsClass.newInstance();
+            IApplicationAssignmentPolicy applicationAssignmentPolicy = new DefaultApplicationAssignment();
 
-        ((IApplicationAssignmentPolicy) assignApplicationsObject).generateFogApplicationMapping(getTopology());
-        ((IApplicationAssignmentPolicy) assignApplicationsObject).generateDeviceApplicationMapping(getTopology());
+            applicationAssignmentPolicy.generateDeviceApplicationMapping(getTopology());
+            applicationAssignmentPolicy.generateFogApplicationMapping(getTopology());
+
+
+        } else {
+            ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+            Class assignApplicationsClass = classLoader.loadClass(settings.getApplicationAssignmentPolicy());
+
+            Object assignApplicationsObject = assignApplicationsClass.newInstance();
+
+            ((IApplicationAssignmentPolicy) assignApplicationsObject).generateFogApplicationMapping(getTopology());
+            ((IApplicationAssignmentPolicy) assignApplicationsObject).generateDeviceApplicationMapping(getTopology());
+        }
+
+
     }
 
     public static class TopologyBuilder{
@@ -142,17 +204,31 @@ public class Topology {
 
     }
 
+    /**
+     * Topology exporter. Desired exporter implementation is dynamically loaded from settings file.
+     * Default fallback is containernet exporter.
+     * @throws Exception
+     */
     public void export() throws Exception {
 
         final Path exportPath = settings.getExportFilePath();
 
-        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        Class exporterClass = classLoader.loadClass(settings.getExporter());
+        // fall back to default exporter
+        if(settings.getExporter() == null){
 
-        Object exporter = exporterClass.newInstance();
+            ITopologyExporter exporter = new ContainernetExporter();
 
-        ((ITopologyExporter)exporter).exportTopology(getTopology(), exportPath);
+            exporter.exportTopology(getTopology(), exportPath);
 
+        } else {
+
+            ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+            Class exporterClass = classLoader.loadClass(settings.getExporter());
+
+            Object exporter = exporterClass.newInstance();
+
+            ((ITopologyExporter) exporter).exportTopology(getTopology(), exportPath);
+        }
     }
 
 }
