@@ -1,4 +1,8 @@
 language: java
-
-gradle assemble
-gradle check
+jdk:
+  - oraclejdk8
+before_script:
+  - chmod +x gradlew
+script:
+  - ./gradlew assemble
+  - ./gradlew check
