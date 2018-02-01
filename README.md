@@ -1,5 +1,7 @@
 # EmuFog
 
+[![Build Status](https://travis-ci.org/emufog/emufog.svg?branch=master)](https://travis-ci.org/emufog/emufog)
+
 ## Dependencies
 
 EmuFog is build using the [JDK 8+](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) to build and run.
