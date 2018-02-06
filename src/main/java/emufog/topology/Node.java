@@ -6,7 +6,6 @@ public abstract class Node {
 
     private final int asID;
 
-    private AS as;
 
     public Node(int id, int asID) {
         this.ID = id;
@@ -17,16 +16,8 @@ public abstract class Node {
         return ID;
     }
 
-    public AS getAs() {
-        return as;
-    }
-
     public int getAsID(){
         return asID;
-    }
-
-    public void setAs(AS as) {
-        this.as = as;
     }
 
     /**
