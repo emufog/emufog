@@ -43,6 +43,8 @@ deviceNodeTypes:
       averageDeviceCount: 1
       memoryLimit: 524288000
       cpuShare: 1
+      nodeLatency: 10
+      nodeBandwidth: 5
 
 ###################################################################
 #                         FogNodeTypes                            #
@@ -64,6 +66,8 @@ fogNodeTypes:
     costs: 2
     memoryLimit: 1048576000
     cpuShare: 1
+    nodeLatency: 1
+    nodeBandwidth: 200
 
 ###################################################################
 #                         Applications                            #
@@ -72,6 +76,8 @@ fogNodeTypes:
 fogApplications:
   # Main idea behind using yaml as settings file is possibility to "copy" service definitions from docker-compose files to emuFog.
   - name: serviceA
+    # TODO: Extend uniqe ip provider to be able to mark ip addresses as already in use. #12 in github
+    ip: 10.0.2.1
     container:
       image: ubuntu:trusty
       # TODO: Try to represent labels as python dict instead of list.

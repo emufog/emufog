@@ -8,10 +8,6 @@ public class FogNodeConfiguration extends NodeConfiguration {
 
     private List<FogNode> dependencies;
 
-    public FogNodeConfiguration(String IP) {
-        super(IP);
-    }
-
     public FogNodeConfiguration(){}
 
     public void setDependencies(List<FogNode> dependencies) {

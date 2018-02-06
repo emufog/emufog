@@ -11,13 +11,6 @@ public abstract class NodeConfiguration {
 
     private List<Application> applications;
 
-    //TODO: Discuss whether IP field on this level is reasonable.
-    private String IP;
-
-    public NodeConfiguration(String IP) {
-        this.IP = IP;
-    }
-
     public NodeConfiguration(){}
 
     public void setApplications(List<Application> applications) {
@@ -30,7 +23,4 @@ public abstract class NodeConfiguration {
         return applications;
     }
 
-    public String getIP() {
-        return IP;
-    }
 }

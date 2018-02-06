@@ -9,6 +9,10 @@ public class Application {
 
     private String name;
 
+    private int id;
+
+    private String ip;
+
     Docker container = new Docker();
 
     /**
@@ -37,5 +41,21 @@ public class Application {
 
     public String getName() {
         return name;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
     }
 }

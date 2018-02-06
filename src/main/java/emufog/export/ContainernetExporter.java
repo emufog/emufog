@@ -8,8 +8,6 @@ import emufog.nodeconfig.DeviceNodeConfiguration;
 import emufog.nodeconfig.FogNodeConfiguration;
 import emufog.settings.Settings;
 import emufog.topology.*;
-import emufog.util.UniqueIDProvider;
-import emufog.util.UniqueIPProvider;
 
 import java.io.File;
 import java.io.IOException;
@@ -201,16 +199,11 @@ public class ContainernetExporter implements ITopologyExporter{
 
             Docker container = checkNotNull(application.getContainer());
 
-            //TODO: Assign unique ids to each application.
-            //get unique id for application node
-            int applicationId = UniqueIDProvider.getInstance().getNextID();
-            UniqueIDProvider.getInstance().markIDused(applicationId);
-
-            String name = device.getName() + applicationId;
+            String name = device.getName() + application.getId();
             addBlankLine();
 
             lines.add("# " + application.getName());
-            addDockerHost(container, name, UniqueIPProvider.getInstance().getNextIPV4Address(), device.getDeviceNodeType().getMemoryLimit());
+            addDockerHost(container, name, application.getIp(), device.getDeviceNodeType().getMemoryLimit());
 
             connectApplicationToSwitch(device, name);
 
@@ -231,17 +224,12 @@ public class ContainernetExporter implements ITopologyExporter{
 
             Docker container = checkNotNull(application.getContainer());
 
-            //TODO: Assign unique ids to each application.
-            //get unique id for application node
-            int applicationId = UniqueIDProvider.getInstance().getNextID();
-            UniqueIDProvider.getInstance().markIDused(applicationId);
-
-            String name = fogNode.getName() + applicationId;
+            String name = fogNode.getName() + application.getId();
             addBlankLine();
 
 
             lines.add("# " + application.getName());
-            addDockerHost(container, name, UniqueIPProvider.getInstance().getNextIPV4Address(), fogNode.getFogNodeType().getMemoryLimit());
+            addDockerHost(container, name, application.getIp(), fogNode.getFogNodeType().getMemoryLimit());
 
             connectApplicationToSwitch(fogNode, name);
 
