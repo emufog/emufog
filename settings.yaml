@@ -23,7 +23,7 @@ costThreshold: 6
 threadCount: 1
 parallelFogBuilding: false
 
-# TODO: Model Resource Settings.
+# TODO: Model Resource Settings. #8 in github
 
 ###################################################################
 #                         DeviceNodeTypes                         #

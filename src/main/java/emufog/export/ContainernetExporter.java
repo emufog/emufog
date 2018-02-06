@@ -93,7 +93,7 @@ public class ContainernetExporter implements ITopologyExporter{
 
     }
 
-    //TODO: Generalize. Method is used in more than one class.
+    //TODO: Generalize. Method is used in more than one class. #6 in github
     /**
      * Iterate over topology and sort nodes into corresponding list.
      * @param t topology to work on.
@@ -238,7 +238,7 @@ public class ContainernetExporter implements ITopologyExporter{
 
     }
 
-    // TODO: Refactor createMultiTierSwitch impmlementation. Generalize input node type. Maybe with Java generics.
+    // TODO: Refactor createMultiTierSwitch impmlementation. Generalize input node type. Maybe with Java generics. #6 in github
     private void createMultiTierSwitch(Device node, Router accessPoint){
         addBlankLine();
         lines.add("# createMultitierSwitch for " + node.getName());
