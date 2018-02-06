@@ -16,8 +16,8 @@ public class DeviceNodeType extends NodeType{
 
 
     @JsonCreator
-    public DeviceNodeType(@JsonProperty("memoryLimit") int memoryLimit, @JsonProperty("cpuShare") int cpuShare, @JsonProperty("scalingFactor") int scalingFactor, @JsonProperty("averageDeviceCount") float averageDeviceCount, @JsonProperty("name") String name) {
-        super(memoryLimit, cpuShare);
+    public DeviceNodeType(@JsonProperty("memoryLimit") int memoryLimit, @JsonProperty("cpuShare") int cpuShare, @JsonProperty("scalingFactor") int scalingFactor, @JsonProperty("nodeLatency") float nodeLatency, @JsonProperty("nodeBandwidth") float nodeBandwidth,@JsonProperty("averageDeviceCount") float averageDeviceCount, @JsonProperty("name") String name) {
+        super(memoryLimit, cpuShare, nodeLatency, nodeBandwidth);
         this.scalingFactor = scalingFactor;
         this.averageDeviceCount = averageDeviceCount;
         this.name = name;

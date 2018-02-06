@@ -63,12 +63,6 @@ public class Settings {
     // upper threshold of the cost function to limit the fog node placement
     private float costThreshold;
 
-    // latency delay between a host device and the edge node
-    private float edgeDeviceDelay;
-
-    // bandwidth between a host device and the edge node
-    private float edgeDeviceBandwidth;
-
     // number of threads to use for the backbone and fog placement
     private int threadCount;
 
@@ -197,22 +191,6 @@ public class Settings {
 
     public void setCostThreshold(float costThreshold) {
         this.costThreshold = costThreshold;
-    }
-
-    public float getEdgeDeviceDelay() {
-        return edgeDeviceDelay;
-    }
-
-    public void setEdgeDeviceDelay(float edgeDeviceDelay) {
-        this.edgeDeviceDelay = edgeDeviceDelay;
-    }
-
-    public float getEdgeDeviceBandwidth() {
-        return edgeDeviceBandwidth;
-    }
-
-    public void setEdgeDeviceBandwidth(float edgeDeviceBandwidth) {
-        this.edgeDeviceBandwidth = edgeDeviceBandwidth;
     }
 
     public int getThreadCount() {

@@ -31,6 +31,11 @@ public class DefaultFogLayout implements IFogLayout{
                 .stream()
                 .filter(n -> n instanceof Router && ((Router) n).getType().equals(ROUTER))
                 .forEach(n -> edgeRouters.add((Router) n));
+        // TODO: Evaluate which stream implementation is better.
+//        edgeRouters = (List<Router>) topology.nodes()
+//                .stream()
+//                .filter(n -> n instanceof Router && ((Router) n).getType().equals(ROUTER))
+//                .collect(Collectors.toList());
 
             //add fog node to each edgeRouter
             for(Router edgeRouter : edgeRouters){
@@ -44,8 +49,7 @@ public class DefaultFogLayout implements IFogLayout{
 
 
                 topology.addNode(fogNode);
-                //TODO: Maybe introduce FogLink Bandwidth?
-                Link link = new Link(UniqueIDProvider.getInstance().getNextID(), Settings.getInstance().getEdgeDeviceDelay(), Settings.getInstance().getEdgeDeviceBandwidth());
+                Link link = new Link(UniqueIDProvider.getInstance().getNextID(), fogNode.getFogNodeType().getNodeLatency(), fogNode.getFogNodeType().getNodeBandwidth());
                 topology.addEdge(fogNode, edgeRouter, link);
             }
         }

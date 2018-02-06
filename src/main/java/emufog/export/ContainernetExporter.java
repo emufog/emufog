@@ -250,13 +250,23 @@ public class ContainernetExporter implements ITopologyExporter{
 
     }
 
-    private void createMultiTierSwitch(Node node, Router accessPoint){
+    // TODO: Refactor createMultiTierSwitch impmlementation. Generalize input node type. Maybe with Java generics.
+    private void createMultiTierSwitch(Device node, Router accessPoint){
         addBlankLine();
         lines.add("# createMultitierSwitch for " + node.getName());
         lines.add("info('*** Create multi tier switch for "+ node.getName() +"\\n')");
         lines.add("mts" + node.getName() + " = net.addSwitch(\'" + "mts" + node.getName() + "\')");
         //connect to original topology router
-        addLink("mts" + node.getName(), accessPoint.getName(), 0, 1000);
+        addLink("mts" + node.getName(), accessPoint.getName(),node.getDeviceNodeType().getNodeLatency(), node.getDeviceNodeType().getNodeBandwidth());
+    }
+
+    private void createMultiTierSwitch(FogNode node, Router accessPoint){
+        addBlankLine();
+        lines.add("# createMultitierSwitch for " + node.getName());
+        lines.add("info('*** Create multi tier switch for "+ node.getName() +"\\n')");
+        lines.add("mts" + node.getName() + " = net.addSwitch(\'" + "mts" + node.getName() + "\')");
+        //connect to original topology router
+        addLink("mts" + node.getName(), accessPoint.getName(),node.getFogNodeType().getNodeLatency(), node.getFogNodeType().getNodeBandwidth());
     }
 
     private void connectApplicationToSwitch(Node node, String name){

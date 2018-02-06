@@ -18,8 +18,8 @@ public class FogNodeType extends NodeType{
 
 
     @JsonCreator
-    public FogNodeType(@JsonProperty("memoryLimit") int memoryLimit, @JsonProperty("cpuShare") int cpuShare, @JsonProperty("maximumConnections") int maximumConections, @JsonProperty("id") int id, @JsonProperty("costs") double costs, @JsonProperty("name") String name) {
-        super(memoryLimit, cpuShare);
+    public FogNodeType(@JsonProperty("memoryLimit") int memoryLimit, @JsonProperty("cpuShare") int cpuShare, @JsonProperty("nodeLatency") float nodeLatency, @JsonProperty("nodeBandwidth") float nodeBandwidth,@JsonProperty("maximumConnections") int maximumConections, @JsonProperty("id") int id, @JsonProperty("costs") double costs, @JsonProperty("name") String name) {
+        super(memoryLimit, cpuShare, nodeLatency, nodeBandwidth);
         this.maximumConnections = maximumConections;
         this.id = id;
         this.costs = costs;

@@ -10,9 +10,14 @@ abstract class NodeType {
     private int memoryLimit;
     private int cpuShare;
 
-    NodeType(int memoryLimit, int cpuShare) {
+    private float nodeLatency;
+    private float nodeBandwidth;
+
+    NodeType(int memoryLimit, int cpuShare, float nodeLatency, float nodeBandwidth) {
         this.memoryLimit = memoryLimit;
         this.cpuShare = cpuShare;
+        this.nodeLatency = nodeLatency;
+        this.nodeBandwidth = nodeBandwidth;
     }
 
     public int getMemoryLimit() {
@@ -31,4 +36,19 @@ abstract class NodeType {
         this.cpuShare = cpuShare;
     }
 
+    public float getNodeLatency() {
+        return nodeLatency;
+    }
+
+    public void setNodeLatency(float nodeLatency) {
+        this.nodeLatency = nodeLatency;
+    }
+
+    public float getNodeBandwidth() {
+        return nodeBandwidth;
+    }
+
+    public void setNodeBandwidth(float nodeBandwidth) {
+        this.nodeBandwidth = nodeBandwidth;
+    }
 }

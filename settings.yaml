@@ -8,9 +8,10 @@ overWriteOutputFile: true
 
 applicationAssignmentPolicy: "emufog.placement.DefaultApplicationAssignment"
 devicePlacement: "emufog.placement.DefaultDevicePlacement"
-#edgeIdentifier: "emufog.placement.DefaultEdgeIdentifier"
+edgeIdentifier: "emufog.placement.DefaultEdgeIdentifier"
 fogPlacement: "emufog.placement.DefaultFogLayout"
-#exporter: "emufog.export.ContainernetExporter"
+exporter: "emufog.export.ContainernetExporter"
+reader: "emufog.reader.BriteReader"
 ###################################################################
 #                         Basic Settings                          #
 ###################################################################
@@ -18,18 +19,11 @@ baseAddress: "10.0.0.0"
 maxFogNodes: 100
 costThreshold: 6
 
-# TODO: Make this FogNode type specific.
-edgeDeviceLatency: 0
-edgeDeviceBandwidth: 1000
-
 # Settings for Parallel building:
 threadCount: 1
 parallelFogBuilding: false
 
 # TODO: Model Resource Settings.
-###################################################################
-#                         Resource Settings                       #
-###################################################################
 
 ###################################################################
 #                         DeviceNodeTypes                         #
@@ -41,6 +35,8 @@ deviceNodeTypes:
       averageDeviceCount: 1
       memoryLimit: 524288000
       cpuShare: 1
+      nodeLatency: 10
+      nodeBandwidth: 5
 
     - name: deviceNode2
       scalingFactor: 1
@@ -59,6 +55,8 @@ fogNodeTypes:
     costs: 1
     memoryLimit: 1048576000
     cpuShare: 1
+    nodeLatency: 5
+    nodeBandwidth: 100
 
   - name: fogNodeType2
     id: 2
