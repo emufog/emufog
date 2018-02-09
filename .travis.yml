@@ -3,3 +3,25 @@ jdk:
   - oraclejdk8
 before_install:
   - chmod +x gradlew
+
+stages:
+  - compile
+  - test
+  - buildDocker
+  - name: deploy
+    if: branch = master OR develop
+jobs:
+  include:
+    - stage: compile
+      script:
+        - ./gradlew build
+
+    - stage: test
+      script:
+        - ./gradlew test
+    - stage: buildDocker
+      script:
+        - ./gradlew buildDocker
+
+    - stage: deploy
+      script:
