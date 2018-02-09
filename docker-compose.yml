@@ -4,7 +4,7 @@ services:
     image: emufog:1.1
     container_name: emufog
     volumes:
-      - /home/renderfehler/IdeaProjects/emufog/emufogDocker/settings.yaml:/usr/app/emufog/settings.yaml:z
-      - /home/renderfehler/IdeaProjects/emufog/emufogDocker/5er.brite:/usr/app/emufog/5er.brite:z
-      - /home/renderfehler/IdeaProjects/emufog/emufogDocker/out:/usr/app/emufog/out:rw
+      - /emufog/emufogDocker/settings.yaml:/usr/app/emufog/settings.yaml:rw
+      - /emufog/emufogDocker/5er.brite:/usr/app/emufog/5er.brite:rw
+      - /emufog/emufogDocker/out:/usr/app/emufog/out:rw
     command: java -jar emufog.jar -s settings.yaml

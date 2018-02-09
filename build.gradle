@@ -35,6 +35,8 @@ sourceCompatibility = 1.8
 
 mainClassName = 'emufog.launcher.Emufog'
 
+group = 'emufog'
+applicationName = 'emufog'
 version = '1.1'
 
 jar {
