@@ -25,6 +25,8 @@ jobs:
     - stage: buildDocker
       script:
         - ./gradlew buildDocker
-
+        - docker images
     - stage: deploy
       script:
+        - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+        - docker push emufog/emufog
