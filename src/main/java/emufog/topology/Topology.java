@@ -213,7 +213,7 @@ public class Topology {
     /**
      * Topology exporter. Desired exporter implementation is dynamically loaded from settings file.
      * Default fallback is containernet exporter.
-     * @throws Exception
+     * @throws Exception if filepath is not availiable.
      */
     public void export() throws Exception {
 

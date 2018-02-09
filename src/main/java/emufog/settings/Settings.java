@@ -104,8 +104,8 @@ public class Settings {
     /**
      * Returns singleton settings instance. If settings is null throws Exception.
      *
-     * @return
-     * @throws Exception
+     * @return retruns settings object.
+     * @throws Exception if Settings file is not yet instantiated.
      */
     public static Settings getInstance() throws Exception {
         if (INSTANCE == null) throw new Exception("There is no Settings file instantiated yet!");

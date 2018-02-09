@@ -2,7 +2,7 @@
 #                  Input/Output Settings                          #
 ###################################################################
 inputGraphFilePath: "5er.brite"
-exportFilePath: "containernet_out.py"
+exportFilePath: "out/containernet_out.py"
 
 overWriteOutputFile: true
 
