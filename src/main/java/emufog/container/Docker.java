@@ -135,6 +135,14 @@ public class Docker extends Container{
         this.environment = environment;
     }
 
+    /**
+     * Method to add additional Environment Variables to the already existing list of environment variables.
+     * @param envrionmentVariable to add to the list
+     */
+    public void addEnvironmentVariable(String envrionmentVariable){
+        this.environment.add(envrionmentVariable);
+    }
+
     public String getImage() {
         return image;
     }
@@ -281,16 +289,28 @@ public class Docker extends Container{
         this.ports = ports;
     }
 
+    /**
+     * Add additional port to publish.
+     * @param port
+     */
+    public void addPort(String port){this.ports.add(port);}
+
     public List<String> getCommands() {
         return commands;
     }
+
+    /**
+     * Method to add additional command to commands list.
+     * @param command to add.
+     */
+    public void addCommand(String command){ this.commands.add(command);}
 
     public void setCommands(List<String> commands) {
         this.commands = commands;
     }
 
     /**
-     * Retrurns formatted port binding string implemented in as python dict syntax.
+     * Returns formatted port binding string implemented in as python dict syntax.
      * @return port binding string in the format {8080:8080, 80:80, ..., 1235:443}
      */
     public String getPortBindings() {
@@ -315,6 +335,12 @@ public class Docker extends Container{
 
 
     }
+
+    /**
+     * Add additional port binding.
+     * @param portBinding string in the format 8080:8080
+     */
+    public void addPortBinding(String portBinding){this.portBindings.add(portBinding);}
 
     public void setPortBindings(List<String> portBindings) {
         this.portBindings = portBindings;
