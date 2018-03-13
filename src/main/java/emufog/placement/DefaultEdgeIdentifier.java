@@ -1,20 +1,16 @@
 package emufog.placement;
 
 import com.google.common.graph.MutableNetwork;
-import com.google.common.graph.Traverser;
 import emufog.topology.Link;
 import emufog.topology.Node;
 import emufog.topology.Router;
 import emufog.util.Logger;
 import emufog.util.LoggerLevel;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import static emufog.topology.Types.RouterType.BACKBONE_ROUTER;
-import static emufog.topology.Types.RouterType.ROUTER;
+import static emufog.topology.Types.RouterType.*;
 
 public class DefaultEdgeIdentifier implements IEdgeIdentifier {
 
@@ -23,9 +19,6 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
 
     private List<Router> routers = new ArrayList<>();
 
-    /*
-    TODO: Change naming convention. Initially every router parsed from the input topology is of type ROUTER. After the edge identification edge routers should have the type EDGE_ROUTER and Backbone Router the type BACKBONE_ROUTER.
-     */
     @Override
     public MutableNetwork identifyEdge(MutableNetwork<Node, Link> topology) {
 
@@ -44,6 +37,12 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
                                 .count() + " Nodes", LoggerLevel.ADVANCED);
         logger.log(
                 "Edge Size: " +
+                        topology.nodes()
+                                .stream()
+                                .filter(node -> node instanceof Router)
+                                .filter(node -> ((Router) node).getType().equals(EDGE_ROUTER))
+                                .count() + " Nodes", LoggerLevel.ADVANCED);
+        logger.log("Remaining routers: " +
                         topology.nodes()
                                 .stream()
                                 .filter(node -> node instanceof Router)
@@ -75,7 +74,10 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
         end = System.nanoTime();
         logger.log("It took " + Logger.convertToMs(start,end) + " to run the buildSingleBackbone method", LoggerLevel.ADVANCED);
 
-        routers.get(0).setType(ROUTER);
+        start = System.nanoTime();
+        convertRemainingRouters(routers);
+        end = System.nanoTime();
+        logger.log("It took " + Logger.convertToMs(start,end) + " to convert the remaining routers", LoggerLevel.ADVANCED);
 
     }
 
@@ -89,14 +91,22 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
             Set<Node> neighbors = t.adjacentNodes(node);
 
             for(Node neighbor : neighbors){
-                if(isCrossASEdge(node, neighbor)){
-                    if(node instanceof Router){
-                        // TODO: Debug if statement feels wrong.
-                        if(!isRouter((Router) node)){ ((Router) node).setType(BACKBONE_ROUTER);}
-                    }
+                if(isCrossAsEdge(node, neighbor)){
+                    if(!isBackboneRouter((Router) node)) ((Router) node).setType(BACKBONE_ROUTER);
+                    if(neighbor instanceof Router) ((Router) neighbor).setType(BACKBONE_ROUTER);
                 }
             }
         }
+    }
+
+    /**
+     * Checks if the neighbor of the given node is member of another AS.
+     * @param node current node
+     * @param neighbor Neighbor node
+     * @return true if neighbor is member in another AS
+     */
+    private boolean isCrossAsEdge(Node node, Node neighbor){
+        return node.getAsID() != neighbor.getAsID();
     }
 
 
@@ -115,16 +125,6 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
         }
     }
 
-    /**
-     * Checks if the neighbor of the given node is member of another AS.
-     * @param node current node
-     * @param neighbor Neighbor node
-     * @return true if neighbor is member in another AS
-     */
-    private boolean isCrossASEdge(Node node, Node neighbor){
-        return node.getAsID() != neighbor.getAsID();
-    }
-
 
     /**
      * Returns the average degree of the system based on the # of router nodes.
@@ -141,41 +141,74 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
 
     }
 
-    //TODO: Finish implementation of buildSingleBackbone method.
+    /**
+     * Creates a single connected backbone by using the Breath-First-Algorithm (kinda)
+     * @param t
+     */
     private void buildSingleBackbone(MutableNetwork<Node, Link> t){
 
-        Traverser<Node> traverser = Traverser.forGraph(t);
+        BitSet visited = new BitSet();
+        BitSet seen = new BitSet();
 
         List<Router> backboneRouters = routers.stream().filter(node -> node.getType().equals(BACKBONE_ROUTER)).collect(Collectors.toList());
 
-        for(Node node : traverser.breadthFirst(backboneRouters.get(1))){
+        Queue<Node> nodeQueue = new ArrayDeque<>();
 
-            if(node instanceof Router){
+        Map<Node, Node> predecessors = new HashMap<>();
 
-                List<Router> adjacentNodes = new ArrayList<>();
+        Node current = backboneRouters.iterator().next();
 
-                t.adjacentNodes(node).stream().filter(n-> n instanceof Router).forEach(n -> adjacentNodes.add(((Router) n)));
+        if(current == null){
+            return;
+        }
 
-                if(isBackboneRouter((Router) node)){
-                    //TODO: Check this statement. Could be unsafe.
-                    if(!adjacentNodes.isEmpty()){
-                        for(Router predecessor : adjacentNodes){
-                            predecessor.setType(BACKBONE_ROUTER);
+        predecessors.put(current, current);
+
+        while (current != null){
+
+            visited.set(current.getID());
+
+            if(isBackboneRouter((Router)current) && predecessors.get(current) instanceof Router) {
+                Node predecessor = predecessors.get(current);
+                while (predecessor instanceof Router){
+                    ((Router) predecessor).setType(BACKBONE_ROUTER);
+
+                    predecessor = predecessors.get(predecessor);
+                }
+            }
+
+
+            for(Node neighbor : t.adjacentNodes(current)){
+
+                if(!isCrossAsEdge(current,neighbor)){
+                    if(!visited.get(neighbor.getID())){
+                        if(seen.get(neighbor.getID())){
+
+                            if(predecessors.get(neighbor) instanceof Router){
+                                predecessors.put(neighbor, current);
+                            }
+                        } else {
+                            predecessors.put(neighbor,current);
+                            nodeQueue.add(neighbor);
+                            seen.set(neighbor.getID());
                         }
                     }
                 }
             }
-        }
 
+            current = nodeQueue.poll();
+
+        }
     }
 
     /**
-     * Simple Router enum type check.
-     * @param router to check.
-     * @return true if Router is of type ROUTER
+     * Convert remaining routers to EDGE_ROUTERS as a router can either belong to the backbone or the edge.
+     * @param routers
      */
-    private boolean isRouter(Router router){
-        return ROUTER.equals(router.getType());
+    private void convertRemainingRouters(List<Router> routers){
+        for(Router router : routers){
+            if(router.getType().equals(ROUTER)) router.setType(EDGE_ROUTER);
+        }
     }
 
     /**
