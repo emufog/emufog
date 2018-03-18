@@ -143,19 +143,24 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
 
     /**
      * Creates a single connected backbone by using the Breath-First-Algorithm.
+     *
      * @param t
      */
     private void buildSingleBackbone(MutableNetwork<Node, Link> t){
 
         Logger logger = Logger.getInstance();
 
-        List<Router> backboneRouters = routers.stream().filter(node -> node.getType().equals(BACKBONE_ROUTER)).collect(Collectors.toList());
         Queue<Node> nodeQueue = new ArrayDeque<>();
         Map<Node, Node> predecessors = new HashMap<>();
 
+        // manage visited nodes
         BitSet visited = new BitSet();
         BitSet seen = new BitSet();
 
+        // start with first backbone router
+        List<Router> backboneRouters = routers.stream()
+                .filter(node -> node.getType().equals(BACKBONE_ROUTER))
+                .collect(Collectors.toList());
         Node current = backboneRouters.get(0);
         nodeQueue.add(current);
 
@@ -188,7 +193,11 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
                 }
             }
 
-            if(isBackboneRouter((Router) current) && predecessors.get(current) instanceof Router && !isBackboneRouter((Router) predecessors.get(current))){
+            // follow a trace from one backbone router to another and convert intermediaries.
+            if(isBackboneRouter((Router) current)
+                    && predecessors.get(current) instanceof Router
+                    && !isBackboneRouter((Router) predecessors.get(current))){
+
                 Node predecessor = predecessors.get(current);
 
                 while (predecessor instanceof Router){
