@@ -166,14 +166,6 @@ public class Topology {
 
     }
 
-    //TODO: Remove this unused method.
-    private void placeFogNodes(){
-
-        IFogPlacement fogPlacement = new DefaultFogPlacement();
-        fogPlacement.placeFogNodes(getTopology());
-
-    }
-
     /**
      * Application assignment policy. Desired implementation is loaded from settings file.
      * Fallback implementation is DefaultApplicationAssignment.
