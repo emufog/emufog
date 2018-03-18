@@ -142,62 +142,61 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
     }
 
     /**
-     * Creates a single connected backbone by using the Breath-First-Algorithm (kinda)
+     * Creates a single connected backbone by using the Breath-First-Algorithm.
      * @param t
      */
     private void buildSingleBackbone(MutableNetwork<Node, Link> t){
 
+        Logger logger = Logger.getInstance();
+
+        List<Router> backboneRouters = routers.stream().filter(node -> node.getType().equals(BACKBONE_ROUTER)).collect(Collectors.toList());
+        Queue<Node> nodeQueue = new ArrayDeque<>();
+        Map<Node, Node> predecessors = new HashMap<>();
+
         BitSet visited = new BitSet();
         BitSet seen = new BitSet();
 
-        List<Router> backboneRouters = routers.stream().filter(node -> node.getType().equals(BACKBONE_ROUTER)).collect(Collectors.toList());
-
-        Queue<Node> nodeQueue = new ArrayDeque<>();
-
-        Map<Node, Node> predecessors = new HashMap<>();
-
-        Node current = backboneRouters.iterator().next();
-
-        if(current == null){
-            return;
-        }
+        Node current = backboneRouters.get(0);
+        nodeQueue.add(current);
 
         predecessors.put(current, current);
 
-        while (current != null){
+        while (!nodeQueue.isEmpty()){
 
             visited.set(current.getID());
 
-            if(isBackboneRouter((Router)current) && predecessors.get(current) instanceof Router) {
-                Node predecessor = predecessors.get(current);
-                while (predecessor instanceof Router){
-                    ((Router) predecessor).setType(BACKBONE_ROUTER);
-
-                    predecessor = predecessors.get(predecessor);
-                }
-            }
-
-
             for(Node neighbor : t.adjacentNodes(current)){
+                if(!visited.get(neighbor.getID())){
+                    if(seen.get(neighbor.getID())){
 
-                if(!isCrossAsEdge(current,neighbor)){
-                    if(!visited.get(neighbor.getID())){
-                        if(seen.get(neighbor.getID())){
+                        if(nodeQueue.contains(neighbor) && !isCrossAsEdge(current,neighbor)){
 
-                            if(predecessors.get(neighbor) instanceof Router){
-                                predecessors.put(neighbor, current);
+                            if(neighbor instanceof Router){
+
+                                if(isBackboneRouter((Router) current) && predecessors.get(neighbor) instanceof Router){
+                                    predecessors.put(neighbor, current);
+
+                                }
                             }
                         } else {
-                            predecessors.put(neighbor,current);
+                            predecessors.put(neighbor, current);
                             nodeQueue.add(neighbor);
                             seen.set(neighbor.getID());
                         }
+
                     }
                 }
             }
 
-            current = nodeQueue.poll();
+            if(isBackboneRouter((Router) current) && predecessors.get(current) instanceof Router && !isBackboneRouter((Router) predecessors.get(current))){
+                Node predecessor = predecessors.get(current);
 
+                while (predecessor instanceof Router){
+                    ((Router) predecessor).setType(BACKBONE_ROUTER);
+                    predecessor = predecessors.get(predecessor);
+                }
+            }
+            current = nodeQueue.poll();
         }
     }
 

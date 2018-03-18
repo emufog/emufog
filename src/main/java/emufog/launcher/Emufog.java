@@ -6,6 +6,8 @@ import emufog.topology.Topology;
 import emufog.util.Logger;
 
 import java.io.FileNotFoundException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * The EmuFog main launcher class. Starts a new instance of the application with the given parameters
@@ -32,7 +34,14 @@ public class Emufog {
             JCommander.newBuilder().addObject(arguments).build().parse(args);
 
             //initialize settings
-            Settings.read(arguments.settingsPath);
+
+
+                Path path = Paths.get("/home/renderfehler/IdeaProjects/emufog/settings.yaml");
+                Settings.read(path);
+
+
+
+
 
             // build topology
             Topology topology = new Topology.TopologyBuilder().build();

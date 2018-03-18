@@ -1,7 +1,7 @@
 ###################################################################
 #                  Input/Output Settings                          #
 ###################################################################
-inputGraphFilePath: "/home/renderfehler/IdeaProjects/emufog/5er.brite"
+inputGraphFilePath: "/home/renderfehler/IdeaProjects/emufog/100_1.brite"
 exportFilePath: "containernet_out.py"
 
 overWriteOutputFile: true
