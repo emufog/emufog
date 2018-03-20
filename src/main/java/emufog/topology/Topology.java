@@ -31,7 +31,7 @@ public class Topology {
         Logger logger = Logger.getInstance();
 
         try {
-            settings = Settings.getInstance();
+            settings = Settings.getSettings();
         } catch (Exception e) {
             e.printStackTrace();
         }

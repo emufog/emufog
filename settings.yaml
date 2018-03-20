@@ -1,7 +1,7 @@
 ###################################################################
 #                  Input/Output Settings                          #
 ###################################################################
-inputGraphFilePath: "/home/renderfehler/IdeaProjects/emufog/100_1.brite"
+inputGraphFilePath: "100_1.brite"
 exportFilePath: "containernet_out.py"
 
 overWriteOutputFile: true
@@ -12,11 +12,12 @@ edgeIdentifier: "emufog.placement.DefaultEdgeIdentifier"
 fogPlacement: "emufog.placement.DefaultFogLayout"
 exporter: "emufog.export.ContainernetExporter"
 reader: "emufog.reader.BriteReader"
+
 ###################################################################
 #                         Basic Settings                          #
 ###################################################################
 baseAddress: "10.0.0.0"
-maxFogNodes: 100
+maxFogNodes: 15
 costThreshold: 6
 
 # Settings for Parallel building:

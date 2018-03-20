@@ -47,7 +47,7 @@ public class ContainernetExporter implements ITopologyExporter{
 
         try {
             //get configuration for overwrite permission
-            boolean isOverwirteAllowed = Settings.getInstance().isOverwriteExperimentFile();
+            boolean isOverwirteAllowed = Settings.getSettings().isOverwriteExperimentFile();
             if(!isOverwirteAllowed && experimentFile.exists()){
                 throw new IllegalArgumentException("The given file already exist. Please provide a valid path");
             }
@@ -81,7 +81,7 @@ public class ContainernetExporter implements ITopologyExporter{
             startContainernetExperiment();
 
             // set the overwrite option if feature is set in the settings file
-            StandardOpenOption overwrite = Settings.getInstance().isOverwriteExperimentFile() ? StandardOpenOption.TRUNCATE_EXISTING : StandardOpenOption.APPEND;
+            StandardOpenOption overwrite = Settings.getSettings().isOverwriteExperimentFile() ? StandardOpenOption.TRUNCATE_EXISTING : StandardOpenOption.APPEND;
 
             // write output in UTF-8 to the specified file
             Files.write(experimentFile.toPath(), lines, StandardCharsets.UTF_8, StandardOpenOption.CREATE, overwrite);

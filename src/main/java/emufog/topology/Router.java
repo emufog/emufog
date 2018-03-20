@@ -1,12 +1,18 @@
 package emufog.topology;
 
+
 public class Router extends Node{
 
     private Types.RouterType type;
 
     private int deviceCount;
 
-    public Router(int id, int asID) {
+    public Router(int asID) {
+        super(asID);
+        this.deviceCount = 0;
+    }
+
+    public Router(int id, int asID){
         super(id, asID);
         this.deviceCount = 0;
     }
@@ -25,6 +31,8 @@ public class Router extends Node{
     public boolean hasDevices(){ return deviceCount > 0;}
 
     public void incrementDeviceCount(int n){ deviceCount += n;}
+
+    public void incrementDeviceCount() { deviceCount++;}
 
     public int getDeviceCount() { return deviceCount;}
 

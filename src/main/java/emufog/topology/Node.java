@@ -1,11 +1,23 @@
 package emufog.topology;
 
+import emufog.util.UniqueIDProvider;
+
 public abstract class Node {
 
     private int ID;
 
-    private final int asID;
+    private int asID;
 
+    public Node(){
+        this.ID = UniqueIDProvider.getInstance().getNextID();
+        UniqueIDProvider.getInstance().markIDused(this.ID);
+    }
+
+    public Node(int asID) {
+        this.ID = UniqueIDProvider.getInstance().getNextID();
+        UniqueIDProvider.getInstance().markIDused(this.ID);
+        this.asID = asID;
+    }
 
     public Node(int id, int asID) {
         this.ID = id;
@@ -26,4 +38,5 @@ public abstract class Node {
      * @return name of the node
      */
     public abstract String getName();
+
 }

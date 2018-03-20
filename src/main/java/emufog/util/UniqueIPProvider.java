@@ -31,7 +31,7 @@ public class UniqueIPProvider {
     public static UniqueIPProvider getInstance(){
         if(INSTANCE == null){
             try {
-                INSTANCE = new UniqueIPProvider(Settings.getInstance());
+                INSTANCE = new UniqueIPProvider(Settings.getSettings());
             } catch (Exception e) {
                 e.printStackTrace();
             }

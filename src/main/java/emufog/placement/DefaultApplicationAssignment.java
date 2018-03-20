@@ -27,7 +27,7 @@ public class DefaultApplicationAssignment implements IApplicationAssignmentPolic
     public void generateDeviceApplicationMapping(MutableNetwork topology) {
 
         try {
-            deviceApplications = checkNotNull(Settings.getInstance().getDeviceApplications());
+            deviceApplications = checkNotNull(Settings.getSettings().getDeviceApplications());
         } catch (Exception e) {
             e.printStackTrace(
             );
@@ -51,7 +51,7 @@ public class DefaultApplicationAssignment implements IApplicationAssignmentPolic
 
         // get List of fogApplications
         try {
-            fogApplications = checkNotNull(Settings.getInstance().getFogApplications());
+            fogApplications = checkNotNull(Settings.getSettings().getFogApplications());
         } catch (Exception e) {
             e.printStackTrace();
         }
