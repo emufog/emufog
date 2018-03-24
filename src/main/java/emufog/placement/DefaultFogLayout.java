@@ -2,7 +2,6 @@ package emufog.placement;
 
 import com.google.common.graph.MutableNetwork;
 import emufog.nodeconfig.FogNodeType;
-import emufog.settings.Settings;
 import emufog.topology.*;
 import emufog.util.Logger;
 import emufog.util.LoggerLevel;
@@ -13,6 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static emufog.settings.Settings.getSettings;
 import static emufog.topology.Topology.getTopology;
+import static emufog.topology.Types.RouterType.BACKBONE_ROUTER;
 import static emufog.topology.Types.RouterType.EDGE_ROUTER;
 
 public class DefaultFogLayout implements IFogLayout {
@@ -27,7 +27,12 @@ public class DefaultFogLayout implements IFogLayout {
 
     private float threshold = getSettings().getCostThreshold();
 
+    private List<Router> possibleFogNodePlacements = new ArrayList<>();
+
     Map<FogNodeType, List<FogNode>> fogPlacements;
+
+    //TODO Add field to settings.
+    private float delayBoundary = 100;
 
     @Override
     public void identifyFogNodes(MutableNetwork topology) throws Exception {
@@ -52,30 +57,107 @@ public class DefaultFogLayout implements IFogLayout {
                         .filter(node -> node instanceof Device)
                         .count(), LoggerLevel.ADVANCED);
 
-        FogResult fogResult = determinePossibleFogNodes();
-        if (fogResult.success) {
-            for (Map.Entry<Node, FogNode> nodeMapping : fogResult.nodeMap.entrySet()) {
-                placeFogNode(nodeMapping.getKey(), nodeMapping.getValue());
+        determinePossibleFogNodes();
+
+
+    }
+
+    private void determinePossibleFogNodes() {
+
+        Map<Integer, List<Router>> candidateRouters = determineCandidateRouters();
+
+        logger.log("Size" + candidateRouters.entrySet().size(), LoggerLevel.ADVANCED);
+
+    }
+
+    private Map<Integer, List<Router>> determineCandidateRouters() {
+
+        float delay = 0;
+
+        Map<Integer, List<Router>> candidateRouters = new HashMap<>();
+
+        for (Router edgeRouter : edgeRouters) {
+
+            List<Router> routerList = new ArrayList<>();
+
+            int range = 0;
+
+            //check if latency(v,a) ≤ latencyBoundary for all v ∈ Routers
+            for (Object neighbor : getTopology().adjacentNodes(edgeRouter)) {
+
+                if (neighbor instanceof Router && ((Router) neighbor).getType().equals(BACKBONE_ROUTER)) {
+
+                    range++;
+
+                    Link link = checkNotNull(getTopology().edgeConnectingOrNull(edgeRouter, (Node) neighbor));
+
+                    delay += link.getDelay();
+
+
+                    if (delay <= delayBoundary) {
+
+                        BitSet visited = new BitSet();
+
+                        routerList.add((Router) neighbor);
+                        visited.set(((Router) neighbor).getID());
+
+                        while (delay <= delayBoundary && range <= threshold) {
+
+                            Router nextRouter = null;
+
+                            for (Object n : getTopology().adjacentNodes((Node) neighbor)) {
+
+                                range++;
+
+                                if (range <= threshold) {
+                                    if (n instanceof Router && ((Router) n).getType().equals(BACKBONE_ROUTER) && !visited.get(((Router) n).getID())) {
+                                        nextRouter = (Router) n;
+                                        visited.set(nextRouter.getID());
+
+                                        Link l = checkNotNull(getTopology().edgeConnectingOrNull(nextRouter, (Node) neighbor));
+                                        delay += l.getDelay();
+
+                                        if (delay <= delayBoundary) routerList.add(nextRouter);
+                                    }
+                                }
+
+                            }
+
+                            if (nextRouter != null) {
+                                neighbor = nextRouter;
+                            } else {
+                                break;
+                            }
+                        }
+
+                        visited.clear();
+
+                    }
+
+                    candidateRouters.put(edgeRouter.getID(), routerList);
+                    logger.log("Router List: " + routerList.size(), LoggerLevel.ADVANCED);
+
+                }
+
+                routerList.clear();
             }
-        }
-    }
 
-    private FogResult determinePossibleFogNodes() {
-
-        FogResult fogResult = new FogResult();
-        for (Router node : edgeRouters) {
-            long start = System.nanoTime();
-
-            FogNode fogNode = new FogNode();
-            PriorityQueue<Node> nodePriorityQueue = new PriorityQueue<>();
-
-            nodePriorityQueue.add(node);
 
         }
 
+        return candidateRouters;
 
-        return fogResult;
     }
+
+    private void findCostOptimalFogNodeType(float threshold, Router router) {
+
+        if (remainingNodes.get() >= 0) {
+
+
+        }
+
+    }
+
 
     private void placeFogNode(Node node, FogNode fogNode) {
         getTopology().addNode(fogNode);
@@ -83,7 +165,7 @@ public class DefaultFogLayout implements IFogLayout {
         getTopology().addEdge(node, fogNode, link);
     }
 
-    static class FogResult {
+    class FogResult {
 
         private boolean success;
 
