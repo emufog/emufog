@@ -17,28 +17,25 @@ import static emufog.topology.Types.RouterType.EDGE_ROUTER;
 
 public class DefaultFogLayout implements IFogLayout {
 
-    Logger logger = Logger.getInstance();
+    private Logger logger = Logger.getInstance();
 
     private List<Router> edgeRouters = new ArrayList<>();
 
-    private List<FogNodeType> fogNodeTypes = new ArrayList<>();
+    // Key represents number of ways to reach edge nodes under given limitations.
+    private Map<Router, AtomicInteger> backboneRouterCoverage = new HashMap<>();
+
+    private Map<Router, Set<Router>> coveredEdgeRouters = new HashMap<>();
+
+    private List<FogNodeType> fogNodeTypes = getSettings().getFogNodeTypes();
 
     private AtomicInteger remainingNodes = new AtomicInteger(getSettings().getMaxFogNodes());
 
     private float threshold = getSettings().getCostThreshold();
 
-    private List<Router> possibleFogNodePlacements = new ArrayList<>();
-
-    Map<FogNodeType, List<FogNode>> fogPlacements;
-
-    //TODO Add field to settings.
-    private float delayBoundary = 100;
+    float delayBoundary = 50;
 
     @Override
-    public void identifyFogNodes(MutableNetwork topology) throws Exception {
-
-        // get fog types from settings
-        fogNodeTypes = (getSettings().getFogNodeTypes());
+    public void identifyFogNodes(MutableNetwork topology) {
 
         //get edgeRouters from stream of nodes
         topology.nodes()
@@ -46,48 +43,69 @@ public class DefaultFogLayout implements IFogLayout {
                 .filter(n -> n instanceof Router && ((Router) n).getType().equals(EDGE_ROUTER))
                 .forEach(n -> edgeRouters.add((Router) n));
 
+        //initialise list of backbone routers
+        topology.nodes()
+                .stream()
+                .filter(n -> n instanceof Router && ((Router) n).getType().equals(BACKBONE_ROUTER))
+                .forEach(n ->
+                        backboneRouterCoverage.put(((Router) n), new AtomicInteger()));
+        //initialise list of backbone routers
+        topology.nodes()
+                .stream()
+                .filter(n -> n instanceof Router && ((Router) n).getType().equals(BACKBONE_ROUTER))
+                .forEach(n ->
+                        coveredEdgeRouters.put(((Router) n), new HashSet<>()));
+
+        logger.log("# Backbone Routers: " + backboneRouterCoverage.size(), LoggerLevel.ADVANCED);
         logger.log("# Edge Routers: " + edgeRouters.size(), LoggerLevel.ADVANCED);
-        logger.log("# Edge Routers with connected devices: " +
-                edgeRouters.stream()
-                        .filter(node -> node.hasDevices())
-                        .count(), LoggerLevel.ADVANCED);
-        logger.log("# Edge devices: " +
-                topology.nodes()
-                        .stream()
-                        .filter(node -> node instanceof Device)
-                        .count(), LoggerLevel.ADVANCED);
+        logger.log(String.format("# Edge Routers with connected devices: %d", edgeRouters.stream()
+                .filter(Router::hasDevices)
+                .count()), LoggerLevel.ADVANCED);
+        logger.log(String.format("# Edge devices: %d", topology.nodes()
+                .stream()
+                .filter(node -> node instanceof Device)
+                .count()), LoggerLevel.ADVANCED);
 
         determinePossibleFogNodes();
 
-
+        logger.log("Peace");
     }
 
     private void determinePossibleFogNodes() {
 
-        Map<Integer, List<Router>> candidateRouters = determineCandidateRouters();
+        determineCandidateRouters();
+        logger.log(coveredEdgeRouters.toString());
 
-        logger.log("Size" + candidateRouters.entrySet().size(), LoggerLevel.ADVANCED);
+        for (Map.Entry<Router, Set<Router>> entry : coveredEdgeRouters.entrySet()) {
+            logger.log("Id" + entry.getKey().getID());
+            for (Map.Entry<Router, Set<Router>> setEntry : coveredEdgeRouters.entrySet()) {
+                logger.log(String.valueOf(setEntry.getValue().size()));
+                if (setEntry.getValue() != null) {
+                    for (Router router : setEntry.getValue()) {
+                        logger.log("Router ID: " + router.getID());
+                    }
+                }
+            }
+        }
 
+        findCostOptimalFogNodeType();
     }
 
-    private Map<Integer, List<Router>> determineCandidateRouters() {
+    private void determineCandidateRouters() {
 
         float delay = 0;
 
-        Map<Integer, List<Router>> candidateRouters = new HashMap<>();
-
         for (Router edgeRouter : edgeRouters) {
 
-            List<Router> routerList = new ArrayList<>();
+            AtomicInteger range = new AtomicInteger();
 
-            int range = 0;
-
-            //check if latency(v,a) ≤ latencyBoundary for all v ∈ Routers
+            //check if latency(v,a) ≤ latencyBoundary for all v ∈ Routers to a ∈ Backbone Routers
             for (Object neighbor : getTopology().adjacentNodes(edgeRouter)) {
 
-                if (neighbor instanceof Router && ((Router) neighbor).getType().equals(BACKBONE_ROUTER)) {
+                if (neighbor instanceof Router
+                        && ((Router) neighbor).getType().equals(BACKBONE_ROUTER)) {
 
-                    range++;
+                    range.getAndIncrement();
 
                     Link link = checkNotNull(getTopology().edgeConnectingOrNull(edgeRouter, (Node) neighbor));
 
@@ -97,30 +115,34 @@ public class DefaultFogLayout implements IFogLayout {
                     if (delay <= delayBoundary) {
 
                         BitSet visited = new BitSet();
-
-                        routerList.add((Router) neighbor);
                         visited.set(((Router) neighbor).getID());
 
-                        while (delay <= delayBoundary && range <= threshold) {
+                        addBackboneRouter(((Router) neighbor), edgeRouter);
+
+                        while (delay <= delayBoundary && range.intValue() < threshold) {
 
                             Router nextRouter = null;
 
                             for (Object n : getTopology().adjacentNodes((Node) neighbor)) {
 
-                                range++;
+                                if (range.intValue() < threshold) {
+                                    if (n instanceof Router
+                                            && ((Router) n).getType().equals(BACKBONE_ROUTER)) {
 
-                                if (range <= threshold) {
-                                    if (n instanceof Router && ((Router) n).getType().equals(BACKBONE_ROUTER) && !visited.get(((Router) n).getID())) {
-                                        nextRouter = (Router) n;
-                                        visited.set(nextRouter.getID());
+                                        if (!visited.get(((Router) n).getID())) {
 
-                                        Link l = checkNotNull(getTopology().edgeConnectingOrNull(nextRouter, (Node) neighbor));
-                                        delay += l.getDelay();
+                                            nextRouter = (Router) n;
+                                            range.getAndIncrement();
+                                            visited.set(nextRouter.getID());
 
-                                        if (delay <= delayBoundary) routerList.add(nextRouter);
+                                            Link l = checkNotNull(getTopology()
+                                                    .edgeConnectingOrNull(nextRouter, (Node) neighbor));
+
+                                            delay += l.getDelay();
+                                            if (delay <= delayBoundary) addBackboneRouter(nextRouter, edgeRouter);
+                                        }
                                     }
                                 }
-
                             }
 
                             if (nextRouter != null) {
@@ -128,34 +150,63 @@ public class DefaultFogLayout implements IFogLayout {
                             } else {
                                 break;
                             }
+
                         }
 
                         visited.clear();
 
+
                     }
-
-                    candidateRouters.put(edgeRouter.getID(), routerList);
-                    logger.log("Router List: " + routerList.size(), LoggerLevel.ADVANCED);
-
                 }
-
-                routerList.clear();
+                range.set(0);
             }
-
 
         }
 
-        return candidateRouters;
 
     }
 
-    private void findCostOptimalFogNodeType(float threshold, Router router) {
-
-        if (remainingNodes.get() >= 0) {
-
-
+    /**
+     * Add Backbone Router to possibleCandiateRouter data structure.
+     *
+     * @param router
+     * @param edgeRouter
+     */
+    private void addBackboneRouter(Router router, Router edgeRouter) {
+        try {
+            backboneRouterCoverage.get(router).incrementAndGet();
+            //Add current edge router to list of covered edge routers for current backbone router
+            try {
+                Set<Router> edgeRouters = coveredEdgeRouters.get(router);
+                edgeRouters.add(edgeRouter);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            logger.log(e.toString());
         }
 
+    }
+
+    private void findCostOptimalFogNodeType() {
+
+        Router connectionPoint = getBackboneNodeWithHighestEdgeCoverage();
+        logger.log("connectionPoint: " + connectionPoint.getID());
+
+
+    }
+
+    /**
+     * Returns the first router with highest edge router coverage.
+     *
+     * @return
+     */
+    private Router getBackboneNodeWithHighestEdgeCoverage() {
+        return backboneRouterCoverage.entrySet()
+                .stream()
+                .max((entry1, entry2) -> entry1.getValue().intValue() > entry2.getValue().intValue() ? 1 : -1)
+                .get()
+                .getKey();
     }
 
 
@@ -169,17 +220,15 @@ public class DefaultFogLayout implements IFogLayout {
 
         private boolean success;
 
-        final Map<Node, FogNode> nodeMap = new HashMap<>();
+        final Map<Router, FogNode> fogNodePlacements = new HashMap<>();
 
         void clearFogNodes() {
-            nodeMap.clear();
+            fogNodePlacements.clear();
         }
 
         void success(boolean value) {
             this.success = value;
         }
-
-
     }
 
     private boolean fogNodesLeft() {
