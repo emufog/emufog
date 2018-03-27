@@ -67,35 +67,35 @@ public class DefaultFogLayout implements IFogLayout {
                 .count()), LoggerLevel.ADVANCED);
 
         while (!edgeRouters.isEmpty()) {
-            determinePossibleFogNodes();
+            determineCandidateRouters();
             Router connectionPoint = getBackboneNodeWithHighestEdgeCoverage();
             FogNode fogNodeToPlace = new FogNode(findCostOptimalFogNodeType(connectionPoint));
-            if(remainingNodes.intValue() > 0){
+            if (remainingNodes.intValue() > 0) {
                 placeFogNode(connectionPoint, fogNodeToPlace);
                 remainingNodes.getAndDecrement();
                 edgeRouters.removeAll(coveredEdgeRouters.get(connectionPoint));
-            }
 
-        }
-    }
+                logger.logSeparator();
+                logger.log("Placed Fog Node at "
+                        + connectionPoint.getID()
+                        + " \nwith Fog Type "
+                        + fogNodeToPlace.getFogNodeType().getId()
+                        + " connecting " + connectedDevices(coveredEdgeRouters.get(connectionPoint))
+                        + " devices.");
+                logger.logSeparator();
 
-    private void determinePossibleFogNodes() {
-
-        determineCandidateRouters();
-        logger.log(coveredEdgeRouters.toString());
-
-        for (Map.Entry<Router, Set<Router>> entry : coveredEdgeRouters.entrySet()) {
-            logger.log("Id" + entry.getKey().getID());
-            for (Map.Entry<Router, Set<Router>> setEntry : coveredEdgeRouters.entrySet()) {
-                logger.log(String.valueOf(setEntry.getValue().size()));
-                if (setEntry.getValue() != null) {
-                    for (Router router : setEntry.getValue()) {
-                        logger.log("Router ID: " + router.getID());
-                    }
+            } else {
+                if (!edgeRouters.isEmpty()) {
+                    logger.logSeparator();
+                    logger.log(String.format("Fog Layout creation was not successful! " +
+                            "\nThere are %d unconnected edge routers. " +
+                            "\nCovering %d devices.", edgeRouters.size(), connectedDevices(edgeRouters)));
+                    logger.logSeparator();
+                    edgeRouters.clear();
                 }
             }
-        }
 
+        }
     }
 
     private void determineCandidateRouters() {
@@ -185,7 +185,7 @@ public class DefaultFogLayout implements IFogLayout {
             //Add current edge router to list of covered edge routers for current backbone router
             try {
                 Set<Router> edgeRouters = coveredEdgeRouters.get(router);
-                edgeRouters.add(edgeRouter);
+                if (router != null) edgeRouters.add(edgeRouter);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -210,7 +210,6 @@ public class DefaultFogLayout implements IFogLayout {
                 .get();
 
         if (fogNodeType != null) {
-            Logger.getInstance().log(fogNodeType.getName() + " was selected");
             return fogNodeType;
         } else {
             Logger.getInstance().log("There is no suitable fog node type.");
@@ -221,15 +220,26 @@ public class DefaultFogLayout implements IFogLayout {
     private int connectedDevices(Set<Router> routers) {
         int connectedDevices = 0;
         for (Router router : routers) {
-            connectedDevices += router.getDeviceCount();
+            if (router != null) {
+                connectedDevices += router.getDeviceCount();
+            }
         }
-        Logger.getInstance().log("Connected Devices: " + connectedDevices);
+        return connectedDevices;
+    }
+
+    private int connectedDevices(List<Router> routers) {
+        int connectedDevices = 0;
+        for (Router router : routers) {
+            if (router != null){
+                connectedDevices += router.getDeviceCount();
+            }
+        }
+
         return connectedDevices;
     }
 
     private double calculateRatio(int connectedDevices, FogNodeType fogNodeType) {
         double ratio = (connectedDevices - fogNodeType.getMaximumConnections()) / fogNodeType.getCosts();
-        Logger.getInstance().log("ratio: " + ratio + " for " + fogNodeType.getId());
         return ratio;
     }
 
