@@ -39,19 +39,19 @@ public class DefaultFogLayout implements IFogLayout {
 
         //get edgeRouters from stream of nodes
         topology.nodes()
-                .stream()
+                .parallelStream()
                 .filter(n -> n instanceof Router && ((Router) n).getType().equals(EDGE_ROUTER))
                 .forEach(n -> edgeRouters.add((Router) n));
 
         //initialise list of backbone routers
         topology.nodes()
-                .stream()
+                .parallelStream()
                 .filter(n -> n instanceof Router && ((Router) n).getType().equals(BACKBONE_ROUTER))
                 .forEach(n ->
                         backboneRouterCoverage.put(((Router) n), new AtomicInteger()));
         //initialise list of backbone routers
         topology.nodes()
-                .stream()
+                .parallelStream()
                 .filter(n -> n instanceof Router && ((Router) n).getType().equals(BACKBONE_ROUTER))
                 .forEach(n ->
                         coveredEdgeRouters.put(((Router) n), new HashSet<>()));
@@ -62,13 +62,21 @@ public class DefaultFogLayout implements IFogLayout {
                 .filter(Router::hasDevices)
                 .count()), LoggerLevel.ADVANCED);
         logger.log(String.format("# Edge devices: %d", topology.nodes()
-                .stream()
+                .parallelStream()
                 .filter(node -> node instanceof Device)
                 .count()), LoggerLevel.ADVANCED);
 
-        determinePossibleFogNodes();
+        while (!edgeRouters.isEmpty()) {
+            determinePossibleFogNodes();
+            Router connectionPoint = getBackboneNodeWithHighestEdgeCoverage();
+            FogNode fogNodeToPlace = new FogNode(findCostOptimalFogNodeType(connectionPoint));
+            if(remainingNodes.intValue() > 0){
+                placeFogNode(connectionPoint, fogNodeToPlace);
+                remainingNodes.getAndDecrement();
+                edgeRouters.removeAll(coveredEdgeRouters.get(connectionPoint));
+            }
 
-        logger.log("Peace");
+        }
     }
 
     private void determinePossibleFogNodes() {
@@ -88,7 +96,6 @@ public class DefaultFogLayout implements IFogLayout {
             }
         }
 
-        findCostOptimalFogNodeType();
     }
 
     private void determineCandidateRouters() {
@@ -188,12 +195,42 @@ public class DefaultFogLayout implements IFogLayout {
 
     }
 
-    private void findCostOptimalFogNodeType() {
-
-        Router connectionPoint = getBackboneNodeWithHighestEdgeCoverage();
-        logger.log("connectionPoint: " + connectionPoint.getID());
+    private FogNodeType findCostOptimalFogNodeType(Router connectionPoint) {
 
 
+        Set<Router> routers = coveredEdgeRouters.get(connectionPoint);
+
+        FogNodeType fogNodeType;
+
+        fogNodeType = fogNodeTypes
+                .stream()
+                .min((fogNodeType1, fogNodeType2) ->
+                        calculateRatio(connectedDevices(routers), fogNodeType1) > calculateRatio(connectedDevices(routers), fogNodeType2)
+                                ? 1 : -1)
+                .get();
+
+        if (fogNodeType != null) {
+            Logger.getInstance().log(fogNodeType.getName() + " was selected");
+            return fogNodeType;
+        } else {
+            Logger.getInstance().log("There is no suitable fog node type.");
+            return null;
+        }
+    }
+
+    private int connectedDevices(Set<Router> routers) {
+        int connectedDevices = 0;
+        for (Router router : routers) {
+            connectedDevices += router.getDeviceCount();
+        }
+        Logger.getInstance().log("Connected Devices: " + connectedDevices);
+        return connectedDevices;
+    }
+
+    private double calculateRatio(int connectedDevices, FogNodeType fogNodeType) {
+        double ratio = (connectedDevices - fogNodeType.getMaximumConnections()) / fogNodeType.getCosts();
+        Logger.getInstance().log("ratio: " + ratio + " for " + fogNodeType.getId());
+        return ratio;
     }
 
     /**
@@ -229,14 +266,6 @@ public class DefaultFogLayout implements IFogLayout {
         void success(boolean value) {
             this.success = value;
         }
-    }
-
-    private boolean fogNodesLeft() {
-        return remainingNodes.get() > 0;
-    }
-
-    void decrementRemainingNodes() {
-        remainingNodes.decrementAndGet();
     }
 
 }

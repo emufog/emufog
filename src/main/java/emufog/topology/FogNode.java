@@ -19,16 +19,19 @@ public class FogNode extends Node {
 
     public FogNode() {
         super();
+        this.configuration = new FogNodeConfiguration();
     }
 
     public FogNode(FogNodeType fogNodeType) {
         super();
         this.fogNodeType = fogNodeType;
+        this.configuration = new FogNodeConfiguration();
     }
 
     public FogNode(int asID, FogNodeType fogNodeType) {
         super(asID);
         this.fogNodeType = fogNodeType;
+        this.configuration = new FogNodeConfiguration();
     }
 
     @Override
@@ -54,44 +57,5 @@ public class FogNode extends Node {
         return configuration;
 
     }
-
-    /**
-     * Custom comparator to sort a list of FogNodes.
-     * The Comparator uses two properties. First the comparator sorts descending according
-     * to the average deployment costs and in case of equal deployment costs descending to
-     * the average connections costs.
-     */
-    class FogComparator implements Comparator<FogNode> {
-
-        @Override
-        public int compare(FogNode fogNode1, FogNode fogNode2) {
-
-            float cost1 = averageDeploymentCosts(fogNode1);
-            float cost2 = averageDeploymentCosts(fogNode2);
-
-            if (cost1 < cost2) return -1;
-            if (cost2 < cost1) return 1;
-
-
-            cost1 = averageConnectionCosts(fogNode1);
-            cost2 = averageConnectionCosts(fogNode2);
-
-            if (cost1 < cost2) return -1;
-            if (cost2 < cost1) return 1;
-
-            return 0;
-        }
-
-        private float averageDeploymentCosts(FogNode fogNode) {
-            float sum = 0.f;
-
-            return 0;
-        }
-
-        private float averageConnectionCosts(FogNode fogNode) {
-            return 0;
-        }
-    }
-
 
 }
