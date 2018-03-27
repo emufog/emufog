@@ -39,32 +39,27 @@ public class DefaultFogLayout implements IFogLayout {
 
         //get edgeRouters from stream of nodes
         topology.nodes()
-                .parallelStream()
+                .stream()
                 .filter(n -> n instanceof Router && ((Router) n).getType().equals(EDGE_ROUTER))
                 .forEach(n -> edgeRouters.add((Router) n));
 
         //initialise list of backbone routers
         topology.nodes()
-                .parallelStream()
+                .stream()
                 .filter(n -> n instanceof Router && ((Router) n).getType().equals(BACKBONE_ROUTER))
                 .forEach(n ->
                         backboneRouterCoverage.put(((Router) n), new AtomicInteger()));
         //initialise list of backbone routers
         topology.nodes()
-                .parallelStream()
+                .stream()
                 .filter(n -> n instanceof Router && ((Router) n).getType().equals(BACKBONE_ROUTER))
                 .forEach(n ->
                         coveredEdgeRouters.put(((Router) n), new HashSet<>()));
 
-        logger.log("# Backbone Routers: " + backboneRouterCoverage.size(), LoggerLevel.ADVANCED);
-        logger.log("# Edge Routers: " + edgeRouters.size(), LoggerLevel.ADVANCED);
         logger.log(String.format("# Edge Routers with connected devices: %d", edgeRouters.stream()
                 .filter(Router::hasDevices)
                 .count()), LoggerLevel.ADVANCED);
-        logger.log(String.format("# Edge devices: %d", topology.nodes()
-                .parallelStream()
-                .filter(node -> node instanceof Device)
-                .count()), LoggerLevel.ADVANCED);
+
 
         while (!edgeRouters.isEmpty()) {
             determineCandidateRouters();
@@ -75,14 +70,14 @@ public class DefaultFogLayout implements IFogLayout {
                 remainingNodes.getAndDecrement();
                 edgeRouters.removeAll(coveredEdgeRouters.get(connectionPoint));
 
-                logger.logSeparator();
-                logger.log("Placed Fog Node at "
+                logger.log("");
+                logger.log("Placed Fog Node at Backbone Router "
                         + connectionPoint.getID()
                         + " \nwith Fog Type "
                         + fogNodeToPlace.getFogNodeType().getId()
                         + " connecting " + connectedDevices(coveredEdgeRouters.get(connectionPoint))
                         + " devices.");
-                logger.logSeparator();
+                logger.log("");
 
             } else {
                 if (!edgeRouters.isEmpty()) {
@@ -96,6 +91,21 @@ public class DefaultFogLayout implements IFogLayout {
             }
 
         }
+
+        logger.log("");
+        logger.log("Placed "
+                + topology.nodes().stream().filter(n -> n instanceof FogNode).count()
+                + " Fog nodes in total in the topology.\n");
+        for(FogNodeType fogNodeType: getSettings().getFogNodeTypes()){
+            int count = (int) topology
+                    .nodes()
+                    .stream()
+                    .filter(n -> n instanceof FogNode && ((FogNode) n).getFogNodeType().getName()
+                            .equals(fogNodeType.getName())).count();
+            logger.log(count + " fog nodes of " + fogNodeType.getName());
+        }
+
+        logger.log("");
     }
 
     private void determineCandidateRouters() {

@@ -25,30 +25,7 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
 
         Logger logger = Logger.getInstance();
 
-        long start = System.nanoTime();
         identifyBackbone(topology);
-        long end = System.nanoTime();
-        logger.log("It took: " + Logger.convertToMs(start, end) + "ms to identify the Edge", LoggerLevel.ADVANCED);
-        logger.log(
-                "Backbone Size: " +
-                        topology.nodes()
-                                .stream()
-                                .filter(node -> node instanceof Router)
-                                .filter(node -> ((Router) node).getType().equals(BACKBONE_ROUTER))
-                                .count() + " Nodes", LoggerLevel.ADVANCED);
-        logger.log(
-                "Edge Size: " +
-                        topology.nodes()
-                                .stream()
-                                .filter(node -> node instanceof Router)
-                                .filter(node -> ((Router) node).getType().equals(EDGE_ROUTER))
-                                .count() + " Nodes", LoggerLevel.ADVANCED);
-        logger.log("Remaining routers: " +
-                topology.nodes()
-                        .stream()
-                        .filter(node -> node instanceof Router)
-                        .filter(node -> ((Router) node).getType().equals(ROUTER))
-                        .count() + " Nodes", LoggerLevel.ADVANCED);
 
         return topology;
     }
@@ -79,6 +56,15 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
         convertRemainingRouters(routers);
         end = System.nanoTime();
         logger.log("It took " + Logger.convertToMs(start, end) + " to convert the remaining routers", LoggerLevel.ADVANCED);
+
+        logger.logSeparator();
+        logger.log("Identified Topology with: \n" + t.nodes()
+                .stream()
+                .filter(n -> n instanceof Router && ((Router) n).getType().equals(EDGE_ROUTER))
+                .count() + " EDGE_ROUTERs \n" + t.nodes()
+                .stream()
+                .filter(n -> n instanceof Router && ((Router) n).getType().equals(BACKBONE_ROUTER))
+                .count() + " BACKBONE_ROUTERs");
 
     }
 

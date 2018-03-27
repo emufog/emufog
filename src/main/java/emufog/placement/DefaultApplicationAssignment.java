@@ -5,6 +5,7 @@ import emufog.application.Application;
 import emufog.settings.Settings;
 import emufog.topology.Device;
 import emufog.topology.FogNode;
+import emufog.util.Logger;
 import emufog.util.UniqueIDProvider;
 import emufog.util.UniqueIPProvider;
 
@@ -42,6 +43,14 @@ public class DefaultApplicationAssignment implements IApplicationAssignmentPolic
             device.getConfiguration().setApplications(deviceApplications);
         }
 
+        Logger logger = Logger.getInstance();
+        int count = 0;
+        for(Device device : deviceList){
+            count += device.getConfiguration().getApplications().size();
+        }
+        logger.log(String.format("Assigned %d applications to devices\n", count));
+
+
     }
 
     @Override
@@ -62,6 +71,13 @@ public class DefaultApplicationAssignment implements IApplicationAssignmentPolic
         for(FogNode fogNode : fogNodeList){
             fogNode.getConfiguration().setApplications(fogApplications);
         }
+
+        Logger logger = Logger.getInstance();
+        int count = 0;
+        for(FogNode fogNode : fogNodeList){
+            count += fogNode.getConfiguration().getApplications().size();
+        }
+        logger.log(String.format("Assigned %d applications to fog nodes\n", count));
 
     }
 

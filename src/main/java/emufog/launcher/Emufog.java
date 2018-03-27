@@ -39,9 +39,16 @@ public class Emufog {
 
 
             // build topology
+            long start = System.nanoTime();
             Topology topology = new Topology.TopologyBuilder().build();
+            long end = System.nanoTime();
+            logger.log("It took " + Logger.convertToMs(start, end) + " to build the complete topology.");
 
+            start = System.nanoTime();
             topology.export();
+            end = System.nanoTime();
+            logger.log("It took " + Logger.convertToMs(start,end) + " to export the topology");
+            logger.logSeparator();
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();

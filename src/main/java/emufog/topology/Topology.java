@@ -19,7 +19,7 @@ public class Topology {
 
     private Settings settings;
 
-    public static MutableNetwork<Node, Link> getTopology(){
+    public static MutableNetwork<Node, Link> getTopology() {
         if (INSTANCE == null) {
             INSTANCE = NetworkBuilder.undirected().allowsParallelEdges(false).build();
         }
@@ -40,31 +40,33 @@ public class Topology {
             long start = System.nanoTime();
             read();
             long end = System.nanoTime();
-            logger.log("It took " + Logger.convertToMs(start,end) + "ms to read the topology");
+            logger.log("It took " + Logger.convertToMs(start, end) + " to read the topology");
             logger.log("Number of nodes: " + getTopology().nodes().size());
             logger.log("Number of edges: " + getTopology().edges().size());
 
             start = System.nanoTime();
             identifyEdge();
             end = System.nanoTime();
-            logger.log("It took " + Logger.convertToMs(start,end) + "ms to identify the Edge");
+            logger.log("It took " + Logger.convertToMs(start, end) + " to identify the Edge");
+            logger.logSeparator();
 
             start = System.nanoTime();
             assignEdgeDevices();
             end = System.nanoTime();
-            logger.log("It took " + Logger.convertToMs(start,end) + "ms to place the Devices");
+            logger.log("It took " + Logger.convertToMs(start, end) + " to place the Devices");
+            logger.logSeparator();
 
             start = System.nanoTime();
             createFogLayout();
             end = System.nanoTime();
-            logger.log("It took " + Logger.convertToMs(start,end) + "ms to create the FogLayout");
+            logger.log("It took " + Logger.convertToMs(start, end) + " to create the FogLayout");
 
             start = System.nanoTime();
             assignApplications();
             end = System.nanoTime();
-            logger.log("It took " + Logger.convertToMs(start,end) + "ms to assignApplications to devices and fog nodes");
+            logger.log("It took " + Logger.convertToMs(start, end) + " to assignApplications to devices and fog nodes");
 
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -72,7 +74,7 @@ public class Topology {
 
     private void read() throws Exception {
 
-        if(settings.getReader() == null) {
+        if (settings.getReader() == null) {
 
             TopologyReader reader = new BriteReader();
 
@@ -84,7 +86,7 @@ public class Topology {
 
             Object readerObject = readerClass.newInstance();
 
-            INSTANCE = ((TopologyReader)readerObject).parse(settings.getInputGraphFilePath());
+            INSTANCE = ((TopologyReader) readerObject).parse(settings.getInputGraphFilePath());
         }
 
     }
@@ -92,12 +94,17 @@ public class Topology {
     /**
      * Edge identification policy. Desired implementation is loaded dynamically from settings file.
      * Fallback is DefaultEdgeIdentifier.
+     *
      * @throws Exception
      */
     private void identifyEdge() throws Exception {
 
+        Logger.getInstance().logSeparator();
+        Logger.getInstance().log("Identifying edge and Backbone");
+        Logger.getInstance().logSeparator();
+
         // fall back to default policy if no preference is set in the settings.
-        if(settings.getEdgeIdentifier() == null){
+        if (settings.getEdgeIdentifier() == null) {
 
             IEdgeIdentifier edgeIdentifier = new DefaultEdgeIdentifier();
 
@@ -119,11 +126,16 @@ public class Topology {
     /**
      * Device placement policy. Desired implementation is loaded dynamically from settings file.
      * Fallback is DefaultDevicePlacement.
+     *
      * @throws Exception
      */
     private void assignEdgeDevices() throws Exception {
 
-        if(settings.getEdgeIdentifier() == null){
+
+        Logger.getInstance().log("Assigning edge devices");
+        Logger.getInstance().logSeparator();
+
+        if (settings.getEdgeIdentifier() == null) {
 
             IDevicePlacement devicePlacement = new DefaultDevicePlacement();
 
@@ -142,11 +154,15 @@ public class Topology {
     /**
      * Fog node placement policy. Desired implementation is dynamically loaded from settings file.
      * Fallback is DefaultFogLayout.
+     *
      * @throws Exception
      */
     private void createFogLayout() throws Exception {
 
-        if(settings.getFogPlacement() == null){
+        Logger.getInstance().log("Starting fog node placement");
+        Logger.getInstance().logSeparator();
+
+        if (settings.getFogPlacement() == null) {
 
             IFogLayout fogLayout = new DefaultFogLayout();
 
@@ -163,17 +179,21 @@ public class Topology {
         }
 
 
-
     }
 
     /**
      * Application assignment policy. Desired implementation is loaded from settings file.
      * Fallback implementation is DefaultApplicationAssignment.
+     *
      * @throws Exception
      */
     private void assignApplications() throws Exception {
 
-        if(settings.getApplicationAssignmentPolicy() == null){
+        Logger.getInstance().logSeparator();
+        Logger.getInstance().log("Starting application assignment");
+        Logger.getInstance().logSeparator();
+
+        if (settings.getApplicationAssignmentPolicy() == null) {
 
             IApplicationAssignmentPolicy applicationAssignmentPolicy = new DefaultApplicationAssignment();
 
@@ -194,7 +214,7 @@ public class Topology {
 
     }
 
-    public static class TopologyBuilder{
+    public static class TopologyBuilder {
 
         public Topology build() throws IOException {
             return new Topology(this);
@@ -205,14 +225,19 @@ public class Topology {
     /**
      * Topology exporter. Desired exporter implementation is dynamically loaded from settings file.
      * Default fallback is containernet exporter.
+     *
      * @throws Exception
      */
     public void export() throws Exception {
 
+        Logger.getInstance().logSeparator();
+        Logger.getInstance().log("Exporting topology:");
+        Logger.getInstance().logSeparator();
+
         final Path exportPath = settings.getExportFilePath();
 
         // fall back to default exporter
-        if(settings.getExporter() == null){
+        if (settings.getExporter() == null) {
 
             ITopologyExporter exporter = new ContainernetExporter();
 

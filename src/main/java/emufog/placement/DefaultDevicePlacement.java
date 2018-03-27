@@ -3,10 +3,10 @@ package emufog.placement;
 import com.google.common.graph.MutableNetwork;
 import emufog.nodeconfig.DeviceNodeConfiguration;
 import emufog.nodeconfig.DeviceNodeType;
-import emufog.settings.Settings;
 import emufog.topology.Device;
 import emufog.topology.Link;
 import emufog.topology.Router;
+import emufog.util.Logger;
 import emufog.util.UniqueIDProvider;
 
 import java.util.ArrayList;
@@ -25,8 +25,6 @@ public class DefaultDevicePlacement implements IDevicePlacement {
      */
     @Override
     public void assignEdgeDevices(MutableNetwork topology, List<DeviceNodeType> deviceNodeTypes) throws Exception {
-
-        Settings settings = Settings.getSettings();
 
         //get stream of nodes filter for edge routers and add them to edgeRouters list.
         topology.nodes()
@@ -61,5 +59,24 @@ public class DefaultDevicePlacement implements IDevicePlacement {
 
             }
         }
+
+
+        Logger logger = Logger.getInstance();
+        logger.log("Placed "
+                + topology
+                .nodes()
+                .stream()
+                .filter(n -> n instanceof Device).count()
+                + " devices in the Topology.\n");
+
+        for(DeviceNodeType deviceNodeType : deviceNodeTypes){
+            int count = (int) topology
+                    .nodes()
+                    .stream()
+                    .filter(n -> n instanceof Device && ((Device) n).getDeviceNodeType().getName()
+                            .equals(deviceNodeType.getName())).count();
+            logger.log(count + " devices of type " + deviceNodeType.getName());
+        }
+        logger.log("");
     }
 }
