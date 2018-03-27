@@ -124,7 +124,9 @@ public class DefaultFogLayout implements IFogLayout {
                         BitSet visited = new BitSet();
                         visited.set(((Router) neighbor).getID());
 
-                        addBackboneRouter(((Router) neighbor), edgeRouter);
+                        if(neighbor != null){
+                            addBackboneRouter(((Router) neighbor), edgeRouter);
+                        }
 
                         while (delay <= delayBoundary && range.intValue() < threshold) {
 
@@ -185,12 +187,12 @@ public class DefaultFogLayout implements IFogLayout {
             //Add current edge router to list of covered edge routers for current backbone router
             try {
                 Set<Router> edgeRouters = coveredEdgeRouters.get(router);
-                if (router != null) edgeRouters.add(edgeRouter);
+                if (edgeRouter != null) edgeRouters.add(edgeRouter);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } catch (Exception e) {
-            logger.log(e.toString());
+            e.printStackTrace();
         }
 
     }
@@ -221,7 +223,10 @@ public class DefaultFogLayout implements IFogLayout {
         int connectedDevices = 0;
         for (Router router : routers) {
             if (router != null) {
-                connectedDevices += router.getDeviceCount();
+
+                if (router.getDeviceCount() >= 0) {
+                    connectedDevices += router.getDeviceCount();
+                }
             }
         }
         return connectedDevices;
@@ -230,11 +235,13 @@ public class DefaultFogLayout implements IFogLayout {
     private int connectedDevices(List<Router> routers) {
         int connectedDevices = 0;
         for (Router router : routers) {
-            if (router != null){
-                connectedDevices += router.getDeviceCount();
+            if (router != null) {
+
+                if (router.getDeviceCount() >= 0) {
+                    connectedDevices += router.getDeviceCount();
+                }
             }
         }
-
         return connectedDevices;
     }
 

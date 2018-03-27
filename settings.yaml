@@ -17,7 +17,7 @@ reader: "emufog.reader.BriteReader"
 #                         Basic Settings                          #
 ###################################################################
 baseAddress: "10.0.0.0"
-maxFogNodes: 50
+maxFogNodes: 15
 costThreshold: 6
 
 # Settings for Parallel building:
@@ -54,7 +54,7 @@ fogNodeTypes:
 
   - name: fogNodeType1
     id: 1
-    maximumConnections: 5
+    maximumConnections: 8
     costs: 2
     memoryLimit: 1048576000
     cpuShare: 1
@@ -63,7 +63,7 @@ fogNodeTypes:
 
   - name: fogNodeType2
     id: 2
-    maximumConnections: 12
+    maximumConnections: 20
     costs: 8
     memoryLimit: 1048576000
     cpuShare: 1
