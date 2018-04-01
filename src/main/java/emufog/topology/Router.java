@@ -1,24 +1,34 @@
 package emufog.topology;
 
 
-public class Router extends Node{
+import java.util.concurrent.atomic.AtomicInteger;
+
+public class Router extends Node {
 
     private Types.RouterType type;
 
-    private int deviceCount;
+    int connectedDevices = 0;
+
+    AtomicInteger uncoveredDevices = new AtomicInteger();
+
+    private AtomicInteger coveredDevices = new AtomicInteger();
 
     public Router(int asID) {
         super(asID);
-        this.deviceCount = 0;
+        this.uncoveredDevices.set(0);
+        this.coveredDevices.set(0);
     }
 
-    public Router(int id, int asID){
+    public Router(int id, int asID) {
         super(id, asID);
-        this.deviceCount = 0;
+        this.uncoveredDevices.set(0);
+        this.coveredDevices.set(0);
     }
 
     @Override
-    public String getName() { return "r" + getID();}
+    public String getName() {
+        return "r" + getID();
+    }
 
     public void setType(Types.RouterType type) {
         this.type = type;
@@ -28,12 +38,35 @@ public class Router extends Node{
         return type;
     }
 
-    public boolean hasDevices(){ return deviceCount > 0;}
+    public void addDevice(){
+        connectedDevices++;
+        uncoveredDevices.getAndIncrement();
+    }
 
-    public void incrementDeviceCount(int n){ deviceCount += n;}
+    public boolean hasDevices() {
+        return connectedDevices > 0;
+    }
 
-    public void incrementDeviceCount() { deviceCount++;}
+    public int getUncoveredDevices() {
+        return connectedDevices - coveredDevices.intValue();
+    }
 
-    public int getDeviceCount() { return deviceCount;}
+    public int connectedDevices(){
+        return connectedDevices;
+    }
+
+    public void incrementCoveredCount() {
+        coveredDevices.getAndIncrement();
+    }
+
+    public int coveredDevices(){
+        return coveredDevices.intValue();
+    }
+
+
+    public boolean covered() {
+        if (uncoveredDevices.intValue() == coveredDevices.intValue()) return true;
+        return false;
+    }
 
 }

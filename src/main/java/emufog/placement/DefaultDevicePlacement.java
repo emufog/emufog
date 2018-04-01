@@ -45,7 +45,7 @@ public class DefaultDevicePlacement implements IDevicePlacement {
 
                     Device device = new Device(router.getAsID(), type);
 
-                    router.incrementDeviceCount();
+                    router.addDevice();
 
                     DeviceNodeConfiguration deviceNodeConfiguration = new DeviceNodeConfiguration();
 

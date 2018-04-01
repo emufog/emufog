@@ -2,7 +2,10 @@ package emufog.placement;
 
 import com.google.common.graph.MutableNetwork;
 import emufog.nodeconfig.FogNodeType;
-import emufog.topology.*;
+import emufog.topology.FogNode;
+import emufog.topology.Link;
+import emufog.topology.Node;
+import emufog.topology.Router;
 import emufog.util.Logger;
 import emufog.util.LoggerLevel;
 
@@ -60,45 +63,56 @@ public class DefaultFogLayout implements IFogLayout {
                 .filter(Router::hasDevices)
                 .count()), LoggerLevel.ADVANCED);
 
+        logger.log("Available fog nodes: " + remainingNodes.intValue());
+
 
         while (!edgeRouters.isEmpty()) {
-            determineCandidateRouters();
-            Router connectionPoint = getBackboneNodeWithHighestEdgeCoverage();
 
-            for (FogNodeType fogNodeType : findCostOptimalFogNodeType(connectionPoint)) {
-                FogNode fogNodeToPlace = new FogNode(fogNodeType);
-                if (remainingNodes.intValue() > 0) {
-                    placeFogNode(connectionPoint, fogNodeToPlace);
-                    remainingNodes.getAndDecrement();
-                    edgeRouters.removeAll(coveredEdgeRouters.get(connectionPoint));
+            if (remainingNodes.intValue() > 0) {
 
-                    logger.log("");
-                    logger.log("Placed Fog Node at Backbone Router "
-                            + connectionPoint.getID()
-                            + " \nwith Fog Type "
-                            + fogNodeToPlace.getFogNodeType().getId()
-                            + " connecting " + connectedDevices(coveredEdgeRouters.get(connectionPoint))
-                            + " devices.");
-                    logger.log("");
+                determineCandidateRouters();
 
-                } else {
-                    if (!edgeRouters.isEmpty()) {
-                        logger.logSeparator();
-                        logger.log(String.format("Fog Layout creation was not successful! " +
-                                "\nThere are %d unconnected edge routers. " +
-                                "\nCovering %d devices.", edgeRouters.size(), connectedDevices(edgeRouters)));
-                        logger.logSeparator();
-                        edgeRouters.clear();
-                    }
+                Router connectionPoint = getBackboneNodeWithHighestEdgeCoverage();
+
+                FogNode fogNodeToPlace = new FogNode(findCostOptimalFogNodeType(connectionPoint));
+
+                placeFogNode(connectionPoint, fogNodeToPlace);
+
+                //Only remove router if all connected devices are covered.
+                for (Router coveredRouter : coveredEdgeRouters.get(connectionPoint)) {
+                    if (coveredRouter.covered()) edgeRouters.remove(coveredRouter);
+                }
+
+                remainingNodes.getAndDecrement();
+
+                logger.log("");
+                logger.log("Placed Fog Node at Backbone Router "
+                        + connectionPoint.getID()
+                        + " \nwith Fog Type "
+                        + fogNodeToPlace.getFogNodeType().getId()
+                        + " covering " + coveredEdgeRouters.get(connectionPoint).size()
+                        + " edge routers.");
+                logger.log("Remaining fog nodes available: " + remainingNodes.intValue());
+                logger.log("");
+
+            } else {
+                if (!edgeRouters.isEmpty()) {
+                    logger.logSeparator();
+                    logger.log(String.format("Fog Layout creation was not successful! " +
+                            "\nThere are %d unconnected edge routers. " +
+                            "\nCovering %d unconnected devices.", edgeRouters.size(), uncoveredDevices(edgeRouters)));
+                    logger.logSeparator();
+                    edgeRouters.clear();
+                    System.exit(1);
                 }
             }
-
 
         }
 
         logger.log("");
         logger.log("Placed "
-                + topology.nodes().stream().filter(n -> n instanceof FogNode).count()
+                + topology.nodes().stream().filter(n -> n instanceof FogNode).
+                count()
                 + " Fog nodes in total in the topology.\n");
         for (FogNodeType fogNodeType : getSettings().getFogNodeTypes()) {
             int count = (int) topology
@@ -108,89 +122,76 @@ public class DefaultFogLayout implements IFogLayout {
                             .equals(fogNodeType.getName())).count();
             logger.log(count + " fog nodes of " + fogNodeType.getName());
         }
-
         logger.log("");
     }
+
+    private boolean isBackboneRouter(Object n) {
+        if (n instanceof Router && ((Router) n).getType().equals(BACKBONE_ROUTER)) {
+            return true;
+        } else return false;
+    }
+
+    private HashSet<Router> getAdjacentBackboneRouters(Router router) {
+        HashSet<Router> adjacentBackboneRouters = new HashSet<>();
+
+        for (Object adjacentRouter : getTopology().adjacentNodes(router)) {
+            if (isBackboneRouter(adjacentRouter)) {
+                adjacentBackboneRouters.add((Router) adjacentRouter);
+            }
+        }
+        return adjacentBackboneRouters;
+    }
+
 
     private void determineCandidateRouters() {
 
         float delay = 0;
+        AtomicInteger range = new AtomicInteger();
+        range.set(0);
 
         for (Router edgeRouter : edgeRouters) {
 
-            AtomicInteger range = new AtomicInteger();
+            Set<Router> adjacentBackboneRouters = new HashSet<>();
 
-            //check if latency(v,a) ≤ latencyBoundary for all v ∈ Routers to a ∈ Backbone Routers
-            for (Object neighbor : getTopology().adjacentNodes(edgeRouter)) {
+            List<Router> predecessors = new ArrayList<>();
+            predecessors.add(edgeRouter);
 
-                if (neighbor instanceof Router
-                        && ((Router) neighbor).getType().equals(BACKBONE_ROUTER)) {
+            BitSet visited = new BitSet();
+
+
+            //iterate over each predecessor
+            for (int i = 0; i <= predecessors.size(); i++) {
+
+                if (range.intValue() < threshold) {
 
                     range.getAndIncrement();
+                    Router predecessor = predecessors.get(i);
+                    // find adjacentBackboneRouters from current predecessor.
+                    adjacentBackboneRouters = getAdjacentBackboneRouters(predecessor);
 
-                    Link link = checkNotNull(getTopology().edgeConnectingOrNull(edgeRouter, (Node) neighbor));
+                    for (Router backboneRouter : adjacentBackboneRouters) {
 
-                    delay += link.getDelay();
+                        Link link = checkNotNull(getTopology().edgeConnectingOrNull(predecessor, backboneRouter));
+                        delay += link.getDelay();
 
-
-                    if (delay <= delayBoundary) {
-
-                        BitSet visited = new BitSet();
-                        visited.set(((Router) neighbor).getID());
-
-                        if (neighbor != null) {
-                            addBackboneRouter(((Router) neighbor), edgeRouter);
+                        if (delay <= delayBoundary) {
+                            addBackboneRouter(backboneRouter, edgeRouter);
                         }
-
-                        while (delay <= delayBoundary && range.intValue() < threshold) {
-
-                            Router nextRouter = null;
-
-                            for (Object n : getTopology().adjacentNodes((Node) neighbor)) {
-
-                                if (range.intValue() < threshold) {
-                                    if (n instanceof Router
-                                            && ((Router) n).getType().equals(BACKBONE_ROUTER)) {
-
-                                        if (!visited.get(((Router) n).getID())) {
-
-                                            nextRouter = (Router) n;
-                                            range.getAndIncrement();
-                                            visited.set(nextRouter.getID());
-
-                                            Link l = checkNotNull(getTopology()
-                                                    .edgeConnectingOrNull(nextRouter, (Node) neighbor));
-
-                                            delay += l.getDelay();
-                                            if (delay <= delayBoundary) addBackboneRouter(nextRouter, edgeRouter);
-                                        }
-                                    }
-                                }
-                            }
-
-                            if (nextRouter != null) {
-                                neighbor = nextRouter;
-                            } else {
-                                break;
-                            }
-
-                        }
-
-                        visited.clear();
-
-
                     }
+
+                    predecessors.addAll(adjacentBackboneRouters);
+                    adjacentBackboneRouters.clear();
+                    predecessors.remove(i);
                 }
-                range.set(0);
             }
 
+            range.set(0);
         }
-
 
     }
 
     /**
-     * Add Backbone Router to possibleCandiateRouter data structure.
+     * Add Backbone Router to possibleCandidateRouter data structure.
      *
      * @param router
      * @param edgeRouter
@@ -211,64 +212,79 @@ public class DefaultFogLayout implements IFogLayout {
 
     }
 
-    private List<FogNodeType> findCostOptimalFogNodeType(Router connectionPoint) {
-
+    /**
+     * Finde one suitable fog node type and adapt covered devices count in topology.
+     *
+     * @param connectionPoint
+     * @return
+     */
+    private FogNodeType findCostOptimalFogNodeType(Router connectionPoint) {
 
         Set<Router> routers = coveredEdgeRouters.get(connectionPoint);
 
-        List<FogNodeType> fogNodeType = new ArrayList<>();
+        FogNodeType fogType = fogNodeTypes
+                .stream()
+                .min((fogNodeType1, fogNodeType2) ->
+                        calculateRatio(uncoveredDevices(routers), fogNodeType1) > calculateRatio(uncoveredDevices(routers), fogNodeType2)
+                                ? 1 : -1)
+                .get();
 
-        int coveredDevices = connectedDevices(routers);
 
-        while (coveredDevices > 0) {
-            FogNodeType fogType = fogNodeTypes
-                    .stream()
-                    .min((fogNodeType1, fogNodeType2) ->
-                            calculateRatio(connectedDevices(routers), fogNodeType1) > calculateRatio(connectedDevices(routers), fogNodeType2)
-                                    ? 1 : -1)
-                    .get();
+        int maxConnections = fogType.getMaximumConnections();
 
-            for(Router router : routers){
-                router.getDeviceCount();
+
+        while (uncoveredDevices(routers) != 0 && maxConnections > 0) {
+            for (Router router : routers) {
+                while (maxConnections > 0 && !router.covered()) {
+                    router.incrementCoveredCount();
+                    maxConnections--;
+                }
             }
-
-            coveredDevices -= fogType.getMaximumConnections();
-
         }
 
-        if (!fogNodeType.isEmpty()) {
-            return fogNodeType;
+
+        if (fogType != null) {
+            return fogType;
+
         } else {
             Logger.getInstance().log("There is no suitable fog node type.");
+            System.exit(1);
             return null;
         }
+
     }
 
-    private int connectedDevices(Set<Router> routers) {
-        int connectedDevices = 0;
+    /**
+     * Sum of uncoverered devices connected to a set of given routers.
+     *
+     * @param routers
+     * @return
+     */
+    private int uncoveredDevices(Collection<Router> routers) {
+        int uncoveredDevices = 0;
         for (Router router : routers) {
             if (router != null) {
 
-                if (router.getDeviceCount() >= 0) {
-                    connectedDevices += router.getDeviceCount();
+                if (!router.covered()) {
+                    uncoveredDevices += router.getUncoveredDevices();
                 }
             }
         }
-        return connectedDevices;
+        return uncoveredDevices;
     }
 
-    private int connectedDevices(List<Router> routers) {
-        int connectedDevices = 0;
+
+    private int coveredDevices(Collection<Router> routers) {
+        int coveredDevices = 0;
         for (Router router : routers) {
             if (router != null) {
-
-                if (router.getDeviceCount() >= 0) {
-                    connectedDevices += router.getDeviceCount();
-                }
+                coveredDevices += router.coveredDevices();
             }
         }
-        return connectedDevices;
+
+        return coveredDevices;
     }
+
 
     private double calculateRatio(int connectedDevices, FogNodeType fogNodeType) {
         double ratio = (connectedDevices - fogNodeType.getMaximumConnections()) / fogNodeType.getCosts();
@@ -288,7 +304,6 @@ public class DefaultFogLayout implements IFogLayout {
                 .getKey();
     }
 
-
     private void placeFogNode(Node node, FogNode fogNode) {
 
         getTopology().addNode(fogNode);
@@ -296,20 +311,4 @@ public class DefaultFogLayout implements IFogLayout {
         getTopology().addEdge(node, fogNode, link);
 
     }
-
-    class FogResult {
-
-        private boolean success;
-
-        final Map<Router, FogNode> fogNodePlacements = new HashMap<>();
-
-        void clearFogNodes() {
-            fogNodePlacements.clear();
-        }
-
-        void success(boolean value) {
-            this.success = value;
-        }
-    }
-
 }

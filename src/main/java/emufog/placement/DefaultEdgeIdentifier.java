@@ -23,8 +23,6 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
     @Override
     public MutableNetwork identifyEdge(MutableNetwork<Node, Link> topology) {
 
-        Logger logger = Logger.getInstance();
-
         identifyBackbone(topology);
 
         return topology;
@@ -141,8 +139,6 @@ public class DefaultEdgeIdentifier implements IEdgeIdentifier {
      * @param t
      */
     private void buildSingleBackbone(MutableNetwork<Node, Link> t) {
-
-        Logger logger = Logger.getInstance();
 
         Queue<Node> nodeQueue = new ArrayDeque<>();
         Map<Node, Node> predecessors = new HashMap<>();
