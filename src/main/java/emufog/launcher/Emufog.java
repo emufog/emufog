@@ -34,7 +34,7 @@ public class Emufog {
             JCommander.newBuilder().addObject(arguments).build().parse(args);
 
             //initialize settings
-            Path path = Paths.get("C:/Users/robin/IdeaProjects/emufog/settings.yaml");
+            Path path = Paths.get("/home/renderfehler/IdeaProjects/emufog/settings.yaml");
             Settings.read(path);
 
 

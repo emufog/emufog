@@ -12,7 +12,6 @@ import emufog.util.LoggerLevel;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static emufog.settings.Settings.getSettings;
 import static emufog.topology.Topology.getTopology;
 import static emufog.topology.Types.RouterType.BACKBONE_ROUTER;
@@ -40,10 +39,10 @@ public class DefaultFogLayout implements IFogLayout {
     @Override
     public void identifyFogNodes(MutableNetwork topology) {
 
-        //get edgeRouters from stream of nodes
+        //get all edge routers that have connected devices.
         topology.nodes()
                 .stream()
-                .filter(n -> n instanceof Router && ((Router) n).getType().equals(EDGE_ROUTER))
+                .filter(n -> n instanceof Router && ((Router) n).getType().equals(EDGE_ROUTER) && ((Router) n).hasDevices())
                 .forEach(n -> edgeRouters.add((Router) n));
 
         //initialise list of backbone routers
@@ -125,69 +124,114 @@ public class DefaultFogLayout implements IFogLayout {
         logger.log("");
     }
 
-    private boolean isBackboneRouter(Object n) {
-        if (n instanceof Router && ((Router) n).getType().equals(BACKBONE_ROUTER)) {
-            return true;
-        } else return false;
-    }
-
-    private HashSet<Router> getAdjacentBackboneRouters(Router router) {
-        HashSet<Router> adjacentBackboneRouters = new HashSet<>();
-
-        for (Object adjacentRouter : getTopology().adjacentNodes(router)) {
-            if (isBackboneRouter(adjacentRouter)) {
-                adjacentBackboneRouters.add((Router) adjacentRouter);
-            }
-        }
-        return adjacentBackboneRouters;
-    }
-
-
+    /**
+     * Iterate over given list of edge Routers and find all suitable backbone routers.
+     */
     private void determineCandidateRouters() {
-
-        float delay = 0;
-        AtomicInteger range = new AtomicInteger();
-        range.set(0);
 
         for (Router edgeRouter : edgeRouters) {
 
-            Set<Router> adjacentBackboneRouters = new HashSet<>();
+            //start Dijkstra for current edgeRouter
+            calculateShortestPathFromEdgeRouter(edgeRouter);
 
-            List<Router> predecessors = new ArrayList<>();
-            predecessors.add(edgeRouter);
+            //filter result
+            for (Iterator<Node> it = getTopology().nodes().stream().filter(n -> n instanceof Router && ((Router) n).getType().equals(BACKBONE_ROUTER)).iterator(); it.hasNext(); ) {
+                Router backboneRouter = (Router) it.next();
 
-            BitSet visited = new BitSet();
+                if (isValidBackboneRouter(backboneRouter)) {
+                    addBackboneRouter(backboneRouter, edgeRouter);
+                    resetNode(backboneRouter);
+                } else {
+                    resetNode(backboneRouter);
+                }
+            }
+        }
+    }
 
+    /**
+     * Checks whether given router fulfills configured delay and threshold configuration. Adds edge router only
+     * iff requirements are satisfied.
+     *
+     * @param router
+     * @return
+     */
+    private boolean isValidBackboneRouter(Router router) {
+        if (!router.getShortestPath().isEmpty() && router.getShortestPath().size() <= threshold) {
+            if (router.getDistance() <= delayBoundary) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-            //iterate over each predecessor
-            for (int i = 0; i <= predecessors.size(); i++) {
+    /**
+     * Reset node set distance to max integer and clear shortest path list.
+     *
+     * @param node
+     */
+    static void resetNode(Node node) {
+        node.setDistance((float) Integer.MAX_VALUE);
+        List<Node> shortestPath = new LinkedList<>();
+        node.setShortestPath(shortestPath);
+    }
 
-                if (range.intValue() < threshold) {
+    /**
+     * Calculate shortest path from given edge router to each backbone router in topology by using dijkstra's algorithm.
+     *
+     * @param edgeRouter
+     */
+    static void calculateShortestPathFromEdgeRouter(Router edgeRouter) {
 
-                    range.getAndIncrement();
-                    Router predecessor = predecessors.get(i);
-                    // find adjacentBackboneRouters from current predecessor.
-                    adjacentBackboneRouters = getAdjacentBackboneRouters(predecessor);
+        edgeRouter.setDistance(0f);
 
-                    for (Router backboneRouter : adjacentBackboneRouters) {
+        Set<Node> settledNodes = new HashSet<>();
+        Set<Node> unsettledNodes = new HashSet<>();
 
-                        Link link = checkNotNull(getTopology().edgeConnectingOrNull(predecessor, backboneRouter));
-                        delay += link.getDelay();
+        unsettledNodes.add(edgeRouter);
 
-                        if (delay <= delayBoundary) {
-                            addBackboneRouter(backboneRouter, edgeRouter);
-                        }
+        while (unsettledNodes.size() != 0) {
+            Node currentNode = getLowestDistanceNode(unsettledNodes);
+            unsettledNodes.remove(currentNode);
+
+            for (Node node : getTopology().adjacentNodes(currentNode)) {
+                if (node instanceof Router && ((Router) node).getType().equals(BACKBONE_ROUTER)) {
+                    Node adjacentNode = (Node) node;
+                    Link link = getTopology().edgeConnectingOrNull(adjacentNode, currentNode);
+                    float delay = link.getDelay();
+
+                    if (!settledNodes.contains(adjacentNode)) {
+                        calculateMinimumDistance(adjacentNode, delay, currentNode);
+                        unsettledNodes.add(adjacentNode);
                     }
-
-                    predecessors.addAll(adjacentBackboneRouters);
-                    adjacentBackboneRouters.clear();
-                    predecessors.remove(i);
                 }
             }
 
-            range.set(0);
+            settledNodes.add(currentNode);
         }
 
+    }
+
+    static Node getLowestDistanceNode(Set<Node> unsettledNodes) {
+        Node lowestDistanceNode = null;
+        float lowestDistance = Integer.MAX_VALUE;
+        for (Node node : unsettledNodes) {
+            float nodeDistance = node.getDistance();
+            if (nodeDistance < lowestDistance) {
+                lowestDistance = nodeDistance;
+                lowestDistanceNode = node;
+            }
+        }
+        return lowestDistanceNode;
+    }
+
+    private static void calculateMinimumDistance(Node evaluationNode, float delay, Node sourceNode) {
+        float sourceDistance = sourceNode.getDistance();
+        if (sourceDistance + delay < evaluationNode.getDistance()) {
+            evaluationNode.setDistance(sourceDistance + delay);
+            LinkedList<Node> shortestPath = new LinkedList<>(sourceNode.getShortestPath());
+            shortestPath.add(sourceNode);
+            evaluationNode.setShortestPath(shortestPath);
+        }
     }
 
     /**
@@ -272,19 +316,6 @@ public class DefaultFogLayout implements IFogLayout {
         }
         return uncoveredDevices;
     }
-
-
-    private int coveredDevices(Collection<Router> routers) {
-        int coveredDevices = 0;
-        for (Router router : routers) {
-            if (router != null) {
-                coveredDevices += router.coveredDevices();
-            }
-        }
-
-        return coveredDevices;
-    }
-
 
     private double calculateRatio(int connectedDevices, FogNodeType fogNodeType) {
         double ratio = (connectedDevices - fogNodeType.getMaximumConnections()) / fogNodeType.getCosts();

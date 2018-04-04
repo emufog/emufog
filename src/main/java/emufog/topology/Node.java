@@ -2,11 +2,19 @@ package emufog.topology;
 
 import emufog.util.UniqueIDProvider;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public abstract class Node {
 
     private int ID;
 
     private int asID;
+
+    private List<Node> shortestPath = new LinkedList<>();
+
+    //Delay
+    private Float distance = Float.valueOf(Integer.MAX_VALUE);
 
     public Node(){
         this.ID = UniqueIDProvider.getInstance().getNextID();
@@ -39,4 +47,19 @@ public abstract class Node {
      */
     public abstract String getName();
 
+    public void setDistance(Float distance) {
+        this.distance = distance;
+    }
+
+    public Float getDistance() {
+        return distance;
+    }
+
+    public List<Node> getShortestPath() {
+        return shortestPath;
+    }
+
+    public void setShortestPath(List<Node> shortestPath) {
+        this.shortestPath = shortestPath;
+    }
 }
