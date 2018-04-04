@@ -82,11 +82,11 @@ public class DefaultApplicationAssignment implements IApplicationAssignmentPolic
     }
 
     /**
-     * Assignes a uniqe id to each application and adds uniqe ip address if not already defined in the settings file.
+     * Assignees a unique id to each application and adds unique ip address if not already defined in the settings file.
      * @param applications
      */
     private void assignIpAndIds(List<Application> applications){
-        //assign uniqe id and ip to each application
+        //assign unique id and ip to each application
         for(Application application : applications){
             if(application.getIp() == null){
                 //generate new unique ip

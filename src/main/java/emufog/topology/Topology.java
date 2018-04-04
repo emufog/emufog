@@ -19,6 +19,10 @@ public class Topology {
 
     private Settings settings;
 
+    /**
+     * Hold Topology as singleton.
+     * @return
+     */
     public static MutableNetwork<Node, Link> getTopology() {
         if (INSTANCE == null) {
             INSTANCE = NetworkBuilder.undirected().allowsParallelEdges(false).build();
@@ -26,7 +30,19 @@ public class Topology {
         return INSTANCE;
     }
 
-    private Topology(TopologyBuilder builder) throws IOException {
+    public static class TopologyBuilder {
+
+        public Topology build() throws IOException {
+            return new Topology();
+        }
+
+    }
+
+    /**
+     * Builds new network topology.
+     * @throws IOException
+     */
+    private Topology() throws IOException {
 
         Logger logger = Logger.getInstance();
 
@@ -47,13 +63,13 @@ public class Topology {
             start = System.nanoTime();
             identifyEdge();
             end = System.nanoTime();
-            logger.log("It took " + Logger.convertToMs(start, end) + " to identify the Edge");
+            logger.log("It took " + Logger.convertToMs(start, end) + " to identify the edge");
             logger.logSeparator();
 
             start = System.nanoTime();
             assignEdgeDevices();
             end = System.nanoTime();
-            logger.log("It took " + Logger.convertToMs(start, end) + " to place the Devices");
+            logger.log("It took " + Logger.convertToMs(start, end) + " to place the devices");
             logger.logSeparator();
 
             start = System.nanoTime();
@@ -72,6 +88,10 @@ public class Topology {
 
     }
 
+    /**
+     * Reads input file and instantiates new MutableNetwork graph instance.
+     * @throws Exception
+     */
     private void read() throws Exception {
 
         if (settings.getReader() == null) {
@@ -100,7 +120,7 @@ public class Topology {
     private void identifyEdge() throws Exception {
 
         Logger.getInstance().logSeparator();
-        Logger.getInstance().log("Identifying edge and Backbone");
+        Logger.getInstance().log("Identifying edge and backbone");
         Logger.getInstance().logSeparator();
 
         // fall back to default policy if no preference is set in the settings.
@@ -115,9 +135,9 @@ public class Topology {
             ClassLoader classLoader = ClassLoader.getSystemClassLoader();
             Class edgeIdentifierClass = classLoader.loadClass(settings.getEdgeIdentifier());
 
-            Object edgeIdentiferObject = edgeIdentifierClass.newInstance();
+            Object edgeIdentifierObject = edgeIdentifierClass.newInstance();
 
-            ((IEdgeIdentifier) edgeIdentiferObject).identifyEdge(getTopology());
+            ((IEdgeIdentifier) edgeIdentifierObject).identifyEdge(getTopology());
         }
 
 
@@ -211,14 +231,6 @@ public class Topology {
             ((IApplicationAssignmentPolicy) assignApplicationsObject).generateDeviceApplicationMapping(getTopology());
         }
 
-
-    }
-
-    public static class TopologyBuilder {
-
-        public Topology build() throws IOException {
-            return new Topology(this);
-        }
 
     }
 
