@@ -17,8 +17,8 @@ reader: "emufog.reader.BriteReader"
 #                         Basic Settings                          #
 ###################################################################
 baseAddress: "10.0.0.0"
-maxFogNodes: 10
-costThreshold: 20
+maxFogNodes: 20
+costThreshold: 2
 
 # Settings for Parallel building:
 threadCount: 1

@@ -319,6 +319,10 @@ public class DefaultFogLayout implements IFogLayout {
 
     private double calculateRatio(int connectedDevices, FogNodeType fogNodeType) {
         double ratio = (connectedDevices - fogNodeType.getMaximumConnections()) / fogNodeType.getCosts();
+        logger.log("Connected Devices: " + connectedDevices + "\n"
+                + "Costs: " + fogNodeType.getCosts()
+                + "\n" + "Max connections: " + fogNodeType.getMaximumConnections() + "\n"
+                + "Ratio: " + ratio + "\n");
         return ratio;
     }
 
