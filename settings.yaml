@@ -1,7 +1,7 @@
 ###################################################################
 #                  Input/Output Settings                          #
 ###################################################################
-inputGraphFilePath: "5er.brite"
+inputGraphFilePath: "100_1.brite"
 exportFilePath: "containernet_out.py"
 
 overWriteOutputFile: true
@@ -12,12 +12,13 @@ edgeIdentifier: "emufog.placement.DefaultEdgeIdentifier"
 fogPlacement: "emufog.placement.DefaultFogLayout"
 exporter: "emufog.export.ContainernetExporter"
 reader: "emufog.reader.BriteReader"
+
 ###################################################################
 #                         Basic Settings                          #
 ###################################################################
 baseAddress: "10.0.0.0"
-maxFogNodes: 100
-costThreshold: 6
+maxFogNodes: 20
+costThreshold: 2
 
 # Settings for Parallel building:
 threadCount: 1
@@ -57,16 +58,16 @@ fogNodeTypes:
     costs: 1
     memoryLimit: 1048576000
     cpuShare: 1
-    nodeLatency: 5
+    nodeLatency: 0
     nodeBandwidth: 100
 
   - name: fogNodeType2
     id: 2
-    maximumConnections: 1
-    costs: 2
+    maximumConnections: 8
+    costs: 8
     memoryLimit: 1048576000
     cpuShare: 1
-    nodeLatency: 1
+    nodeLatency: 0
     nodeBandwidth: 200
 
 ###################################################################

@@ -6,6 +6,8 @@ import emufog.topology.Topology;
 import emufog.util.Logger;
 
 import java.io.FileNotFoundException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * The EmuFog main launcher class. Starts a new instance of the application with the given parameters
@@ -22,7 +24,19 @@ public class Emufog {
 
         Logger logger = Logger.getInstance();
         logger.logSeparator();
-        logger.log("Welcome to EmuFog - MultiTierApplication");
+        logger.log("\n" +
+                "$$$$$$$$\\                         $$$$$$$$\\                  \n" +
+                "$$  _____|                        $$  _____|                 \n" +
+                "$$ |      $$$$$$\\$$$$\\  $$\\   $$\\ $$ |    $$$$$$\\   $$$$$$\\  \n" +
+                "$$$$$\\    $$  _$$  _$$\\ $$ |  $$ |$$$$$\\ $$  __$$\\ $$  __$$\\ \n" +
+                "$$  __|   $$ / $$ / $$ |$$ |  $$ |$$  __|$$ /  $$ |$$ /  $$ |\n" +
+                "$$ |      $$ | $$ | $$ |$$ |  $$ |$$ |   $$ |  $$ |$$ |  $$ |\n" +
+                "$$$$$$$$\\ $$ | $$ | $$ |\\$$$$$$  |$$ |   \\$$$$$$  |\\$$$$$$$ |\n" +
+                "\\________|\\__| \\__| \\__| \\______/ \\__|    \\______/  \\____$$ |\n" +
+                "                                                   $$\\   $$ |\n" +
+                "                                                   \\$$$$$$  |\n" +
+                "                                                    \\______/ \n" +
+                " \n");
         logger.logSeparator();
 
         Arguments arguments = new Arguments();
@@ -32,12 +46,21 @@ public class Emufog {
             JCommander.newBuilder().addObject(arguments).build().parse(args);
 
             //initialize settings
-            Settings.read(arguments.settingsPath);
+            Path path = Paths.get("/home/renderfehler/IdeaProjects/emufog/settings.yaml");
+            Settings.read(path);
+
 
             // build topology
+            long start = System.nanoTime();
             Topology topology = new Topology.TopologyBuilder().build();
+            long end = System.nanoTime();
+            logger.log("It took " + Logger.convertToMs(start, end) + " to build the complete topology.");
 
+            start = System.nanoTime();
             topology.export();
+            end = System.nanoTime();
+            logger.log("It took " + Logger.convertToMs(start,end) + " to export the topology");
+            logger.logSeparator();
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();

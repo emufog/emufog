@@ -18,11 +18,12 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+
 /**
  * The settings class contains all different settings used within the application.
  * An instance of this class can be read in from a valid settings file.
  */
-@JsonIgnoreProperties(ignoreUnknown=true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Settings {
 
     private static Settings INSTANCE;
@@ -71,7 +72,7 @@ public class Settings {
 
     private List<DeviceNodeType> deviceNodeTypes = new ArrayList<>();
 
-    private List<FogNodeType>fogNodeTypes = new ArrayList<>();
+    private List<FogNodeType> fogNodeTypes = new ArrayList<>();
 
     private List<Application> fogApplications = new ArrayList<>();
 
@@ -107,8 +108,12 @@ public class Settings {
      * @return retruns settings object.
      * @throws Exception if Settings file is not yet instantiated.
      */
-    public static Settings getInstance() throws Exception {
-        if (INSTANCE == null) throw new Exception("There is no Settings file instantiated yet!");
+    public static Settings getSettings() {
+        if (INSTANCE == null) try {
+            throw new Exception("There is no Settings file instantiated yet!");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return INSTANCE;
     }

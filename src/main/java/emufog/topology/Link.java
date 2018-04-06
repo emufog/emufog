@@ -1,5 +1,7 @@
 package emufog.topology;
 
+import emufog.util.UniqueIDProvider;
+
 public class Link {
 
     private final int id;
@@ -11,6 +13,15 @@ public class Link {
         this.delay = delay;
         this.bandwidth = bandwidth;
     }
+
+    public Link(float delay, float bandwidth){
+        this.id = UniqueIDProvider.getInstance().getNextID();
+        UniqueIDProvider.getInstance().markIDused(id);
+        this.delay = delay;
+        this.bandwidth = bandwidth;
+    }
+
+
 
     public int getId() {
         return id;

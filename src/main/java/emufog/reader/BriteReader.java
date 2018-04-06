@@ -65,7 +65,7 @@ public class BriteReader extends TopologyReader{
             if(values.length >= 7){
                 int id = Integer.parseInt(values[0]);
                 int asID = Integer.parseInt(values[5]);
-                Router router = new Router(id, asID);
+                Router router = new Router(id,asID);
                 // mark parsed id as used to avoid naming problems in exporter.
                 UniqueIDProvider.getInstance().markIDused(id);
                 router.setType(ROUTER);

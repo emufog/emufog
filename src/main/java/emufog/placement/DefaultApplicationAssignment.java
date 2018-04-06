@@ -5,6 +5,7 @@ import emufog.application.Application;
 import emufog.settings.Settings;
 import emufog.topology.Device;
 import emufog.topology.FogNode;
+import emufog.util.Logger;
 import emufog.util.UniqueIDProvider;
 import emufog.util.UniqueIPProvider;
 
@@ -27,7 +28,7 @@ public class DefaultApplicationAssignment implements IApplicationAssignmentPolic
     public void generateDeviceApplicationMapping(MutableNetwork topology) {
 
         try {
-            deviceApplications = checkNotNull(Settings.getInstance().getDeviceApplications());
+            deviceApplications = checkNotNull(Settings.getSettings().getDeviceApplications());
         } catch (Exception e) {
             e.printStackTrace(
             );
@@ -42,6 +43,14 @@ public class DefaultApplicationAssignment implements IApplicationAssignmentPolic
             device.getConfiguration().setApplications(deviceApplications);
         }
 
+        Logger logger = Logger.getInstance();
+        int count = 0;
+        for(Device device : deviceList){
+            count += device.getConfiguration().getApplications().size();
+        }
+        logger.log(String.format("Assigned %d applications to devices\n", count));
+
+
     }
 
     @Override
@@ -51,7 +60,7 @@ public class DefaultApplicationAssignment implements IApplicationAssignmentPolic
 
         // get List of fogApplications
         try {
-            fogApplications = checkNotNull(Settings.getInstance().getFogApplications());
+            fogApplications = checkNotNull(Settings.getSettings().getFogApplications());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -63,14 +72,21 @@ public class DefaultApplicationAssignment implements IApplicationAssignmentPolic
             fogNode.getConfiguration().setApplications(fogApplications);
         }
 
+        Logger logger = Logger.getInstance();
+        int count = 0;
+        for(FogNode fogNode : fogNodeList){
+            count += fogNode.getConfiguration().getApplications().size();
+        }
+        logger.log(String.format("Assigned %d applications to fog nodes\n", count));
+
     }
 
     /**
-     * Assignes a uniqe id to each application and adds uniqe ip address if not already defined in the settings file.
+     * Assignees a unique id to each application and adds unique ip address if not already defined in the settings file.
      * @param applications
      */
     private void assignIpAndIds(List<Application> applications){
-        //assign uniqe id and ip to each application
+        //assign unique id and ip to each application
         for(Application application : applications){
             if(application.getIp() == null){
                 //generate new unique ip

@@ -47,8 +47,8 @@ public class ContainernetExporter implements ITopologyExporter{
 
         try {
             //get configuration for overwrite permission
-            boolean isOverwirteAllowed = Settings.getInstance().isOverwriteExperimentFile();
-            if(!isOverwirteAllowed && experimentFile.exists()){
+            boolean isOverwriteAllowed = Settings.getSettings().isOverwriteExperimentFile();
+            if(!isOverwriteAllowed && experimentFile.exists()){
                 throw new IllegalArgumentException("The given file already exist. Please provide a valid path");
             }
 
@@ -81,7 +81,7 @@ public class ContainernetExporter implements ITopologyExporter{
             startContainernetExperiment();
 
             // set the overwrite option if feature is set in the settings file
-            StandardOpenOption overwrite = Settings.getInstance().isOverwriteExperimentFile() ? StandardOpenOption.TRUNCATE_EXISTING : StandardOpenOption.APPEND;
+            StandardOpenOption overwrite = Settings.getSettings().isOverwriteExperimentFile() ? StandardOpenOption.TRUNCATE_EXISTING : StandardOpenOption.APPEND;
 
             // write output in UTF-8 to the specified file
             Files.write(experimentFile.toPath(), lines, StandardCharsets.UTF_8, StandardOpenOption.CREATE, overwrite);
@@ -238,7 +238,7 @@ public class ContainernetExporter implements ITopologyExporter{
 
     }
 
-    // TODO: Refactor createMultiTierSwitch impmlementation. Generalize input node type. Maybe with Java generics. #6 in github
+    // TODO: Refactor createMultiTierSwitch implementation. Generalize input node type. Maybe with Java generics. #6 in github
     private void createMultiTierSwitch(Device node, Router accessPoint){
         addBlankLine();
         lines.add("# createMultitierSwitch for " + node.getName());
