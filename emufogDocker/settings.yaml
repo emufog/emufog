@@ -1,0 +1,120 @@
+###################################################################
+#                  Input/Output Settings                          #
+###################################################################
+inputGraphFilePath: "5er.brite"
+exportFilePath: "out/containernet_out.py"
+
+overWriteOutputFile: true
+
+applicationAssignmentPolicy: "emufog.placement.DefaultApplicationAssignment"
+devicePlacement: "emufog.placement.DefaultDevicePlacement"
+edgeIdentifier: "emufog.placement.DefaultEdgeIdentifier"
+fogPlacement: "emufog.placement.DefaultFogLayout"
+exporter: "emufog.export.ContainernetExporter"
+reader: "emufog.reader.BriteReader"
+###################################################################
+#                         Basic Settings                          #
+###################################################################
+baseAddress: "10.0.0.0"
+maxFogNodes: 100
+costThreshold: 6
+
+# Settings for Parallel building:
+threadCount: 1
+parallelFogBuilding: false
+
+# TODO: Model Resource Settings. #8 in github
+
+###################################################################
+#                         DeviceNodeTypes                         #
+###################################################################
+deviceNodeTypes:
+
+    - name: deviceNode1
+      scalingFactor: 1
+      averageDeviceCount: 1
+      memoryLimit: 524288000
+      cpuShare: 1
+      nodeLatency: 10
+      nodeBandwidth: 5
+
+    - name: deviceNode2
+      scalingFactor: 1
+      averageDeviceCount: 1
+      memoryLimit: 524288000
+      cpuShare: 1
+      nodeLatency: 10
+      nodeBandwidth: 5
+
+###################################################################
+#                         FogNodeTypes                            #
+###################################################################
+fogNodeTypes:
+
+  - name: fogNodeType1
+    id: 1
+    maximumConnections: 1
+    costs: 1
+    memoryLimit: 1048576000
+    cpuShare: 1
+    nodeLatency: 5
+    nodeBandwidth: 100
+
+  - name: fogNodeType2
+    id: 2
+    maximumConnections: 1
+    costs: 2
+    memoryLimit: 1048576000
+    cpuShare: 1
+    nodeLatency: 1
+    nodeBandwidth: 200
+
+###################################################################
+#                         Applications                            #
+###################################################################
+
+fogApplications:
+  # Main idea behind using yaml as settings file is possibility to "copy" service definitions from docker-compose files to emuFog.
+  - name: serviceA
+    # TODO: Extend uniqe ip provider to be able to mark ip addresses as already in use. #12 in github
+    ip: 10.0.2.1
+    container:
+      image: ubuntu:trusty
+      # TODO: Try to represent labels as python dict instead of list.
+      labels:
+        - "'com.emufog'"
+      commands:
+        - "ls"
+        - "ls"
+      volumes:
+        - "'settings.yaml:/home/settings.yaml'"
+
+  - name: serviceB
+    container:
+      image: heron/heron
+      ports:
+        - "8888"
+        - "8889"
+      publishAllPorts: true
+      portBindings:
+        - "8888:8888"
+        - "8889:8889"
+
+
+  - name: nginx
+    container:
+      image: nginx
+      ports:
+        - "8080"
+        - "80"
+      publishAllPorts: true
+      portBindings:
+        - "80:8080"
+      environment:
+        - "'NGINX_HOST=0.0.0.0'"
+
+deviceApplications:
+
+  - name: serviceA
+    container:
+      image: heron/heron

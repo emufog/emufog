@@ -1,0 +1,10 @@
+version: "2.1"
+services:
+  emufog:
+    image: emufog:1.1
+    container_name: emufog
+    volumes:
+      - /emufog/emufogDocker/settings.yaml:/usr/app/emufog/settings.yaml:rw
+      - /emufog/emufogDocker/5er.brite:/usr/app/emufog/5er.brite:rw
+      - /emufog/emufogDocker/out:/usr/app/emufog/out:rw
+    command: java -jar emufog.jar -s settings.yaml

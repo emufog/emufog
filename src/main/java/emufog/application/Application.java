@@ -17,7 +17,8 @@ public class Application {
 
     /**
      * Set corresponding application image.
-     * @param img
+     * @param img imagename as String
+     * @param imageVersion as String
      */
     public void image(String img, String imageVersion){
         container.image(img);
