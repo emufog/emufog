@@ -34,7 +34,7 @@ public class DefaultFogLayout implements IFogLayout {
 
     private float threshold = getSettings().getCostThreshold();
 
-    float delayBoundary = 50;
+    float delayBoundary = getSettings().getDelayBoundary();
 
     @Override
     public void identifyFogNodes(MutableNetwork topology) {

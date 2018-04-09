@@ -64,6 +64,9 @@ public class Settings {
     // upper threshold of the cost function to limit the fog node placement
     private float costThreshold;
 
+    // upper latency limit
+    private float delayBoundary;
+
     // number of threads to use for the backbone and fog placement
     private int threadCount;
 
@@ -268,6 +271,14 @@ public class Settings {
 
     public void setReader(String reader) {
         this.reader = reader;
+    }
+
+    public float getDelayBoundary() {
+        return delayBoundary;
+    }
+
+    public void setDelayBoundary(float delayBoundary) {
+        this.delayBoundary = delayBoundary;
     }
 }
 
