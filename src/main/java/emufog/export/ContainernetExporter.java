@@ -285,9 +285,12 @@ public class ContainernetExporter implements ITopologyExporter{
                 + ", ports= " + container.getPorts()
                 + ", port_bindings=" + container.getPortBindings()
                 + ", labels=" + container.getLabels()
+                + ", exec_run=" + container
                 + ")");
 
     }
+
+    // TODO: Fix command execution
 
     private void executeCommands(Docker container, String nodeName){
         List<String> commands = container.getCommands();
