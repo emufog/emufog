@@ -54,6 +54,30 @@ public class Docker extends Container{
     /*List of commands*/
     private List<String> commands = new ArrayList<>();
 
+    public Docker(){
+
+    }
+
+    public Docker(Docker docker) {
+        this.memoryLimit = docker.getMemoryLimit();
+        this.cpuShares = docker.getCpuShares();
+        this.cpuQuota = docker.getCpuQuota();
+        this.cpuPeriod = docker.getCpuPeriod();
+        this.cpuSet = docker.getCpuSet();
+        this.containerName = docker.getContainerName();
+        this.entrypoint = docker.getEntrypoint();
+        this.environment = docker.environment;
+        this.image = docker.getImage();
+        this.imageVersion = docker.getImageVersion();
+        this.labels = docker.labels;
+        this.ports = docker.ports;
+        this.portBindings = docker.portBindings;
+        this.volumes = docker.volumes;
+        this.publishAllPorts = docker.publishAllPorts;
+        this.dns = docker.dns;
+        this.commands = docker.dns;
+    }
+
     @Override
     public void image(String img) {
         this.image = img;

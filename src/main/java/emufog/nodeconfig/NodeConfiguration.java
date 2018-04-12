@@ -2,6 +2,7 @@ package emufog.nodeconfig;
 
 import emufog.application.Application;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -9,7 +10,7 @@ import java.util.List;
  */
 public abstract class NodeConfiguration {
 
-    private List<Application> applications;
+    private List<Application> applications = new LinkedList<>();
 
     public NodeConfiguration(){}
 
@@ -21,6 +22,10 @@ public abstract class NodeConfiguration {
 
     public List<Application> getApplications() {
         return applications;
+    }
+
+    public void addApplication(Application application) {
+        applications.add(application);
     }
 
 }
