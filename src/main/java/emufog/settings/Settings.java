@@ -105,8 +105,8 @@ public class Settings {
     /**
      * Returns singleton settings instance. If settings is null throws Exception.
      *
-     * @return
-     * @throws Exception
+     * @return retruns settings object.
+     * @throws Exception if Settings file is not yet instantiated.
      */
     public static Settings getSettings() {
         if (INSTANCE == null) try {
