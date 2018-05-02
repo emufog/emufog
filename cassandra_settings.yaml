@@ -1,0 +1,71 @@
+###################################################################
+#                  Input/Output Settings                          #
+###################################################################
+inputGraphFilePath: "10_1.brite"
+exportFilePath: "cassandra_out.py"
+
+overWriteOutputFile: true
+
+applicationAssignmentPolicy: "emufog.placement.DefaultApplicationAssignment"
+devicePlacement: "emufog.placement.DefaultDevicePlacement"
+edgeIdentifier: "emufog.placement.DefaultEdgeIdentifier"
+fogPlacement: "emufog.placement.DefaultFogLayout"
+exporter: "emufog.export.ContainernetExporter"
+reader: "emufog.reader.BriteReader"
+
+###################################################################
+#                         Basic Settings                          #
+###################################################################
+baseAddress: "10.0.0.0"
+maxFogNodes: 1
+costThreshold: 2
+delayBoundary: 20
+
+# Settings for Parallel building:
+threadCount: 1
+parallelFogBuilding: false
+
+###################################################################
+#                         DeviceNodeTypes                         #
+###################################################################
+deviceNodeTypes:
+
+    - name: deviceNode1
+      scalingFactor: 1
+      averageDeviceCount: 1
+      cpuShare: 1
+      nodeLatency: 10
+      nodeBandwidth: 5
+
+###################################################################
+#                         FogNodeTypes                            #
+###################################################################
+fogNodeTypes:
+
+  - name: fogNodeType1
+    id: 1
+    maximumConnections: 100
+    costs: 1
+    cpuShare: 1
+    nodeLatency: 0
+    nodeBandwidth: 100
+
+###################################################################
+#                         Applications                            #
+###################################################################
+fogApplications:
+
+  - name: cassandra
+    container:
+      image: cassandracontainernet:latest
+      publishAllPorts: true
+      environment:
+        - "'CASSANDRA_CLUSTER_NAME=dev_cluster'"
+        - "'IP=10.0.0.1'"
+        - "'CQLSH_HOST=10.0.0.1'"
+
+deviceApplications:
+
+  - name: ycsb
+    container:
+      image: webdizz/ycsb
