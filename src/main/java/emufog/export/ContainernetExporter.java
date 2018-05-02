@@ -119,7 +119,7 @@ public class ContainernetExporter implements ITopologyExporter{
     private void setupContainernetImports(String logLevel){
         lines.add("#!/usr/bin/python");
         lines.add("from mininet.net import Containernet");
-        lines.add("from mininet.node import Controller");
+        lines.add("from mininet.node import RemoteController");
         lines.add("from mininet.cli import CLI");
         lines.add("from mininet.link import TCLink");
         lines.add("from mininet.log import info, setLogLevel");
@@ -129,7 +129,7 @@ public class ContainernetExporter implements ITopologyExporter{
 
     private void setupContainernetExperiment(){
         addBlankLine();
-        lines.add("net = Containernet(controller=Controller)");
+        lines.add("net = Containernet(controller=RemoteController)");
         lines.add("info('*** Adding controller\\n')");
         lines.add("net.addController('c0')");
     }
@@ -285,7 +285,6 @@ public class ContainernetExporter implements ITopologyExporter{
                 + ", ports= " + container.getPorts()
                 + ", port_bindings=" + container.getPortBindings()
                 + ", labels=" + container.getLabels()
-                + ", exec_run=" + container
                 + ")");
 
     }
