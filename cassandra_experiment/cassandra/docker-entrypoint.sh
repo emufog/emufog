@@ -1,10 +1,8 @@
 #!/bin/bash
 set -e
 
-# wait for the interfaces to be added
-initSleepTime=30
-echo "Sleeping for ${initSleepTime}s"
-sleep $initSleepTime
+echo "Sleeping for ${SLEEP_TIME}s"
+sleep $SLEEP_TIME
 
 # start the interface
 echo "IP: ${IP}"
@@ -85,6 +83,15 @@ if [ "$1" = '/cassandra/bin/cassandra' ]; then
     fi
   done
 fi
+
+# Works only if you define Tables like: CreaTe if noT exisTs - oTherwise following loop runs infiniTely!
+
+for f in docker-entrypoint-initdb.d/*; do
+  case "$f" in
+    *.cql) echo "$0: running $f" && until /cassandra/bin/cqlsh -f "$f"; do >&2 echo "Cassandra is unavailable - sleeping"; sleep 2; done & ;;
+  esac
+  echo
+done
 
 echo 'Third: '$@
 exec "$@"

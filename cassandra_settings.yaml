@@ -58,11 +58,14 @@ fogApplications:
   - name: cassandra
     container:
       image: cassandracontainernet:latest
+      volumes:
+        - "'/home/renderfehler/IdeaProjects/emufog/cassandra_experiment/cassandra/db-schema.cql:/docker-entrypoint-initdb.d/db-schema.cql'"
       publishAllPorts: true
       environment:
         - "'CASSANDRA_CLUSTER_NAME=dev_cluster'"
         - "'IP=10.0.0.1'"
         - "'CQLSH_HOST=10.0.0.1'"
+        - "'SLEEP_TIME=15'"
 
 deviceApplications:
 
