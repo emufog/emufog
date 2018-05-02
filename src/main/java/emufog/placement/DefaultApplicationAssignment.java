@@ -79,7 +79,6 @@ public class DefaultApplicationAssignment implements IApplicationAssignmentPolic
             for (Application application : fogApplications) {
                 if (application.getName().equals("cassandra")) {
                     Application cassandra = new Application(application, new Docker(application.getContainer()));
-                    cassandra.getContainer().addCommand(command);
                     fogNode.getConfiguration().addApplication(cassandra);
                 }
             }
@@ -134,9 +133,9 @@ public class DefaultApplicationAssignment implements IApplicationAssignmentPolic
 
         StringBuilder CASSANDRA_SEEDS = new StringBuilder();
 
-        CASSANDRA_SEEDS.append("\"CASSANDRA_SEEDS=\'");
+        CASSANDRA_SEEDS.append("\"CASSANDRA_SEEDS=");
 
-        CASSANDRA_SEEDS.append(collectAddresses().get(0) + "\'\"");
+        CASSANDRA_SEEDS.append(collectAddresses().get(0) + "\"");
 
         Logger.getInstance().log(CASSANDRA_SEEDS.toString());
 
