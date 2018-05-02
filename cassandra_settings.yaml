@@ -33,6 +33,7 @@ deviceNodeTypes:
     - name: deviceNode1
       scalingFactor: 1
       averageDeviceCount: 1
+      memoryLimit: "'512mb'"
       cpuShare: 1
       nodeLatency: 10
       nodeBandwidth: 5
@@ -45,6 +46,7 @@ fogNodeTypes:
   - name: fogNodeType1
     id: 1
     maximumConnections: 100
+    memoryLimit: "'4gb'"
     costs: 1
     cpuShare: 1
     nodeLatency: 0
