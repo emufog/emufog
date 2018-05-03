@@ -55,7 +55,10 @@ public class Docker extends Container{
     private List<String> commands = new ArrayList<>();
 
     public Docker(){
+    }
 
+    public List<String> getEnvironment() {
+        return environment;
     }
 
     public Docker(Docker docker) {
@@ -65,8 +68,7 @@ public class Docker extends Container{
         this.cpuPeriod = docker.getCpuPeriod();
         this.cpuSet = docker.getCpuSet();
         this.containerName = docker.getContainerName();
-        this.entrypoint = docker.getEntrypoint();
-        this.environment = docker.environment;
+        this.environment = new ArrayList<>(docker.getEnvironment());
         this.image = docker.getImage();
         this.imageVersion = docker.getImageVersion();
         this.labels = docker.labels;
@@ -130,12 +132,13 @@ public class Docker extends Container{
         this.entrypoint = entrypoint;
     }
 
+
     /**
      * Return formatted environment string. The docker-py api is able to consume either dicts or lists.
      * Implemented is list formatting.
      * @return environment string in the format ['SOMEVARIABLE=xxx'].
      */
-    public String getEnvironment() {
+    public String getEnvironmentString() {
 
         StringBuilder environmentString = new StringBuilder();
         environmentString.append("[");

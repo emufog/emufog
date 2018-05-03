@@ -281,7 +281,7 @@ public class ContainernetExporter implements ITopologyExporter{
                 +"', dimage=\"" + container.getImage()
                 + "\", mem_limit=" + memoryLimit
                 + ", volumes=" + container.getVolumes()
-                + ", environment=" + container.getEnvironment()
+                + ", environment=" + container.getEnvironmentString()
                 + ", publish_all_ports=" + container.isPublishAllPorts()
                 + ", ports= " + container.getPorts()
                 + ", port_bindings=" + container.getPortBindings()

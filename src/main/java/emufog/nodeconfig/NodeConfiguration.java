@@ -1,6 +1,7 @@
 package emufog.nodeconfig;
 
 import emufog.application.Application;
+import emufog.topology.Node;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -13,6 +14,10 @@ public abstract class NodeConfiguration {
     private List<Application> applications = new LinkedList<>();
 
     public NodeConfiguration(){}
+
+    public NodeConfiguration(NodeConfiguration configuration){
+        this.applications = configuration.getApplications();
+    }
 
     public void setApplications(List<Application> applications) {
 
