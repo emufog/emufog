@@ -1,7 +1,7 @@
 version: "2.1"
 services:
   emufog:
-    image: emufog:1.1
+    image: emufog:latest
     container_name: emufog
     volumes:
       - /emufog/emufogDocker/settings.yaml:/usr/app/emufog/settings.yaml:rw

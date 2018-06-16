@@ -7,20 +7,20 @@ package emufog.nodeconfig;
  */
 abstract class NodeType {
 
-    private int memoryLimit;
+    private String memoryLimit;
     private int cpuShare;
 
     private float nodeLatency;
     private float nodeBandwidth;
 
-    NodeType(int memoryLimit, int cpuShare, float nodeLatency, float nodeBandwidth) {
+    NodeType(String memoryLimit, int cpuShare, float nodeLatency, float nodeBandwidth) {
         this.memoryLimit = memoryLimit;
         this.cpuShare = cpuShare;
         this.nodeLatency = nodeLatency;
         this.nodeBandwidth = nodeBandwidth;
     }
 
-    public int getMemoryLimit() {
+    public String getMemoryLimit() {
         return memoryLimit;
     }
 
@@ -28,7 +28,7 @@ abstract class NodeType {
         return cpuShare;
     }
 
-    public void setMemoryLimit(int memoryLimit) {
+    public void setMemoryLimit(String memoryLimit) {
         this.memoryLimit = memoryLimit;
     }
 

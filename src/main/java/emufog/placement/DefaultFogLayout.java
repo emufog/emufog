@@ -34,7 +34,7 @@ public class DefaultFogLayout implements IFogLayout {
 
     private float threshold = getSettings().getCostThreshold();
 
-    float delayBoundary = getSettings().getDelayBoundary();
+    private float delayBoundary = getSettings().getDelayBoundary();
 
     @Override
     public void identifyFogNodes(MutableNetwork topology) {
@@ -125,7 +125,8 @@ public class DefaultFogLayout implements IFogLayout {
     }
 
     /**
-     * Iterate over given list of edge Routers and find all suitable backbone routers.
+     * Iterate over given list of edge Routers and find all suitable backbone routers using dijkstra to find shortest
+     * paths.
      */
     private void determineCandidateRouters() {
 
@@ -134,7 +135,10 @@ public class DefaultFogLayout implements IFogLayout {
             //start Dijkstra for current edgeRouter
             calculateShortestPathFromEdgeRouter(edgeRouter);
 
-            //filter result
+            /*
+            Iterate over all backbone router in given topology and filter according to defined delay and hop
+            threshold.
+             */
             for (Iterator<Node> it = getTopology().nodes().stream().filter(n -> n instanceof Router && ((Router) n).getType().equals(BACKBONE_ROUTER)).iterator(); it.hasNext(); ) {
                 Router backboneRouter = (Router) it.next();
 
@@ -257,7 +261,7 @@ public class DefaultFogLayout implements IFogLayout {
     }
 
     /**
-     * Finde one suitable fog node type and adapt covered devices count in topology.
+     * Find one suitable fog node type and adapt covered devices count in topology.
      *
      * @param connectionPoint
      * @return
@@ -299,7 +303,7 @@ public class DefaultFogLayout implements IFogLayout {
     }
 
     /**
-     * Sum of uncoverered devices connected to a set of given routers.
+     * Sum of uncovered devices connected to a set of given routers.
      *
      * @param routers
      * @return

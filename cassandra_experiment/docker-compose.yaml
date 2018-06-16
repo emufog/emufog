@@ -1,0 +1,15 @@
+version: '2.1'
+services:
+  cassandra:
+    container_name: cassandra
+    image: cassandracontainernet
+    environment:
+      - CASSANDRA_CLUSTER_NAME=dev_cluster
+      - CASSANDRA_RPC_ADDRESS=10.0.0.1
+      - CASSANDRA_START_RPC=true
+      - CASSANDRA_LISTEN_ADDRESS=10.0.0.1
+  ycsb:
+    container_name: ycsb
+    image: webdizz/ycsb
+    volumes:
+      - /home/renderfehler/IdeaProjects/emufog/cassandra_experiment/ycsb/results:/home/results:rw

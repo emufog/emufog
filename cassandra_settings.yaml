@@ -1,0 +1,75 @@
+###################################################################
+#                  Input/Output Settings                          #
+###################################################################
+inputGraphFilePath: "10_1.brite"
+exportFilePath: "cassandra_10_1.py"
+
+overWriteOutputFile: true
+
+applicationAssignmentPolicy: "emufog.placement.CassandraAssignment"
+devicePlacement: "emufog.placement.DefaultDevicePlacement"
+edgeIdentifier: "emufog.placement.DefaultEdgeIdentifier"
+fogPlacement: "emufog.placement.DefaultFogLayout"
+exporter: "emufog.export.ContainernetExporter"
+reader: "emufog.reader.BriteReader"
+
+###################################################################
+#                         Basic Settings                          #
+###################################################################
+baseAddress: "10.0.0.0"
+maxFogNodes: 5
+costThreshold: 1
+delayBoundary: 20
+
+# Settings for Parallel building:
+threadCount: 1
+parallelFogBuilding: false
+
+###################################################################
+#                         DeviceNodeTypes                         #
+###################################################################
+deviceNodeTypes:
+
+    - name: deviceNode1
+      scalingFactor: 1
+      averageDeviceCount: 1
+      memoryLimit: "'512mb'"
+      cpuShare: 1
+      nodeLatency: 10
+      nodeBandwidth: 5
+
+###################################################################
+#                         FogNodeTypes                            #
+###################################################################
+fogNodeTypes:
+
+  - name: fogNodeType1
+    id: 1
+    maximumConnections: 20
+    memoryLimit: "'8gb'"
+    costs: 1
+    cpuShare: 1
+    nodeLatency: 10
+    nodeBandwidth: 100
+
+###################################################################
+#                         Applications                            #
+###################################################################
+fogApplications:
+
+  - name: cassandra
+    container:
+      image: emufog/cassandra
+      volumes:
+        - "'/home/renderfehler/IdeaProjects/emufog/cassandra_experiment/cassandra/db-schema.cql:/docker-entrypoint-initdb.d/db-schema.cql'"
+      publishAllPorts: true
+      environment:
+        - "'CASSANDRA_CLUSTER_NAME=dev_cluster'"
+
+deviceApplications:
+
+  - name: ycsb
+    container:
+      image: emufog/ycsb
+      volumes:
+        - "'/home/renderfehler/demoResults:/home/results'"

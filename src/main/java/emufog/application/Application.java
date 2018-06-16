@@ -15,6 +15,15 @@ public class Application {
 
     Docker container = new Docker();
 
+
+    public Application(){
+    }
+
+    public Application(Application application, Docker container){
+        this.name = application.name;
+        this.container = container;
+    }
+
     /**
      * Set corresponding application image.
      * @param img imagename as String
