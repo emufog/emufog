@@ -1,8 +1,8 @@
-create keyspace ycsb
+CREATE KEYSPACE IF NOT EXISTS ycsb
 WITH REPLICATION = {'class' : 'SimpleStrategy',
 'replication_factor': 1 };
 USE ycsb;
-create table usertable (
+CREATE TABLE IF NOT EXISTS usertable (
 y_id varchar primary key,
 field0 varchar,
 field1 varchar,

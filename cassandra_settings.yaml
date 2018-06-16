@@ -2,11 +2,11 @@
 #                  Input/Output Settings                          #
 ###################################################################
 inputGraphFilePath: "10_1.brite"
-exportFilePath: "cassandra_out.py"
+exportFilePath: "cassandra_10_1.py"
 
 overWriteOutputFile: true
 
-applicationAssignmentPolicy: "emufog.placement.DefaultApplicationAssignment"
+applicationAssignmentPolicy: "emufog.placement.CassandraAssignment"
 devicePlacement: "emufog.placement.DefaultDevicePlacement"
 edgeIdentifier: "emufog.placement.DefaultEdgeIdentifier"
 fogPlacement: "emufog.placement.DefaultFogLayout"
@@ -17,8 +17,8 @@ reader: "emufog.reader.BriteReader"
 #                         Basic Settings                          #
 ###################################################################
 baseAddress: "10.0.0.0"
-maxFogNodes: 1
-costThreshold: 2
+maxFogNodes: 5
+costThreshold: 1
 delayBoundary: 20
 
 # Settings for Parallel building:
@@ -45,11 +45,11 @@ fogNodeTypes:
 
   - name: fogNodeType1
     id: 1
-    maximumConnections: 100
-    memoryLimit: "'4gb'"
+    maximumConnections: 20
+    memoryLimit: "'8gb'"
     costs: 1
     cpuShare: 1
-    nodeLatency: 0
+    nodeLatency: 10
     nodeBandwidth: 100
 
 ###################################################################
@@ -59,18 +59,17 @@ fogApplications:
 
   - name: cassandra
     container:
-      image: cassandracontainernet:latest
+      image: emufog/cassandra
       volumes:
         - "'/home/renderfehler/IdeaProjects/emufog/cassandra_experiment/cassandra/db-schema.cql:/docker-entrypoint-initdb.d/db-schema.cql'"
       publishAllPorts: true
       environment:
         - "'CASSANDRA_CLUSTER_NAME=dev_cluster'"
-        - "'IP=10.0.0.1'"
-        - "'CQLSH_HOST=10.0.0.1'"
-        - "'SLEEP_TIME=15'"
 
 deviceApplications:
 
   - name: ycsb
     container:
-      image: webdizz/ycsb
+      image: emufog/ycsb
+      volumes:
+        - "'/home/renderfehler/demoResults:/home/results'"

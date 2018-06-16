@@ -134,13 +134,13 @@ public class CassandraAssignment implements IApplicationAssignmentPolicy{
     private void addHosts(){
         StringBuilder HOSTS = new StringBuilder();
 
-        HOSTS.append("\"HOSTS=");
+        HOSTS.append("\"HOSTS=\\\"");
 
         for(int i=0; i < collectAddresses().size(); i++){
             if(i == collectAddresses().size() - 1 && i != 0){
-                HOSTS.append("'" + collectAddresses().get(i) + "'\"");
+                HOSTS.append(collectAddresses().get(i) + "\\\"\"");
             }else {
-                HOSTS.append("'" + collectAddresses().get(i) + "',");
+                HOSTS.append(collectAddresses().get(i) + " ");
             }
 
         }
@@ -169,9 +169,9 @@ public class CassandraAssignment implements IApplicationAssignmentPolicy{
             StringBuilder CQLSH_HOST = new StringBuilder().append("\"CQLSH_HOST=");
             StringBuilder SLEEP_TIME = new StringBuilder().append("\"SLEEP_TIME=");
 
-            int timer = 30;
+            int timer = 0;
 
-            timer = timer * i;
+            timer = timer + (i * 60);
 
             for(Application application : fogNodeList.get(i).getConfiguration().getApplications()){
                 if(application.getName().equals("cassandra")){
