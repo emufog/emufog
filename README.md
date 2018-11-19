@@ -4,46 +4,55 @@
 
 ## Dependencies
 
-EmuFog is build using the [JDK 8+](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) to build and run.
-Make sure to have Java 8 installed on your device.
+EmuFog is build using Java 8.
+Get the JDK to compile from sources.
 
 ## Build EmuFog From Source
 
 The EmuFog project uses [Gradle](https://gradle.org/) to include dependencies and build binaries from the source code.
-In case you have Gradle version 3.4+ installed you can use the local installation otherwise the already included Gradle wrapper.
+This repository contains a Gradle wrapper file `gradlew` for Linux and macOS and a `gradlew.bat` for Windows.
+Local installations of Gradle can be used too.
 
 To build EmuFog simply clone the git repository
-
-    git clone https://github.com/emufog/emufog.git
+```bash
+git clone https://github.com/emufog/emufog.git
+```
     
 change the directory to the newly added emufog directory
-
-    cd emufog/
-
-### Build EmuFog With Gradle
-
-With an installed version of Gradle simply call:
-
-    gradle build
+```bash
+cd emufog/
+```
     
-### Build EmuFog Without Gradle
+Run the Gradle build task to compile the sources.
+```bash
+chmod +x gradlew && ./gradlew build
+```
 
-For Linux and macOS call:
-    
-    ./gradlew build
-    
-For Microsoft Windows call: 
+The compiled binaries can be found in `build/libs`.
+Those include a regular compiled version and a `-fat` jar.
 
-    gradlew build
+````bash
+libs/
+├── emufog-<version>-fat.jar
+└── emufog-<version>.jar
+````
 
 ## Running EmuFog
 
-Issue command `gradle installApp` which packages the application into a binary with all libraries.
+EmuFog can be started using Gradle
 
-Packaged binary is found in `build/install/emufog/bin`. Execute it with the command line arguments to main ().
+````bash
+gradlew run
+````
+
+or by running a precompiled jar file e.g.
+````bash
+java -jar build/libs/emufog-<version>-fat.jar
+````
+
+
 The [wiki](https://github.com/emufog/emufog/wiki) explains how to use EmuFog in more detail.
 
-## EmuFog Uses Open Source Software
+## License
 
-* [jCommander](http://jcommander.org/)
-* [gson](https://github.com/google/gson)
+Licensed under the [MIT](LICENSE) license.
