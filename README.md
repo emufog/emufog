@@ -11,7 +11,8 @@ Applications for clients and fog nodes can be anything shipped in a Docker conta
 
 ## Build EmuFog From Source
 
-The EmuFog project uses [Gradle](https://gradle.org/) to include dependencies and build binaries from the source code.
+EmuFog is build using Java 8.
+It uses [Gradle](https://gradle.org/) to include dependencies and build binaries from the source code.
 This repository contains a Gradle wrapper file `gradlew` for Linux and macOS and a `gradlew.bat` for Windows.
 Local installations of Gradle can be used too.
 
@@ -44,7 +45,7 @@ libs/
 EmuFog can be started using Gradle
 
 ````bash
-gradlew run
+./gradlew run
 ````
 
 or by running a precompiled jar file e.g.
