@@ -28,7 +28,7 @@ cd emufog/
     
 Run the Gradle build task to compile the sources.
 ```bash
-chmod +x gradlew && ./gradlew build
+./gradlew build
 ```
 
 The compiled binaries can be found in `build/libs`.
