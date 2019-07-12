@@ -33,7 +33,11 @@ import emufog.settings.Settings;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,9 +53,6 @@ public class MaxiNetExporter implements IGraphExporter {
     /* list of all lines of the respective file in top down order */
     private final List<String> lines;
 
-    /* blank line object to reuse for all blank lines */
-    private final String blankLine;
-
     /* mapping of edges to their respective connector */
     private final Map<Edge, String> connectors;
 
@@ -60,7 +61,6 @@ public class MaxiNetExporter implements IGraphExporter {
      */
     public MaxiNetExporter() {
         lines = new ArrayList<>();
-        blankLine = "";
         connectors = new HashMap<>();
     }
 
@@ -111,7 +111,7 @@ public class MaxiNetExporter implements IGraphExporter {
      * Adds a blank line to the output file.
      */
     private void addBlankLine() {
-        lines.add(blankLine);
+        lines.add("");
     }
 
     /**
