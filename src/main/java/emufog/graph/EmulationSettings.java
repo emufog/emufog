@@ -23,7 +23,7 @@
  */
 package emufog.graph;
 
-import emufog.docker.DockerType;
+import emufog.container.ContainerType;
 
 /**
  * This class represents the settings to use emulating a node of the graph.
@@ -33,18 +33,18 @@ public class EmulationSettings {
     /* IP address to use */
     final String IP;
 
-    /* docker image containing the application to emulate */
-    final DockerType dockerType;
+    /* container image containing the application to emulate */
+    final ContainerType containerType;
 
     /**
-     * Creates a new instance of the emulation settings object using the given IP and docker image.
+     * Creates a new instance of the emulation settings object using the given IP and container image.
      *
      * @param IP         IP address to use
-     * @param dockerType docker image to use
+     * @param containerType container image to use
      */
-    EmulationSettings(String IP, DockerType dockerType) {
+    EmulationSettings(String IP, ContainerType containerType) {
         this.IP = IP;
-        this.dockerType = dockerType;
+        this.containerType = containerType;
     }
 
     /**
@@ -57,11 +57,11 @@ public class EmulationSettings {
     }
 
     /**
-     * Returns the docker image to emulate.
+     * Returns the container image to emulate.
      *
-     * @return docker image
+     * @return container image
      */
-    public DockerType getDockerType() {
-        return dockerType;
+    public ContainerType getContainerType() {
+        return containerType;
     }
 }

@@ -23,17 +23,17 @@
  */
 package emufog.graph;
 
-import emufog.docker.DeviceType;
+import emufog.container.DeviceType;
 
 /**
- * This class represents a host device. Each host device has a docker image
+ * This class represents a host device. Each host device has a container image
  * associated to run the application specific code.
  */
 public class HostDevice extends Node {
 
     /**
      * Creates a new host device.
-     * The host device must have an docker image and IP address assigned.
+     * The host device must have an container image and IP address assigned.
      *
      * @param id                unique identifier
      * @param as                autonomous system the belongs to
@@ -51,12 +51,12 @@ public class HostDevice extends Node {
     }
 
     /**
-     * Returns the docker type for this host device. The type is always a device type instance.
+     * Returns the container type for this host device. The type is always a device type instance.
      *
-     * @return device docker type
+     * @return device container type
      */
     DeviceType getDockerType() {
-        return (DeviceType) emulationSettings.dockerType;
+        return (DeviceType) emulationSettings.containerType;
     }
 
     @Override

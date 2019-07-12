@@ -79,12 +79,13 @@ public class SettingsReader {
         float HostDeviceBandwidth;
         int ThreadCount;
         boolean ParalleledFogBuilding;
+        boolean timeMeasuring;
         Collection<DeviceType> DeviceNodeTypes;
         Collection<FogType> FogNodeTypes;
     }
 
     /**
-     * Abstract docker type class for host devices and fog nodes.
+     * Abstract container type class for host devices and fog nodes.
      */
     abstract class DockerType {
         DockerName DockerImage;
@@ -93,7 +94,7 @@ public class SettingsReader {
     }
 
     /**
-     * Docker type for host devices extending the abstract docker type with scaling
+     * Docker type for host devices extending the abstract container type with scaling
      * factor and the device count.
      */
     class DeviceType extends DockerType {

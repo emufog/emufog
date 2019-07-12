@@ -23,7 +23,7 @@
  */
 package emufog.fog;
 
-import emufog.docker.FogType;
+import emufog.container.FogType;
 import emufog.graph.Node;
 
 import java.util.*;

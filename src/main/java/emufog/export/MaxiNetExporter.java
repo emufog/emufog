@@ -23,7 +23,7 @@
  */
 package emufog.export;
 
-import emufog.docker.DockerType;
+import emufog.container.ContainerType;
 import emufog.graph.Edge;
 import emufog.graph.EmulationSettings;
 import emufog.graph.Graph;
@@ -115,7 +115,7 @@ public class MaxiNetExporter implements IGraphExporter {
     }
 
     /**
-     * Writes all docker host nodes of the graph to the output file.
+     * Writes all container host nodes of the graph to the output file.
      *
      * @param graph graph to export
      */
@@ -125,14 +125,14 @@ public class MaxiNetExporter implements IGraphExporter {
 
         for (Node n : graph.getNodes().stream().filter(Node::hasEmulationSettings).collect(Collectors.toList())) {
             EmulationSettings emu = n.getEmulationNode();
-            DockerType docker = emu.getDockerType();
+            ContainerType docker = emu.getContainerType();
             lines.add(n.getName() + " = topo.addHost(\"" + n.getName() + "\", cls=Docker, ip=\"" + emu.getIP() +
-                    "\", dimage=\"" + docker.dockerImage + "\", mem_limit=" + docker.memoryLimit + ")");
+                    "\", dimage=\"" + docker.name + "\", mem_limit=" + docker.memoryLimit + ")");
         }
     }
 
     /**
-     * Writes all switches that do not require docker to the output file.
+     * Writes all switches that do not require container to the output file.
      *
      * @param graph graph to export
      */

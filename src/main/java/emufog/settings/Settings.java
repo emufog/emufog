@@ -23,8 +23,8 @@
  */
 package emufog.settings;
 
-import emufog.docker.DeviceType;
-import emufog.docker.FogType;
+import emufog.container.DeviceType;
+import emufog.container.FogType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,6 +67,8 @@ public class Settings {
     /* indicator whether the fog graph should be build in parallel */
     public final boolean fogGraphParallel;
 
+    public final boolean timeMeasuring;
+
     /**
      * Creates a new instance of the Settings class using the JSON object.
      *
@@ -81,6 +83,7 @@ public class Settings {
         edgeDeviceBandwidth = json.HostDeviceBandwidth;
         threadCount = json.ThreadCount;
         fogGraphParallel = json.ParalleledFogBuilding;
+        timeMeasuring = json.timeMeasuring;
 
         Map<Integer, FogType> fogTypes = new HashMap<>();
         for (SettingsReader.FogType fogType : json.FogNodeTypes) {
