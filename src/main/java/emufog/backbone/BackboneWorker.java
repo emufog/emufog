@@ -23,17 +23,31 @@
  */
 package emufog.backbone;
 
-import emufog.graph.*;
-import emufog.util.Logger;
-import emufog.util.LoggerLevel;
+import emufog.graph.AS;
+import emufog.graph.Edge;
+import emufog.graph.Node;
+import emufog.graph.Router;
+import emufog.graph.Switch;
+import emufog.graph.SwitchConverter;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import static emufog.util.ConversionsUtils.intervalToString;
 
 /**
  * This worker class operates on a single AS of the graph so it can used in parallel.
  * Executes the 2nd and 3rd step of the classification algorithm.
  */
 class BackboneWorker implements Runnable {
+
+    private static final Logger LOG = LoggerFactory.getLogger(BackboneWorker.class);
 
     /* percentage of the average degree to compare to */
     private static final float BACKBONE_DEGREE_PERCENTAGE = 0.6f;
@@ -57,23 +71,21 @@ class BackboneWorker implements Runnable {
 
     @Override
     public void run() {
-        Logger logger = Logger.getInstance();
-
         //2nd step
         long start = System.nanoTime();
         convertHighDegrees();
         long end = System.nanoTime();
-        logger.log(as + " Step 2 - Time: " + Logger.convertToMs(start, end), LoggerLevel.ADVANCED);
-        logger.log("Backbone Size: " + as.getSwitches().size(), LoggerLevel.ADVANCED);
-        logger.log("Edge Size: " + as.getRouters().size(), LoggerLevel.ADVANCED);
+        LOG.info(as + " Step 2 - Time: " + intervalToString(start, end));
+        LOG.info("Backbone Size: " + as.getSwitches().size());
+        LOG.info("Edge Size: " + as.getRouters().size());
 
         // 3rd step
         start = System.nanoTime();
         buildSingleBackbone();
         end = System.nanoTime();
-        logger.log(as + " Step 3 - Time: " + Logger.convertToMs(start, end), LoggerLevel.ADVANCED);
-        logger.log("Backbone Size: " + as.getSwitches().size(), LoggerLevel.ADVANCED);
-        logger.log("Edge Size: " + as.getRouters().size(), LoggerLevel.ADVANCED);
+        LOG.info(as + " Step 3 - Time: " + intervalToString(start, end));
+        LOG.info("Backbone Size: " + as.getSwitches().size());
+        LOG.info("Edge Size: " + as.getRouters().size());
     }
 
     /**
@@ -137,7 +149,8 @@ class BackboneWorker implements Runnable {
                             if (current instanceof Switch && predecessors.get(neighbor) instanceof Router) {
                                 predecessors.put(neighbor, current);
                             }
-                        } else {
+                        }
+                        else {
                             // push a new node to the queue
                             predecessors.put(neighbor, current);
                             queue.add(neighbor);

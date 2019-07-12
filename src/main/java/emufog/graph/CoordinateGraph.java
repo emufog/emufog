@@ -23,18 +23,21 @@
  */
 package emufog.graph;
 
-import emufog.docker.DeviceType;
+import emufog.container.DeviceType;
 import emufog.settings.Settings;
-import emufog.util.LoggerLevel;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The graph represents the topology of the network. The coordinate graph provides the option to associate
  * the nodes with coordinates to calculate the latency based on them.
  */
 public class CoordinateGraph extends Graph {
+
+    private static final Logger LOG = LoggerFactory.getLogger(CoordinateGraph.class);
 
     /* mapping of node IDs to their respective coordinates */
     private final Map<Integer, NodeCoordinates> coordinates;
@@ -91,12 +94,11 @@ public class CoordinateGraph extends Graph {
      * @param as    autonomous system the device belongs to
      * @param xPos  x coordinate
      * @param yPos  y coordinate
-     * @param image docker image to use for the host device
+     * @param image container image to use for the host device
      * @return the newly created host device
      * @throws IllegalArgumentException if the id already in use or the image object is null
      */
-    public HostDevice createHostDevice(int id, int as, float xPos, float yPos, DeviceType image)
-            throws IllegalArgumentException {
+    public HostDevice createHostDevice(int id, int as, float xPos, float yPos, DeviceType image) throws IllegalArgumentException {
         coordinates.put(id, new NodeCoordinates(xPos, yPos));
 
         return createHostDevice(id, as, image);
@@ -115,8 +117,8 @@ public class CoordinateGraph extends Graph {
      * @throws IllegalArgumentException if any of the objects is null or the nodes are not
      *                                  associated with coordinates
      */
-    public Edge createEdge(int id, Node from, Node to, ILatencyCalculator latencyEstimator,
-                           float bandwidth) throws IllegalArgumentException {
+    public Edge createEdge(
+        int id, Node from, Node to, ILatencyCalculator latencyEstimator, float bandwidth) throws IllegalArgumentException {
         if (from == null || to == null) {
             throw new IllegalArgumentException("The source and destination nodes cannot be null.");
         }
@@ -126,12 +128,12 @@ public class CoordinateGraph extends Graph {
 
         NodeCoordinates fromCoords = coordinates.get(from.getID());
         if (fromCoords == null) {
-            logger.log("The source " + from + " is not associated with coordinates.", LoggerLevel.WARNING);
+            LOG.warn("The source " + from + " is not associated with coordinates.");
             return null;
         }
         NodeCoordinates toCoords = coordinates.get(to.getID());
         if (toCoords == null) {
-            logger.log("The source " + to + " is not associated with coordinates.", LoggerLevel.WARNING);
+            LOG.warn("The source " + to + " is not associated with coordinates.");
             return null;
         }
 

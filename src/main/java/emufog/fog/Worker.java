@@ -23,14 +23,16 @@
  */
 package emufog.fog;
 
-import emufog.docker.FogType;
+import emufog.container.FogType;
 import emufog.graph.*;
-import emufog.util.Logger;
-import emufog.util.LoggerLevel;
 import emufog.util.Tuple;
 
 import java.util.*;
 import java.util.concurrent.Callable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static emufog.util.ConversionsUtils.intervalToString;
 
 /**
  * The worker class identifies fog nodes on the given AS. Therefore the worker uses a partly
@@ -38,14 +40,13 @@ import java.util.concurrent.Callable;
  */
 abstract class Worker implements Callable<FogResult> {
 
+    private static final Logger LOG = LoggerFactory.getLogger(Worker.class);
+
     /* AS associated for this worker */
     private final AS as;
 
     /* master classifier class synchronizing the remaining nodes to place */
     private final FogNodeClassifier classifier;
-
-    /* logger for advanced logging */
-    private final Logger logger;
 
     /* mapping of fog types to all nodes with this type */
     private final Map<FogType, List<FogNode>> fogPlacements;
@@ -59,7 +60,6 @@ abstract class Worker implements Callable<FogResult> {
     Worker(AS as, FogNodeClassifier classifier) {
         this.as = as;
         this.classifier = classifier;
-        logger = Logger.getInstance();
         fogPlacements = new HashMap<>();
     }
 
@@ -144,7 +144,8 @@ abstract class Worker implements Callable<FogResult> {
                                 // newly discovered node
                                 neighborNode.initPredecessor(edgeNode, current, nextCosts);
                                 queue.add(neighborNode);
-                            } else if (nextCosts < neighborCosts) {
+                            }
+                            else if (nextCosts < neighborCosts) {
                                 // update an already discovered node
                                 neighborNode.updatePredecessor(edgeNode, current, nextCosts);
                             }
@@ -155,8 +156,7 @@ abstract class Worker implements Callable<FogResult> {
         }
 
         long end = System.nanoTime();
-        logger.log("Time per router to build graph: " + Logger.convertToMs(start, end),
-                LoggerLevel.ADVANCED);
+        LOG.info("Time per router to build graph: " + intervalToString(start, end));
     }
 
     /**
@@ -201,7 +201,8 @@ abstract class Worker implements Callable<FogResult> {
 
             if (remainingTypes.isEmpty()) {
                 throw new Exception("TODO"); //TODO
-            } else {
+            }
+            else {
                 FogType next = possibleNextLevels.get(0);
                 possibleNextLevels.remove(0);
                 List<FogType> duplicates = new ArrayList<>();
@@ -257,15 +258,13 @@ abstract class Worker implements Callable<FogResult> {
             long start = System.nanoTime();
             FogGraph fogGraph = buildFogGraph(level);
             long end = System.nanoTime();
-            logger.log("Time to build fog graph for " + as + ": " + Logger.convertToMs(start, end),
-                    LoggerLevel.ADVANCED);
+            LOG.info("Time to build fog graph for " + as + ": " + intervalToString(start, end));
 
             while (classifier.fogNodesLeft() && fogGraph.hasEdgeNodes()) {
                 start = System.nanoTime();
                 FogNode next = fogGraph.getNext();
                 end = System.nanoTime();
-                logger.log("Time to find nextLevels fog node for " + as + ": " + Logger.convertToMs(start, end),
-                        LoggerLevel.ADVANCED);
+                LOG.info("Time to find nextLevels fog node for " + as + ": " + intervalToString(start, end));
 
                 // add the new fog node to the partial result
                 partResult.addFogNode(next);
@@ -279,7 +278,8 @@ abstract class Worker implements Callable<FogResult> {
             if (fogGraph.hasEdgeNodes() && !classifier.fogNodesLeft()) {
                 partResult.setSuccess(false);
                 partResult.clearFogNodes();
-            } else {
+            }
+            else {
                 partResult.setSuccess(true);
             }
 

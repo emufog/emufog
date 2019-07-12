@@ -23,18 +23,26 @@
  */
 package emufog.graph;
 
-import emufog.docker.DeviceType;
-import emufog.docker.FogType;
+import emufog.container.DeviceType;
+import emufog.container.FogType;
 import emufog.settings.Settings;
-import emufog.util.Logger;
-import emufog.util.LoggerLevel;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The graph represents the topology of the network.
  */
 public class Graph {
+
+    private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
 
     /* list of all edges in the graph */
     private final List<Edge> edges;
@@ -57,9 +65,6 @@ public class Graph {
     /* provider of unique edge IDs */
     private final UniqueIDProvider edgeIDprovider;
 
-    /* logger instance to log warnings */
-    protected final Logger logger;
-
     /**
      * Creates a new basic graph instance.
      * Uses the given settings for the classification algorithms.
@@ -79,7 +84,6 @@ public class Graph {
         IPprovider = new UniqueIPProvider(settings);
         nodeIDprovider = new UniqueIDProvider();
         edgeIDprovider = new UniqueIDProvider();
-        logger = Logger.getInstance();
     }
 
     /**
@@ -133,14 +137,14 @@ public class Graph {
      *
      * @param id    unique identifier
      * @param as    autonomous system the device belongs to
-     * @param image docker image to use for the host device
+     * @param image container image to use for the host device
      * @return the newly created host device
      * @throws IllegalArgumentException if the id already in use or the image object is null
      */
     public HostDevice createHostDevice(int id, int as, DeviceType image) throws IllegalArgumentException {
         checkNodeID(id);
         if (image == null) {
-            throw new IllegalArgumentException("The given docker image is not initialized.");
+            throw new IllegalArgumentException("The given container image is not initialized.");
         }
 
         EmulationSettings emulationSettings = new EmulationSettings(IPprovider.getNextIPV4Address(), image);
@@ -183,9 +187,9 @@ public class Graph {
         }
 
         if (edgeIDprovider.isUsed(id)) {
-            logger.log("The edge ID: " + id + " is already in use", LoggerLevel.WARNING);
+            LOG.warn("The edge ID: " + id + " is already in use");
             id = edgeIDprovider.getNextID();
-            logger.log("Assigning new edge ID: " + id, LoggerLevel.WARNING);
+            LOG.warn("Assigning new edge ID: " + id);
         }
 
         Edge edge = new Edge(id, from, to, delay, bandwidth);
@@ -223,8 +227,7 @@ public class Graph {
                 for (int i = 0; i < count; ++i) {
                     HostDevice device = createHostDevice(nodeIDprovider.getNextID(), r.as.id, type);
 
-                    createEdge(edgeIDprovider.getNextID(), r, device, settings.edgeDeviceDelay,
-                            settings.edgeDeviceBandwidth);
+                    createEdge(edgeIDprovider.getNextID(), r, device, settings.edgeDeviceDelay, settings.edgeDeviceBandwidth);
                 }
             }
         }

@@ -27,21 +27,24 @@ import emufog.graph.AS;
 import emufog.graph.Edge;
 import emufog.graph.Graph;
 import emufog.graph.SwitchConverter;
-import emufog.util.Logger;
-import emufog.util.LoggerLevel;
 import emufog.util.Tuple;
 
 import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import static emufog.util.ConversionsUtils.intervalToString;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 
 /**
  * This class runs the backbone classification algorithm on a graph instance.
  */
 public class BackboneClassifier {
+
+    private static final Logger LOG = LoggerFactory.getLogger(BackboneClassifier.class);
 
     /**
      * Starts the backbone classification algorithm on the given graph.
@@ -54,16 +57,14 @@ public class BackboneClassifier {
             throw new IllegalArgumentException("The graph object is not initialized.");
         }
 
-        Logger logger = Logger.getInstance();
-
         // 1st step sequentially
-        logger.log("Start Backbone Classification", LoggerLevel.ADVANCED);
+        LOG.debug("Start Backbone Classification");
         long start = System.nanoTime();
         markASEdgeNodes(graph);
         long stop = System.nanoTime();
-        logger.log("Graph Step 1 - Time: " + Logger.convertToMs(start, stop), LoggerLevel.ADVANCED);
-        logger.log("Backbone Size: " + graph.getSwitches().size(), LoggerLevel.ADVANCED);
-        logger.log("Edge Size: " + graph.getRouters().size(), LoggerLevel.ADVANCED);
+        LOG.debug("Graph Step 1 - Time: " + intervalToString(start, stop));
+        LOG.info("Backbone Size: " + graph.getSwitches().size());
+        LOG.info("Edge Size: " + graph.getRouters().size());
 
         // rest in parallel
         Collection<AS> ASs = graph.getSystems();
@@ -80,15 +81,15 @@ public class BackboneClassifier {
         for (Tuple<AS, Future<?>> t : workers) {
             try {
                 t.getValue().get();
-            } catch (InterruptedException | ExecutionException e) {
+            }
+            catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
-                logger.log("Backbone Thread for " + t.getKey() + " was interrupted.", LoggerLevel.ERROR);
-                logger.log("Error message: " + e.getMessage(), LoggerLevel.ERROR);
+                LOG.error("Backbone Thread for " + t.getKey() + " was interrupted.");
+                LOG.error("Error message: " + e.getMessage());
             }
         }
         pool.shutdownNow();
-        logger.log("Finished Backbone Classification.", LoggerLevel.ADVANCED);
-        logger.logSeparator(LoggerLevel.ADVANCED);
+        LOG.info("Finished Backbone Classification.");
 
         return graph;
     }

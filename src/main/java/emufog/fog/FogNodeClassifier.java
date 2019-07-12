@@ -23,12 +23,10 @@
  */
 package emufog.fog;
 
-import emufog.docker.FogType;
+import emufog.container.FogType;
 import emufog.graph.AS;
 import emufog.graph.Graph;
 import emufog.settings.Settings;
-import emufog.util.Logger;
-import emufog.util.LoggerLevel;
 import emufog.util.Tuple;
 
 import java.util.Collection;
@@ -38,11 +36,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This classifier identifies a list of possible fog node placements in the given graph.
  */
 public class FogNodeClassifier {
+
+    private static final Logger LOG = LoggerFactory.getLogger(FogNodeClassifier.class);
 
     /* list of all available types of fog nodes */
     final List<FogType> fogTypes;
@@ -83,8 +85,6 @@ public class FogNodeClassifier {
             throw new IllegalArgumentException("The graph object is not initialized.");
         }
 
-        Logger logger = Logger.getInstance();
-
         // init result object to
         FogResult result = new FogResult();
 
@@ -111,16 +111,19 @@ public class FogNodeClassifier {
 
                 if (partResult.getStatus()) {
                     result.addAll(partResult.getFogNodes());
-                } else {
+                }
+                else {
                     stop = true;
                 }
             }
-        } catch (InterruptedException | ExecutionException e) {
+        }
+        catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
-            logger.log("Fog Placement Thread for " + t.getKey() + " was interrupted.", LoggerLevel.ERROR);
-            logger.log("Error message: " + e.getMessage(), LoggerLevel.ERROR);
+            LOG.error("Fog Placement Thread for " + t.getKey() + " was interrupted.");
+            LOG.error("Error message: " + e.getMessage());
             stop = true;
-        } finally {
+        }
+        finally {
             pool.shutdownNow();
         }
 
@@ -128,7 +131,8 @@ public class FogNodeClassifier {
         if (stop) {
             result.setSuccess(false);
             result.clearFogNodes();
-        } else {
+        }
+        else {
             result.setSuccess(true);
         }
 
@@ -145,7 +149,8 @@ public class FogNodeClassifier {
     private Worker getWorker(AS as, Settings settings) {
         if (settings.fogGraphParallel) {
             return new ParallelFogWorker(as, this);
-        } else {
+        }
+        else {
             return new SequentialFogWorker(as, this);
         }
     }

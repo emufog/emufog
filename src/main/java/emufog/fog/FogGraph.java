@@ -23,22 +23,26 @@
  */
 package emufog.fog;
 
-import emufog.docker.FogType;
+import emufog.container.FogType;
 import emufog.graph.AS;
 import emufog.graph.Node;
 import emufog.graph.Router;
 import emufog.graph.Switch;
-import emufog.util.Logger;
-import emufog.util.LoggerLevel;
 import emufog.util.Tuple;
 
 import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static emufog.util.ConversionsUtils.intervalToString;
 
 /**
  * The graph represents a sub graph for the fog placement algorithm. It maps the nodes
  * of the underlying graph to the fog nodes.
  */
 class FogGraph {
+
+    private static final Logger LOG = LoggerFactory.getLogger(FogGraph.class);
 
     /* list of possible Docker types for fog nodes */
     final List<FogType> servers;
@@ -94,7 +98,8 @@ class FogGraph {
             EdgeNode edgeNode;
             if (t.getKey() instanceof Router && t.getValue() == null) {
                 edgeNode = new EdgeNode(this, (Router) t.getKey());
-            } else {
+            }
+            else {
                 edgeNode = new EdgeNode(this, t.getKey(), t.getValue());
             }
             nodeMapping.put(t.getKey(), edgeNode);
@@ -138,8 +143,7 @@ class FogGraph {
      * @return nextLevels node picked
      */
     FogNode getNext() {
-        Logger logger = Logger.getInstance();
-        logger.log("Remaining Edge Nodes to cover: " + edgeNodes.size());
+        LOG.info("Remaining Edge Nodes to cover: " + edgeNodes.size());
         long start = System.nanoTime();
         List<FogNode> fogNodes = new ArrayList<>(nodeMapping.values());
         assert !fogNodes.isEmpty() : "there are no more possible fog nodes available";
@@ -148,7 +152,7 @@ class FogGraph {
             n.findFogType();
         }
         long end = System.nanoTime();
-        logger.log("Find Types Time: " + Logger.convertToMs(start, end), LoggerLevel.ADVANCED);
+        LOG.info("Find Types Time: " + intervalToString(start, end));
 
         //TODO debug
         for (EdgeNode edgeNode : edgeNodes) {
@@ -160,7 +164,7 @@ class FogGraph {
         // sort the possible fog nodes with a FogComparator
         fogNodes.sort(comparator);
         end = System.nanoTime();
-        logger.log("Sort Time: " + Logger.convertToMs(start, end), LoggerLevel.ADVANCED);
+        LOG.info("Sort Time: " + intervalToString(start, end));
 
         // retrieve the nextLevels optimal node
         FogNode next = fogNodes.get(0);
@@ -193,12 +197,12 @@ class FogGraph {
         // remove all covered nodes from the edge nodes set
         edgeNodes.removeAll(coveredNodes);
         end = System.nanoTime();
-        logger.log("remove nodes Time: " + Logger.convertToMs(start, end), LoggerLevel.ADVANCED);
+        LOG.info("remove nodes Time: " + intervalToString(start, end));
 
         assert edgeNodes.size() <= nodeMapping.size() : "weniger edge nodes als gesamt";
 
         end = System.nanoTime();
-        logger.log("GetNext() Time: " + Logger.convertToMs(start, end), LoggerLevel.ADVANCED);
+        LOG.info("GetNext() Time: " + intervalToString(start, end));
 
         return next;
     }

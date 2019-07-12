@@ -28,8 +28,6 @@ import emufog.graph.Graph;
 import emufog.graph.ILatencyCalculator;
 import emufog.graph.Node;
 import emufog.settings.Settings;
-import emufog.util.Logger;
-import emufog.util.LoggerLevel;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -40,11 +38,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This reader can read in the CAIDA topology an build a graph based on that data.
  */
 public class CaidaFormatReader extends GraphReader {
+
+    private static final Logger LOG = LoggerFactory.getLogger(CaidaFormatReader.class);
 
     /* number of times AS field exceeds the Integer range */
     private int asOutOfRange;
@@ -147,19 +149,16 @@ public class CaidaFormatReader extends GraphReader {
      * Logs the errors and not matching IDs while reading.
      */
     private void logResults() {
-        Logger logger = Logger.getInstance();
-
         // additional logging for debugging
-        logger.log("ID out of Integer range: " + idOutOfRange, LoggerLevel.ADVANCED);
-        logger.log("AS out of Integer range: " + asOutOfRange, LoggerLevel.ADVANCED);
-        logger.log("Coordinates out of Float range: " + coordinatesOutOfRange, LoggerLevel.ADVANCED);
-        logger.log("Number of times no nodes were found to assign an AS: " + noNodeFoundForAS, LoggerLevel.ADVANCED);
-        logger.log("Number of times no nodes were found to build an edge: " + noNodeFoundForEdge, LoggerLevel.ADVANCED);
-        logger.log("Nodes read without an AS: " + nodeCoordinates.size(), LoggerLevel.ADVANCED);
-        logger.logSeparator();
-        logger.log("Number of node lines skipped: " + nodeLineSkipped, LoggerLevel.ADVANCED);
-        logger.log("Number of AS lines skipped: " + asLineSkipped, LoggerLevel.ADVANCED);
-        logger.log("Number of link lines skipped: " + linkLineSkipped, LoggerLevel.ADVANCED);
+        LOG.info("ID out of Integer range: " + idOutOfRange);
+        LOG.info("AS out of Integer range: " + asOutOfRange);
+        LOG.info("Coordinates out of Float range: " + coordinatesOutOfRange);
+        LOG.info("Number of times no nodes were found to assign an AS: " + noNodeFoundForAS);
+        LOG.info("Number of times no nodes were found to build an edge: " + noNodeFoundForEdge);
+        LOG.info("Nodes read without an AS: " + nodeCoordinates.size());
+        LOG.info("Number of node lines skipped: " + nodeLineSkipped);
+        LOG.info("Number of AS lines skipped: " + asLineSkipped);
+        LOG.info("Number of link lines skipped: " + linkLineSkipped);
     }
 
     /**
@@ -177,7 +176,8 @@ public class CaidaFormatReader extends GraphReader {
                 int id;
                 try {
                     id = Integer.parseInt(linkStr);
-                } catch (NumberFormatException e) {
+                }
+                catch (NumberFormatException e) {
                     idOutOfRange++;
                     return;
                 }
@@ -193,7 +193,8 @@ public class CaidaFormatReader extends GraphReader {
                     int sourceID;
                     try {
                         sourceID = Integer.parseInt(sourceStr);
-                    } catch (NumberFormatException e) {
+                    }
+                    catch (NumberFormatException e) {
                         idOutOfRange++;
                         return;
                     }
@@ -207,7 +208,8 @@ public class CaidaFormatReader extends GraphReader {
                     int destinationID;
                     try {
                         destinationID = Integer.parseInt(destinationStr);
-                    } catch (NumberFormatException e) {
+                    }
+                    catch (NumberFormatException e) {
                         idOutOfRange++;
                         return;
                     }
@@ -217,11 +219,13 @@ public class CaidaFormatReader extends GraphReader {
 
                     if (from != null && to != null) {
                         graph.createEdge(id, from, to, calculator, 1000);
-                    } else {
+                    }
+                    else {
                         noNodeFoundForEdge++;
                     }
                 }
-            } else {
+            }
+            else {
                 linkLineSkipped++;
             }
         }
@@ -242,14 +246,16 @@ public class CaidaFormatReader extends GraphReader {
                 int id;
                 try {
                     id = Integer.parseInt(nodeStr);
-                } catch (NumberFormatException e) {
+                }
+                catch (NumberFormatException e) {
                     idOutOfRange++;
                     return;
                 }
                 int as;
                 try {
                     as = Integer.parseInt(values[2]);
-                } catch (NumberFormatException e) {
+                }
+                catch (NumberFormatException e) {
                     asOutOfRange++;
                     return;
                 }
@@ -257,16 +263,19 @@ public class CaidaFormatReader extends GraphReader {
                 Coordinates coordinates = null;
                 try {
                     coordinates = nodeCoordinates.get(id);
-                } catch (IllegalArgumentException e) {
+                }
+                catch (IllegalArgumentException e) {
                     noNodeFoundForAS++;
                 }
                 if (coordinates == null) {
                     noNodeFoundForAS++;
-                } else {
+                }
+                else {
                     graph.createRouter(id, as, coordinates.xPos, coordinates.yPos);
                     nodeCoordinates.remove(id);
                 }
-            } else {
+            }
+            else {
                 asLineSkipped++;
             }
         }
@@ -286,7 +295,8 @@ public class CaidaFormatReader extends GraphReader {
                 int id;
                 try {
                     id = Integer.parseInt(nodeStr);
-                } catch (NumberFormatException e) {
+                }
+                catch (NumberFormatException e) {
                     idOutOfRange++;
                     return;
                 }
@@ -295,13 +305,15 @@ public class CaidaFormatReader extends GraphReader {
                 try {
                     xPos = Float.parseFloat(values[5]);
                     yPos = Float.parseFloat(values[6]);
-                } catch (NumberFormatException e) {
+                }
+                catch (NumberFormatException e) {
                     coordinatesOutOfRange++;
                     return;
                 }
 
                 nodeCoordinates.put(id, new Coordinates(xPos, yPos));
-            } else {
+            }
+            else {
                 nodeLineSkipped++;
             }
         }

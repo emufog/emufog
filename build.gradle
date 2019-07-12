@@ -11,8 +11,10 @@ repositories {
 }
 
 dependencies {
-    compile 'com.beust:jcommander:1.69'
-    compile 'com.google.code.gson:gson:2.8.1'
+    compile 'info.picocli:picocli:4.0.0-beta-2'
+    compile 'com.google.code.gson:gson:2.8.5'
+    compile 'org.slf4j:slf4j-api:1.7.26'
+    runtime 'ch.qos.logback:logback-classic:1.2.3'
 }
 
 version = '1.0'
