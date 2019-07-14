@@ -23,14 +23,19 @@
  */
 package emufog.settings;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Abstract container type class for host devices and fog nodes.
  */
 class ContainerTypeConfig {
 
+    @JsonProperty("container-image")
     ContainerNameConfig containerImage;
 
+    @JsonProperty("memory-limit")
     int memoryLimit;
 
+    @JsonProperty("cpu-share")
     float cpuShare;
 }

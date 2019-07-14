@@ -23,17 +23,23 @@
  */
 package emufog.settings;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Container type for fog nodes with their respective dependencies and properties for
  * the placement algorithm.
  */
 class FogTypeConfig extends ContainerTypeConfig {
 
+    @JsonProperty("id")
     int id;
 
+    @JsonProperty("maximum-connections")
     int maximumConnections;
 
+    @JsonProperty("costs")
     float costs;
 
+    @JsonProperty("dependencies")
     int[] dependencies;
 }

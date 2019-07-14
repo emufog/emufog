@@ -23,6 +23,7 @@
  */
 package emufog.settings;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Collection;
 
 /**
@@ -30,25 +31,36 @@ import java.util.Collection;
  */
 class SettingsConfig {
 
+    @JsonProperty("base-address")
     String baseAddress;
 
+    @JsonProperty("overwrite-experiment-file")
     boolean overWriteOutputFile;
 
+    @JsonProperty("max-fog-nodes")
     int maxFogNodes;
 
+    @JsonProperty("cost-threshold")
     float costThreshold;
 
+    @JsonProperty("host-device-latency")
     float hostDeviceLatency;
 
+    @JsonProperty("host-device-bandwidth")
     float hostDeviceBandwidth;
 
+    @JsonProperty("thread-count")
     int threadCount;
 
+    @JsonProperty("paralleled-fog-building")
     boolean paralleledFogBuilding;
 
+    @JsonProperty("time-measuring")
     boolean timeMeasuring;
 
+    @JsonProperty("device-node-types")
     Collection<DeviceTypeConfig> deviceNodeTypes;
 
+    @JsonProperty("fog-node-types")
     Collection<FogTypeConfig> fogNodeTypes;
 }

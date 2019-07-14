@@ -23,12 +23,16 @@
  */
 package emufog.settings;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Name of a container consisting of the name of the image and the version to use.
  */
 class ContainerNameConfig {
 
+    @JsonProperty("name")
     String name;
 
+    @JsonProperty("version")
     String version;
 }

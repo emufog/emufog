@@ -24,6 +24,7 @@
 package emufog.launcher;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import picocli.CommandLine.Option;
@@ -34,13 +35,13 @@ import picocli.CommandLine.Option;
 class Arguments {
 
     @Option(names = {"--settings", "-s"}, description = "settings file to use")
-    Path settingsPath;
+    Path settingsPath = Paths.get("src", "main", "resources", "application.yaml");
 
     @Option(names = {"--type", "-t"}, description = "input format to read in")
     String inputType;
 
     @Option(names = {"--output", "-o"}, description = "path to the output file")
-    String output;
+    Path output = Paths.get("output.py");
 
     @Option(names = {"--file", "-f"}, description = "files to read in")
     List<Path> files = new ArrayList<>();

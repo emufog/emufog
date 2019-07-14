@@ -1,32 +1,33 @@
-baseAddress: 10.0.0.0
+base-address: 10.0.0.0
 overwrite-experiment-file: true
-max-fog-modes: 100
-costThreshold: 6
-hostDeviceLatency: 0
-hostDeviceBandwidth: 1000
-threadCount: 1
-paralleledFogBuilding: false
-deviceNodeTypes:
-  - DockerImage:
-      Name: ubuntu
-      Version: latest
-    ScalingFactor: 1
-    AverageDeviceCount: 1
-    MemoryLimit: 524288000
-    CPUShare: 1
-dogNodeTypes:
-  - ID: 1
-    DockerImage:
-      Name: ubuntu
-      Version: trusty
-    MaximumConnections: 1
-    Costs: 1
-    MemoryLimit: 1048576000
-    CPUShare: 1
-  - ID: 2
-    DockerImage:
-      Name: debian
-    MaximumConnections: 5
-    Costs: 2.5
-    MemoryLimit: 1048576000
-    CPUShare: 1.5
+max-fog-nodes: 100
+cost-threshold: 6
+host-device-latency: 0
+host-device-bandwidth: 1000
+#thread-count: 1
+paralleled-fog-building: false
+time-measuring: false
+device-node-types:
+  - container-image:
+      name: ubuntu
+      version: latest
+    scaling-factor: 1
+    average-device-count: 1
+    memory-limit: 524288000
+    cpu-share: 1
+fog-node-types:
+  - id: 1
+    container-image:
+      name: ubuntu
+      version: trusty
+    maximum-connections: 1
+    costs: 1
+    memory-limit: 1048576000
+    cpu-share: 1
+  - id: 2
+    container-image:
+      name: debian
+    maximum-connections: 5
+    costs: 2.5
+    memory-limit: 1048576000
+    cpu-share: 1.5

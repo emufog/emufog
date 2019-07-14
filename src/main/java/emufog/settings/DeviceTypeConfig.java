@@ -23,13 +23,17 @@
  */
 package emufog.settings;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Docker type for host devices extending the abstract container type with scaling
  * factor and the device count.
  */
 class DeviceTypeConfig extends ContainerTypeConfig {
 
+    @JsonProperty("scaling-factor")
     int scalingFactor;
 
+    @JsonProperty("average-device-count")
     int averageDeviceCount;
 }

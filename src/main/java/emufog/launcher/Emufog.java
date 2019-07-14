@@ -38,9 +38,9 @@ import emufog.settings.Settings;
 import emufog.settings.YamlReader;
 import emufog.util.Tuple;
 import java.io.IOException;
-import java.nio.file.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import picocli.CommandLine;
 
 import static emufog.util.ConversionsUtils.intervalToString;
 
@@ -65,7 +65,7 @@ public class Emufog {
         // parse the command line arguments
         Arguments arguments = new Arguments();
         try {
-            //new CommandLine(arguments).parseArgs(args);
+            new CommandLine(arguments).parseArgs(args);
         } catch (Exception e) {
             LOG.error("Failed to read in command line arguments.", e);
             return;
@@ -110,7 +110,7 @@ public class Emufog {
                 }
 
                 IGraphExporter exporter = new MaxiNetExporter();
-                exporter.exportGraph(graph, Paths.get(arguments.output));
+                exporter.exportGraph(graph, arguments.output);
             } else {
                 // no fog placement found, aborting
                 LOG.error("Unable to find a fog placement with the provided settings.");
