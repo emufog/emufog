@@ -27,17 +27,11 @@ import emufog.graph.AS;
 import emufog.graph.Edge;
 import emufog.graph.Graph;
 import emufog.graph.SwitchConverter;
-import emufog.util.Tuple;
-
 import java.util.Collection;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static emufog.util.ConversionsUtils.intervalToString;
-import static java.util.concurrent.Executors.newFixedThreadPool;
 
 /**
  * This class runs the backbone classification algorithm on a graph instance.
@@ -48,11 +42,11 @@ public class BackboneClassifier {
 
     /**
      * Starts the backbone classification algorithm on the given graph.
-     * Returns the graph including backbone and edge of the network.
+     * Modifies the graph including backbone and edge of the network.
      *
-     * @return the modified graph
+     * @throws IllegalArgumentException thrown if graph is {@code null}
      */
-    public static Graph identifyBackbone(Graph graph) {
+    public static void identifyBackbone(final Graph graph) throws IllegalArgumentException {
         if (graph == null) {
             throw new IllegalArgumentException("The graph object is not initialized.");
         }
@@ -62,36 +56,28 @@ public class BackboneClassifier {
         long start = System.nanoTime();
         markASEdgeNodes(graph);
         long stop = System.nanoTime();
-        LOG.debug("Graph Step 1 - Time: " + intervalToString(start, stop));
-        LOG.info("Backbone Size: " + graph.getSwitches().size());
-        LOG.info("Edge Size: " + graph.getRouters().size());
+        if (graph.getSettings().timeMeasuring) {
+            LOG.info("Graph Step 1 - Time: {}", intervalToString(start, stop));
+        }
+        LOG.debug("Backbone Size: {}", graph.getSwitches().size());
+        LOG.debug("Edge Size: {}", graph.getRouters().size());
 
-        // rest in parallel
-        Collection<AS> ASs = graph.getSystems();
-        Tuple<AS, Future<?>>[] workers = new Tuple[ASs.size()];
+        Collection<AS> systems = graph.getSystems();
 
-        ExecutorService pool = newFixedThreadPool(graph.getSettings().threadCount);
-        int count = 0;
-        for (AS as : ASs) {
+        // 2nd step in parallel
+        start = System.nanoTime();
+        systems.parallelStream().forEach(as -> {
             BackboneWorker worker = new BackboneWorker(as);
-            workers[count] = new Tuple<>(as, pool.submit(worker));
-            count++;
+            worker.run();
+        });
+        stop = System.nanoTime();
+        if (graph.getSettings().timeMeasuring) {
+            LOG.info("Graph Step 2 - Time: {}", intervalToString(start, stop));
         }
+        LOG.debug("Backbone Size: {}", graph.getSwitches().size());
+        LOG.debug("Edge Size: {}", graph.getRouters().size());
 
-        for (Tuple<AS, Future<?>> t : workers) {
-            try {
-                t.getValue().get();
-            }
-            catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-                LOG.error("Backbone Thread for " + t.getKey() + " was interrupted.");
-                LOG.error("Error message: " + e.getMessage());
-            }
-        }
-        pool.shutdownNow();
         LOG.info("Finished Backbone Classification.");
-
-        return graph;
     }
 
     /**

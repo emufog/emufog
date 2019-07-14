@@ -30,12 +30,13 @@ import emufog.graph.Router;
 import emufog.graph.Switch;
 import emufog.graph.SwitchConverter;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,31 +76,25 @@ class BackboneWorker implements Runnable {
         long start = System.nanoTime();
         convertHighDegrees();
         long end = System.nanoTime();
-        LOG.info(as + " Step 2 - Time: " + intervalToString(start, end));
-        LOG.info("Backbone Size: " + as.getSwitches().size());
-        LOG.info("Edge Size: " + as.getRouters().size());
+        LOG.info("{} Step 2 - Time: {}", as, intervalToString(start, end));
+        LOG.info("{} Backbone Size: {}", as, as.getSwitches().size());
+        LOG.info("{} Edge Size: {}", as, as.getRouters().size());
 
         // 3rd step
         start = System.nanoTime();
         buildSingleBackbone();
         end = System.nanoTime();
-        LOG.info(as + " Step 3 - Time: " + intervalToString(start, end));
-        LOG.info("Backbone Size: " + as.getSwitches().size());
-        LOG.info("Edge Size: " + as.getRouters().size());
+        LOG.info("{} Step 3 - Time: {}", as, intervalToString(start, end));
+        LOG.info("{} Backbone Size: {}", as, as.getSwitches().size());
+        LOG.info("{} Edge Size: {}", as, as.getRouters().size());
     }
 
     /**
      * Converts nodes with an above average degree to a backbone node.
      */
     private void convertHighDegrees() {
-        float averageDegree = calculateAverageDegree() * BACKBONE_DEGREE_PERCENTAGE;
-        List<Router> toConvert = new ArrayList<>();
-
-        for (Router router : as.getRouters()) {
-            if (router.getDegree() >= averageDegree) {
-                toConvert.add(router);
-            }
-        }
+        final double averageDegree = calculateAverageDegree() * BACKBONE_DEGREE_PERCENTAGE;
+        List<Router> toConvert = as.getRouters().parallelStream().filter(r -> r.getDegree() >= averageDegree).collect(Collectors.toList());
 
         for (Router r : toConvert) {
             converter.convert(r);
@@ -110,6 +105,11 @@ class BackboneWorker implements Runnable {
      * Creates a single connected backbone by using the Breadth-First-Algorithm.
      */
     private void buildSingleBackbone() {
+        Collection<Switch> switches = as.getSwitches();
+        if (switches.isEmpty()) {
+            return;
+        }
+
         // bit sets to check for visited nodes and nodes in the queue
         BitSet visited = new BitSet();
         BitSet seen = new BitSet();
@@ -118,19 +118,20 @@ class BackboneWorker implements Runnable {
         Map<Node, Node> predecessors = new HashMap<>();
 
         // start with any backbone node
-        Node current = as.getSwitches().iterator().next();
-        if (current == null) {
-            return;
-        }
+        Node node = switches.iterator().next();
+        predecessors.put(node, null);
+        queue.add(node);
 
-        predecessors.put(current, current);
-
-        while (current != null) {
-            visited.set(current.getID());
+        while (!queue.isEmpty()) {
+            node = queue.poll();
+            if (visited.get(node.getID())) {
+                continue;
+            }
+            visited.set(node.getID());
 
             // follow a trace via the predecessor to convert all on this way
-            if (current instanceof Switch && predecessors.get(current) instanceof Router) {
-                Node predecessor = predecessors.get(current);
+            if (node instanceof Switch && predecessors.get(node) instanceof Router) {
+                Node predecessor = predecessors.get(node);
                 while (predecessor instanceof Router) {
                     converter.convert(predecessor);
 
@@ -139,28 +140,29 @@ class BackboneWorker implements Runnable {
             }
 
             // add or update neighborhood
-            for (Edge e : current.getEdges()) {
-                if (!e.isCrossASEdge()) {
-                    Node neighbor = e.getDestinationForSource(current);
-                    // avoid visiting twice
-                    if (!visited.get(neighbor.getID())) {
-                        if (seen.get(neighbor.getID())) {
-                            // update the predecessor if necessary
-                            if (current instanceof Switch && predecessors.get(neighbor) instanceof Router) {
-                                predecessors.put(neighbor, current);
-                            }
-                        }
-                        else {
-                            // push a new node to the queue
-                            predecessors.put(neighbor, current);
-                            queue.add(neighbor);
-                            seen.set(neighbor.getID());
-                        }
+            for (Edge e : node.getEdges()) {
+                if (e.isCrossASEdge()) {
+                    continue;
+                }
+
+                Node neighbor = e.getDestinationForSource(node);
+                // avoid visiting twice
+                if (visited.get(neighbor.getID())) {
+                    continue;
+                }
+
+                if (seen.get(neighbor.getID())) {
+                    // update the predecessor if necessary
+                    if (node instanceof Switch && predecessors.get(neighbor) instanceof Router) {
+                        predecessors.put(neighbor, node);
                     }
+                } else {
+                    // push a new node to the queue
+                    predecessors.put(neighbor, node);
+                    queue.add(neighbor);
+                    seen.set(neighbor.getID());
                 }
             }
-
-            current = queue.poll();
         }
     }
 
@@ -169,16 +171,23 @@ class BackboneWorker implements Runnable {
      *
      * @return the average degree
      */
-    private float calculateAverageDegree() {
-        int sum = 0;
+    private double calculateAverageDegree() {
+        long sum = 0;
+        Collection<Router> routers = as.getRouters();
+        Collection<Switch> switches = as.getSwitches();
 
-        for (Node n : as.getRouters()) {
+        for (Node n : routers) {
             sum += n.getDegree();
         }
-        for (Node n : as.getSwitches()) {
+        for (Node n : switches) {
             sum += n.getDegree();
         }
+        int n = switches.size() + routers.size();
 
-        return sum / (as.getSwitches().size() + as.getRouters().size());
+        if (n == 0) {
+            return 0.f;
+        }
+
+        return (double) sum / n;
     }
 }
