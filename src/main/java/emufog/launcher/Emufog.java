@@ -62,8 +62,26 @@ public class Emufog {
         LOG.info("                   Welcome to EmuFog");
         LOG.info("##############################################################");
 
+        try {
+            runEmuFog(args);
+        } catch (Exception e) {
+            LOG.error("An exception stopped EmuFog!", e);
+        }
+
+        LOG.info("##############################################################");
+        LOG.info("                     Closing EmuFog");
+        LOG.info("##############################################################");
+    }
+
+    /**
+     * Runs an execution of emufog with the given arguments from the command line.
+     *
+     * @param args arguments passed to the execution
+     * @throws IOException thrown in case of a problem during the execution
+     */
+    private static void runEmuFog(String[] args) throws IOException {
         // parse the command line arguments
-        Arguments arguments = new Arguments();
+        final Arguments arguments = new Arguments();
         try {
             new CommandLine(arguments).parseArgs(args);
         } catch (Exception e) {
@@ -71,58 +89,59 @@ public class Emufog {
             return;
         }
 
-        Graph graph;
+        // read in the settings file
+        Settings settings;
         try {
-            // read in the settings file
-            Settings settings = YamlReader.read(arguments.settingsPath);
-
-            // determines the respective format reader
-            GraphReader reader = getReader(arguments.inputType, settings);
-
-            // read in the graph with the graph reader
-            long start = System.nanoTime();
-            graph = reader.readGraph(arguments.files);
-            long end = System.nanoTime();
-            LOG.info("Time to read in the graph: " + intervalToString(start, end));
-            LOG.info("##############################################################");
-            // print graph details for information purposes
-            LOG.info("Number of nodes in the graph: " + graph.getRouters().size());
-            LOG.info("Number of edges in the graph: " + graph.getEdges().size());
-            LOG.info("##############################################################");
-
-            // compute the backbone of the network
-            start = System.nanoTime();
-            BackboneClassifier.identifyBackbone(graph);
-            end = System.nanoTime();
-            LOG.info("Time to determine the backbone of the topology: " + intervalToString(start, end));
-            LOG.info("##############################################################");
-            LOG.info("Number of backbone nodes identified: " + graph.getSwitches().size());
-            LOG.info("##############################################################");
-
-            // assign devices to the edge
-            graph.assignEdgeDevices();
-
-            // find the fog node placements
-            FogResult result = new FogNodeClassifier(settings).findFogNodes(graph);
-            if (result.getStatus()) {
-                for (Tuple<Node, FogType> tuple : result.getFogNodes()) {
-                    graph.placeFogNode(tuple.getKey(), tuple.getValue());
-                }
-
-                IGraphExporter exporter = new MaxiNetExporter();
-                exporter.exportGraph(graph, arguments.output);
-            } else {
-                // no fog placement found, aborting
-                LOG.error("Unable to find a fog placement with the provided settings.");
-                LOG.error("Consider using different settings.");
-            }
-        } catch (IOException e) {
-            LOG.error("An exception stopped EmuFog!", e);
+            settings = YamlReader.read(arguments.settingsPath);
+        } catch (Exception e) {
+            LOG.error("Failed to read in the configuration file: {}", arguments.settingsPath, e);
+            return;
         }
 
+        // determines the respective format reader
+        GraphReader reader = getReader(arguments.inputType, settings);
+
+        // read in the graph with the graph reader
+        long start = System.nanoTime();
+        Graph graph = reader.readGraph(arguments.files);
+        long end = System.nanoTime();
+        if (settings.timeMeasuring) {
+            LOG.info("Time to read in the graph: {}", intervalToString(start, end));
+        }
         LOG.info("##############################################################");
-        LOG.info("                     Closing EmuFog");
+        // print graph details for information purposes
+        LOG.info("Number of nodes in the graph: {}", graph.getRouters().size());
+        LOG.info("Number of edges in the graph: {}", graph.getEdges().size());
         LOG.info("##############################################################");
+
+        // compute the backbone of the network
+        start = System.nanoTime();
+        BackboneClassifier.identifyBackbone(graph);
+        end = System.nanoTime();
+        if (settings.timeMeasuring) {
+            LOG.info("Time to determine the backbone of the topology: {}", intervalToString(start, end));
+        }
+        LOG.info("##############################################################");
+        LOG.info("Number of backbone nodes identified: {}", graph.getSwitches().size());
+        LOG.info("##############################################################");
+
+        // assign devices to the edge
+        graph.assignEdgeDevices();
+
+        // find the fog node placements
+        FogResult result = new FogNodeClassifier(settings).findFogNodes(graph);
+        if (result.getStatus()) {
+            for (Tuple<Node, FogType> tuple : result.getFogNodes()) {
+                graph.placeFogNode(tuple.getKey(), tuple.getValue());
+            }
+
+            IGraphExporter exporter = new MaxiNetExporter();
+            exporter.exportGraph(graph, arguments.output);
+        } else {
+            // no fog placement found, aborting
+            LOG.warn("Unable to find a fog placement with the provided settings.");
+            LOG.warn("Consider using different settings.");
+        }
     }
 
     /**
