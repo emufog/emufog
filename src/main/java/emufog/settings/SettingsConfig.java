@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2018 emufog contributors
+ * Copyright (c) 2019 emufog contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,27 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.launcher;
+package emufog.settings;
 
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import picocli.CommandLine.Option;
+import java.util.Collection;
 
 /**
- * Arguments to read in from the command line.
+ * Top level settings object of the YAML document.
  */
-class Arguments {
+class SettingsConfig {
 
-    @Option(names = {"--settings", "-s"}, description = "settings file to use")
-    Path settingsPath;
+    String baseAddress;
 
-    @Option(names = {"--type", "-t"}, description = "input format to read in")
-    String inputType;
+    boolean overWriteOutputFile;
 
-    @Option(names = {"--output", "-o"}, description = "path to the output file")
-    String output;
+    int maxFogNodes;
 
-    @Option(names = {"--file", "-f"}, description = "files to read in")
-    List<Path> files = new ArrayList<>();
+    float costThreshold;
+
+    float hostDeviceLatency;
+
+    float hostDeviceBandwidth;
+
+    int threadCount;
+
+    boolean paralleledFogBuilding;
+
+    boolean timeMeasuring;
+
+    Collection<DeviceTypeConfig> deviceNodeTypes;
+
+    Collection<FogTypeConfig> fogNodeTypes;
 }

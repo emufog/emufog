@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2018 emufog contributors
+ * Copyright (c) 2019 emufog contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,27 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.launcher;
-
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import picocli.CommandLine.Option;
+package emufog.settings;
 
 /**
- * Arguments to read in from the command line.
+ * Docker type for host devices extending the abstract container type with scaling
+ * factor and the device count.
  */
-class Arguments {
+class DeviceTypeConfig extends ContainerTypeConfig {
 
-    @Option(names = {"--settings", "-s"}, description = "settings file to use")
-    Path settingsPath;
+    int scalingFactor;
 
-    @Option(names = {"--type", "-t"}, description = "input format to read in")
-    String inputType;
-
-    @Option(names = {"--output", "-o"}, description = "path to the output file")
-    String output;
-
-    @Option(names = {"--file", "-f"}, description = "files to read in")
-    List<Path> files = new ArrayList<>();
+    int averageDeviceCount;
 }

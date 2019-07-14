@@ -1,9 +1,6 @@
 apply plugin: 'java'
 apply plugin: 'application'
 
-targetCompatibility = 1.8
-sourceCompatibility = 1.8
-
 mainClassName = 'emufog.launcher.Emufog'
 
 repositories {
@@ -11,10 +8,11 @@ repositories {
 }
 
 dependencies {
-    compile 'info.picocli:picocli:4.0.0-beta-2'
-    compile 'com.google.code.gson:gson:2.8.5'
+    compile 'info.picocli:picocli:3.9.6'
     compile 'org.slf4j:slf4j-api:1.7.26'
     runtime 'ch.qos.logback:logback-classic:1.2.3'
+    compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.9'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.9.9.1'
 }
 
 version = '1.0'

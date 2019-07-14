@@ -35,12 +35,12 @@ import emufog.reader.BriteFormatReader;
 import emufog.reader.CaidaFormatReader;
 import emufog.reader.GraphReader;
 import emufog.settings.Settings;
-import emufog.settings.SettingsReader;
+import emufog.settings.YamlReader;
 import emufog.util.Tuple;
 import java.io.IOException;
 import java.nio.file.Paths;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import picocli.CommandLine;
 
 import static emufog.util.ConversionsUtils.intervalToString;
 
@@ -50,7 +50,7 @@ import static emufog.util.ConversionsUtils.intervalToString;
  */
 public class Emufog {
 
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(Emufog.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Emufog.class);
 
     /**
      * Main function call to start EmuFog.
@@ -64,12 +64,17 @@ public class Emufog {
 
         // parse the command line arguments
         Arguments arguments = new Arguments();
-        new CommandLine(arguments).parseArgs(args);
+        try {
+            //new CommandLine(arguments).parseArgs(args);
+        } catch (Exception e) {
+            LOG.error("Failed to read in command line arguments.", e);
+            return;
+        }
 
         Graph graph;
         try {
             // read in the settings file
-            Settings settings = SettingsReader.read(arguments.settingsPath);
+            Settings settings = YamlReader.read(arguments.settingsPath);
 
             // determines the respective format reader
             GraphReader reader = getReader(arguments.inputType, settings);
@@ -106,14 +111,12 @@ public class Emufog {
 
                 IGraphExporter exporter = new MaxiNetExporter();
                 exporter.exportGraph(graph, Paths.get(arguments.output));
-            }
-            else {
+            } else {
                 // no fog placement found, aborting
                 LOG.error("Unable to find a fog placement with the provided settings.");
                 LOG.error("Consider using different settings.");
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             LOG.error("An exception stopped EmuFog!", e);
         }
 

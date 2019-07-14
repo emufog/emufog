@@ -25,11 +25,13 @@ package emufog.settings;
 
 import emufog.container.DeviceType;
 import emufog.container.FogType;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import static emufog.util.StringUtils.nullOrEmpty;
 
 /**
  * The settings class contains all different settings used within the application.
@@ -70,40 +72,64 @@ public class Settings {
     public final boolean timeMeasuring;
 
     /**
-     * Creates a new instance of the Settings class using the JSON object.
+     * Creates a new instance of the Settings class using the read in config object.
      *
-     * @param json JSON object containing the required information
+     * @param config config object containing the required information
      */
-    Settings(SettingsReader.JSONSettings json) {
-        baseAddress = json.BaseAddress;
-        overwriteExperimentFile = json.OverWriteOutputFile;
-        maxFogNodes = json.MaxFogNodes;
-        costThreshold = json.CostThreshold;
-        edgeDeviceDelay = json.HostDeviceLatency;
-        edgeDeviceBandwidth = json.HostDeviceBandwidth;
-        threadCount = json.ThreadCount;
-        fogGraphParallel = json.ParalleledFogBuilding;
-        timeMeasuring = json.timeMeasuring;
+    Settings(SettingsConfig config) {
+        baseAddress = config.baseAddress;
+        overwriteExperimentFile = config.overWriteOutputFile;
+        maxFogNodes = config.maxFogNodes;
+        costThreshold = config.costThreshold;
+        edgeDeviceDelay = config.hostDeviceLatency;
+        edgeDeviceBandwidth = config.hostDeviceBandwidth;
+        threadCount = config.threadCount;
+        fogGraphParallel = config.paralleledFogBuilding;
+        timeMeasuring = config.timeMeasuring;
 
         Map<Integer, FogType> fogTypes = new HashMap<>();
-        for (SettingsReader.FogType fogType : json.FogNodeTypes) {
-            fogTypes.put(fogType.ID, new FogType(fogType.DockerImage.toString(), fogType.MaximumConnections, fogType.Costs,
-                    fogType.MemoryLimit, fogType.CPUShare));
+        for (FogTypeConfig type : config.fogNodeTypes) {
+            fogTypes.put(type.id, mapFogType(type));
         }
-        for (SettingsReader.FogType fogType : json.FogNodeTypes) {
-            FogType fogNodeType = fogTypes.get(fogType.ID);
-            if (fogType.Dependencies != null) {
-                for (int id : fogType.Dependencies) {
+
+        for (FogTypeConfig fogType : config.fogNodeTypes) {
+            if (fogType.dependencies != null) {
+                FogType fogNodeType = fogTypes.get(fogType.id);
+                for (int id : fogType.dependencies) {
                     fogNodeType.addDependency(fogTypes.get(id));
                 }
             }
         }
         fogNodeTypes = new ArrayList<>(fogTypes.values());
 
-        deviceNodeTypes = new ArrayList<>();
-        for (SettingsReader.DeviceType deviceType : json.DeviceNodeTypes) {
-            deviceNodeTypes.add(new DeviceType(deviceType.DockerImage.toString(), deviceType.ScalingFactor,
-                    deviceType.AverageDeviceCount, deviceType.MemoryLimit, deviceType.CPUShare));
+        deviceNodeTypes = config.deviceNodeTypes.stream().map(Settings::mapDeviceType).collect(Collectors.toList());
+    }
+
+    /**
+     * Maps the configuration for a fog type to an instance of the model.
+     *
+     * @param f fog type config to map to an object
+     * @return mapped fog type object
+     */
+    private static FogType mapFogType(FogTypeConfig f) {
+        if (nullOrEmpty(f.containerImage.version)) {
+            return new FogType(f.containerImage.name, f.maximumConnections, f.costs, f.memoryLimit, f.cpuShare);
+        } else {
+            return new FogType(f.containerImage.name, f.containerImage.version, f.maximumConnections, f.costs, f.memoryLimit, f.cpuShare);
+        }
+    }
+
+    /**
+     * Maps the configuration for a device type to an instance of the model.
+     *
+     * @param d device type config to map to an object
+     * @return mapped device type object
+     */
+    private static DeviceType mapDeviceType(DeviceTypeConfig d) {
+        if (nullOrEmpty(d.containerImage.version)) {
+            return new DeviceType(d.containerImage.name, d.scalingFactor, d.averageDeviceCount, d.memoryLimit, d.cpuShare);
+        } else {
+            return new DeviceType(d.containerImage.name, d.containerImage.version, d.scalingFactor, d.averageDeviceCount, d.memoryLimit, d.cpuShare);
         }
     }
 }
