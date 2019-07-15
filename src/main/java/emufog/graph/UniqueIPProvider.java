@@ -51,16 +51,14 @@ class UniqueIPProvider {
      */
     String getNextIPV4Address() {
         String[] nums = lastIP.split("\\.");
-        int i = (Integer.parseInt(nums[0]) << 24 | Integer.parseInt(nums[2]) << 8
-                | Integer.parseInt(nums[1]) << 16 | Integer.parseInt(nums[3])) + 1;
+        int i = (Integer.parseInt(nums[0]) << 24 | Integer.parseInt(nums[2]) << 8 | Integer.parseInt(nums[1]) << 16 | Integer.parseInt(nums[3])) + 1;
 
         // If you wish to skip over .255 addresses.
         if ((byte) i == -1) {
             i++;
         }
 
-        lastIP = String.format("%d.%d.%d.%d", i >>> 24 & 0xFF, i >> 16 & 0xFF,
-                i >> 8 & 0xFF, i >> 0 & 0xFF);
+        lastIP = String.format("%d.%d.%d.%d", i >>> 24 & 0xFF, i >> 16 & 0xFF, i >> 8 & 0xFF, i & 0xFF);
 
         return lastIP;
     }
