@@ -28,7 +28,6 @@ import emufog.graph.Graph;
 import emufog.graph.ILatencyCalculator;
 import emufog.graph.Node;
 import emufog.settings.Settings;
-
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -37,7 +36,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,15 +90,15 @@ public class CaidaFormatReader extends GraphReader {
 
     @Override
     public Graph readGraph(List<Path> files) throws IOException, IllegalArgumentException {
-        Path nodesFile = getPathForEnding(files, ".nodes.geo");
+        Path nodesFile = getFileWithEnding(files, ".nodes.geo");
         if (nodesFile == null) {
             throw new IllegalArgumentException("The given files do not contain a .nodes.geo file.");
         }
-        Path asFile = getPathForEnding(files, ".nodes.as");
+        Path asFile = getFileWithEnding(files, ".nodes.as");
         if (asFile == null) {
             throw new IllegalArgumentException("The given files do not contain a .nodes.as file.");
         }
-        Path linkFile = getPathForEnding(files, ".links");
+        Path linkFile = getFileWithEnding(files, ".links");
         if (linkFile == null) {
             throw new IllegalArgumentException("The given files do not contain a .links file.");
         }
@@ -115,29 +113,19 @@ public class CaidaFormatReader extends GraphReader {
         asLineSkipped = 0;
         linkLineSkipped = 0;
 
-        int counter;
-        try (Stream<String> lines = Files.lines(asFile, charset)) {
-            counter = (int) lines.count();
-        }
+        nodeCoordinates = new HashMap<>();
 
-        nodeCoordinates = new HashMap<>(counter);
-        CoordinateGraph graph = new CoordinateGraph(settings);
-        ILatencyCalculator calculator = new CaidaLatencyCalculator();
+        final CoordinateGraph graph = new CoordinateGraph(settings);
+        final ILatencyCalculator calculator = new CaidaLatencyCalculator();
 
         // read in the nodes
-        try (Stream<String> lines = Files.lines(nodesFile, charset)) {
-            lines.forEach(this::processNodeLine);
-        }
+        Files.lines(nodesFile, charset).forEach(this::processNodeLine);
 
         // read in the AS
-        try (Stream<String> lines = Files.lines(asFile, charset)) {
-            lines.forEach(x -> processASLine(graph, x));
-        }
+        Files.lines(asFile, charset).forEach(x -> processASLine(graph, x));
 
         // read in the edges
-        try (Stream<String> lines = Files.lines(linkFile, charset)) {
-            lines.forEach(x -> processLinkLine(graph, x, calculator));
-        }
+        Files.lines(linkFile, charset).forEach(x -> processLinkLine(graph, x, calculator));
 
         // log errors
         logResults();
@@ -150,15 +138,15 @@ public class CaidaFormatReader extends GraphReader {
      */
     private void logResults() {
         // additional logging for debugging
-        LOG.info("ID out of Integer range: " + idOutOfRange);
-        LOG.info("AS out of Integer range: " + asOutOfRange);
-        LOG.info("Coordinates out of Float range: " + coordinatesOutOfRange);
-        LOG.info("Number of times no nodes were found to assign an AS: " + noNodeFoundForAS);
-        LOG.info("Number of times no nodes were found to build an edge: " + noNodeFoundForEdge);
-        LOG.info("Nodes read without an AS: " + nodeCoordinates.size());
-        LOG.info("Number of node lines skipped: " + nodeLineSkipped);
-        LOG.info("Number of AS lines skipped: " + asLineSkipped);
-        LOG.info("Number of link lines skipped: " + linkLineSkipped);
+        LOG.debug("ID out of Integer range: {}", idOutOfRange);
+        LOG.debug("AS out of Integer range: {}", asOutOfRange);
+        LOG.debug("Coordinates out of Float range: {}", coordinatesOutOfRange);
+        LOG.debug("Number of times no nodes were found to assign an AS: {}", noNodeFoundForAS);
+        LOG.debug("Number of times no nodes were found to build an edge: {}", noNodeFoundForEdge);
+        LOG.debug("Nodes read without an AS: {}", nodeCoordinates.size());
+        LOG.debug("Number of node lines skipped: {}", nodeLineSkipped);
+        LOG.debug("Number of AS lines skipped: {}", asLineSkipped);
+        LOG.debug("Number of link lines skipped: {}", linkLineSkipped);
     }
 
     /**
@@ -168,65 +156,67 @@ public class CaidaFormatReader extends GraphReader {
      * @param line  current line to process
      */
     private void processLinkLine(CoordinateGraph graph, String line, ILatencyCalculator calculator) {
-        if (line.startsWith("link ")) {
-            String[] values = line.split(" ");
-            if (values.length >= 4) {
-                String linkStr = values[1];
-                linkStr = linkStr.substring(1, linkStr.length() - 1);
-                int id;
-                try {
-                    id = Integer.parseInt(linkStr);
-                }
-                catch (NumberFormatException e) {
-                    idOutOfRange++;
-                    return;
-                }
+        if (!line.startsWith("link ")) {
+            return;
+        }
 
-                for (int i = 3; i < values.length - 1; ++i) {
+        String[] values = line.split(" ");
+        if (values.length < 4) {
+            LOG.debug("The number of values in the column doesn't match the expectations of >= 4: {}", line);
+            linkLineSkipped++;
+            return;
+        }
 
-                    String sourceStr = values[i];
-                    int end = sourceStr.indexOf(':');
-                    if (end == -1) {
-                        end = sourceStr.length();
-                    }
-                    sourceStr = sourceStr.substring(1, end);
-                    int sourceID;
-                    try {
-                        sourceID = Integer.parseInt(sourceStr);
-                    }
-                    catch (NumberFormatException e) {
-                        idOutOfRange++;
-                        return;
-                    }
+        String linkStr = values[1];
+        linkStr = linkStr.substring(1, linkStr.length() - 1);
+        int id;
+        try {
+            id = Integer.parseInt(linkStr);
+        } catch (NumberFormatException e) {
+            LOG.debug("Failed to parse the link id {} to an integer.", linkStr);
+            idOutOfRange++;
+            return;
+        }
 
-                    String destinationStr = values[i + 1];
-                    end = destinationStr.indexOf(':');
-                    if (end == -1) {
-                        end = destinationStr.length();
-                    }
-                    destinationStr = destinationStr.substring(1, end);
-                    int destinationID;
-                    try {
-                        destinationID = Integer.parseInt(destinationStr);
-                    }
-                    catch (NumberFormatException e) {
-                        idOutOfRange++;
-                        return;
-                    }
-
-                    Node from = graph.getRouter(sourceID);
-                    Node to = graph.getRouter(destinationID);
-
-                    if (from != null && to != null) {
-                        graph.createEdge(id, from, to, calculator, 1000);
-                    }
-                    else {
-                        noNodeFoundForEdge++;
-                    }
-                }
+        for (int i = 3; i < values.length - 1; ++i) {
+            String sourceStr = values[i];
+            int end = sourceStr.indexOf(':');
+            if (end == -1) {
+                end = sourceStr.length();
             }
-            else {
-                linkLineSkipped++;
+            sourceStr = sourceStr.substring(1, end);
+            int sourceID;
+            try {
+                sourceID = Integer.parseInt(sourceStr);
+            } catch (NumberFormatException e) {
+                LOG.debug("Failed to parse the link's source id {} to an integer.", sourceStr);
+                idOutOfRange++;
+                return;
+            }
+
+            String destinationStr = values[i + 1];
+            end = destinationStr.indexOf(':');
+            if (end == -1) {
+                end = destinationStr.length();
+            }
+            destinationStr = destinationStr.substring(1, end);
+            int destinationID;
+            try {
+                destinationID = Integer.parseInt(destinationStr);
+            } catch (NumberFormatException e) {
+                LOG.debug("Failed to parse the link's destination id {} to an integer.", destinationStr);
+                idOutOfRange++;
+                return;
+            }
+
+            Node from = graph.getRouter(sourceID);
+            Node to = graph.getRouter(destinationID);
+
+            if (from != null && to != null) {
+                graph.createEdge(id, from, to, calculator, 1000);
+            } else {
+                LOG.debug("To create a link source and destination must be found.");
+                noNodeFoundForEdge++;
             }
         }
     }
@@ -238,47 +228,46 @@ public class CaidaFormatReader extends GraphReader {
      * @param line  current line to process
      */
     private void processASLine(CoordinateGraph graph, String line) {
-        if (line.startsWith("node.AS ")) {
-            String[] values = line.split(" ");
-            if (values.length >= 3) {
-                String nodeStr = values[1];
-                nodeStr = nodeStr.substring(1);
-                int id;
-                try {
-                    id = Integer.parseInt(nodeStr);
-                }
-                catch (NumberFormatException e) {
-                    idOutOfRange++;
-                    return;
-                }
-                int as;
-                try {
-                    as = Integer.parseInt(values[2]);
-                }
-                catch (NumberFormatException e) {
-                    asOutOfRange++;
-                    return;
-                }
-
-                Coordinates coordinates = null;
-                try {
-                    coordinates = nodeCoordinates.get(id);
-                }
-                catch (IllegalArgumentException e) {
-                    noNodeFoundForAS++;
-                }
-                if (coordinates == null) {
-                    noNodeFoundForAS++;
-                }
-                else {
-                    graph.createRouter(id, as, coordinates.xPos, coordinates.yPos);
-                    nodeCoordinates.remove(id);
-                }
-            }
-            else {
-                asLineSkipped++;
-            }
+        if (!line.startsWith("node.AS ")) {
+            return;
         }
+
+        String[] values = line.split(" ");
+        if (values.length < 3) {
+            asLineSkipped++;
+            LOG.debug("The number of values in the column doesn't match the expectations of >= 3: {}", line);
+            return;
+        }
+
+        String nodeStr = values[1];
+        nodeStr = nodeStr.substring(1);
+        int id;
+        try {
+            id = Integer.parseInt(nodeStr);
+        } catch (NumberFormatException e) {
+            LOG.debug("Failed to parse the id {} to an integer.", nodeStr);
+            idOutOfRange++;
+            return;
+        }
+
+        int as;
+        try {
+            as = Integer.parseInt(values[2]);
+        } catch (NumberFormatException e) {
+            LOG.debug("Failed to parse the autonomous system id {} to an integer.", values[2]);
+            asOutOfRange++;
+            return;
+        }
+
+        Coordinates coordinates = nodeCoordinates.get(id);
+        if (coordinates == null) {
+            LOG.debug("No node was found for the id: {}", id);
+            noNodeFoundForAS++;
+            return;
+        }
+
+        graph.createRouter(id, as, coordinates.xPos, coordinates.yPos);
+        nodeCoordinates.remove(id);
     }
 
     /**
@@ -287,36 +276,39 @@ public class CaidaFormatReader extends GraphReader {
      * @param line current line to process
      */
     private void processNodeLine(String line) {
-        if (line.startsWith("node.geo ")) {
-            String[] values = line.split("\t");
-            if (values.length >= 7) {
-                String nodeStr = values[0];
-                nodeStr = nodeStr.substring(10, nodeStr.length() - 1);
-                int id;
-                try {
-                    id = Integer.parseInt(nodeStr);
-                }
-                catch (NumberFormatException e) {
-                    idOutOfRange++;
-                    return;
-                }
-
-                float xPos, yPos;
-                try {
-                    xPos = Float.parseFloat(values[5]);
-                    yPos = Float.parseFloat(values[6]);
-                }
-                catch (NumberFormatException e) {
-                    coordinatesOutOfRange++;
-                    return;
-                }
-
-                nodeCoordinates.put(id, new Coordinates(xPos, yPos));
-            }
-            else {
-                nodeLineSkipped++;
-            }
+        if (!line.startsWith("node.geo ")) {
+            return;
         }
+
+        String[] values = line.split("\t");
+        if (values.length < 7) {
+            LOG.debug("The number of values in the column doesn't match the expectations of >= 7: {}", line);
+            nodeLineSkipped++;
+            return;
+        }
+
+        String nodeStr = values[0];
+        nodeStr = nodeStr.substring(10, nodeStr.length() - 1);
+        int id;
+        try {
+            id = Integer.parseInt(nodeStr);
+        } catch (NumberFormatException e) {
+            LOG.debug("Failed to parse the id {} to an integer.", nodeStr);
+            idOutOfRange++;
+            return;
+        }
+
+        float xPos, yPos;
+        try {
+            xPos = Float.parseFloat(values[5]);
+            yPos = Float.parseFloat(values[6]);
+        } catch (NumberFormatException e) {
+            LOG.debug("Failed to parse coordinates {} and {} to floats.", values[5], values[6]);
+            coordinatesOutOfRange++;
+            return;
+        }
+
+        nodeCoordinates.put(id, new Coordinates(xPos, yPos));
     }
 
     /**
@@ -324,9 +316,9 @@ public class CaidaFormatReader extends GraphReader {
      *
      * @param files         list of possible files
      * @param fileExtension file extension to match
-     * @return the file of the list matching the extension or null if not found
+     * @return the file of the list matching the extension or {@code null} if not found
      */
-    private static Path getPathForEnding(List<Path> files, String fileExtension) {
+    private static Path getFileWithEnding(List<Path> files, String fileExtension) {
         Optional<Path> query = files.stream().filter(x -> x.toString().endsWith(fileExtension)).findFirst();
 
         return query.orElse(null);
