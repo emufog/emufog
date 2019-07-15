@@ -33,6 +33,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
+import static emufog.util.StringUtils.nullOrEmpty;
+
 /**
  * The reader reads in a graph object from the BRITE file format specified
  * in the documentation (https://www.cs.bu.edu/brite/user_manual/node29.html).
@@ -59,7 +61,7 @@ public class BriteFormatReader extends GraphReader {
     private static void extractNodes(Graph graph, BufferedReader reader) throws IOException {
         String line = reader.readLine();
 
-        while (line != null && !line.isEmpty()) {
+        while (nullOrEmpty(line)) {
             // split the line into pieces and parse them separately
             String[] values = line.split("\t");
             if (values.length >= 7) {
@@ -84,7 +86,7 @@ public class BriteFormatReader extends GraphReader {
     private static void extractEdges(Graph graph, BufferedReader reader) throws IOException {
         String line = reader.readLine();
 
-        while (line != null && !line.isEmpty()) {
+        while (nullOrEmpty(line)) {
             // split the line into pieces and parse them separately
             String[] values = line.split("\t");
             if (values.length >= 9) {
@@ -112,23 +114,27 @@ public class BriteFormatReader extends GraphReader {
         if (files == null || files.isEmpty()) {
             throw new IllegalArgumentException("No files given to read in.");
         }
-        Graph graph = new Graph(settings);
+        if (files.size() != 1) {
+            throw new IllegalArgumentException("The BRITE reader only supports one input file.");
+        }
+
+        final Graph graph = new Graph(settings);
 
         BufferedReader reader = new BufferedReader(new FileReader(files.get(0).toFile()));
 
-        String currentLine = reader.readLine();
-        while (currentLine != null) {
+        String line = reader.readLine();
+        while (nullOrEmpty(line)) {
             // read in the nodes of the graph
-            if (currentLine.startsWith("Nodes:")) {
+            if (line.startsWith("Nodes:")) {
                 extractNodes(graph, reader);
             }
 
             // read in the edges of the graph
-            if (currentLine.startsWith("Edges:")) {
+            if (line.startsWith("Edges:")) {
                 extractEdges(graph, reader);
             }
 
-            currentLine = reader.readLine();
+            line = reader.readLine();
         }
 
         return graph;
