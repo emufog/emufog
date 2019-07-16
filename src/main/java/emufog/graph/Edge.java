@@ -33,10 +33,10 @@ public class Edge {
     final int id;
 
     /* latency delay on this edge in ms */
-    final float delay;
+    private final float delay;
 
     /* bandwidth of the connection on Mbit/s */
-    final float bandwidth;
+    private final float bandwidth;
 
     /* one end of the connection */
     Node from;
