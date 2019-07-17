@@ -72,7 +72,7 @@ public class AS {
      * @param id the edge node's ID
      * @return node object or {@code null} if not found
      */
-    EdgeNode getEdgeNodes(int id) {
+    EdgeNode getEdgeNode(int id) {
         return edgeNodes.get(id);
     }
 
