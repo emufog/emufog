@@ -37,9 +37,11 @@ public abstract class Node {
     /* autonomous system this node belongs to */
     final AS as;
 
-    /* list of edges associated with the node */ Edge[] edges;
+    /* list of edges associated with the node */
+    Edge[] edges;
 
-    /* emulation settings for this node */ EmulationSettings emulationSettings;
+    /* emulation settings for this node */
+    EmulationSettings emulationSettings;
 
     /**
      * Creates a node of the graph with the initial parameter given.
