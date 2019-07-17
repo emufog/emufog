@@ -37,27 +37,29 @@ public class ConversionsUtils {
      */
     public static String intervalToString(long start, long end) {
         long duration = end - start;
+        duration = Math.max(duration, 0);
         StringBuilder sb = new StringBuilder();
+        boolean started = false;
 
         long hours = TimeUnit.HOURS.convert(duration, TimeUnit.NANOSECONDS);
         if (hours > 0) {
-            sb.append(hours).append('h');
+            sb.append(hours).append("h ");
+            started = true;
         }
 
         long minutes = TimeUnit.MINUTES.convert(duration, TimeUnit.NANOSECONDS);
-        if (minutes > 0) {
-            sb.append(minutes).append("min");
+        if (started || minutes > 0) {
+            sb.append(minutes).append("min ");
+            started = true;
         }
 
         long seconds = TimeUnit.SECONDS.convert(duration, TimeUnit.NANOSECONDS);
-        if (seconds > 0) {
-            sb.append(seconds).append('s');
+        if (started || seconds > 0) {
+            sb.append(seconds).append("s ");
         }
 
         long milliseconds = TimeUnit.MILLISECONDS.convert(duration, TimeUnit.NANOSECONDS);
-        if (milliseconds > 0) {
-            sb.append(milliseconds).append("ms");
-        }
+        sb.append(milliseconds).append("ms");
 
         return sb.toString();
     }
