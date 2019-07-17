@@ -24,7 +24,6 @@
 package emufog.fog;
 
 import emufog.graph.Node;
-import emufog.graph.Router;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,13 +44,13 @@ class EdgeNode extends FogNode {
      * Creates a new edge node for the fog node placement algorithm.
      *
      * @param graph  original graph instance
-     * @param router edge node for the iteration
+     * @param edgeNode edge node for the iteration
      */
-    EdgeNode(FogGraph graph, Router router) {
-        super(graph, router);
+    EdgeNode(FogGraph graph, emufog.graph.EdgeNode edgeNode) {
+        super(graph, edgeNode);
 
         possibleNodes = new ArrayList<>();
-        deviceCount = router.getDeviceCount();
+        deviceCount = edgeNode.getDeviceCount();
     }
 
     /**

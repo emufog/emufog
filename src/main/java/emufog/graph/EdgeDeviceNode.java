@@ -23,29 +23,39 @@
  */
 package emufog.graph;
 
+import emufog.container.DeviceType;
+
 /**
- * A switch is part of the backbone of a network and cannot connect to host devices directly.
- * It can still though be a fog computing node.
+ * This class represents a edge device. Each edge device has a container image
+ * associated to run the application specific code.
  */
-public class Switch extends Node {
+public class EdgeDeviceNode extends Node {
 
     /**
-     * Creates a new switch node.
+     * Creates a new edge device node.
+     * The edge device node must have an container image and IP address assigned.
      *
-     * @param id unique identifier
-     * @param as autonomous system the belongs to
+     * @param id                unique identifier
+     * @param as                autonomous system the belongs to
+     * @param emulationSettings emulation node associated with the edge device
      */
-    Switch(int id, AS as) {
+    EdgeDeviceNode(int id, AS as, EmulationSettings emulationSettings) {
         super(id, as);
+
+        this.emulationSettings = emulationSettings;
     }
 
-    @Override
-    void addToAS() {
-        as.addSwitch(this);
+    /**
+     * Returns the container type for this edge device node. The type is always a device type instance.
+     *
+     * @return device container type
+     */
+    DeviceType getContainerType() {
+        return (DeviceType) emulationSettings.getContainerType();
     }
 
     @Override
     public String getName() {
-        return "s" + id;
+        return "h" + id;
     }
 }

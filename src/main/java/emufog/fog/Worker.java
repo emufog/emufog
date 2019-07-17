@@ -134,7 +134,7 @@ abstract class Worker implements Callable<FogResult> {
                     Node neighbor = e.getDestinationForSource(current.oldNode);
 
                     // ignore host devices as they are not considered to be possible nodes
-                    if (!(neighbor instanceof HostDevice)) {
+                    if (!(neighbor instanceof EdgeDeviceNode)) {
                         float nextCosts = currentCosts + calculateCosts(e);
                         if (nextCosts <= threshold) {
                             FogNode neighborNode = g.getNode(neighbor);
@@ -177,7 +177,7 @@ abstract class Worker implements Callable<FogResult> {
             }
         }
         FogLevel firstLevel = new FogLevel(fogPlacements, startLevel, null);
-        firstLevel.addStartingRouters(as.getRouters());
+        firstLevel.addStartingRouters(as.getEdgeNodes());
 
         for (FogType type : startLevel) {
             levelMap.put(type, firstLevel);

@@ -24,27 +24,55 @@
 package emufog.graph;
 
 /**
- * This class convert an existing node to a switch node in the graph.
+ * The edge node class represents a node of the graph host devices can connect to.
  */
-public class SwitchConverter extends NodeConverter {
+public class EdgeNode extends Node {
 
-    @Override
-    protected Node createNewNode(Node node) {
-        return new Switch(node.id, node.as);
+    /* number of devices connected to this edge node */
+    private int deviceCount;
+
+    /**
+     * Creates a new edge node instance.
+     *
+     * @param id unique identifier
+     * @param as autonomous system the belongs to
+     */
+    EdgeNode(int id, AS as) {
+        super(id, as);
+
+        deviceCount = 0;
+    }
+
+    /**
+     * Returns indication whether this edge node has devices connected.
+     *
+     * @return true if there are devices connected, false otherwise
+     */
+    public boolean hasDevices() {
+        return deviceCount > 0;
+    }
+
+    /**
+     * Increments the device counter by the given number.
+     *
+     * @param n the number to increase the device count
+     */
+    void incrementDeviceCount(int n) {
+        deviceCount += n;
+    }
+
+    /**
+     * Returns the device count of this edge node.
+     * The count includes the scaling factor given by the settings.
+     *
+     * @return device count
+     */
+    public int getDeviceCount() {
+        return deviceCount;
     }
 
     @Override
-    protected void addNodeToGraph(Node newNode) {
-        newNode.as.addSwitch((Switch) newNode);
-    }
-
-    @Override
-    protected boolean needsConversion(Node node) {
-        return !(node instanceof Switch);
-    }
-
-    @Override
-    public Switch convert(Node node) {
-        return (Switch) super.convert(node);
+    public String getName() {
+        return "r" + id;
     }
 }

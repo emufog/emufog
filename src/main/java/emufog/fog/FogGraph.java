@@ -26,8 +26,8 @@ package emufog.fog;
 import emufog.container.FogType;
 import emufog.graph.AS;
 import emufog.graph.Node;
-import emufog.graph.Router;
-import emufog.graph.Switch;
+import emufog.graph.EdgeNode;
+import emufog.graph.BackboneNode;
 import emufog.util.Tuple;
 
 import java.util.*;
@@ -48,7 +48,7 @@ class FogGraph {
     final List<FogType> servers;
 
     /* list of all edge nodes still to cover */
-    private final List<EdgeNode> edgeNodes;
+    private final List<emufog.fog.EdgeNode> edgeNodes;
 
     /* mapping of nodes of the underlying graph to their respective fog nodes equivalent */
     private final Map<Node, FogNode> nodeMapping;
@@ -85,22 +85,22 @@ class FogGraph {
      * @param startNodes list of nodes with their respective edge nodes
      * @param as         AS instance to work on
      */
-    void initNodes(List<Tuple<Node, List<EdgeNode>>> startNodes, AS as) {
-        for (Router r : as.getRouters()) {
+    void initNodes(List<Tuple<Node, List<emufog.fog.EdgeNode>>> startNodes, AS as) {
+        for (EdgeNode r : as.getEdgeNodes()) {
             nodeMapping.put(r, new SwitchNode(this, r));
         }
 
-        for (Switch s : as.getSwitches()) {
+        for (BackboneNode s : as.getBackboneNodes()) {
             nodeMapping.put(s, new SwitchNode(this, s));
         }
 
-        for (Tuple<Node, List<EdgeNode>> t : startNodes) {
-            EdgeNode edgeNode;
-            if (t.getKey() instanceof Router && t.getValue() == null) {
-                edgeNode = new EdgeNode(this, (Router) t.getKey());
+        for (Tuple<Node, List<emufog.fog.EdgeNode>> t : startNodes) {
+            emufog.fog.EdgeNode edgeNode;
+            if (t.getKey() instanceof EdgeNode && t.getValue() == null) {
+                edgeNode = new emufog.fog.EdgeNode(this, (emufog.graph.EdgeNode) t.getKey());
             }
             else {
-                edgeNode = new EdgeNode(this, t.getKey(), t.getValue());
+                edgeNode = new emufog.fog.EdgeNode(this, t.getKey(), t.getValue());
             }
             nodeMapping.put(t.getKey(), edgeNode);
             edgeNodes.add(edgeNode);
@@ -155,7 +155,7 @@ class FogGraph {
         LOG.info("Find Types Time: " + intervalToString(start, end));
 
         //TODO debug
-        for (EdgeNode edgeNode : edgeNodes) {
+        for (emufog.fog.EdgeNode edgeNode : edgeNodes) {
             assert edgeNode != null : "edge node in the list is null";
             assert edgeNode.isMappedToItself() : "edge node is not mapped to itself";
         }
@@ -170,10 +170,10 @@ class FogGraph {
         FogNode next = fogNodes.get(0);
 
         // get covered nodes by the fog node placement
-        Collection<EdgeNode> coveredNodes = next.getCoveredEdgeNodes();
+        Collection<emufog.fog.EdgeNode> coveredNodes = next.getCoveredEdgeNodes();
 
         //TODO debug
-        if (next instanceof EdgeNode && edgeNodes.contains(next)) {
+        if (next instanceof emufog.fog.EdgeNode && edgeNodes.contains(next)) {
             assert coveredNodes.contains(next) : "covered nodes set doesn't contain nextLevels node";
         }
 
@@ -182,13 +182,13 @@ class FogGraph {
         nodeMapping.remove(next.oldNode);
 
         // update all edge nodes connected to nextLevels
-        for (EdgeNode edgeNode : next.getConnectedEdgeNodes()) {
+        for (emufog.fog.EdgeNode edgeNode : next.getConnectedEdgeNodes()) {
             edgeNode.removePossibleNode(next);
         }
         next.clearAllEdgeNodes();
 
         // update all fog nodes connected to the selected node set
-        for (EdgeNode coveredNode : coveredNodes) {
+        for (emufog.fog.EdgeNode coveredNode : coveredNodes) {
             coveredNode.notifyPossibleNodes();
             coveredNode.clearPossibleNodes();
             nodeMapping.remove(coveredNode.oldNode);

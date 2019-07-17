@@ -23,44 +23,28 @@
  */
 package emufog.graph;
 
-import emufog.container.DeviceType;
-
 /**
- * This class represents a host device. Each host device has a container image
- * associated to run the application specific code.
+ * This class convert an existing node to a backbone node in the graph.
  */
-public class HostDevice extends Node {
+public class BackboneNodeConverter extends NodeConverter {
 
-    /**
-     * Creates a new host device.
-     * The host device must have an container image and IP address assigned.
-     *
-     * @param id                unique identifier
-     * @param as                autonomous system the belongs to
-     * @param emulationSettings emulation node associated with the host device
-     */
-    HostDevice(int id, AS as, EmulationSettings emulationSettings) {
-        super(id, as);
-
-        this.emulationSettings = emulationSettings;
+    @Override
+    protected Node createNewNode(Node node) {
+        return new BackboneNode(node.id, node.as);
     }
 
     @Override
-    void addToAS() {
-        as.addDevice(this);
-    }
-
-    /**
-     * Returns the container type for this host device. The type is always a device type instance.
-     *
-     * @return device container type
-     */
-    DeviceType getDockerType() {
-        return (DeviceType) emulationSettings.containerType;
+    protected void addNodeToGraph(Node newNode) {
+        newNode.as.addBackboneNode((BackboneNode) newNode);
     }
 
     @Override
-    public String getName() {
-        return "h" + id;
+    protected boolean needsConversion(Node node) {
+        return !(node instanceof BackboneNode);
+    }
+
+    @Override
+    public BackboneNode convert(Node node) {
+        return (BackboneNode) super.convert(node);
     }
 }

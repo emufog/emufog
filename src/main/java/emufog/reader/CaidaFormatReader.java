@@ -23,6 +23,7 @@
  */
 package emufog.reader;
 
+import emufog.graph.AS;
 import emufog.graph.CoordinateGraph;
 import emufog.graph.Graph;
 import emufog.graph.ILatencyCalculator;
@@ -209,11 +210,11 @@ public class CaidaFormatReader extends GraphReader {
                 return;
             }
 
-            Node from = graph.getRouter(sourceID);
-            Node to = graph.getRouter(destinationID);
+            Node from = graph.getEdgeNode(sourceID);
+            Node to = graph.getEdgeNode(destinationID);
 
             if (from != null && to != null) {
-                graph.createEdge(id, from, to, calculator, 1000);
+                graph.createEdge(id, from, to, 1000, calculator);
             } else {
                 LOG.debug("To create a link source and destination must be found.");
                 noNodeFoundForEdge++;
@@ -266,7 +267,8 @@ public class CaidaFormatReader extends GraphReader {
             return;
         }
 
-        graph.createRouter(id, as, coordinates.xPos, coordinates.yPos);
+        AS system = graph.getOrCreateAutonomousSystem(as);
+        graph.createEdgeNode(id, system, coordinates.xPos, coordinates.yPos);
         nodeCoordinates.remove(id);
     }
 

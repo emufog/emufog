@@ -24,20 +24,20 @@
 package emufog.graph;
 
 /**
- * This class convert an existing node to a host device node in the graph.
+ * This class convert an existing node to a edge device node in the graph.
  */
-public class HostDeviceConverter extends NodeConverter {
+public class EdgeDeviceNodeConverter extends NodeConverter {
 
     private final EmulationSettings emulationSettings;
 
     /**
-     * Creates a new HostDeviceConverter instance to convert an existing node and
+     * Creates a new EdgeDeviceNodeConverter instance to convert an existing node and
      * replace it with the given emulation settings.
      *
      * @param emulationSettings emulation settings of the newly created node
-     * @throws IllegalArgumentException if the emulation settings object is null
+     * @throws IllegalArgumentException if the emulation settings object is {@code null}
      */
-    public HostDeviceConverter(EmulationSettings emulationSettings) throws IllegalArgumentException {
+    public EdgeDeviceNodeConverter(EmulationSettings emulationSettings) throws IllegalArgumentException {
         if (emulationSettings == null) {
             throw new IllegalArgumentException("The emulation settings object is not initialized.");
         }
@@ -47,21 +47,21 @@ public class HostDeviceConverter extends NodeConverter {
 
     @Override
     protected Node createNewNode(Node node) {
-        return new HostDevice(node.id, node.as, emulationSettings);
+        return new EdgeDeviceNode(node.id, node.as, emulationSettings);
     }
 
     @Override
     protected void addNodeToGraph(Node newNode) {
-        newNode.as.addDevice((HostDevice) newNode);
+        newNode.as.addDevice((EdgeDeviceNode) newNode);
     }
 
     @Override
     protected boolean needsConversion(Node node) {
-        return !(node instanceof HostDevice);
+        return !(node instanceof EdgeDeviceNode);
     }
 
     @Override
-    public HostDevice convert(Node node) {
-        return (HostDevice) super.convert(node);
+    public EdgeDeviceNode convert(Node node) {
+        return (EdgeDeviceNode) super.convert(node);
     }
 }

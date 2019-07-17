@@ -25,7 +25,7 @@ package emufog.fog;
 
 import emufog.container.FogType;
 import emufog.graph.Node;
-import emufog.graph.Router;
+import emufog.graph.EdgeNode;
 import emufog.util.Tuple;
 
 import java.util.ArrayList;
@@ -49,7 +49,7 @@ class FogLevel {
     private final List<FogLevel> nextLevels;
 
     /* list of routers to start with */
-    private List<Router> startingNodes;
+    private List<EdgeNode> startingNodes;
 
     /**
      * Creates a new instance of a fog level. This requires information of previously
@@ -72,12 +72,12 @@ class FogLevel {
     }
 
     /**
-     * Adds a collection of routers as a starting set.
+     * Adds a collection of edgeNodes as a starting set.
      *
-     * @param routers routers to start this level with
+     * @param edgeNodes edgeNodes to start this level with
      */
-    void addStartingRouters(Collection<Router> routers) {
-        startingNodes = new ArrayList<>(routers);
+    void addStartingRouters(Collection<EdgeNode> edgeNodes) {
+        startingNodes = new ArrayList<>(edgeNodes);
     }
 
     /**
@@ -86,12 +86,12 @@ class FogLevel {
      *
      * @return list of nodes to start this fog level
      */
-    List<Tuple<Node, List<EdgeNode>>> getStartNodes() {
-        List<Tuple<Node, List<EdgeNode>>> result = new ArrayList<>();
+    List<Tuple<Node, List<emufog.fog.EdgeNode>>> getStartNodes() {
+        List<Tuple<Node, List<emufog.fog.EdgeNode>>> result = new ArrayList<>();
 
         if (startingNodes != null) {
             // starting with routers on the first iteration
-            for (Router r : startingNodes) {
+            for (EdgeNode r : startingNodes) {
                 if (r.hasDevices()) {
                     result.add(new Tuple<>(r, null));
                 }

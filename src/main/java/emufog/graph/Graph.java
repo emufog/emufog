@@ -26,14 +26,13 @@ package emufog.graph;
 import emufog.container.DeviceType;
 import emufog.container.FogType;
 import emufog.settings.Settings;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,10 +47,10 @@ public class Graph {
     private final List<Edge> edges;
 
     /* mapping of autonomous systems by their unique ID */
-    private final Map<Integer, AS> systems;
+    private final List<AS> systems;
 
-    /* mapping of node ID to AS ID */
-    private final Map<Integer, Integer> nodes;
+    /* mapping of node ID to the object */
+    private final Map<Integer, AS> nodes;
 
     /* settings associated with the graph */
     private final Settings settings;
@@ -70,7 +69,7 @@ public class Graph {
      * Uses the given settings for the classification algorithms.
      *
      * @param settings settings to use for the graph
-     * @throws IllegalArgumentException if the settings object is null
+     * @throws IllegalArgumentException if the settings object is {@code null}
      */
     public Graph(Settings settings) throws IllegalArgumentException {
         if (settings == null) {
@@ -78,181 +77,12 @@ public class Graph {
         }
 
         edges = new ArrayList<>();
-        systems = new HashMap<>();
+        systems = new ArrayList<>();
         nodes = new HashMap<>();
         this.settings = settings;
         IPprovider = new UniqueIPProvider(settings);
         nodeIDprovider = new UniqueIDProvider();
         edgeIDprovider = new UniqueIDProvider();
-    }
-
-    /**
-     * Returns the autonomous system instance mapped to the given id or create the new AS initially.
-     *
-     * @param id id of the AS to seek
-     * @return the AS associated or a new instance
-     */
-    private AS getAS(int id) {
-        return systems.computeIfAbsent(id, AS::new);
-    }
-
-    /**
-     * Creates a new router in the graph
-     *
-     * @param id unique identifier
-     * @param as autonomous system the belongs to
-     * @return the newly created router
-     * @throws IllegalArgumentException throws an exception if the ID is already in use
-     */
-    public Router createRouter(int id, int as) throws IllegalArgumentException {
-        checkNodeID(id);
-
-        Router router = new Router(id, getAS(as));
-        nodeIDprovider.markIDused(id);
-        nodes.put(id, as);
-
-        return router;
-    }
-
-    /**
-     * Creates a new switch in the graph.
-     *
-     * @param id unique identifier
-     * @param as autonomous system the belongs to
-     * @return the newly created switch
-     * @throws IllegalArgumentException throws an exception if the ID is already in use
-     */
-    public Switch createSwitch(int id, int as) throws IllegalArgumentException {
-        checkNodeID(id);
-
-        Switch aSwitch = new Switch(id, getAS(as));
-        nodeIDprovider.markIDused(id);
-        nodes.put(id, as);
-
-        return aSwitch;
-    }
-
-    /**
-     * Creates a new host device in the graph.
-     *
-     * @param id    unique identifier
-     * @param as    autonomous system the device belongs to
-     * @param image container image to use for the host device
-     * @return the newly created host device
-     * @throws IllegalArgumentException if the id already in use or the image object is null
-     */
-    public HostDevice createHostDevice(int id, int as, DeviceType image) throws IllegalArgumentException {
-        checkNodeID(id);
-        if (image == null) {
-            throw new IllegalArgumentException("The given container image is not initialized.");
-        }
-
-        EmulationSettings emulationSettings = new EmulationSettings(IPprovider.getNextIPV4Address(), image);
-        HostDevice device = new HostDevice(id, getAS(as), emulationSettings);
-        nodeIDprovider.markIDused(id);
-        nodes.put(id, as);
-
-        return device;
-    }
-
-    /**
-     * Check the node's ID if it's already in use.
-     * Throws an exception if the ID is used before.
-     *
-     * @param id ID to check
-     * @throws IllegalArgumentException if the ID is already in use
-     */
-    private void checkNodeID(int id) throws IllegalArgumentException {
-        if (nodeIDprovider.isUsed(id)) {
-            throw new IllegalArgumentException("The ID: " + id + " is already in use.");
-        }
-    }
-
-    /**
-     * Creates a new edge using the given latency and bandwidth.
-     * If there are no coordinates associated the method is unable to create a new edge.
-     *
-     * @param id        unique id of the edge
-     * @param from      1st end of the edge
-     * @param to        2nd end of the edge
-     * @param delay     delay of the edge
-     * @param bandwidth bandwidth of the edge
-     * @return the newly created edge
-     * @throws IllegalArgumentException if any of the objects is null or the nodes are not
-     *                                  associated with coordinates
-     */
-    public Edge createEdge(int id, Node from, Node to, float delay, float bandwidth) throws IllegalArgumentException {
-        if (from == null || to == null) {
-            throw new IllegalArgumentException("The source and destination nodes cannot be null.");
-        }
-
-        if (edgeIDprovider.isUsed(id)) {
-            LOG.warn("The edge ID: " + id + " is already in use");
-            id = edgeIDprovider.getNextID();
-            LOG.warn("Assigning new edge ID: " + id);
-        }
-
-        Edge edge = new Edge(id, from, to, delay, bandwidth);
-        edgeIDprovider.markIDused(id);
-        edges.add(edge);
-
-        if (from.as.equals(to.as)) {
-            from.as.incrementDegree();
-            to.as.incrementDegree();
-        }
-
-        if (from instanceof Router && to instanceof HostDevice) {
-            ((Router) from).incrementDeviceCount(((HostDevice) to).getDockerType().scalingFactor);
-        }
-        if (from instanceof HostDevice && to instanceof Router) {
-            ((Router) to).incrementDeviceCount(((HostDevice) from).getDockerType().scalingFactor);
-        }
-
-        return edge;
-    }
-
-    /**
-     * Assigns the devices specified in the settings to the edge nodes on a random base.
-     */
-    public void assignEdgeDevices() {
-        Random random = new Random();
-
-        for (DeviceType type : settings.deviceNodeTypes) {
-            float upper = Math.abs(type.averageDeviceCount) * 2;
-
-            for (Router r : getRouters()) {
-                // random distribution within the interval from 0 to count * 2
-                int count = (int) (random.nextFloat() * upper);
-
-                for (int i = 0; i < count; ++i) {
-                    HostDevice device = createHostDevice(nodeIDprovider.getNextID(), r.as.id, type);
-
-                    createEdge(edgeIDprovider.getNextID(), r, device, settings.edgeDeviceDelay, settings.edgeDeviceBandwidth);
-                }
-            }
-        }
-    }
-
-    /**
-     * Places a fog node in the graph's topology. The graph has to contain the given node.
-     * Also a new unique IP address will be assigned.
-     *
-     * @param node node to place a fog node at
-     * @param type fog type to set the node to
-     * @throws IllegalArgumentException if the parameters are null, the graph does not contain the given node
-     */
-    public void placeFogNode(Node node, FogType type) throws IllegalArgumentException {
-        if (node == null) {
-            throw new IllegalArgumentException("The given node is not initialized.");
-        }
-        if (type == null) {
-            throw new IllegalArgumentException("The given fog type is not initialized.");
-        }
-        if (!nodes.containsKey(node.id)) {
-            throw new IllegalArgumentException("This graph object does not contain the given node.");
-        }
-
-        node.emulationSettings = new EmulationSettings(IPprovider.getNextIPV4Address(), type);
     }
 
     /**
@@ -265,58 +95,12 @@ public class Graph {
     }
 
     /**
-     * Returns all nodes of the graph.
+     * Returns all autonomous systems of the graph.
      *
-     * @return nodes of the graph
+     * @return all autonomous systems
      */
-    public Collection<Node> getNodes() {
-        //TODO
-        List<Node> nodes = new ArrayList<>();
-        nodes.addAll(getRouters());
-        nodes.addAll(getSwitches());
-        nodes.addAll(getHostDevices());
-
-        return nodes;
-    }
-
-    /**
-     * Returns the host device with the given identifier.
-     *
-     * @param id identifier of the host device
-     * @return host device with the given ID
-     */
-    public HostDevice getHostDevice(int id) {
-        return nodes.containsKey(id) ? getASforNode(id).getDevice(id) : null;
-    }
-
-    /**
-     * Returns the switch with the given identifier.
-     *
-     * @param id identifier of the switch
-     * @return switch with the given ID
-     */
-    public Switch getSwitch(int id) {
-        return nodes.containsKey(id) ? getASforNode(id).getSwitch(id) : null;
-    }
-
-    /**
-     * Returns the router with the given identifier.
-     *
-     * @param id identifier of the router
-     * @return router with the given ID
-     */
-    public Router getRouter(int id) {
-        return nodes.containsKey(id) ? getASforNode(id).getRouter(id) : null;
-    }
-
-    /**
-     * Returns the AS instance the node is part of.
-     *
-     * @param id ID of the node
-     * @return node's AS
-     */
-    private AS getASforNode(int id) {
-        return getAS(nodes.get(id));
+    public List<AS> getSystems() {
+        return systems;
     }
 
     /**
@@ -333,61 +117,265 @@ public class Graph {
      *
      * @return host devices of the graph
      */
-    public Collection<HostDevice> getHostDevices() {
-        List<HostDevice> devices = new ArrayList<>();
+    public Collection<EdgeDeviceNode> getHostDevices() {
+        return systems.stream().map(AS::getEdgeDeviceNodes).flatMap(Collection::stream).collect(Collectors.toList());
+    }
 
-        for (AS as : systems.values()) {
-            devices.addAll(as.getDevices());
+    /**
+     * Returns all the edge nodes of the graph.
+     *
+     * @return edge nodes of the graph
+     */
+    public Collection<EdgeNode> getEdgeNodes() {
+        return systems.stream().map(AS::getEdgeNodes).flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    /**
+     * Returns all the backbone nodes of the graph.
+     *
+     * @return backbone nodes of the graph
+     */
+    public Collection<BackboneNode> getBackboneNodes() {
+        return systems.stream().map(AS::getBackboneNodes).flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    /**
+     * Returns all nodes of the graph.
+     *
+     * @return nodes of the graph
+     */
+    public Collection<Node> getNodes() {
+        List<Node> nodes = new ArrayList<>();
+        nodes.addAll(getEdgeNodes());
+        nodes.addAll(getBackboneNodes());
+        nodes.addAll(getHostDevices());
+
+        return nodes;
+    }
+
+    /**
+     * Returns the edge device node with the given identifier.
+     *
+     * @param id identifier of the edge device node
+     * @return edge device node with the given ID
+     */
+    public EdgeDeviceNode getEdgeDeviceNode(int id) {
+        return nodes.containsKey(id) ? nodes.get(id).getEdgeDeviceNode(id) : null;
+    }
+
+    /**
+     * Returns the backbone node with the given identifier.
+     *
+     * @param id identifier of the backbone node
+     * @return backbone node with the given ID
+     */
+    public BackboneNode getBackboneNode(int id) {
+        return nodes.containsKey(id) ? nodes.get(id).getBackboneNode(id) : null;
+    }
+
+    /**
+     * Returns the edge node with the given identifier.
+     *
+     * @param id identifier of the edge node
+     * @return edge node with the given ID
+     */
+    public EdgeNode getEdgeNode(int id) {
+        return nodes.containsKey(id) ? nodes.get(id).getEdgeNodes(id) : null;
+    }
+
+    /**
+     * Returns the autonomous system with the given id or {@code null}
+     * if it's nor present.
+     *
+     * @param id id to query for
+     * @return autonomous system or {@code null} if not present
+     */
+    public AS getAutonomousSystem(int id) {
+        return systems.stream().filter(as -> as.id == id).findFirst().orElse(null);
+    }
+
+    /**
+     * Gets or creates a new autonomous system with the given id in the graph.
+     *
+     * @param id unique id of the as
+     * @return autonomous system with the id
+     */
+    public AS getOrCreateAutonomousSystem(int id) {
+        AS as = getAutonomousSystem(id);
+        if (as != null) {
+            return as;
         }
 
-        return devices;
+        as = new AS(id);
+        systems.add(as);
+
+        return as;
     }
 
     /**
-     * Returns all the routers of the graph.
+     * Creates a new edge node in the graph
      *
-     * @return routers of the graph
+     * @param id unique identifier
+     * @param as autonomous system the edge node belongs to
+     * @return the newly created edge node
+     * @throws IllegalArgumentException thrown if the ID is already in use or as is {@code null}
      */
-    public Collection<Router> getRouters() {
-        List<Router> routers = new ArrayList<>();
+    public EdgeNode createEdgeNode(int id, AS as) throws IllegalArgumentException {
+        if (as == null) {
+            throw new IllegalArgumentException("The autonomous system is null.");
+        }
+        checkNodeID(id);
 
-        for (AS as : systems.values()) {
-            routers.addAll(as.getRouters());
+        EdgeNode edgeNode = new EdgeNode(id, as);
+        nodeIDprovider.markIDused(id);
+        as.addEdgeNode(edgeNode);
+        nodes.put(id, as);
+
+        return edgeNode;
+    }
+
+    /**
+     * Creates a new backbone node in the graph.
+     *
+     * @param id unique identifier
+     * @param as autonomous system the backbone node belongs to
+     * @return the newly created backbone node
+     * @throws IllegalArgumentException thrown if the ID is already in use or as is {@code null}
+     */
+    public BackboneNode createBackboneNode(int id, AS as) throws IllegalArgumentException {
+        if (as == null) {
+            throw new IllegalArgumentException("The autonomous system is null.");
+        }
+        checkNodeID(id);
+
+        BackboneNode backboneNode = new BackboneNode(id, as);
+        nodeIDprovider.markIDused(id);
+        as.addBackboneNode(backboneNode);
+        nodes.put(id, as);
+
+        return backboneNode;
+    }
+
+    /**
+     * Creates a new edge device in the graph.
+     *
+     * @param id    unique identifier
+     * @param as    autonomous system the device belongs to
+     * @param image container image to use for the edge device
+     * @return the newly created edge device
+     * @throws IllegalArgumentException thrown if the ID is already in use or as or image is {@code null}
+     */
+    public EdgeDeviceNode createEdgeDeviceNode(int id, AS as, DeviceType image) throws IllegalArgumentException {
+        if (as == null) {
+            throw new IllegalArgumentException("The autonomous system is null.");
+        }
+        if (image == null) {
+            throw new IllegalArgumentException("The given container image is not initialized.");
+        }
+        checkNodeID(id);
+
+        EmulationSettings emulationSettings = new EmulationSettings(IPprovider.getNextIPV4Address(), image);
+        EdgeDeviceNode edgeDevice = new EdgeDeviceNode(id, as, emulationSettings);
+        nodeIDprovider.markIDused(id);
+        as.addDevice(edgeDevice);
+        nodes.put(id, as);
+
+        return edgeDevice;
+    }
+
+    /**
+     * Creates a new edge using the given latency and bandwidth.
+     * If there are no coordinates associated the method is unable to create a new edge.
+     *
+     * @param id        unique id of the edge
+     * @param from      1st end of the edge
+     * @param to        2nd end of the edge
+     * @param delay     delay of the edge
+     * @param bandwidth bandwidth of the edge
+     * @return the newly created edge
+     * @throws IllegalArgumentException if any of the objects is {@code null} or the nodes are not
+     *                                  associated with coordinates
+     */
+    public Edge createEdge(int id, Node from, Node to, float delay, float bandwidth) throws IllegalArgumentException {
+        if (from == null || to == null) {
+            throw new IllegalArgumentException("The source and destination nodes cannot be null.");
         }
 
-        return routers;
-    }
-
-    /**
-     * Returns all the switches of the graph.
-     *
-     * @return switches of the graph
-     */
-    public Collection<Switch> getSwitches() {
-        List<Switch> switches = new ArrayList<>();
-
-        for (AS as : systems.values()) {
-            switches.addAll(as.getSwitches());
+        if (edgeIDprovider.isUsed(id)) {
+            LOG.warn("The edge id: {} is already in use", id);
+            id = edgeIDprovider.getNextID();
+            LOG.warn("Assigning new edge id: {}", id);
         }
 
-        return switches;
+        Edge edge = new Edge(id, from, to, delay, bandwidth);
+        edgeIDprovider.markIDused(id);
+        edges.add(edge);
+
+        if (from instanceof EdgeNode && to instanceof EdgeDeviceNode) {
+            ((EdgeNode) from).incrementDeviceCount(((EdgeDeviceNode) to).getContainerType().scalingFactor);
+        }
+        if (from instanceof EdgeDeviceNode && to instanceof EdgeNode) {
+            ((EdgeNode) to).incrementDeviceCount(((EdgeDeviceNode) from).getContainerType().scalingFactor);
+        }
+
+        return edge;
     }
 
     /**
-     * Returns a set of all autonomous system identifiers.
-     *
-     * @return set of AS IDs
+     * Assigns the devices specified in the settings to the edge nodes on a random base.
      */
-    public Set<Integer> getASIdentifiers() {
-        return systems.keySet();
+    public void assignEdgeDevices() {
+        Random random = new Random();
+
+        for (DeviceType type : settings.deviceNodeTypes) {
+            float upper = Math.abs(type.averageDeviceCount) * 2;
+
+            for (EdgeNode r : getEdgeNodes()) {
+                // random distribution within the interval from 0 to count * 2
+                int count = (int) (random.nextFloat() * upper);
+
+                for (int i = 0; i < count; ++i) {
+                    EdgeDeviceNode device = createEdgeDeviceNode(nodeIDprovider.getNextID(), r.as, type);
+
+                    createEdge(edgeIDprovider.getNextID(), r, device, settings.edgeDeviceDelay, settings.edgeDeviceBandwidth);
+                }
+            }
+        }
     }
 
     /**
-     * Returns all autonomous systems of the graph.
+     * Places a fog node in the graph's topology. The graph has to contain the given node.
+     * Also a new unique IP address will be assigned.
      *
-     * @return all autonomous systems
+     * @param node node to place a fog node at
+     * @param type fog type to set the node to
+     * @throws IllegalArgumentException if the parameters are {@code null}, the graph does not
+     *                                  contain the given node
      */
-    public Collection<AS> getSystems() {
-        return systems.values();
+    public void placeFogNode(Node node, FogType type) throws IllegalArgumentException {
+        if (node == null) {
+            throw new IllegalArgumentException("The given node is not initialized.");
+        }
+        if (type == null) {
+            throw new IllegalArgumentException("The given fog type is not initialized.");
+        }
+        if (!nodes.containsKey(node.id)) {
+            throw new IllegalArgumentException("This graph object does not contain the given node.");
+        }
+
+        node.emulationSettings = new EmulationSettings(IPprovider.getNextIPV4Address(), type);
+    }
+
+    /**
+     * Check the node's ID if it's already in use.
+     * Throws an exception if the ID is used before.
+     *
+     * @param id ID to check
+     * @throws IllegalArgumentException if the ID is already in use
+     */
+    private void checkNodeID(int id) throws IllegalArgumentException {
+        if (nodeIDprovider.isUsed(id)) {
+            throw new IllegalArgumentException("The node ID: " + id + " is already in use.");
+        }
     }
 }

@@ -31,15 +31,15 @@ import emufog.container.ContainerType;
 public class EmulationSettings {
 
     /* IP address to use */
-    final String IP;
+    private final String IP;
 
     /* container image containing the application to emulate */
-    final ContainerType containerType;
+    private final ContainerType containerType;
 
     /**
      * Creates a new instance of the emulation settings object using the given IP and container image.
      *
-     * @param IP         IP address to use
+     * @param IP            IP address to use
      * @param containerType container image to use
      */
     EmulationSettings(String IP, ContainerType containerType) {

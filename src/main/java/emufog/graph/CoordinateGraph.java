@@ -47,7 +47,7 @@ public class CoordinateGraph extends Graph {
      * Uses the given settings for the classification algorithms.
      *
      * @param settings settings to use for the graph
-     * @throws IllegalArgumentException if the settings object is null
+     * @throws IllegalArgumentException if the settings object is {@code null}
      */
     public CoordinateGraph(Settings settings) throws IllegalArgumentException {
         super(settings);
@@ -56,7 +56,7 @@ public class CoordinateGraph extends Graph {
     }
 
     /**
-     * Creates a new router in the graph
+     * Creates a new edge node in the graph
      *
      * @param id   unique identifier
      * @param as   autonomous system the router belongs to
@@ -65,14 +65,15 @@ public class CoordinateGraph extends Graph {
      * @return the newly created router
      * @throws IllegalArgumentException throws an exception if the ID is already in use
      */
-    public Router createRouter(int id, int as, float xPos, float yPos) throws IllegalArgumentException {
+    public EdgeNode createEdgeNode(int id, AS as, float xPos, float yPos) throws IllegalArgumentException {
+        EdgeNode edgeNode = createEdgeNode(id, as);
         coordinates.put(id, new NodeCoordinates(xPos, yPos));
 
-        return createRouter(id, as);
+        return edgeNode;
     }
 
     /**
-     * Creates a new switch in the graph.
+     * Creates a new backbone node in the graph.
      *
      * @param id   unique identifier
      * @param as   autonomous system the switch belongs to
@@ -81,14 +82,15 @@ public class CoordinateGraph extends Graph {
      * @return the newly created switch
      * @throws IllegalArgumentException throws an exception if the ID is already in use
      */
-    public Switch createSwitch(int id, int as, float xPos, float yPos) throws IllegalArgumentException {
+    public BackboneNode createBackboneNode(int id, AS as, float xPos, float yPos) throws IllegalArgumentException {
+        BackboneNode backboneNode = createBackboneNode(id, as);
         coordinates.put(id, new NodeCoordinates(xPos, yPos));
 
-        return createSwitch(id, as);
+        return backboneNode;
     }
 
     /**
-     * Creates a new host device in the graph.
+     * Creates a new edge device node in the graph.
      *
      * @param id    unique identifier
      * @param as    autonomous system the device belongs to
@@ -96,12 +98,13 @@ public class CoordinateGraph extends Graph {
      * @param yPos  y coordinate
      * @param image container image to use for the host device
      * @return the newly created host device
-     * @throws IllegalArgumentException if the id already in use or the image object is null
+     * @throws IllegalArgumentException if the id already in use or the image object is {@code null}
      */
-    public HostDevice createHostDevice(int id, int as, float xPos, float yPos, DeviceType image) throws IllegalArgumentException {
+    public EdgeDeviceNode createEdgeDeviceNode(int id, AS as, float xPos, float yPos, DeviceType image) throws IllegalArgumentException {
+        EdgeDeviceNode edgeDeviceNode = createEdgeDeviceNode(id, as, image);
         coordinates.put(id, new NodeCoordinates(xPos, yPos));
 
-        return createHostDevice(id, as, image);
+        return edgeDeviceNode;
     }
 
     /**
@@ -111,14 +114,13 @@ public class CoordinateGraph extends Graph {
      * @param id               unique id of the edge
      * @param from             1st end of the edge
      * @param to               2nd end of the edge
-     * @param latencyEstimator latency calculator to use
      * @param bandwidth        bandwidth of the edge
+     * @param latencyEstimator latency calculator to use
      * @return the newly created edge
-     * @throws IllegalArgumentException if any of the objects is null or the nodes are not
+     * @throws IllegalArgumentException if any of the objects is {@code null} or the nodes are not
      *                                  associated with coordinates
      */
-    public Edge createEdge(
-        int id, Node from, Node to, ILatencyCalculator latencyEstimator, float bandwidth) throws IllegalArgumentException {
+    public Edge createEdge(int id, Node from, Node to, float bandwidth, ILatencyCalculator latencyEstimator) throws IllegalArgumentException {
         if (from == null || to == null) {
             throw new IllegalArgumentException("The source and destination nodes cannot be null.");
         }
@@ -128,12 +130,12 @@ public class CoordinateGraph extends Graph {
 
         NodeCoordinates fromCoords = coordinates.get(from.getID());
         if (fromCoords == null) {
-            LOG.warn("The source " + from + " is not associated with coordinates.");
+            LOG.error("The source {} is not associated with coordinates.", from);
             return null;
         }
         NodeCoordinates toCoords = coordinates.get(to.getID());
         if (toCoords == null) {
-            LOG.warn("The source " + to + " is not associated with coordinates.");
+            LOG.error("The source {} is not associated with coordinates.", to);
             return null;
         }
 

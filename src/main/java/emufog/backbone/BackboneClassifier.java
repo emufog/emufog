@@ -26,7 +26,7 @@ package emufog.backbone;
 import emufog.graph.AS;
 import emufog.graph.Edge;
 import emufog.graph.Graph;
-import emufog.graph.SwitchConverter;
+import emufog.graph.BackboneNodeConverter;
 import java.util.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,8 +59,8 @@ public class BackboneClassifier {
         if (graph.getSettings().timeMeasuring) {
             LOG.info("Graph Step 1 - Time: {}", intervalToString(start, stop));
         }
-        LOG.debug("Backbone Size: {}", graph.getSwitches().size());
-        LOG.debug("Edge Size: {}", graph.getRouters().size());
+        LOG.debug("Backbone Size: {}", graph.getBackboneNodes().size());
+        LOG.debug("Edge Size: {}", graph.getEdgeNodes().size());
 
         Collection<AS> systems = graph.getSystems();
 
@@ -74,8 +74,8 @@ public class BackboneClassifier {
         if (graph.getSettings().timeMeasuring) {
             LOG.info("Graph Step 2 - Time: {}", intervalToString(start, stop));
         }
-        LOG.debug("Backbone Size: {}", graph.getSwitches().size());
-        LOG.debug("Edge Size: {}", graph.getRouters().size());
+        LOG.debug("Backbone Size: {}", graph.getBackboneNodes().size());
+        LOG.debug("Edge Size: {}", graph.getEdgeNodes().size());
 
         LOG.info("Finished Backbone Classification.");
     }
@@ -84,7 +84,7 @@ public class BackboneClassifier {
      * This methods marks all cross-AS edge's endpoints as backbone nodes.
      */
     private static void markASEdgeNodes(Graph graph) {
-        SwitchConverter converter = new SwitchConverter();
+        BackboneNodeConverter converter = new BackboneNodeConverter();
 
         for (Edge e : graph.getEdges()) {
             if (e.isCrossASEdge()) {
