@@ -28,9 +28,8 @@ import emufog.container.FogType;
 import emufog.settings.Settings;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -46,11 +45,8 @@ public class Graph {
     /* list of all edges in the graph */
     private final List<Edge> edges;
 
-    /* mapping of autonomous systems by their unique ID */
+    /* list of all autonomous systems */
     private final List<AS> systems;
-
-    /* mapping of node ID to the object */
-    private final Map<Integer, AS> nodes;
 
     /* settings associated with the graph */
     private final Settings settings;
@@ -78,7 +74,6 @@ public class Graph {
 
         edges = new ArrayList<>();
         systems = new ArrayList<>();
-        nodes = new HashMap<>();
         this.settings = settings;
         IPprovider = new UniqueIPProvider(settings);
         nodeIDprovider = new UniqueIDProvider();
@@ -160,7 +155,7 @@ public class Graph {
      * @return edge device node with the given ID
      */
     public EdgeDeviceNode getEdgeDeviceNode(int id) {
-        return nodes.containsKey(id) ? nodes.get(id).getEdgeDeviceNode(id) : null;
+        return systems.stream().map(as -> as.getEdgeDeviceNode(id)).filter(Objects::nonNull).findFirst().orElse(null);
     }
 
     /**
@@ -170,7 +165,7 @@ public class Graph {
      * @return backbone node with the given ID
      */
     public BackboneNode getBackboneNode(int id) {
-        return nodes.containsKey(id) ? nodes.get(id).getBackboneNode(id) : null;
+        return systems.stream().map(as -> as.getBackboneNode(id)).filter(Objects::nonNull).findFirst().orElse(null);
     }
 
     /**
@@ -180,7 +175,7 @@ public class Graph {
      * @return edge node with the given ID
      */
     public EdgeNode getEdgeNode(int id) {
-        return nodes.containsKey(id) ? nodes.get(id).getEdgeNodes(id) : null;
+        return systems.stream().map(as -> as.getEdgeNode(id)).filter(Objects::nonNull).findFirst().orElse(null);
     }
 
     /**
@@ -229,7 +224,6 @@ public class Graph {
         EdgeNode edgeNode = new EdgeNode(id, as);
         nodeIDprovider.markIDused(id);
         as.addEdgeNode(edgeNode);
-        nodes.put(id, as);
 
         return edgeNode;
     }
@@ -251,7 +245,6 @@ public class Graph {
         BackboneNode backboneNode = new BackboneNode(id, as);
         nodeIDprovider.markIDused(id);
         as.addBackboneNode(backboneNode);
-        nodes.put(id, as);
 
         return backboneNode;
     }
@@ -278,7 +271,6 @@ public class Graph {
         EdgeDeviceNode edgeDevice = new EdgeDeviceNode(id, as, emulationSettings);
         nodeIDprovider.markIDused(id);
         as.addDevice(edgeDevice);
-        nodes.put(id, as);
 
         return edgeDevice;
     }
@@ -359,7 +351,8 @@ public class Graph {
         if (type == null) {
             throw new IllegalArgumentException("The given fog type is not initialized.");
         }
-        if (!nodes.containsKey(node.id)) {
+
+        if (!nodeIDprovider.isUsed(node.id)) {
             throw new IllegalArgumentException("This graph object does not contain the given node.");
         }
 
