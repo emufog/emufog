@@ -24,9 +24,7 @@
 package emufog.reader;
 
 import emufog.graph.AS;
-import emufog.graph.CoordinateGraph;
 import emufog.graph.Graph;
-import emufog.graph.ILatencyCalculator;
 import emufog.graph.Node;
 import emufog.settings.Settings;
 import java.io.IOException;
@@ -116,8 +114,7 @@ public class CaidaFormatReader extends GraphReader {
 
         nodeCoordinates = new HashMap<>();
 
-        final CoordinateGraph graph = new CoordinateGraph(settings);
-        final ILatencyCalculator calculator = new CaidaLatencyCalculator();
+        final Graph graph = new Graph(settings);
 
         // read in the nodes
         Files.lines(nodesFile, charset).forEach(this::processNodeLine);
@@ -126,7 +123,7 @@ public class CaidaFormatReader extends GraphReader {
         Files.lines(asFile, charset).forEach(x -> processASLine(graph, x));
 
         // read in the edges
-        Files.lines(linkFile, charset).forEach(x -> processLinkLine(graph, x, calculator));
+        Files.lines(linkFile, charset).forEach(x -> processLinkLine(graph, x));
 
         // log errors
         logResults();
@@ -156,7 +153,7 @@ public class CaidaFormatReader extends GraphReader {
      * @param graph graph to add the edge to
      * @param line  current line to process
      */
-    private void processLinkLine(CoordinateGraph graph, String line, ILatencyCalculator calculator) {
+    private void processLinkLine(Graph graph, String line) {
         if (!line.startsWith("link ")) {
             return;
         }
@@ -214,7 +211,7 @@ public class CaidaFormatReader extends GraphReader {
             Node to = graph.getEdgeNode(destinationID);
 
             if (from != null && to != null) {
-                graph.createEdge(id, from, to, 1000, calculator);
+                graph.createEdge(id, from, to, getLatency(from, to), 1000);
             } else {
                 LOG.debug("To create a link source and destination must be found.");
                 noNodeFoundForEdge++;
@@ -228,7 +225,7 @@ public class CaidaFormatReader extends GraphReader {
      * @param graph graph to modify the nodes from
      * @param line  current line to process
      */
-    private void processASLine(CoordinateGraph graph, String line) {
+    private void processASLine(Graph graph, String line) {
         if (!line.startsWith("node.AS ")) {
             return;
         }
@@ -262,14 +259,13 @@ public class CaidaFormatReader extends GraphReader {
 
         Coordinates coordinates = nodeCoordinates.get(id);
         if (coordinates == null) {
-            LOG.debug("No node was found for the id: {}", id);
+            LOG.debug("No node coordinates were found for the node id: {}", id);
             noNodeFoundForAS++;
             return;
         }
 
         AS system = graph.getOrCreateAutonomousSystem(as);
-        graph.createEdgeNode(id, system, coordinates.xPos, coordinates.yPos);
-        nodeCoordinates.remove(id);
+        graph.createEdgeNode(id, system);
     }
 
     /**
@@ -326,6 +322,10 @@ public class CaidaFormatReader extends GraphReader {
         return query.orElse(null);
     }
 
+    private float getLatency(Node from, Node to) {
+        return 1.f;
+    }
+
     /**
      * Coordinates of a node in the graph. This class gets mapped to the respective ID of the node.
      */
@@ -346,17 +346,6 @@ public class CaidaFormatReader extends GraphReader {
         Coordinates(float x, float y) {
             xPos = x;
             yPos = y;
-        }
-    }
-
-    /**
-     * Latency calculator for the Caida topology.
-     */
-    class CaidaLatencyCalculator implements ILatencyCalculator {
-
-        @Override
-        public float getLatency(float x1, float y1, float x2, float y2) {
-            return 1.f;
         }
     }
 }
