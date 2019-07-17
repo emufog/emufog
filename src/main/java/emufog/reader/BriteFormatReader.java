@@ -23,8 +23,9 @@
  */
 package emufog.reader;
 
+import emufog.graph.AS;
 import emufog.graph.Graph;
-import emufog.graph.Router;
+import emufog.graph.EdgeNode;
 import emufog.settings.Settings;
 
 import java.io.BufferedReader;
@@ -67,8 +68,9 @@ public class BriteFormatReader extends GraphReader {
             if (values.length >= 7) {
                 int id = Integer.parseInt(values[0]);
                 int as = Integer.parseInt(values[5]);
+                AS system = graph.getOrCreateAutonomousSystem(as);
                 // create a new router object
-                graph.createRouter(id, as);
+                graph.createEdgeNode(id, system);
             }
 
             line = reader.readLine();
@@ -97,8 +99,8 @@ public class BriteFormatReader extends GraphReader {
                 float bandwidth = Float.parseFloat(values[5]);
 
                 // get the source and destination nodes from the existing graph
-                Router fromNode = graph.getRouter(from);
-                Router toNode = graph.getRouter(to);
+                EdgeNode fromNode = graph.getEdgeNode(from);
+                EdgeNode toNode = graph.getEdgeNode(to);
                 if (fromNode != null && toNode != null) {
                     // create the new edge object
                     graph.createEdge(id, fromNode, toNode, delay, bandwidth);

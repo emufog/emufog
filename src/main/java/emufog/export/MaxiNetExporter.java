@@ -29,7 +29,6 @@ import emufog.graph.EmulationSettings;
 import emufog.graph.Graph;
 import emufog.graph.Node;
 import emufog.settings.Settings;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -42,7 +41,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * This class exports a graph object to a valid python file usable with the
@@ -123,12 +121,16 @@ public class MaxiNetExporter implements IGraphExporter {
         addBlankLine();
         lines.add("# add hosts");
 
-        for (Node n : graph.getNodes().stream().filter(Node::hasEmulationSettings).collect(Collectors.toList())) {
+        graph.getNodes().stream().filter(Node::hasEmulationSettings).forEach(n -> {
             EmulationSettings emu = n.getEmulationNode();
-            ContainerType docker = emu.getContainerType();
-            lines.add(n.getName() + " = topo.addHost(\"" + n.getName() + "\", cls=Docker, ip=\"" + emu.getIP() +
-                    "\", dimage=\"" + docker.name + "\", mem_limit=" + docker.memoryLimit + ")");
-        }
+            ContainerType container = emu.getContainerType();
+            lines.add(String.format("%s = topo.addHost(\"%s\", cls=Docker, ip=\"%s\", dimage=\"%s\", mem_limit=%d)",
+                n.getName(),
+                n.getName(),
+                emu.getIP(),
+                container.name,
+                container.memoryLimit));
+        });
     }
 
     /**
@@ -141,11 +143,9 @@ public class MaxiNetExporter implements IGraphExporter {
         lines.add("# add switches");
 
         List<Node> nodes = new ArrayList<>();
-        nodes.addAll(graph.getRouters());
-        nodes.addAll(graph.getSwitches());
-        for (Node n : nodes.stream().filter(n -> !n.hasEmulationSettings()).collect(Collectors.toList())) {
-            lines.add(n.getName() + " = topo.addSwitch(\"" + n.getName() + "\")");
-        }
+        nodes.addAll(graph.getEdgeNodes());
+        nodes.addAll(graph.getBackboneNodes());
+        nodes.stream().filter(n -> !n.hasEmulationSettings()).forEach(n -> lines.add(String.format("%s = topo.addSwitch(\"%s\")", n.getName(), n.getName())));
     }
 
     /**
@@ -161,7 +161,7 @@ public class MaxiNetExporter implements IGraphExporter {
         for (Edge e : graph.getEdges()) {
             if (e.getSource().hasEmulationSettings() && e.getDestination().hasEmulationSettings()) {
                 String name = "c" + counter;
-                lines.add(name + " = topo.addSwitch(\"" + name + "\")");
+                lines.add(String.format("%s = topo.addSwitch(\"%s\")", name, name));
                 connectors.put(e, name);
                 counter++;
             }
@@ -197,8 +197,7 @@ public class MaxiNetExporter implements IGraphExporter {
      * @param bandwidth   bandwidth limitations of this link
      */
     private void addLink(String source, String destination, float latency, float bandwidth) {
-        lines.add("topo.addLink(" + source + ", " + destination +
-                ", delay='" + latency + "ms', bw=" + bandwidth + ")");
+        lines.add(String.format("topo.addLink(%s, %s, delay='%fms', bw=%f)", source, destination, latency, bandwidth));
     }
 
     /**

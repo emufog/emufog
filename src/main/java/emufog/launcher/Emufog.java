@@ -110,7 +110,7 @@ public class Emufog {
         }
         LOG.info("##############################################################");
         // print graph details for information purposes
-        LOG.info("Number of nodes in the graph: {}", graph.getRouters().size());
+        LOG.info("Number of nodes in the graph: {}", graph.getEdgeNodes().size());
         LOG.info("Number of edges in the graph: {}", graph.getEdges().size());
         LOG.info("##############################################################");
 
@@ -122,7 +122,7 @@ public class Emufog {
             LOG.info("Time to determine the backbone of the topology: {}", intervalToString(start, end));
         }
         LOG.info("##############################################################");
-        LOG.info("Number of backbone nodes identified: {}", graph.getSwitches().size());
+        LOG.info("Number of backbone nodes identified: {}", graph.getBackboneNodes().size());
         LOG.info("##############################################################");
 
         // assign devices to the edge

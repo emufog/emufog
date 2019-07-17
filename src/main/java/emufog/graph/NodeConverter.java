@@ -66,7 +66,7 @@ public abstract class NodeConverter {
      * If the node is already an instance of the requested class the method just returns this object.
      *
      * @param node node to convert
-     * @return the replacing node or null if the given node is null
+     * @return the replacing node or {@code null} if the given node is {@code null}
      */
     public Node convert(Node node) {
         if (node == null) {

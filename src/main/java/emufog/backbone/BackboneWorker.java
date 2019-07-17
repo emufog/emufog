@@ -25,10 +25,10 @@ package emufog.backbone;
 
 import emufog.graph.AS;
 import emufog.graph.Edge;
+import emufog.graph.EdgeNode;
 import emufog.graph.Node;
-import emufog.graph.Router;
-import emufog.graph.Switch;
-import emufog.graph.SwitchConverter;
+import emufog.graph.BackboneNode;
+import emufog.graph.BackboneNodeConverter;
 import java.util.ArrayDeque;
 import java.util.BitSet;
 import java.util.Collection;
@@ -57,7 +57,7 @@ class BackboneWorker implements Runnable {
     private final AS as;
 
     /* converter to mark backbone nodes */
-    private final SwitchConverter converter;
+    private final BackboneNodeConverter converter;
 
     /**
      * Creates a new worker instance to compute the backbone classification algorithms on a given AS.
@@ -67,7 +67,7 @@ class BackboneWorker implements Runnable {
      */
     BackboneWorker(AS as) {
         this.as = as;
-        converter = new SwitchConverter();
+        converter = new BackboneNodeConverter();
     }
 
     @Override
@@ -77,16 +77,16 @@ class BackboneWorker implements Runnable {
         convertHighDegrees();
         long end = System.nanoTime();
         LOG.info("{} Step 2 - Time: {}", as, intervalToString(start, end));
-        LOG.info("{} Backbone Size: {}", as, as.getSwitches().size());
-        LOG.info("{} Edge Size: {}", as, as.getRouters().size());
+        LOG.info("{} Backbone Size: {}", as, as.getBackboneNodes().size());
+        LOG.info("{} Edge Size: {}", as, as.getEdgeNodes().size());
 
         // 3rd step
         start = System.nanoTime();
         buildSingleBackbone();
         end = System.nanoTime();
         LOG.info("{} Step 3 - Time: {}", as, intervalToString(start, end));
-        LOG.info("{} Backbone Size: {}", as, as.getSwitches().size());
-        LOG.info("{} Edge Size: {}", as, as.getRouters().size());
+        LOG.info("{} Backbone Size: {}", as, as.getBackboneNodes().size());
+        LOG.info("{} Edge Size: {}", as, as.getEdgeNodes().size());
     }
 
     /**
@@ -94,9 +94,9 @@ class BackboneWorker implements Runnable {
      */
     private void convertHighDegrees() {
         final double averageDegree = calculateAverageDegree() * BACKBONE_DEGREE_PERCENTAGE;
-        List<Router> toConvert = as.getRouters().parallelStream().filter(r -> r.getDegree() >= averageDegree).collect(Collectors.toList());
+        List<EdgeNode> toConvert = as.getEdgeNodes().parallelStream().filter(r -> r.getDegree() >= averageDegree).collect(Collectors.toList());
 
-        for (Router r : toConvert) {
+        for (EdgeNode r : toConvert) {
             converter.convert(r);
         }
     }
@@ -105,8 +105,8 @@ class BackboneWorker implements Runnable {
      * Creates a single connected backbone by using the Breadth-First-Algorithm.
      */
     private void buildSingleBackbone() {
-        Collection<Switch> switches = as.getSwitches();
-        if (switches.isEmpty()) {
+        Collection<BackboneNode> backboneNodes = as.getBackboneNodes();
+        if (backboneNodes.isEmpty()) {
             return;
         }
 
@@ -118,7 +118,7 @@ class BackboneWorker implements Runnable {
         Map<Node, Node> predecessors = new HashMap<>();
 
         // start with any backbone node
-        Node node = switches.iterator().next();
+        Node node = backboneNodes.iterator().next();
         predecessors.put(node, null);
         queue.add(node);
 
@@ -130,9 +130,9 @@ class BackboneWorker implements Runnable {
             visited.set(node.getID());
 
             // follow a trace via the predecessor to convert all on this way
-            if (node instanceof Switch && predecessors.get(node) instanceof Router) {
+            if (node instanceof BackboneNode && predecessors.get(node) instanceof EdgeNode) {
                 Node predecessor = predecessors.get(node);
-                while (predecessor instanceof Router) {
+                while (predecessor instanceof EdgeNode) {
                     converter.convert(predecessor);
 
                     predecessor = predecessors.get(predecessor);
@@ -153,7 +153,7 @@ class BackboneWorker implements Runnable {
 
                 if (seen.get(neighbor.getID())) {
                     // update the predecessor if necessary
-                    if (node instanceof Switch && predecessors.get(neighbor) instanceof Router) {
+                    if (node instanceof BackboneNode && predecessors.get(neighbor) instanceof EdgeNode) {
                         predecessors.put(neighbor, node);
                     }
                 } else {
@@ -173,16 +173,16 @@ class BackboneWorker implements Runnable {
      */
     private double calculateAverageDegree() {
         long sum = 0;
-        Collection<Router> routers = as.getRouters();
-        Collection<Switch> switches = as.getSwitches();
+        Collection<EdgeNode> edgeNodes = as.getEdgeNodes();
+        Collection<BackboneNode> backboneNodes = as.getBackboneNodes();
 
-        for (Node n : routers) {
+        for (Node n : edgeNodes) {
             sum += n.getDegree();
         }
-        for (Node n : switches) {
+        for (Node n : backboneNodes) {
             sum += n.getDegree();
         }
-        int n = switches.size() + routers.size();
+        int n = backboneNodes.size() + edgeNodes.size();
 
         if (n == 0) {
             return 0.f;

@@ -37,11 +37,9 @@ public abstract class Node {
     /* autonomous system this node belongs to */
     final AS as;
 
-    /* list of edges associated with the node */
-    Edge[] edges;
+    /* list of edges associated with the node */ Edge[] edges;
 
-    /* emulation settings for this node */
-    EmulationSettings emulationSettings;
+    /* emulation settings for this node */ EmulationSettings emulationSettings;
 
     /**
      * Creates a node of the graph with the initial parameter given.
@@ -53,18 +51,12 @@ public abstract class Node {
         this.id = id;
         this.as = as;
         edges = new Edge[0];
-        addToAS();
     }
 
     /**
-     * Adds this node to the respective AS.
-     */
-    abstract void addToAS();
-
-    /**
-     * Returns the emulation settings associated. If there are none returns null.
+     * Returns the emulation settings associated. If there are none returns {@code null}.
      *
-     * @return emulation  settings or null
+     * @return emulation settings or {@code null}
      */
     public EmulationSettings getEmulationNode() {
         return emulationSettings;

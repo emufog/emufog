@@ -24,27 +24,23 @@
 package emufog.graph;
 
 /**
- * This class convert an existing node to a router node in the graph.
+ * A backbone node is part of the backbone of a network and cannot connect to host devices directly.
+ * It can still though be a fog computing node.
  */
-public class RouterConverter extends NodeConverter {
+public class BackboneNode extends Node {
 
-    @Override
-    protected Node createNewNode(Node node) {
-        return new Router(node.id, node.as);
+    /**
+     * Creates a new backbone node.
+     *
+     * @param id unique identifier
+     * @param as autonomous system the belongs to
+     */
+    BackboneNode(int id, AS as) {
+        super(id, as);
     }
 
     @Override
-    protected void addNodeToGraph(Node newNode) {
-        newNode.as.addRouter((Router) newNode);
-    }
-
-    @Override
-    protected boolean needsConversion(Node node) {
-        return !(node instanceof Router);
-    }
-
-    @Override
-    public Router convert(Node node) {
-        return (Router) super.convert(node);
+    public String getName() {
+        return "s" + id;
     }
 }

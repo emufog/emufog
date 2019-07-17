@@ -36,17 +36,14 @@ public class AS {
     /* unique identifier of the autonomous system */
     final int id;
 
-    /* edge degree of the autonomous system */
-    private int degree;
+    /* mapping of edge nodes in the autonomous system */
+    private final Map<Integer, EdgeNode> edgeNodes;
 
-    /* mapping of routers in the autonomous system */
-    private final Map<Integer, Router> routers;
+    /* mapping of backbone nodes in the autonomous system */
+    private final Map<Integer, BackboneNode> backboneNodes;
 
-    /* mapping of switches in the autonomous system */
-    private final Map<Integer, Switch> switches;
-
-    /* mapping of devices in the autonomous system */
-    private final Map<Integer, HostDevice> devices;
+    /* mapping of edge device nodes in the autonomous system */
+    private final Map<Integer, EdgeDeviceNode> edgeDeviceNodes;
 
     /**
      * Creates a new instance
@@ -55,10 +52,9 @@ public class AS {
      */
     AS(int id) {
         this.id = id;
-        degree = 0;
-        routers = new HashMap<>();
-        switches = new HashMap<>();
-        devices = new HashMap<>();
+        edgeNodes = new HashMap<>();
+        backboneNodes = new HashMap<>();
+        edgeDeviceNodes = new HashMap<>();
     }
 
     /**
@@ -71,103 +67,87 @@ public class AS {
     }
 
     /**
-     * Returns the degree of the autonomous system.
+     * Returns the edge node associated with the given ID from the AS.
      *
-     * @return AS'S degree
+     * @param id the edge node's ID
+     * @return node object or {@code null} if not found
      */
-    public int getDegree() {
-        return degree;
+    EdgeNode getEdgeNodes(int id) {
+        return edgeNodes.get(id);
     }
 
     /**
-     * Increments the degree of the autonomous system by 1.
+     * Returns the backbone node associated with the given ID from the AS.
+     *
+     * @param id the backbone node's ID
+     * @return node object or {@code null} if not found
      */
-    void incrementDegree() {
-        degree++;
+    BackboneNode getBackboneNode(int id) {
+        return backboneNodes.get(id);
     }
 
     /**
-     * Returns the router associated with the given ID from the AS.
+     * Returns the edge device node associated with the given ID from the AS.
      *
-     * @param id the router's ID
-     * @return node object or null if not found
+     * @param id the edge device node's ID
+     * @return node object or {@code null} if not found
      */
-    Router getRouter(int id) {
-        return routers.get(id);
+    EdgeDeviceNode getEdgeDeviceNode(int id) {
+        return edgeDeviceNodes.get(id);
     }
 
     /**
-     * Returns the switch associated with the given ID from the AS.
+     * Returns all edgeNodes from the AS.
      *
-     * @param id the switch's ID
-     * @return node object or null if not found
+     * @return edgeNodes of the AS
      */
-    Switch getSwitch(int id) {
-        return switches.get(id);
+    public Collection<EdgeNode> getEdgeNodes() {
+        return edgeNodes.values();
     }
 
     /**
-     * Returns the host device associated with the given ID from the AS.
+     * Returns all backboneNodes from the AS.
      *
-     * @param id the device's ID
-     * @return node object or null if not found
+     * @return backboneNodes of the AS
      */
-    HostDevice getDevice(int id) {
-        return devices.get(id);
+    public Collection<BackboneNode> getBackboneNodes() {
+        return backboneNodes.values();
     }
 
     /**
-     * Returns all routers from the AS.
+     * Returns all host edgeDeviceNodes from the AS.
      *
-     * @return routers of the AS
+     * @return edgeDeviceNodes of the AS
      */
-    public Collection<Router> getRouters() {
-        return routers.values();
+    public Collection<EdgeDeviceNode> getEdgeDeviceNodes() {
+        return edgeDeviceNodes.values();
     }
 
     /**
-     * Returns all switches from the AS.
+     * Adds an edge node to the AS.
      *
-     * @return switches of the AS
+     * @param e edge node to add
      */
-    public Collection<Switch> getSwitches() {
-        return switches.values();
+    void addEdgeNode(EdgeNode e) {
+        edgeNodes.put(e.id, e);
     }
 
     /**
-     * Returns all host devices from the AS.
+     * Adds a backbone node to the AS.
      *
-     * @return devices of the AS
+     * @param b backbone node to add
      */
-    public Collection<HostDevice> getDevices() {
-        return devices.values();
+    void addBackboneNode(BackboneNode b) {
+        backboneNodes.put(b.id, b);
     }
 
     /**
-     * Adds a router to the AS.
+     * Adds a edge device node to the AS.
      *
-     * @param r router to add
+     * @param d edge device node to add
      */
-    void addRouter(Router r) {
-        routers.put(r.id, r);
-    }
-
-    /**
-     * Adds a switch to the AS.
-     *
-     * @param s switch to add
-     */
-    void addSwitch(Switch s) {
-        switches.put(s.id, s);
-    }
-
-    /**
-     * Adds a host device to the AS.
-     *
-     * @param d device to add
-     */
-    void addDevice(HostDevice d) {
-        devices.put(d.id, d);
+    void addDevice(EdgeDeviceNode d) {
+        edgeDeviceNodes.put(d.id, d);
     }
 
     /**
@@ -177,16 +157,27 @@ public class AS {
      * @return true if node could be deleted, false if not
      */
     boolean removeNode(Node node) {
-        boolean result = routers.remove(node.id) != null;
+        boolean result = edgeNodes.remove(node.id) != null;
 
         if (!result) {
-            result = switches.remove(node.id) != null;
+            result = backboneNodes.remove(node.id) != null;
         }
         if (!result) {
-            result = devices.remove(node.id) != null;
+            result = edgeDeviceNodes.remove(node.id) != null;
         }
 
         return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof AS)) {
+            return false;
+        }
+
+        AS other = (AS) obj;
+
+        return id == other.id;
     }
 
     @Override
