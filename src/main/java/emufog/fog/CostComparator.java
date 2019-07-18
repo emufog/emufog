@@ -47,13 +47,6 @@ class CostComparator implements Comparator<FogNode> {
         float cost1 = o1.getCosts(edge);
         float cost2 = o2.getCosts(edge);
 
-        if (cost1 < cost2) {
-            return -1;
-        }
-        if (cost1 > cost2) {
-            return 1;
-        }
-
-        return 0;
+        return Float.compare(cost1, cost2);
     }
 }
