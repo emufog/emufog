@@ -49,14 +49,6 @@ class FogComparator implements Comparator<FogNode> {
         cost1 = fogNode.getAverageConnectionCosts();
         cost2 = t1.getAverageConnectionCosts();
 
-        if (cost1 < cost2) {
-            return -1;
-        }
-
-        if (cost2 < cost1) {
-            return 1;
-        }
-
-        return 0;
+        return Float.compare(cost1, cost2);
     }
 }
