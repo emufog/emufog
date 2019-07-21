@@ -32,7 +32,7 @@ import java.util.*;
  * This node represents a node of the sub graph used to identify fog nodes.
  * The original node of the underlying graph identifies this node.
  */
-abstract class FogNode {
+public abstract class FogNode {
 
     /* the original node of the underlying graph */
     final Node oldNode;
@@ -69,6 +69,19 @@ abstract class FogNode {
         this.oldNode = oldNode;
         connectedNodes = new HashMap<>();
         modified = true;
+    }
+
+    public Node getBaseNode() {
+        return oldNode;
+    }
+
+    /**
+     * Returns the currently chosen fog type for this fog node.
+     *
+     * @return fog type object currently chosen
+     */
+    public FogType getFogType() {
+        return type;
     }
 
     /**
@@ -122,15 +135,6 @@ abstract class FogNode {
     void clearAllEdgeNodes() {
         connectedNodes.clear();
         setModified(true);
-    }
-
-    /**
-     * Returns the currently chosen fog type for this fog node.
-     *
-     * @return fog type object currently chosen
-     */
-    FogType getFogType() {
-        return type;
     }
 
     /**
@@ -286,11 +290,9 @@ abstract class FogNode {
         /* edge node to start the connection */
         final EdgeNode edge;
 
-        /* predecessor node */
-        FogNode predecessor;
+        /* predecessor node */ FogNode predecessor;
 
-        /* current cost function value */
-        float costs;
+        /* current cost function value */ float costs;
 
         /**
          * Creates a connection class for a connection from the given edge node

@@ -64,19 +64,17 @@ class FogLevel {
         this.fogTypes = fogTypes;
         this.nextLevels = new ArrayList<>();
 
-        if (predecessors != null) {
-            for (FogLevel predecessor : predecessors) {
-                predecessor.addNextLevel(this);
-            }
+        for (FogLevel predecessor : predecessors) {
+            predecessor.addNextLevel(this);
         }
     }
 
     /**
-     * Adds a collection of edgeNodes as a starting set.
+     * Adds a collection of edge nodes as a starting set.
      *
-     * @param edgeNodes edgeNodes to start this level with
+     * @param edgeNodes edge nodes to start this level with
      */
-    void addStartingRouters(Collection<EdgeNode> edgeNodes) {
+    void addStartingEdgeNodes(Collection<EdgeNode> edgeNodes) {
         startingNodes = new ArrayList<>(edgeNodes);
     }
 

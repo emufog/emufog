@@ -27,6 +27,7 @@ import emufog.backbone.BackboneClassifier;
 import emufog.container.FogType;
 import emufog.export.IGraphExporter;
 import emufog.export.MaxiNetExporter;
+import emufog.fog.FogNode;
 import emufog.fog.FogNodeClassifier;
 import emufog.fog.FogResult;
 import emufog.graph.Graph;
@@ -131,8 +132,8 @@ public class Emufog {
         // find the fog node placements
         FogResult result = new FogNodeClassifier(settings).findFogNodes(graph);
         if (result.getStatus()) {
-            for (Tuple<Node, FogType> tuple : result.getFogNodes()) {
-                graph.placeFogNode(tuple.getKey(), tuple.getValue());
+            for (FogNode node : result.getFogNodes()) {
+                graph.placeFogNode(node.getBaseNode(), node.getFogType());
             }
 
             IGraphExporter exporter = new MaxiNetExporter();

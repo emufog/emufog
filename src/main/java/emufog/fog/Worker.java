@@ -24,11 +24,24 @@
 package emufog.fog;
 
 import emufog.container.FogType;
-import emufog.graph.*;
+import emufog.graph.AS;
+import emufog.graph.Edge;
+import emufog.graph.EdgeDeviceNode;
+import emufog.graph.Node;
 import emufog.util.Tuple;
-
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +77,15 @@ abstract class Worker implements Callable<FogResult> {
     }
 
     /**
+     * Returns the autonomous system processed by this worker.
+     *
+     * @return autonomous system to process
+     */
+    AS getAs() {
+        return as;
+    }
+
+    /**
      * Calculates the costs for a given edge of the graph.
      *
      * @param edge edge to calculate the costs for
@@ -86,10 +108,8 @@ abstract class Worker implements Callable<FogResult> {
 
         List<Tuple<Node, List<EdgeNode>>> startNodes = level.getStartNodes();
         g.initNodes(startNodes, as);
-        List<Node> nodes = new ArrayList<>();
-        for (Tuple<Node, List<EdgeNode>> t : startNodes) {
-            nodes.add(t.getKey());
-        }
+        List<Node> nodes = startNodes.stream().map(Tuple::getKey).collect(Collectors.toList());
+
         iterateNodes(g, nodes, classifier.threshold);
         g.trimNodes();
 
@@ -144,8 +164,7 @@ abstract class Worker implements Callable<FogResult> {
                                 // newly discovered node
                                 neighborNode.initPredecessor(edgeNode, current, nextCosts);
                                 queue.add(neighborNode);
-                            }
-                            else if (nextCosts < neighborCosts) {
+                            } else if (nextCosts < neighborCosts) {
                                 // update an already discovered node
                                 neighborNode.updatePredecessor(edgeNode, current, nextCosts);
                             }
@@ -163,32 +182,25 @@ abstract class Worker implements Callable<FogResult> {
      * Calculates the dependencies of fog levels and returns the first level to start with.
      *
      * @return first fog level to start with
-     * @throws Exception
      */
-    private FogLevel getFirstLevel() throws Exception {
-        List<FogType> remainingTypes = new ArrayList<>(classifier.fogTypes);
-        Map<FogType, FogLevel> levelMap = new HashMap<>();
+    private FogLevel getFirstLevel() {
+        Set<FogType> remainingTypes = new HashSet<>(classifier.fogTypes);
 
         // build first level
-        List<FogType> startLevel = new ArrayList<>();
-        for (FogType type : remainingTypes) {
-            if (!type.hasDependencies()) {
-                startLevel.add(type);
-            }
-        }
-        FogLevel firstLevel = new FogLevel(fogPlacements, startLevel, null);
-        firstLevel.addStartingRouters(as.getEdgeNodes());
+        List<FogType> startLevel = remainingTypes.stream().filter(t -> !t.hasDependencies()).collect(Collectors.toList());
 
-        for (FogType type : startLevel) {
-            levelMap.put(type, firstLevel);
-        }
-        remainingTypes.removeAll(startLevel);
+        FogLevel firstLevel = new FogLevel(fogPlacements, startLevel, Collections.emptyList());
+        firstLevel.addStartingEdgeNodes(as.getEdgeNodes());
 
+        //TODO rethink
+        //remainingTypes.removeAll(startLevel);
+        //Map<FogType, FogLevel> levelMap = startLevel.stream().collect(Collectors.toMap(type -> type, type -> firstLevel));
+
+        /*
         while (!remainingTypes.isEmpty()) {
             List<FogType> possibleNextLevels = new ArrayList<>();
 
             for (FogType type : remainingTypes) {
-
                 boolean valid = true;
                 for (int i = 0; i < type.dependencies.size() && valid; ++i) {
                     valid = !remainingTypes.contains(type.dependencies.get(i));
@@ -199,12 +211,8 @@ abstract class Worker implements Callable<FogResult> {
                 }
             }
 
-            if (remainingTypes.isEmpty()) {
-                throw new Exception("TODO"); //TODO
-            }
-            else {
-                FogType next = possibleNextLevels.get(0);
-                possibleNextLevels.remove(0);
+            if (!possibleNextLevels.isEmpty()) {
+                FogType next = possibleNextLevels.remove(0);
                 List<FogType> duplicates = new ArrayList<>();
 
                 // find duplicates
@@ -226,6 +234,7 @@ abstract class Worker implements Callable<FogResult> {
                 }
             }
         }
+        */
 
         return firstLevel;
     }
@@ -242,52 +251,47 @@ abstract class Worker implements Callable<FogResult> {
     }
 
     @Override
-    public FogResult call() throws Exception {
+    public FogResult call() {
         // init partial result for this AS
-        FogResult partResult = new FogResult();
+        FogResult result = new FogResult();
 
         // create fog levels
         Queue<FogLevel> queue = new ArrayDeque<>();
         queue.add(getFirstLevel());
 
-        partResult.setSuccess(true);
-        while (!queue.isEmpty() && partResult.getStatus()) {
+        result.setSuccess(true);
+        while (!queue.isEmpty()) {
             FogLevel level = queue.poll();
 
             // build an initial sub graph will all edge routers
             long start = System.nanoTime();
             FogGraph fogGraph = buildFogGraph(level);
             long end = System.nanoTime();
-            LOG.info("Time to build fog graph for " + as + ": " + intervalToString(start, end));
+            LOG.info("Time to build fog graph for {}: {}", as, intervalToString(start, end));
 
-            while (classifier.fogNodesLeft() && fogGraph.hasEdgeNodes()) {
+            while (fogGraph.hasEdgeNodes()) {
+                if (!classifier.fogNodesLeft()) {
+                    result.setSuccess(false);
+                    result.clearFogNodes();
+                    return result;
+                }
+
                 start = System.nanoTime();
-                FogNode next = fogGraph.getNext();
+                FogNode fogNode = fogGraph.getNext();
                 end = System.nanoTime();
-                LOG.info("Time to find nextLevels fog node for " + as + ": " + intervalToString(start, end));
+                LOG.info("Time to find nextLevels fog node for {}: {}", as, intervalToString(start, end));
 
                 // add the new fog node to the partial result
-                partResult.addFogNode(next);
+                result.addFogNode(fogNode);
                 classifier.reduceRemainingNodes();
                 // add placement to the map
-                List<FogNode> nodes = fogPlacements.computeIfAbsent(next.getFogType(), k -> new ArrayList<>());
-                nodes.add(next);
+                List<FogNode> nodes = fogPlacements.computeIfAbsent(fogNode.getFogType(), k -> new ArrayList<>());
+                nodes.add(fogNode);
             }
 
-            // check if result is positive
-            if (fogGraph.hasEdgeNodes() && !classifier.fogNodesLeft()) {
-                partResult.setSuccess(false);
-                partResult.clearFogNodes();
-            }
-            else {
-                partResult.setSuccess(true);
-            }
-
-            if (partResult.getStatus()) {
-                queue.addAll(level.getNextLevels());
-            }
+            queue.addAll(level.getNextLevels());
         }
 
-        return partResult;
+        return result;
     }
 }
