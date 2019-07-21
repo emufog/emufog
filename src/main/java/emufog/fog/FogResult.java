@@ -23,10 +23,6 @@
  */
 package emufog.fog;
 
-import emufog.container.FogType;
-import emufog.graph.Node;
-import emufog.util.Tuple;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -40,8 +36,8 @@ public class FogResult {
     /* success state of the result */
     private boolean success;
 
-    /* list of node to fog type mappings */
-    private final List<Tuple<Node, FogType>> nodes;
+    /* list of fog node placements */
+    private final List<FogNode> nodes;
 
     /**
      * Creates a new result object. By default the success state is 'failure'.
@@ -57,33 +53,33 @@ public class FogResult {
      * @param node fog node to add
      */
     void addFogNode(FogNode node) {
-        nodes.add(new Tuple<>(node.oldNode, node.getFogType()));
+        nodes.add(node);
     }
 
     /**
-     * Adds all node mappings from the given collection to the existing list.
+     * Adds all fog node placements from the given collection to the existing list.
      *
-     * @param nodes collection of node mappings to add
+     * @param nodes collection of fog nodes to add
      */
-    void addAll(Collection<Tuple<Node, FogType>> nodes) {
+    void addAll(Collection<FogNode> nodes) {
         this.nodes.addAll(nodes);
     }
 
     /**
      * Returns the status of this result object.
      *
-     * @return true if successful, false if not
+     * @return {@code true} if successful, {@code false} if not
      */
     public boolean getStatus() {
         return success;
     }
 
     /**
-     * Returns a list of mappings from nodes to their respective fog type.
+     * Returns a list of fog node placements.
      *
-     * @return list of node to type mappings
+     * @return list of fog nodes
      */
-    public List<Tuple<Node, FogType>> getFogNodes() {
+    public List<FogNode> getFogNodes() {
         return nodes;
     }
 
@@ -97,7 +93,7 @@ public class FogResult {
     /**
      * Sets the success state to the given state.
      *
-     * @param success true for success, false for failure
+     * @param success {@code true} for success, {@code false} for failure
      */
     void setSuccess(boolean success) {
         this.success = success;

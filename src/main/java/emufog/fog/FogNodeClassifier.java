@@ -27,15 +27,11 @@ import emufog.container.FogType;
 import emufog.graph.AS;
 import emufog.graph.Graph;
 import emufog.settings.Settings;
-import emufog.util.Tuple;
-
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +55,7 @@ public class FogNodeClassifier {
      * Creates a new FogNodeClassifier using the given settings.
      *
      * @param settings settings to use for classification
-     * @throws IllegalArgumentException throws exception if the settings object is null
+     * @throws IllegalArgumentException throws exception if the settings object is {@code null}
      */
     public FogNodeClassifier(Settings settings) throws IllegalArgumentException {
         if (settings == null) {
@@ -78,65 +74,35 @@ public class FogNodeClassifier {
      *
      * @param graph graph to find fog nodes in
      * @return result object with the list of fog nodes or failure state
-     * @throws IllegalArgumentException throws exception if the graph parameter is null
+     * @throws IllegalArgumentException throws exception if the graph parameter is {@code null}
      */
     public FogResult findFogNodes(Graph graph) throws IllegalArgumentException {
         if (graph == null) {
             throw new IllegalArgumentException("The graph object is not initialized.");
         }
 
-        // init result object to
+        // init result object
         FogResult result = new FogResult();
 
-        ExecutorService pool = Executors.newFixedThreadPool(graph.getSettings().threadCount);
+        Collection<AS> systems = graph.getSystems();
+        List<FogResult> results = systems.parallelStream().map(as -> getWorker(as, graph.getSettings())).map(FogNodeClassifier::executeWorker).collect(Collectors.toList());
 
-        Collection<AS> ASs = graph.getSystems();
-        Tuple<AS, Future<FogResult>>[] workers = new Tuple[ASs.size()];
-        // calculate fog nodes for each AS separately
-        int count = 0;
-        for (AS as : ASs) {
-            // init sequential or parallel worker
-            Worker worker = getWorker(as, graph.getSettings());
-            workers[count] = new Tuple<>(as, pool.submit(worker));
-            count++;
-        }
-
-        // add all nodes of the partial result to the final list
-        boolean stop = false;
-        Tuple<AS, Future<FogResult>> t = null;
-        try {
-            for (int i = 0; i < workers.length && !stop; ++i) {
-                t = workers[i];
-                FogResult partResult = t.getValue().get();
-
-                if (partResult.getStatus()) {
-                    result.addAll(partResult.getFogNodes());
-                }
-                else {
-                    stop = true;
-                }
-            }
-        }
-        catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-            LOG.error("Fog Placement Thread for " + t.getKey() + " was interrupted.");
-            LOG.error("Error message: " + e.getMessage());
-            stop = true;
-        }
-        finally {
-            pool.shutdownNow();
-        }
-
-        // determine the overall status
-        if (stop) {
-            result.setSuccess(false);
-            result.clearFogNodes();
-        }
-        else {
+        Optional<FogResult> optional = results.parallelStream().filter(r -> !r.getStatus()).findFirst();
+        if (!optional.isPresent()) {
             result.setSuccess(true);
+            result.addAll(results.parallelStream().map(FogResult::getFogNodes).flatMap(List::stream).collect(Collectors.toList()));
         }
 
         return result;
+    }
+
+    private static FogResult executeWorker(Worker worker) {
+        try {
+            return worker.call();
+        } catch (Exception e) {
+            LOG.error("Fog placement failed for {}", worker.getAs(), e);
+            return new FogResult();
+        }
     }
 
     /**
@@ -149,8 +115,7 @@ public class FogNodeClassifier {
     private Worker getWorker(AS as, Settings settings) {
         if (settings.fogGraphParallel) {
             return new ParallelFogWorker(as, this);
-        }
-        else {
+        } else {
             return new SequentialFogWorker(as, this);
         }
     }
@@ -158,7 +123,7 @@ public class FogNodeClassifier {
     /**
      * Indicates if there are still fog nodes to place available.
      *
-     * @return true if there are, none if 0
+     * @return {@code true} if there are, {@code false} if 0
      */
     boolean fogNodesLeft() {
         return remainingNodes.get() > 0;
