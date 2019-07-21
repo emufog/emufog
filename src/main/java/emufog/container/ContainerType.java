@@ -90,4 +90,9 @@ public abstract class ContainerType {
         ContainerType other = (ContainerType) obj;
         return name.equals(other.name) && version.equals(other.version) && memoryLimit == other.memoryLimit && cpuShare == other.cpuShare;
     }
+
+    @Override
+    public String toString() {
+        return name + ':' + version;
+    }
 }
