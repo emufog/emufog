@@ -235,7 +235,7 @@ public abstract class FogNode {
                 deviceCount += n.getDeviceCount();
             }
 
-            for (FogType fogType : graph.servers) {
+            for (FogType fogType : graph.containerTypes) {
                 int connections = deviceCount;
 
                 if (connections > fogType.maxClients) {

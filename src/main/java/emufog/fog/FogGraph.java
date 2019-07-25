@@ -29,8 +29,12 @@ import emufog.graph.Node;
 import emufog.graph.EdgeNode;
 import emufog.graph.BackboneNode;
 import emufog.util.Tuple;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,8 +48,8 @@ class FogGraph {
 
     private static final Logger LOG = LoggerFactory.getLogger(FogGraph.class);
 
-    /* list of possible Docker types for fog nodes */
-    final List<FogType> servers;
+    /* list of possible container types for fog nodes */
+    final List<FogType> containerTypes;
 
     /* list of all edge nodes still to cover */
     private final List<emufog.fog.EdgeNode> edgeNodes;
@@ -57,12 +61,12 @@ class FogGraph {
     private final Comparator<FogNode> comparator;
 
     /**
-     * Creates a new sub graph with the given list of possible Docker images for fog nodes.
+     * Creates a new sub graph with the given list of possible container images for fog nodes.
      *
-     * @param servers list of Docker images
+     * @param containerTypes list of container images
      */
-    FogGraph(List<FogType> servers) {
-        this.servers = servers;
+    FogGraph(List<FogType> containerTypes) {
+        this.containerTypes = containerTypes;
         edgeNodes = new ArrayList<>();
         nodeMapping = new HashMap<>();
         comparator = new FogComparator();
@@ -77,6 +81,15 @@ class FogGraph {
      */
     FogNode getNode(Node node) {
         return nodeMapping.get(node);
+    }
+
+    /**
+     * Removes the given node from the graph.
+     *
+     * @param node node to remove
+     */
+    void removeNode(FogNode node) {
+        nodeMapping.remove(node.oldNode);
     }
 
     /**
@@ -98,8 +111,7 @@ class FogGraph {
             emufog.fog.EdgeNode edgeNode;
             if (t.getKey() instanceof EdgeNode && t.getValue() == null) {
                 edgeNode = new emufog.fog.EdgeNode(this, (emufog.graph.EdgeNode) t.getKey());
-            }
-            else {
+            } else {
                 edgeNode = new emufog.fog.EdgeNode(this, t.getKey(), t.getValue());
             }
             nodeMapping.put(t.getKey(), edgeNode);
@@ -108,23 +120,10 @@ class FogGraph {
     }
 
     /**
-     * Removes the given node from the graph.
-     *
-     * @param node node to remove
-     */
-    void removeNode(FogNode node) {
-        nodeMapping.remove(node.oldNode);
-    }
-
-    /**
      * Removes all unused nodes from the graph.
      */
     void trimNodes() {
-        for (FogNode node : new ArrayList<>(nodeMapping.values())) {
-            if (node.getConnectedEdgeNodes().isEmpty()) {
-                nodeMapping.remove(node.oldNode);
-            }
-        }
+        nodeMapping.values().stream().filter(n -> n.connectedNodes.isEmpty()).forEach(n -> nodeMapping.remove(n.oldNode));
     }
 
     /**
