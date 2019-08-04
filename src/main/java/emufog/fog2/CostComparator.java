@@ -1,24 +1,17 @@
 package emufog.fog2;
 
-import emufog.fog.EdgeNode;
-import emufog.fog.FogNode;
 import java.util.Comparator;
 
+class CostComparator implements Comparator<BaseNode> {
 
-class CostComparator implements Comparator<Node> {
+    private final StartingNode startingNode;
 
-    private final EdgeNode edge;
-
-
-    CostComparator(EdgeNode edge) {
-        this.edge = edge;
+    CostComparator(StartingNode startingNode) {
+        this.startingNode = startingNode;
     }
 
     @Override
-    public int compare(FogNode o1, FogNode o2) {
-        float cost1 = o1.getCosts(edge);
-        float cost2 = o2.getCosts(edge);
-
-        return Float.compare(cost1, cost2);
+    public int compare(BaseNode o1, BaseNode o2) {
+        return Float.compare(o1.getCosts(startingNode), o2.getCosts(startingNode));
     }
 }

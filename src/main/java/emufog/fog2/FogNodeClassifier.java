@@ -1,10 +1,10 @@
 package emufog.fog2;
 
-import emufog.graph.AS;
 import emufog.graph.Graph;
 import emufog.settings.Settings;
-import java.util.Collection;
+
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -27,10 +27,21 @@ public class FogNodeClassifier {
     }
 
     public FogResult placeFogNodes() {
+        // init empty failed result
         FogResult result = new FogResult();
+        result.setFailure();
 
-        Collection<AS> systems = graph.getSystems();
-        List<FogResult> results = systems.parallelStream().map(s -> new FogWorker(s, this).processAS()).collect(Collectors.toList());
+        // process all systems in parallel
+        List<FogResult> results = graph.getSystems().parallelStream()
+                .map(s -> new FogWorker(s, this).processAS())
+                .collect(Collectors.toList());
+
+        // check if all part results are success
+        Optional<FogResult> optional = results.stream().filter(r -> !r.getStatus()).findFirst();
+        if (!optional.isPresent()) {
+            result.setSuccess();
+            results.forEach(r -> result.addPlacements(r.getPlacements()));
+        }
 
         return result;
     }

@@ -29,6 +29,9 @@ import emufog.graph.Edge;
 import emufog.graph.EdgeDeviceNode;
 import emufog.graph.Node;
 import emufog.util.Tuple;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,8 +45,6 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static emufog.util.ConversionsUtils.intervalToString;
 
