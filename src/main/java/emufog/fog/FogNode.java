@@ -316,14 +316,8 @@ public abstract class FogNode {
 
         @Override
         public int compare(Connection o1, Connection o2) {
-            if (o1.costs < o2.costs) {
-                return -1;
-            }
-            if (o2.costs < o1.costs) {
-                return 1;
-            }
+            return Float.compare(o1.costs, o2.costs);
 
-            return 0;
         }
     }
 }

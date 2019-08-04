@@ -1,8 +1,9 @@
 package emufog.fog2;
 
-import emufog.container.ContainerType;
+import emufog.container.FogType;
 import emufog.graph.Node;
 import emufog.util.Tuple;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -11,7 +12,7 @@ public class FogResult {
 
     private boolean status;
 
-    private final List<Tuple<Node, ContainerType>> placements;
+    private final List<Tuple<Node, FogType>> placements;
 
     FogResult() {
         status = false;
@@ -22,15 +23,19 @@ public class FogResult {
         return status;
     }
 
-    public List<Tuple<Node, ContainerType>> getPlacements() {
+    public List<Tuple<Node, FogType>> getPlacements() {
         return placements;
     }
 
-    void addPlacements(Collection<Tuple<Node, ContainerType>> placements) {
+    void addPlacement(Tuple<Node, FogType> placement) {
+        placements.add(placement);
+    }
+
+    void addPlacements(Collection<Tuple<Node, FogType>> placements) {
         this.placements.addAll(placements);
     }
 
-    void setSucccess() {
+    void setSuccess() {
         status = true;
     }
 
