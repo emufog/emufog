@@ -19,7 +19,7 @@ class StartingNode extends BaseNode {
         return ((EdgeNode) node).getDeviceCount();
     }
 
-    public Set<BaseNode> getReachableNodes() {
+    Set<BaseNode> getReachableNodes() {
         return reachableNodes;
     }
 
