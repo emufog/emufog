@@ -17,7 +17,7 @@ abstract class BaseNode {
 
     private final Map<StartingNode, Tuple<BaseNode, Float>> costs;
 
-    protected boolean modified;
+    boolean modified;
 
     private FogType type;
 
