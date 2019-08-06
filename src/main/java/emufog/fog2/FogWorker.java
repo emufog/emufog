@@ -24,16 +24,12 @@
 package emufog.fog2;
 
 import emufog.container.FogType;
-import emufog.fog.FogNode;
 import emufog.graph.AS;
 import emufog.graph.Edge;
 import emufog.graph.EdgeDeviceNode;
 import emufog.graph.EdgeNode;
 import emufog.graph.Node;
 import emufog.util.Tuple;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -41,6 +37,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static emufog.util.ConversionsUtils.intervalToString;
 
@@ -87,7 +85,7 @@ class FogWorker {
             }
 
             start = System.nanoTime();
-            Tuple<Node, FogType> fogNode = getNextFogNode(startingNodes);
+            FogNodePlacement fogNode = getNextFogNode(startingNodes);
             if (classifier.settings.timeMeasuring) {
                 LOG.info("Time to find next fog node for {}: {}", as, intervalToString(start, System.nanoTime()));
             }
@@ -103,7 +101,7 @@ class FogWorker {
         return result;
     }
 
-    private Tuple<Node, FogType> getNextFogNode(List<StartingNode> startingNodes) {
+    private FogNodePlacement getNextFogNode(List<StartingNode> startingNodes) {
         LOG.debug("Remaining Edge Nodes to cover: {}", startingNodes.size());
 
         long functionStart = System.nanoTime();
@@ -147,7 +145,7 @@ class FogWorker {
             LOG.info("Time to calculate the next fog node Time: {}", intervalToString(functionStart, System.nanoTime()));
         }
 
-        return new Tuple<>(next.node, next.getType());
+        return new FogNodePlacement(next);
     }
 
     private void calculateConnectionCosts(StartingNode node) {

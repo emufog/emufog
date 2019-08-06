@@ -23,42 +23,29 @@
  */
 package emufog.fog2;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import emufog.container.FogType;
+import emufog.graph.Node;
 
-public class FogResult {
+public class FogNodePlacement {
 
-    private boolean status;
+    private final Node node;
 
-    private final List<FogNodePlacement> placements;
+    private final FogType type;
 
-    FogResult() {
-        status = false;
-        placements = new ArrayList<>();
+    FogNodePlacement(Node node, FogType type) {
+        this.node = node;
+        this.type = type;
     }
 
-    public boolean getStatus() {
-        return status;
+    FogNodePlacement(BaseNode node) {
+        this(node.node, node.getType());
     }
 
-    public List<FogNodePlacement> getPlacements() {
-        return placements;
+    public Node getNode() {
+        return node;
     }
 
-    void addPlacement(FogNodePlacement placement) {
-        placements.add(placement);
-    }
-
-    void addPlacements(Collection<FogNodePlacement> placements) {
-        this.placements.addAll(placements);
-    }
-
-    void setSuccess() {
-        status = true;
-    }
-
-    void setFailure() {
-        status = false;
+    public FogType getType() {
+        return type;
     }
 }
