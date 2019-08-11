@@ -27,7 +27,6 @@ import emufog.graph.AS;
 import emufog.graph.Graph;
 import emufog.graph.EdgeNode;
 import emufog.settings.Settings;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -62,7 +61,7 @@ public class BriteFormatReader extends GraphReader {
     private static void extractNodes(Graph graph, BufferedReader reader) throws IOException {
         String line = reader.readLine();
 
-        while (nullOrEmpty(line)) {
+        while (!nullOrEmpty(line)) {
             // split the line into pieces and parse them separately
             String[] values = line.split("\t");
             if (values.length >= 7) {
@@ -88,7 +87,7 @@ public class BriteFormatReader extends GraphReader {
     private static void extractEdges(Graph graph, BufferedReader reader) throws IOException {
         String line = reader.readLine();
 
-        while (nullOrEmpty(line)) {
+        while (!nullOrEmpty(line)) {
             // split the line into pieces and parse them separately
             String[] values = line.split("\t");
             if (values.length >= 9) {
@@ -125,7 +124,7 @@ public class BriteFormatReader extends GraphReader {
         BufferedReader reader = new BufferedReader(new FileReader(files.get(0).toFile()));
 
         String line = reader.readLine();
-        while (nullOrEmpty(line)) {
+        while (line != null) {
             // read in the nodes of the graph
             if (line.startsWith("Nodes:")) {
                 extractNodes(graph, reader);
