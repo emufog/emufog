@@ -25,12 +25,24 @@ package emufog.fog2;
 
 import java.util.Comparator;
 
+/**
+ * This comparator compares {@link BaseNode} based on their connection costs for
+ * a certain starting node. Connection costs are based on {@link BaseNode#getCosts(StartingNode)}.
+ */
 class CostComparator implements Comparator<BaseNode> {
 
+    /**
+     * starting node to calculate the costs for
+     */
     private final StartingNode startingNode;
 
-    CostComparator(StartingNode startingNode) {
-        this.startingNode = startingNode;
+    /**
+     * Creates a new connection costs comparator for the given starting node.
+     *
+     * @param node starting node to retrieve connection costs for
+     */
+    CostComparator(StartingNode node) {
+        startingNode = node;
     }
 
     @Override
