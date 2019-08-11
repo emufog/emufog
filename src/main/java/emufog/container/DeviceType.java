@@ -42,7 +42,7 @@ public class DeviceType extends ContainerType {
      *
      * @param containerName      name of container image to deploy
      * @param containerVersion   version of container image to deploy
-     * @param scalingFactor      scaling factor of this container image, factor >= 1
+     * @param scalingFactor      scaling factor of this container image, factor {@code >= 1}
      * @param averageDeviceCount average number of devices of this image deployed to each router
      * @param memoryLimit        upper limit of memory to use in Bytes
      * @param cpuShare           of the sum of available computing resources
@@ -62,7 +62,7 @@ public class DeviceType extends ContainerType {
      * Will be distributed based on the average count per router.
      *
      * @param containerName      name of container image to deploy
-     * @param scalingFactor      scaling factor of this container image, factor >= 1
+     * @param scalingFactor      scaling factor of this container image, factor {@code >= 1}
      * @param averageDeviceCount average number of devices of this image deployed to each router
      * @param memoryLimit        upper limit of memory to use in Bytes
      * @param cpuShare           of the sum of available computing resources
