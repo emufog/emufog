@@ -26,7 +26,7 @@ package emufog.fog2;
 import java.util.Comparator;
 
 /**
- * Custom comparator to sort a list of FogNodes.
+ * Custom comparator to sort {@link BaseNode} for an optimal fog node placement.
  * The comparator uses two properties. First the comparator sorts descending
  * according to the average deployment costs and in case they are equal
  * the comparator sorts descending to the average connection costs.
