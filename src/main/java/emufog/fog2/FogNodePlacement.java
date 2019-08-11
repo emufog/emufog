@@ -26,25 +26,47 @@ package emufog.fog2;
 import emufog.container.FogType;
 import emufog.graph.Node;
 
+/**
+ * This class represents a placement of a fog node in the graph.
+ * The result contains the node and the type of fog node to use.
+ */
 public class FogNodePlacement {
 
+    /**
+     * node where the fog node should be placed
+     */
     private final Node node;
 
+    /**
+     * type of the fog node
+     */
     private final FogType type;
 
-    FogNodePlacement(Node node, FogType type) {
-        this.node = node;
-        this.type = type;
-    }
-
+    /**
+     * Creates a new placement based on the given node and the associated
+     * fog node type.
+     *
+     * @param node node to base the placement on
+     */
     FogNodePlacement(BaseNode node) {
-        this(node.node, node.getType());
+        this.node = node.node;
+        type = node.getType();
     }
 
+    /**
+     * Returns the node object in the graph where to place the fog node.
+     *
+     * @return node instance in the graph
+     */
     public Node getNode() {
         return node;
     }
 
+    /**
+     * Returns the fog node type that should be used.
+     *
+     * @return fog node type to use
+     */
     public FogType getType() {
         return type;
     }
