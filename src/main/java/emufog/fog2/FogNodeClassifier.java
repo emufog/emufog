@@ -25,21 +25,39 @@ package emufog.fog2;
 
 import emufog.graph.Graph;
 import emufog.settings.Settings;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+/**
+ * The fog node classifier is running the fog node placement algorithm on the given
+ * graph object.
+ */
 public class FogNodeClassifier {
 
+    /**
+     * graph to place fog nodes in
+     */
     private final Graph graph;
 
+    /**
+     * settings to use for the fog node classification
+     */
     final Settings settings;
 
+    /**
+     * counter of remaining fog nodes to place in the graph, atomic for parallel access
+     */
     private final AtomicInteger counter;
 
-    public FogNodeClassifier(final Graph graph) throws IllegalArgumentException {
+    /**
+     * Creates a new fog node classifier for the given graph object.
+     *
+     * @param graph graph object to run the fog node classification for
+     * @throws IllegalArgumentException thrown if the graph object is {@code null}
+     */
+    public FogNodeClassifier(Graph graph) throws IllegalArgumentException {
         if (graph == null) {
             throw new IllegalArgumentException("The graph is null.");
         }
@@ -49,10 +67,16 @@ public class FogNodeClassifier {
         counter = new AtomicInteger(settings.maxFogNodes);
     }
 
+    /**
+     * Runs the fog node placement algorithm on the graph associated with this instance.
+     * All autonomous systems of the graph are processed in parallel and the partial results
+     * are combined to a final outcome.
+     *
+     * @return result object of the fog node placement
+     */
     public FogResult placeFogNodes() {
         // init empty failed result
         FogResult result = new FogResult();
-        result.setFailure();
 
         // process all systems in parallel
         List<FogResult> results = graph.getSystems().parallelStream().map(s -> new FogWorker(s, this).processAS()).collect(Collectors.toList());
