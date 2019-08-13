@@ -24,24 +24,64 @@
 package emufog.fog2;
 
 import emufog.graph.EdgeNode;
-
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * A starting node represents a starting point in the fog node placement algorithm.
+ * Such a node is based on a {@link EdgeNode} and wraps it for the algorithm
+ * execution.
+ */
 class StartingNode extends BaseNode {
 
+    /**
+     * set of all nodes that reachable from this starting node
+     */
     private final Set<BaseNode> reachableNodes;
 
+    /**
+     * number of devices connected to the edge node
+     */
+    private int deviceCount;
+
+    /**
+     * Creates a new starting node for the given edge node. The device count is
+     * initialized with the edge node's device count.
+     *
+     * @param node edge node to create a starting node for
+     */
     StartingNode(EdgeNode node) {
         super(node);
 
         reachableNodes = new HashSet<>();
+        deviceCount = node.getDeviceCount();
     }
 
+    /**
+     * Returns the device count connected to the underlying {@link EdgeNode} remaining
+     * to be covered by a fog node.
+     *
+     * @return device count to cover
+     */
     int getDeviceCount() {
-        return ((EdgeNode) node).getDeviceCount();
+        return deviceCount;
     }
 
+    /**
+     * Decreases the number of devices to be covered by the given value {@code n}.
+     *
+     * @param n number to decrease the device count by
+     */
+    void decreaseDeviceCount(int n) {
+        deviceCount -= n;
+    }
+
+    /**
+     * Returns a set of all nodes reachable from this starting node given the connection
+     * cost threshold in the configuration.
+     *
+     * @return all nodes that are reachable from this node
+     */
     Set<BaseNode> getReachableNodes() {
         return reachableNodes;
     }
