@@ -60,7 +60,7 @@ class FogWorker {
         nodes = new HashMap<>();
     }
 
-    FogResult processAS() {
+    FogResult findFogNodes() {
         // map edge device nodes to their respective wrappers
         List<StartingNode> startingNodes = as.getEdgeNodes().stream().filter(EdgeNode::hasDevices).map(this::createStartingNode).collect(Collectors.toList());
         // calculate connection costs from the edge device nodes

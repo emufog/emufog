@@ -79,7 +79,7 @@ public class FogNodeClassifier {
         FogResult result = new FogResult();
 
         // process all systems in parallel
-        List<FogResult> results = graph.getSystems().parallelStream().map(s -> new FogWorker(s, this).processAS()).collect(Collectors.toList());
+        List<FogResult> results = graph.getSystems().parallelStream().map(s -> new FogWorker(s, this).findFogNodes()).collect(Collectors.toList());
 
         // check if all part results are success
         Optional<FogResult> optional = results.stream().filter(r -> !r.getStatus()).findFirst();
