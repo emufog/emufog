@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * Therefore all such connections are stored using the predecessor on the path to this
  * node and the overall costs. It can also be a possible placement for a fog node.
  */
-abstract class BaseNode {
+class BaseNode {
 
     private static final Logger LOG = LoggerFactory.getLogger(BaseNode.class);
 

@@ -23,15 +23,14 @@
  */
 package emufog.fog2;
 
-import emufog.container.FogType;
 import emufog.graph.AS;
 import emufog.graph.Edge;
 import emufog.graph.EdgeDeviceNode;
 import emufog.graph.EdgeNode;
 import emufog.graph.Node;
+import emufog.settings.Settings;
 import emufog.util.Tuple;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,18 +49,15 @@ class FogWorker {
 
     private final FogNodeClassifier classifier;
 
-    private final List<FogType> fogNodeTypes;
+    private final Settings settings;
 
     private final Map<Node, BaseNode> nodes;
-
-    private final Comparator<BaseNode> comparator;
 
     FogWorker(AS as, FogNodeClassifier classifier) {
         this.as = as;
         this.classifier = classifier;
-        fogNodeTypes = classifier.settings.fogNodeTypes;
+        settings = classifier.settings;
         nodes = new HashMap<>();
-        comparator = new FogComparator();
     }
 
     FogResult processAS() {
@@ -70,7 +66,7 @@ class FogWorker {
         // calculate connection costs from the edge device nodes
         long start = System.nanoTime();
         startingNodes.forEach(this::calculateConnectionCosts);
-        if (classifier.settings.timeMeasuring) {
+        if (settings.timeMeasuring) {
             LOG.info("Time to calculate connection costs for edge devices: {}", intervalToString(start, System.nanoTime()));
         }
 
@@ -86,7 +82,7 @@ class FogWorker {
 
             start = System.nanoTime();
             FogNodePlacement fogNode = getNextFogNode(startingNodes);
-            if (classifier.settings.timeMeasuring) {
+            if (settings.timeMeasuring) {
                 LOG.info("Time to find next fog node for {}: {}", as, intervalToString(start, System.nanoTime()));
             }
 
@@ -106,17 +102,17 @@ class FogWorker {
 
         long functionStart = System.nanoTime();
         List<BaseNode> fogNodes = new ArrayList<>(nodes.values());
-        fogNodes.forEach(n -> n.findFogType(fogNodeTypes));
-        if (classifier.settings.timeMeasuring) {
+        fogNodes.forEach(n -> n.findFogType(settings.fogNodeTypes));
+        if (settings.timeMeasuring) {
             LOG.info("Time to find possible fog nodes: {}", intervalToString(functionStart, System.nanoTime()));
         }
 
         long start = System.nanoTime();
         // sort the possible fog nodes with a FogComparator
-        fogNodes.sort(comparator);
+        fogNodes.sort(new FogComparator());
         // retrieve the nextLevels optimal node
         BaseNode next = fogNodes.get(0);
-        if (classifier.settings.timeMeasuring) {
+        if (settings.timeMeasuring) {
             LOG.info("Find the optimal fog node placement: " + intervalToString(start, System.nanoTime()));
         }
 
@@ -126,21 +122,23 @@ class FogWorker {
         start = System.nanoTime();
         for (Tuple<StartingNode, Integer> t : coveredNodes) {
             StartingNode coveredStartingNode = t.getKey();
-            coveredStartingNode.removePossibleNode(next);
+            coveredStartingNode.decreaseDeviceCount(t.getValue());
+            //coveredStartingNode.removePossibleNode(next);
             // node is fully covered
-            if (coveredStartingNode.getDeviceCount() == t.getValue()) {
+            if (coveredStartingNode.getDeviceCount() <= 0) {
                 coveredStartingNode.notifyPossibleNodes();
                 nodes.remove(coveredStartingNode.node);
-            } else { // partially covered node
-                //TODO rethink
             }
+
+            coveredStartingNode.getReachableNodes().stream().filter(n -> !n.hasConnections()).forEach(n -> nodes.remove(n.node));
         }
 
-        next.clearAllEdgeNodes();
+        next.getStartingNodes().forEach(n -> n.removePossibleNode(next));
+        nodes.remove(next.node);
 
         // remove all covered nodes from the edge nodes set
         startingNodes.removeAll(coveredNodes.stream().map(Tuple::getKey).collect(Collectors.toList()));
-        if (classifier.settings.timeMeasuring) {
+        if (settings.timeMeasuring) {
             LOG.info("Time to remove the determined fog node from the graph: {}", intervalToString(start, System.nanoTime()));
             LOG.info("Time to calculate the next fog node Time: {}", intervalToString(functionStart, System.nanoTime()));
         }
@@ -172,7 +170,7 @@ class FogWorker {
                 }
                 // abort on costs above the threshold
                 float nextCosts = currentCosts + calculateCosts(e);
-                if (nextCosts > classifier.settings.costThreshold) {
+                if (nextCosts > settings.costThreshold) {
                     continue;
                 }
 
@@ -192,7 +190,7 @@ class FogWorker {
     }
 
     private BaseNode getBaseNode(Node node) {
-        return nodes.computeIfAbsent(node, NetworkNode::new);
+        return nodes.computeIfAbsent(node, BaseNode::new);
     }
 
     private StartingNode createStartingNode(EdgeNode node) {
