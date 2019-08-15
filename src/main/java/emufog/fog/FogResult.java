@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2018 emufog contributors
+ * Copyright (c) 2019 emufog contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,74 +28,82 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * This class represents the result of a fog placement algorithm. It states the overall
- * success state as well as the list of found placements.
+ * This class represents the outcome of a fog node placement algorithm.
+ * The {@link #status} represents the success or failure of the placement
+ * and {@link #placements} the individual fog node placements.
  */
 public class FogResult {
 
-    /* success state of the result */
-    private boolean success;
-
-    /* list of fog node placements */
-    private final List<FogNode> nodes;
+    /**
+     * the outcome of the result set
+     */
+    private boolean status;
 
     /**
-     * Creates a new result object. By default the success state is 'failure'.
+     * list of all fog node placements in the result set
+     */
+    private final List<FogNodePlacement> placements;
+
+    /**
+     * Creates a new empty result object. Initially the outcome is {@code false} and
+     * there are no placements.
      */
     FogResult() {
-        success = false;
-        nodes = new ArrayList<>();
+        status = false;
+        placements = new ArrayList<>();
     }
 
     /**
-     * Adds a fog node to the result list.
+     * Returns the outcome of the fog node placement.
+     * If {@code true} the {@link #getPlacements()} is returning the
+     * correct result. For {@code false} {@link #getPlacements()} can
+     * be any intermediate result.
      *
-     * @param node fog node to add
-     */
-    void addFogNode(FogNode node) {
-        nodes.add(node);
-    }
-
-    /**
-     * Adds all fog node placements from the given collection to the existing list.
-     *
-     * @param nodes collection of fog nodes to add
-     */
-    void addAll(Collection<FogNode> nodes) {
-        this.nodes.addAll(nodes);
-    }
-
-    /**
-     * Returns the status of this result object.
-     *
-     * @return {@code true} if successful, {@code false} if not
+     * @return outcome status of the fog node placement
      */
     public boolean getStatus() {
-        return success;
+        return status;
     }
 
     /**
-     * Returns a list of fog node placements.
+     * Returns the list of fog node placements associated with this fog node placement
+     * result object.
      *
-     * @return list of fog nodes
+     * @return list off all fog node placements identified
      */
-    public List<FogNode> getFogNodes() {
-        return nodes;
+    public List<FogNodePlacement> getPlacements() {
+        return placements;
     }
 
     /**
-     * Clears the list of fog nodes currently stored in this object.
-     */
-    void clearFogNodes() {
-        nodes.clear();
-    }
-
-    /**
-     * Sets the success state to the given state.
+     * Adds a new fog node placement to the list of the result object.
      *
-     * @param success {@code true} for success, {@code false} for failure
+     * @param placement fog node placement to add
      */
-    void setSuccess(boolean success) {
-        this.success = success;
+    void addPlacement(FogNodePlacement placement) {
+        placements.add(placement);
+    }
+
+    /**
+     * Adds a collection of fog node placements to the list of the result object.
+     *
+     * @param placements collection of fog node placements to add
+     */
+    void addPlacements(Collection<FogNodePlacement> placements) {
+        this.placements.addAll(placements);
+    }
+
+    /**
+     * Sets the {@link #status} of the result object to {@code true}.
+     */
+    void setSuccess() {
+        status = true;
+    }
+
+    /**
+     * Sets the {@link #status} of the result object to {@code false}.
+     */
+    void setFailure() {
+        status = false;
     }
 }

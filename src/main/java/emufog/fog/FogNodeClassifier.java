@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2018 emufog contributors
+ * Copyright (c) 2019 emufog contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,101 +23,72 @@
  */
 package emufog.fog;
 
-import emufog.container.FogType;
-import emufog.graph.AS;
 import emufog.graph.Graph;
 import emufog.settings.Settings;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * This classifier identifies a list of possible fog node placements in the given graph.
+ * The fog node classifier is running the fog node placement algorithm on the given
+ * graph object.
  */
 public class FogNodeClassifier {
 
-    private static final Logger LOG = LoggerFactory.getLogger(FogNodeClassifier.class);
-
-    /* list of all available types of fog nodes */
-    final List<FogType> fogTypes;
-
-    /* remaining number of nodes to place in the graph */
-    private final AtomicInteger remainingNodes;
-
-    /* threshold for the cost function to limit the search */
-    final float threshold;
+    /**
+     * graph to place fog nodes in
+     */
+    private final Graph graph;
 
     /**
-     * Creates a new FogNodeClassifier using the given settings.
-     *
-     * @param settings settings to use for classification
-     * @throws IllegalArgumentException throws exception if the settings object is {@code null}
+     * settings to use for the fog node classification
      */
-    public FogNodeClassifier(Settings settings) throws IllegalArgumentException {
-        if (settings == null) {
-            throw new IllegalArgumentException("No settings object given.");
+    final Settings settings;
+
+    /**
+     * counter of remaining fog nodes to place in the graph, atomic for parallel access
+     */
+    private final AtomicInteger counter;
+
+    /**
+     * Creates a new fog node classifier for the given graph object.
+     *
+     * @param graph graph object to run the fog node classification for
+     * @throws IllegalArgumentException thrown if the graph object is {@code null}
+     */
+    public FogNodeClassifier(Graph graph) throws IllegalArgumentException {
+        if (graph == null) {
+            throw new IllegalArgumentException("The graph is null.");
         }
 
-        fogTypes = settings.fogNodeTypes;
-        remainingNodes = new AtomicInteger(settings.maxFogNodes);
-        threshold = settings.costThreshold;
+        this.graph = graph;
+        settings = graph.getSettings();
+        counter = new AtomicInteger(settings.maxFogNodes);
     }
 
     /**
-     * This method identifies the fog nodes in the given graph. The settings passed to
-     * the constructor are used for the algorithm. The result might not be optimal as the
-     * method uses a greedy algorithm to approximate the optimal solution.
+     * Runs the fog node placement algorithm on the graph associated with this instance.
+     * All autonomous systems of the graph are processed in parallel and the partial results
+     * are combined to a final outcome.
      *
-     * @param graph graph to find fog nodes in
-     * @return result object with the list of fog nodes or failure state
-     * @throws IllegalArgumentException throws exception if the graph parameter is {@code null}
+     * @return result object of the fog node placement
      */
-    public FogResult findFogNodes(Graph graph) throws IllegalArgumentException {
-        if (graph == null) {
-            throw new IllegalArgumentException("The graph object is not initialized.");
-        }
-
-        // init result object
+    public FogResult placeFogNodes() {
+        // init empty failed result
         FogResult result = new FogResult();
 
-        Collection<AS> systems = graph.getSystems();
-        List<FogResult> results = systems.parallelStream().map(as -> getWorker(as, graph.getSettings())).map(FogNodeClassifier::executeWorker).collect(Collectors.toList());
+        // process all systems in parallel
+        List<FogResult> results = graph.getSystems().parallelStream().map(s -> new FogWorker(s, this).findFogNodes()).collect(Collectors.toList());
 
-        Optional<FogResult> optional = results.parallelStream().filter(r -> !r.getStatus()).findFirst();
+        // check if all part results are success
+        Optional<FogResult> optional = results.stream().filter(r -> !r.getStatus()).findFirst();
         if (!optional.isPresent()) {
-            result.setSuccess(true);
-            result.addAll(results.parallelStream().map(FogResult::getFogNodes).flatMap(List::stream).collect(Collectors.toList()));
+            result.setSuccess();
+            results.forEach(r -> result.addPlacements(r.getPlacements()));
         }
 
         return result;
-    }
-
-    private static FogResult executeWorker(Worker worker) {
-        try {
-            return worker.call();
-        } catch (Exception e) {
-            LOG.error("Fog placement failed for {}", worker.getAs(), e);
-            return new FogResult();
-        }
-    }
-
-    /**
-     * Returns a new worker class depending on the settings given.
-     *
-     * @param as       as to work on
-     * @param settings settings to determine parallel or sequential
-     * @return worker class according to settings
-     */
-    private Worker getWorker(AS as, Settings settings) {
-        if (settings.fogGraphParallel) {
-            return new ParallelFogWorker(as, this);
-        } else {
-            return new SequentialFogWorker(as, this);
-        }
     }
 
     /**
@@ -126,13 +97,13 @@ public class FogNodeClassifier {
      * @return {@code true} if there are, {@code false} if 0
      */
     boolean fogNodesLeft() {
-        return remainingNodes.get() > 0;
+        return counter.get() > 0;
     }
 
     /**
      * Decrements the remaining fog node to place by 1.
      */
     void reduceRemainingNodes() {
-        remainingNodes.decrementAndGet();
+        counter.decrementAndGet();
     }
 }

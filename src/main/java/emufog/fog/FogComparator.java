@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2018 emufog contributors
+ * Copyright (c) 2019 emufog contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,17 +26,17 @@ package emufog.fog;
 import java.util.Comparator;
 
 /**
- * Custom comparator to sort a list of FogNodes.
+ * Custom comparator to sort {@link BaseNode} for an optimal fog node placement.
  * The comparator uses two properties. First the comparator sorts descending
  * according to the average deployment costs and in case they are equal
  * the comparator sorts descending to the average connection costs.
  */
-class FogComparator implements Comparator<FogNode> {
+class FogComparator implements Comparator<BaseNode> {
 
     @Override
-    public int compare(FogNode fogNode, FogNode t1) {
-        float cost1 = fogNode.getAverageDeploymentCosts();
-        float cost2 = t1.getAverageDeploymentCosts();
+    public int compare(BaseNode o1, BaseNode o2) {
+        float cost1 = o1.getAverageDeploymentCosts();
+        float cost2 = o2.getAverageDeploymentCosts();
 
         if (cost1 < cost2) {
             return -1;
@@ -46,8 +46,8 @@ class FogComparator implements Comparator<FogNode> {
             return 1;
         }
 
-        cost1 = fogNode.getAverageConnectionCosts();
-        cost2 = t1.getAverageConnectionCosts();
+        cost1 = o1.getAverageConnectionCosts();
+        cost2 = o2.getAverageConnectionCosts();
 
         return Float.compare(cost1, cost2);
     }

@@ -24,20 +24,17 @@
 package emufog.launcher;
 
 import emufog.backbone.BackboneClassifier;
-import emufog.container.FogType;
 import emufog.export.IGraphExporter;
 import emufog.export.MaxiNetExporter;
-import emufog.fog.FogNode;
 import emufog.fog.FogNodeClassifier;
+import emufog.fog.FogNodePlacement;
 import emufog.fog.FogResult;
 import emufog.graph.Graph;
-import emufog.graph.Node;
 import emufog.reader.BriteFormatReader;
 import emufog.reader.CaidaFormatReader;
 import emufog.reader.GraphReader;
 import emufog.settings.Settings;
 import emufog.settings.YamlReader;
-import emufog.util.Tuple;
 import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,10 +127,10 @@ public class Emufog {
         graph.assignEdgeDevices();
 
         // find the fog node placements
-        FogResult result = new FogNodeClassifier(settings).findFogNodes(graph);
+        FogResult result = new FogNodeClassifier(graph).placeFogNodes();
         if (result.getStatus()) {
-            for (FogNode node : result.getFogNodes()) {
-                graph.placeFogNode(node.getBaseNode(), node.getFogType());
+            for (FogNodePlacement placement : result.getPlacements()) {
+                graph.placeFogNode(placement.getNode(), placement.getType());
             }
 
             IGraphExporter exporter = new MaxiNetExporter();
