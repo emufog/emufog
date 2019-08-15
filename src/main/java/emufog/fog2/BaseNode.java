@@ -243,7 +243,7 @@ class BaseNode {
      * Can be retrieved by {@link #getAverageConnectionCosts()}
      */
     private void calculateAverageCosts() {
-        double sum = 0.f;
+        double sum = 0;
         for (Tuple<BaseNode, Float> t : costs.values()) {
             sum += t.getValue();
         }
