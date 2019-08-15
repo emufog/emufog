@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.fog2;
+package emufog.fog;
 
 import emufog.graph.EdgeNode;
 import java.util.HashSet;

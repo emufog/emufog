@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2018 emufog contributors
+ * Copyright (c) 2019 emufog contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,27 +26,27 @@ package emufog.fog;
 import java.util.Comparator;
 
 /**
- * The cost comparator compares fog nodes based on their associated costs for a given edge node.
+ * This comparator compares {@link BaseNode} based on their connection costs for
+ * a certain starting node. Connection costs are based on {@link BaseNode#getCosts(StartingNode)}.
  */
-class CostComparator implements Comparator<FogNode> {
-
-    /* edge node to compare costs for */
-    private final EdgeNode edge;
+class CostComparator implements Comparator<BaseNode> {
 
     /**
-     * Creates a new comparator to compare fog nodes based on their cost from the given edge.
-     *
-     * @param edge edge node to sort for
+     * starting node to calculate the costs for
      */
-    CostComparator(EdgeNode edge) {
-        this.edge = edge;
+    private final StartingNode startingNode;
+
+    /**
+     * Creates a new connection costs comparator for the given starting node.
+     *
+     * @param node starting node to retrieve connection costs for
+     */
+    CostComparator(StartingNode node) {
+        startingNode = node;
     }
 
     @Override
-    public int compare(FogNode o1, FogNode o2) {
-        float cost1 = o1.getCosts(edge);
-        float cost2 = o2.getCosts(edge);
-
-        return Float.compare(cost1, cost2);
+    public int compare(BaseNode o1, BaseNode o2) {
+        return Float.compare(o1.getCosts(startingNode), o2.getCosts(startingNode));
     }
 }
