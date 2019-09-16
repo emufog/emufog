@@ -28,16 +28,17 @@ import java.util.concurrent.TimeUnit;
 public class ConversionsUtils {
 
     /**
-     * Converts an interval of start and endpoint to a string
-     * representing the duration in the format e.g. '1h1min1s1ms'.
+     * Converts an interval of start and endpoint in nanoseconds to a
+     * string representing the duration in the format e.g. '1h 1min 1s 1ms'.
+     * Leading 0's will be dropped except for '0ms'. A negative interval will
+     * set to duration 0ns.
      *
      * @param start start point of the interval in ns
      * @param end   end point of the interval in ns
      * @return string representation of the interval to print
      */
     public static String intervalToString(long start, long end) {
-        long duration = end - start;
-        duration = Math.max(duration, 0);
+        long duration = Math.max(end - start, 0);
         StringBuilder sb = new StringBuilder();
         boolean started = false;
 
