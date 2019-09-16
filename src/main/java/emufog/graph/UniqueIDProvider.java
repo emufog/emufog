@@ -31,10 +31,14 @@ import java.util.BitSet;
  */
 class UniqueIDProvider {
 
-    /* the current ID is the last one in use */
+    /**
+     * the current ID is the last one in use
+     */
     private int current;
 
-    /* set to keep track of all used IDs */
+    /**
+     * set to keep track of all used IDs
+     */
     private final BitSet bitSet;
 
     /**

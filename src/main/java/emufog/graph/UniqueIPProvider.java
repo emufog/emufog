@@ -31,7 +31,9 @@ import emufog.settings.Settings;
  */
 class UniqueIPProvider {
 
-    /* the last assigned IP in the network */
+    /**
+     * the last assigned IP in the network
+     */
     private String lastIP;
 
     /**
