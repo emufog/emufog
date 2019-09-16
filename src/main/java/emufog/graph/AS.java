@@ -33,16 +33,24 @@ import java.util.Map;
  */
 public class AS {
 
-    /* unique identifier of the autonomous system */
+    /**
+     * unique identifier of the autonomous system
+     */
     final int id;
 
-    /* mapping of edge nodes in the autonomous system */
+    /**
+     * mapping of edge nodes in the autonomous system
+     */
     private final Map<Integer, EdgeNode> edgeNodes;
 
-    /* mapping of backbone nodes in the autonomous system */
+    /**
+     * mapping of backbone nodes in the autonomous system
+     */
     private final Map<Integer, BackboneNode> backboneNodes;
 
-    /* mapping of edge device nodes in the autonomous system */
+    /**
+     * mapping of edge device nodes in the autonomous system
+     */
     private final Map<Integer, EdgeDeviceNode> edgeDeviceNodes;
 
     /**
@@ -72,7 +80,7 @@ public class AS {
      * @param id the edge node's ID
      * @return node object or {@code null} if not found
      */
-    EdgeNode getEdgeNode(int id) {
+    public EdgeNode getEdgeNode(int id) {
         return edgeNodes.get(id);
     }
 
@@ -82,7 +90,7 @@ public class AS {
      * @param id the backbone node's ID
      * @return node object or {@code null} if not found
      */
-    BackboneNode getBackboneNode(int id) {
+    public BackboneNode getBackboneNode(int id) {
         return backboneNodes.get(id);
     }
 
@@ -92,7 +100,7 @@ public class AS {
      * @param id the edge device node's ID
      * @return node object or {@code null} if not found
      */
-    EdgeDeviceNode getEdgeDeviceNode(int id) {
+    public EdgeDeviceNode getEdgeDeviceNode(int id) {
         return edgeDeviceNodes.get(id);
     }
 
@@ -121,6 +129,27 @@ public class AS {
      */
     public Collection<EdgeDeviceNode> getEdgeDeviceNodes() {
         return edgeDeviceNodes.values();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof AS)) {
+            return false;
+        }
+
+        AS other = (AS) obj;
+
+        return id == other.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(id);
+    }
+
+    @Override
+    public String toString() {
+        return "AS: " + id;
     }
 
     /**
@@ -167,21 +196,5 @@ public class AS {
         }
 
         return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof AS)) {
-            return false;
-        }
-
-        AS other = (AS) obj;
-
-        return id == other.id;
-    }
-
-    @Override
-    public String toString() {
-        return "AS: " + id;
     }
 }
