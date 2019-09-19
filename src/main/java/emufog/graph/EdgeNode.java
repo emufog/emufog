@@ -56,10 +56,15 @@ public class EdgeNode extends Node {
 
     /**
      * Increments the device counter by the given number.
+     * Will be ignored if negative.
      *
      * @param n the number to increase the device count
      */
     void incrementDeviceCount(int n) {
+        if (n < 0) {
+            return;
+        }
+
         deviceCount += n;
     }
 
