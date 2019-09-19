@@ -42,22 +42,34 @@ public class Graph {
 
     private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
 
-    /* list of all edges in the graph */
+    /**
+     * list of all edges in the graph
+     */
     private final List<Edge> edges;
 
-    /* list of all autonomous systems */
+    /**
+     * list of all autonomous systems
+     */
     private final List<AS> systems;
 
-    /* settings associated with the graph */
+    /**
+     * settings associated with the graph
+     */
     private final Settings settings;
 
-    /* provider of unique IP addresses for emulation */
+    /**
+     * provider of unique IP addresses for emulation
+     */
     private final UniqueIPProvider IPprovider;
 
-    /* provider of unique node IDs */
+    /**
+     * provider of unique node IDs
+     */
     private final UniqueIDProvider nodeIDprovider;
 
-    /* provider of unique edge IDs */
+    /**
+     * provider of unique edge IDs
+     */
     private final UniqueIDProvider edgeIDprovider;
 
     /**
@@ -103,7 +115,7 @@ public class Graph {
      *
      * @return edges of the graph
      */
-    public Collection<Edge> getEdges() {
+    public List<Edge> getEdges() {
         return edges;
     }
 
@@ -112,7 +124,7 @@ public class Graph {
      *
      * @return host devices of the graph
      */
-    public Collection<EdgeDeviceNode> getHostDevices() {
+    public List<EdgeDeviceNode> getHostDevices() {
         return systems.stream().map(AS::getEdgeDeviceNodes).flatMap(Collection::stream).collect(Collectors.toList());
     }
 
@@ -121,7 +133,7 @@ public class Graph {
      *
      * @return edge nodes of the graph
      */
-    public Collection<EdgeNode> getEdgeNodes() {
+    public List<EdgeNode> getEdgeNodes() {
         return systems.stream().map(AS::getEdgeNodes).flatMap(Collection::stream).collect(Collectors.toList());
     }
 
@@ -130,7 +142,7 @@ public class Graph {
      *
      * @return backbone nodes of the graph
      */
-    public Collection<BackboneNode> getBackboneNodes() {
+    public List<BackboneNode> getBackboneNodes() {
         return systems.stream().map(AS::getBackboneNodes).flatMap(Collection::stream).collect(Collectors.toList());
     }
 
@@ -139,7 +151,7 @@ public class Graph {
      *
      * @return nodes of the graph
      */
-    public Collection<Node> getNodes() {
+    public List<Node> getNodes() {
         List<Node> nodes = new ArrayList<>();
         nodes.addAll(getEdgeNodes());
         nodes.addAll(getBackboneNodes());
@@ -216,13 +228,9 @@ public class Graph {
      * @throws IllegalArgumentException thrown if the ID is already in use or as is {@code null}
      */
     public EdgeNode createEdgeNode(int id, AS as) throws IllegalArgumentException {
-        if (as == null) {
-            throw new IllegalArgumentException("The autonomous system is null.");
-        }
-        checkNodeID(id);
+        validateAndMarkNodeInput(id, as);
 
         EdgeNode edgeNode = new EdgeNode(id, as);
-        nodeIDprovider.markIDused(id);
         as.addEdgeNode(edgeNode);
 
         return edgeNode;
@@ -237,13 +245,9 @@ public class Graph {
      * @throws IllegalArgumentException thrown if the ID is already in use or as is {@code null}
      */
     public BackboneNode createBackboneNode(int id, AS as) throws IllegalArgumentException {
-        if (as == null) {
-            throw new IllegalArgumentException("The autonomous system is null.");
-        }
-        checkNodeID(id);
+        validateAndMarkNodeInput(id, as);
 
         BackboneNode backboneNode = new BackboneNode(id, as);
-        nodeIDprovider.markIDused(id);
         as.addBackboneNode(backboneNode);
 
         return backboneNode;
@@ -259,17 +263,13 @@ public class Graph {
      * @throws IllegalArgumentException thrown if the ID is already in use or as or image is {@code null}
      */
     public EdgeDeviceNode createEdgeDeviceNode(int id, AS as, DeviceType image) throws IllegalArgumentException {
-        if (as == null) {
-            throw new IllegalArgumentException("The autonomous system is null.");
-        }
         if (image == null) {
             throw new IllegalArgumentException("The given container image is not initialized.");
         }
-        checkNodeID(id);
+        validateAndMarkNodeInput(id, as);
 
         EmulationSettings emulationSettings = new EmulationSettings(IPprovider.getNextIPV4Address(), image);
         EdgeDeviceNode edgeDevice = new EdgeDeviceNode(id, as, emulationSettings);
-        nodeIDprovider.markIDused(id);
         as.addDevice(edgeDevice);
 
         return edgeDevice;
@@ -303,6 +303,7 @@ public class Graph {
         edgeIDprovider.markIDused(id);
         edges.add(edge);
 
+        //TODO fix scaling factor
         if (from instanceof EdgeNode && to instanceof EdgeDeviceNode) {
             ((EdgeNode) from).incrementDeviceCount(((EdgeDeviceNode) to).getContainerType().scalingFactor);
         }
@@ -351,7 +352,6 @@ public class Graph {
         if (type == null) {
             throw new IllegalArgumentException("The given fog type is not initialized.");
         }
-
         if (!nodeIDprovider.isUsed(node.id)) {
             throw new IllegalArgumentException("This graph object does not contain the given node.");
         }
@@ -360,15 +360,21 @@ public class Graph {
     }
 
     /**
-     * Check the node's ID if it's already in use.
-     * Throws an exception if the ID is used before.
+     * Validates if the as is not {@code null} and the id still available.
+     * If the input is valid the function marks the given id as used.
      *
-     * @param id ID to check
-     * @throws IllegalArgumentException if the ID is already in use
+     * @param id id to validate and mark
+     * @param as as instance to validate
+     * @throws IllegalArgumentException thrown if as is {@code null} or the id already in use
      */
-    private void checkNodeID(int id) throws IllegalArgumentException {
+    private void validateAndMarkNodeInput(int id, AS as) throws IllegalArgumentException {
+        if (as == null) {
+            throw new IllegalArgumentException("The autonomous system is null.");
+        }
         if (nodeIDprovider.isUsed(id)) {
             throw new IllegalArgumentException("The node ID: " + id + " is already in use.");
         }
+
+        nodeIDprovider.markIDused(id);
     }
 }
