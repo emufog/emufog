@@ -26,25 +26,31 @@ package emufog.graph;
 /**
  * This class convert an existing node to a backbone node in the graph.
  */
-public class BackboneNodeConverter extends NodeConverter {
+class BackboneNodeConverter extends NodeConverter {
+
+    private static final BackboneNodeConverter INSTANCE = new BackboneNodeConverter();
 
     @Override
-    protected Node createNewNode(Node node) {
+    Node createNewNode(Node node) {
         return new BackboneNode(node.id, node.as);
     }
 
     @Override
-    protected void addNodeToGraph(Node newNode) {
+    void addNodeToGraph(Node newNode) {
         newNode.as.addBackboneNode((BackboneNode) newNode);
     }
 
     @Override
-    protected boolean needsConversion(Node node) {
+    boolean needsConversion(Node node) {
         return !(node instanceof BackboneNode);
     }
 
     @Override
-    public BackboneNode convert(Node node) {
+    BackboneNode convert(Node node) {
         return (BackboneNode) super.convert(node);
+    }
+
+    static BackboneNode convertToBackbone(Node node) {
+        return INSTANCE.convert(node);
     }
 }

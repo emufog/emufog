@@ -23,7 +23,8 @@
  */
 package emufog.graph;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents a general node of graph with the basic functionality.
@@ -31,16 +32,24 @@ import java.util.Arrays;
  */
 public abstract class Node {
 
-    /* unique identifier of the node */
+    /**
+     * unique identifier of the node
+     */
     final int id;
 
-    /* autonomous system this node belongs to */
+    /**
+     * autonomous system this node belongs to
+     */
     final AS as;
 
-    /* list of edges associated with the node */
-    Edge[] edges;
+    /**
+     * list of edges associated with the node
+     */
+    final List<Edge> edges;
 
-    /* emulation settings for this node */
+    /**
+     * emulation settings for this node
+     */
     EmulationSettings emulationSettings;
 
     /**
@@ -52,7 +61,7 @@ public abstract class Node {
     Node(int id, AS as) {
         this.id = id;
         this.as = as;
-        edges = new Edge[0];
+        edges = new ArrayList<>();
     }
 
     /**
@@ -62,15 +71,6 @@ public abstract class Node {
      */
     public EmulationSettings getEmulationNode() {
         return emulationSettings;
-    }
-
-    /**
-     * Returns identification if this node can be emulated with existing settings.
-     *
-     * @return true if it can be emulated, false otherwise
-     */
-    public boolean hasEmulationSettings() {
-        return emulationSettings != null;
     }
 
     /**
@@ -87,7 +87,7 @@ public abstract class Node {
      *
      * @return array of the node's edges
      */
-    public Edge[] getEdges() {
+    public List<Edge> getEdges() {
         return edges;
     }
 
@@ -104,7 +104,7 @@ public abstract class Node {
      * @return number of edges associated with the node
      */
     public int getDegree() {
-        return edges.length;
+        return edges.size();
     }
 
     /**
@@ -117,33 +117,71 @@ public abstract class Node {
     }
 
     /**
-     * Adds an edge to the array of edges associated with this node. Grows the array by one to add an edge.
+     * Returns identification if this node can be emulated with existing settings.
      *
-     * @param edge edge to add to node
+     * @return true if it can be emulated, false otherwise
      */
-    void addEdge(Edge edge) {
-        edges = Arrays.copyOf(edges, edges.length + 1);
-        edges[edges.length - 1] = edge;
+    public boolean hasEmulationSettings() {
+        return emulationSettings != null;
+    }
+
+    public BackboneNode convertToBackboneNode() {
+        return BackboneNodeConverter.convertToBackbone(this);
+    }
+
+    public EdgeNode convertToEdgeNode() {
+        return EdgeNodeConverter.convertToEdgeNode(this);
+    }
+
+    public EdgeDeviceNode convertToEdgeDeviceNode(EmulationSettings emulationSettings) {
+        return EdgeDeviceNodeConverter.convertToEdgeDeviceNode(this, emulationSettings);
     }
 
     @Override
     public boolean equals(Object o) {
-        boolean result = false;
-
-        if (o instanceof Node) {
-            result = ((Node) o).id == id;
+        if (!(o instanceof Node)) {
+            return false;
         }
 
-        return result;
+        Node other = (Node) o;
+
+        return id == other.id;
     }
 
     @Override
     public int hashCode() {
-        return id;
+        return Integer.hashCode(id);
     }
 
     @Override
     public String toString() {
         return getName();
+    }
+
+    /**
+     * Adds an edge to the array of edges associated with this node. Grows the array by one to add an edge.
+     *
+     * @param edge edge to add to node
+     */
+    void addEdge(Edge edge) {
+        edges.add(edge);
+    }
+
+    void copyFromOldNode(Node node) {
+        copyFields(node);
+
+        // update the edges
+        for (Edge e : edges) {
+            if (e.getSource().equals(node)) {
+                e.setSource(this);
+            } else {
+                e.setDestination(this);
+            }
+        }
+    }
+
+    protected void copyFields(Node node) {
+        edges.addAll(node.edges);
+        emulationSettings = node.emulationSettings;
     }
 }
