@@ -28,7 +28,9 @@ package emufog.graph;
  */
 public class EdgeNode extends Node {
 
-    /* number of devices connected to this edge node */
+    /**
+     * number of devices connected to this edge node
+     */
     private int deviceCount;
 
     /**
