@@ -35,19 +35,14 @@ class EdgeDeviceNodeConverter extends NodeConverter {
      * replace it with the given emulation settings.
      *
      * @param emulationSettings emulation settings of the newly created node
-     * @throws IllegalArgumentException if the emulation settings object is {@code null}
      */
-    private EdgeDeviceNodeConverter(EmulationSettings emulationSettings) throws IllegalArgumentException {
-        if (emulationSettings == null) {
-            throw new IllegalArgumentException("The emulation settings object is not initialized.");
-        }
-
+    private EdgeDeviceNodeConverter(EmulationSettings emulationSettings) {
         this.emulationSettings = emulationSettings;
     }
 
     @Override
-    Node createNewNode(Node node) {
-        return new EdgeDeviceNode(node.id, node.as, emulationSettings);
+    Node createNewNode(Node oldNode) {
+        return new EdgeDeviceNode(oldNode.id, oldNode.as, emulationSettings);
     }
 
     @Override
@@ -56,16 +51,25 @@ class EdgeDeviceNodeConverter extends NodeConverter {
     }
 
     @Override
-    boolean needsConversion(Node node) {
-        return !(node instanceof EdgeDeviceNode);
+    boolean needsConversion(Node oldNode) {
+        return !(oldNode instanceof EdgeDeviceNode);
     }
 
     @Override
-    EdgeDeviceNode convert(Node node) {
-        return (EdgeDeviceNode) super.convert(node);
+    EdgeDeviceNode convert(Node oldNode) {
+        return (EdgeDeviceNode) super.convert(oldNode);
     }
 
-    static EdgeDeviceNode convertToEdgeDeviceNode(Node node, EmulationSettings emulationSettings) {
-        return new EdgeDeviceNodeConverter(emulationSettings).convert(node);
+    /**
+     * Converts an arbitrary node to an edge device node. If the node is already an edge device
+     * node it will just be returned. Otherwise the old node will be removed from the AS and
+     * replaced by the new node.
+     *
+     * @param oldNode           old node to replace by an edge device node
+     * @param emulationSettings emulation settings to set for the new node
+     * @return newly created edge device node instance
+     */
+    static EdgeDeviceNode convertToEdgeDeviceNode(Node oldNode, EmulationSettings emulationSettings) {
+        return new EdgeDeviceNodeConverter(emulationSettings).convert(oldNode);
     }
 }

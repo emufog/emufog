@@ -31,8 +31,8 @@ class BackboneNodeConverter extends NodeConverter {
     private static final BackboneNodeConverter INSTANCE = new BackboneNodeConverter();
 
     @Override
-    Node createNewNode(Node node) {
-        return new BackboneNode(node.id, node.as);
+    Node createNewNode(Node oldNode) {
+        return new BackboneNode(oldNode.id, oldNode.as);
     }
 
     @Override
@@ -41,16 +41,24 @@ class BackboneNodeConverter extends NodeConverter {
     }
 
     @Override
-    boolean needsConversion(Node node) {
-        return !(node instanceof BackboneNode);
+    boolean needsConversion(Node oldNode) {
+        return !(oldNode instanceof BackboneNode);
     }
 
     @Override
-    BackboneNode convert(Node node) {
-        return (BackboneNode) super.convert(node);
+    BackboneNode convert(Node oldNode) {
+        return (BackboneNode) super.convert(oldNode);
     }
 
-    static BackboneNode convertToBackbone(Node node) {
-        return INSTANCE.convert(node);
+    /**
+     * Converts an arbitrary node to a backbone node. If the node is already a backbone node
+     * it will just be returned. Otherwise the old node will be removed from the AS and
+     * replaced by the new node.
+     *
+     * @param oldNode old node to replace by a backbone node
+     * @return newly created backbone node instance
+     */
+    static BackboneNode convertToBackbone(Node oldNode) {
+        return INSTANCE.convert(oldNode);
     }
 }

@@ -32,10 +32,10 @@ abstract class NodeConverter {
      * Creates a new node based on the given old node.
      * The type of the new node is based on the subclass.
      *
-     * @param node node to create a new node from
+     * @param oldNode node to create a new node from
      * @return the newly created node
      */
-    abstract Node createNewNode(Node node);
+    abstract Node createNewNode(Node oldNode);
 
     /**
      * Adds the new node to the respective list in the graph.
@@ -47,34 +47,34 @@ abstract class NodeConverter {
     /**
      * Checks if the given node needs to be converted by the specific converter.
      *
-     * @param node node to check
+     * @param oldNode node to check
      * @return true if the given node needs to be converted
      */
-    abstract boolean needsConversion(Node node);
+    abstract boolean needsConversion(Node oldNode);
 
     /**
      * Converts the given node to a different type and replace it in the associated graph.
      * If the node is already an instance of the requested class the method just returns this object.
      *
-     * @param node node to convert
+     * @param oldNode node to convert
      * @return the replacing node or {@code null} if the given node is {@code null}
      */
-    Node convert(Node node) {
-        if (node == null) {
+    Node convert(Node oldNode) {
+        if (oldNode == null) {
             return null;
         }
-        if (!needsConversion(node)) {
-            return node;
+        if (!needsConversion(oldNode)) {
+            return oldNode;
         }
 
         // remove the old node from the graph
-        node.as.removeNode(node);
+        oldNode.as.removeNode(oldNode);
 
         // create a new node of the requested type
-        Node newNode = createNewNode(node);
+        Node newNode = createNewNode(oldNode);
 
         // update links from the old node
-        newNode.copyFromOldNode(node);
+        newNode.copyFromOldNode(oldNode);
 
         // add the new node to the graph
         addNodeToGraph(newNode);

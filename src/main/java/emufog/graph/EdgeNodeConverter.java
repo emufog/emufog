@@ -31,8 +31,8 @@ class EdgeNodeConverter extends NodeConverter {
     private static final EdgeNodeConverter INSTANCE = new EdgeNodeConverter();
 
     @Override
-    Node createNewNode(Node node) {
-        return new EdgeNode(node.id, node.as);
+    Node createNewNode(Node oldNode) {
+        return new EdgeNode(oldNode.id, oldNode.as);
     }
 
     @Override
@@ -41,16 +41,24 @@ class EdgeNodeConverter extends NodeConverter {
     }
 
     @Override
-    boolean needsConversion(Node node) {
-        return !(node instanceof EdgeNode);
+    boolean needsConversion(Node oldNode) {
+        return !(oldNode instanceof EdgeNode);
     }
 
     @Override
-    EdgeNode convert(Node node) {
-        return (EdgeNode) super.convert(node);
+    EdgeNode convert(Node oldNode) {
+        return (EdgeNode) super.convert(oldNode);
     }
 
-    static EdgeNode convertToEdgeNode(Node node) {
-        return INSTANCE.convert(node);
+    /**
+     * Converts an arbitrary node to an edge node. If the node is already an edge node
+     * it will just be returned. Otherwise the old node will be removed from the AS and
+     * replaced by the new node.
+     *
+     * @param oldNode old node to replace by an edge node
+     * @return newly created edge node instance
+     */
+    static EdgeNode convertToEdgeNode(Node oldNode) {
+        return INSTANCE.convert(oldNode);
     }
 }
