@@ -30,20 +30,24 @@ import emufog.container.ContainerType;
  */
 public class EmulationSettings {
 
-    /* IP address to use */
-    private final String IP;
+    /**
+     * IP address to use
+     */
+    private final String ip;
 
-    /* container image containing the application to emulate */
+    /**
+     * container image containing the application to emulate
+     */
     private final ContainerType containerType;
 
     /**
      * Creates a new instance of the emulation settings object using the given IP and container image.
      *
-     * @param IP            IP address to use
+     * @param ip            ip address to use
      * @param containerType container image to use
      */
-    EmulationSettings(String IP, ContainerType containerType) {
-        this.IP = IP;
+    EmulationSettings(String ip, ContainerType containerType) {
+        this.ip = ip;
         this.containerType = containerType;
     }
 
@@ -53,7 +57,7 @@ public class EmulationSettings {
      * @return IP address
      */
     public String getIP() {
-        return IP;
+        return ip;
     }
 
     /**
