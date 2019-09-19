@@ -88,12 +88,25 @@ public class Tuple<K, V> {
 
     @Override
     public boolean equals(Object o) {
-        boolean result = false;
-
-        if (o instanceof Tuple) {
-            result = key.equals(((Tuple) o).key);
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof Tuple)) {
+            return false;
         }
 
-        return result;
+        Tuple other = (Tuple) o;
+
+        return key.equals(other.key);
+    }
+
+    @Override
+    public int hashCode() {
+        return key.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "Tuple: <" + key.toString() + ", " + value.toString() + ">";
     }
 }
