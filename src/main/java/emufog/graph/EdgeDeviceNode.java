@@ -60,7 +60,7 @@ public class EdgeDeviceNode extends Node {
     }
 
     @Override
-    protected void copyFields(Node node) {
-        edges.addAll(node.edges);
+    protected void copyFields(Node oldNode) {
+        edges.addAll(oldNode.edges);
     }
 }

@@ -83,9 +83,9 @@ public abstract class Node {
     }
 
     /**
-     * Returns an array of all edges associated with the node.
+     * Returns a list of all edges associated with the node.
      *
-     * @return array of the node's edges
+     * @return list of the node's edges
      */
     public List<Edge> getEdges() {
         return edges;
@@ -125,14 +125,30 @@ public abstract class Node {
         return emulationSettings != null;
     }
 
+    /**
+     * Converts and replaces this node with a backbone node.
+     *
+     * @return the newly converted backbone node
+     */
     public BackboneNode convertToBackboneNode() {
         return BackboneNodeConverter.convertToBackbone(this);
     }
 
+    /**
+     * Converts and replaces this node with a edge node.
+     *
+     * @return the newly converted edge node
+     */
     public EdgeNode convertToEdgeNode() {
         return EdgeNodeConverter.convertToEdgeNode(this);
     }
 
+    /**
+     * Converts and replaces this node with a edge device node.
+     *
+     * @param emulationSettings emulation settings to use to create a new edge device node
+     * @return the newly converted edge device node
+     */
     public EdgeDeviceNode convertToEdgeDeviceNode(EmulationSettings emulationSettings) {
         return EdgeDeviceNodeConverter.convertToEdgeDeviceNode(this, emulationSettings);
     }
@@ -167,12 +183,18 @@ public abstract class Node {
         edges.add(edge);
     }
 
-    void copyFromOldNode(Node node) {
-        copyFields(node);
+    /**
+     * Copies the fields {@link #copyFields(Node)} from the old node and updates the references of
+     * the associated connections to match the new node instance.
+     *
+     * @param oldNode old node to copy fields from
+     */
+    void copyFromOldNode(Node oldNode) {
+        copyFields(oldNode);
 
         // update the edges
         for (Edge e : edges) {
-            if (e.getSource().equals(node)) {
+            if (e.getSource().equals(oldNode)) {
                 e.setSource(this);
             } else {
                 e.setDestination(this);
@@ -180,8 +202,13 @@ public abstract class Node {
         }
     }
 
-    protected void copyFields(Node node) {
-        edges.addAll(node.edges);
-        emulationSettings = node.emulationSettings;
+    /**
+     * Copies the required fields from the old node.
+     *
+     * @param oldNode old node to copy fields from
+     */
+    protected void copyFields(Node oldNode) {
+        edges.addAll(oldNode.edges);
+        emulationSettings = oldNode.emulationSettings;
     }
 }
