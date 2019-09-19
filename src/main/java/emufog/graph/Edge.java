@@ -113,10 +113,10 @@ public class Edge {
 
     /**
      * Returns the other end of the connection for the given node.
-     * In case the node is not part of the connection the method returns null.
+     * In case the node is not part of the connection the method returns {@code null}.
      *
      * @param node node to find the partner for
-     * @return the other end of the connection
+     * @return the other end of the connection or {@code null} if node is not part of this edge
      */
     public Node getDestinationForSource(Node node) {
         if (from.equals(node)) {
@@ -159,10 +159,20 @@ public class Edge {
         return "Edge: " + id;
     }
 
+    /**
+     * Sets the first/source node of the connection.
+     *
+     * @param source first/source node to set
+     */
     void setSource(Node source) {
         from = source;
     }
 
+    /**
+     * Sets the second/destination node of the connection.
+     *
+     * @param destination second/destination node to set
+     */
     void setDestination(Node destination) {
         to = destination;
     }
