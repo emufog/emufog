@@ -26,25 +26,31 @@ package emufog.graph;
 /**
  * This class convert an existing node to a edge node in the graph.
  */
-public class EdgeNodeConverter extends NodeConverter {
+class EdgeNodeConverter extends NodeConverter {
+
+    private static final EdgeNodeConverter INSTANCE = new EdgeNodeConverter();
 
     @Override
-    protected Node createNewNode(Node node) {
+    Node createNewNode(Node node) {
         return new EdgeNode(node.id, node.as);
     }
 
     @Override
-    protected void addNodeToGraph(Node newNode) {
+    void addNodeToGraph(Node newNode) {
         newNode.as.addEdgeNode((EdgeNode) newNode);
     }
 
     @Override
-    protected boolean needsConversion(Node node) {
+    boolean needsConversion(Node node) {
         return !(node instanceof EdgeNode);
     }
 
     @Override
-    public EdgeNode convert(Node node) {
+    EdgeNode convert(Node node) {
         return (EdgeNode) super.convert(node);
+    }
+
+    static EdgeNode convertToEdgeNode(Node node) {
+        return INSTANCE.convert(node);
     }
 }

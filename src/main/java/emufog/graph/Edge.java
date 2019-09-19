@@ -29,20 +29,30 @@ package emufog.graph;
  */
 public class Edge {
 
-    /* unique identifier of the edge object */
-    final int id;
+    /**
+     * unique identifier of the edge object
+     */
+    private final int id;
 
-    /* latency delay on this edge in ms */
+    /**
+     * latency delay on this edge in ms
+     */
     private final float delay;
 
-    /* bandwidth of the connection on Mbit/s */
+    /**
+     * bandwidth of the connection on Mbit/s
+     */
     private final float bandwidth;
 
-    /* one end of the connection */
-    Node from;
+    /**
+     * one end of the connection
+     */
+    private Node from;
 
-    /* the other end of the connection */
-    Node to;
+    /**
+     * the other end of the connection
+     */
+    private Node to;
 
     /**
      * Creates a new edge instance connecting two nodes of the graph.
@@ -84,35 +94,6 @@ public class Edge {
     }
 
     /**
-     * Returns the other end of the connection for the given node.
-     * In case the node is not part of the connection the method returns null.
-     *
-     * @param node node to find the partner for
-     * @return the other end of the connection
-     */
-    public Node getDestinationForSource(Node node) {
-        Node result = null;
-
-        if (from.equals(node)) {
-            result = to;
-        }
-        if (to.equals(node)) {
-            result = from;
-        }
-
-        return result;
-    }
-
-    /**
-     * Indicates whether this edge connects two different ASs or not.
-     *
-     * @return true if edge is connecting different ASs, false otherwise
-     */
-    public boolean isCrossASEdge() {
-        return !from.as.equals(to.as);
-    }
-
-    /**
      * Returns the source/first node of the connection.
      *
      * @return source/first node
@@ -130,14 +111,59 @@ public class Edge {
         return to;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        boolean result = false;
-
-        if (o instanceof Edge) {
-            result = ((Edge) o).id == id;
+    /**
+     * Returns the other end of the connection for the given node.
+     * In case the node is not part of the connection the method returns null.
+     *
+     * @param node node to find the partner for
+     * @return the other end of the connection
+     */
+    public Node getDestinationForSource(Node node) {
+        if (from.equals(node)) {
+            return to;
+        }
+        if (to.equals(node)) {
+            return from;
         }
 
-        return result;
+        return null;
+    }
+
+    /**
+     * Indicates whether this edge connects two different ASs or not.
+     *
+     * @return true if edge is connecting different ASs, false otherwise
+     */
+    public boolean isCrossASEdge() {
+        return !from.as.equals(to.as);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Edge)) {
+            return false;
+        }
+
+        Edge other = (Edge) o;
+
+        return id == other.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Edge: " + id;
+    }
+
+    void setSource(Node source) {
+        from = source;
+    }
+
+    void setDestination(Node destination) {
+        to = destination;
     }
 }

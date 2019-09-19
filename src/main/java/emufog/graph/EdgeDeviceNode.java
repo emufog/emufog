@@ -45,6 +45,11 @@ public class EdgeDeviceNode extends Node {
         this.emulationSettings = emulationSettings;
     }
 
+    @Override
+    public String getName() {
+        return "h" + id;
+    }
+
     /**
      * Returns the container type for this edge device node. The type is always a device type instance.
      *
@@ -55,7 +60,7 @@ public class EdgeDeviceNode extends Node {
     }
 
     @Override
-    public String getName() {
-        return "h" + id;
+    protected void copyFields(Node node) {
+        edges.addAll(node.edges);
     }
 }

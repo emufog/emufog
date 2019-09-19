@@ -24,11 +24,10 @@
 package emufog.backbone;
 
 import emufog.graph.AS;
+import emufog.graph.BackboneNode;
 import emufog.graph.Edge;
 import emufog.graph.EdgeNode;
 import emufog.graph.Node;
-import emufog.graph.BackboneNode;
-import emufog.graph.BackboneNodeConverter;
 import java.util.ArrayDeque;
 import java.util.BitSet;
 import java.util.Collection;
@@ -56,9 +55,6 @@ class BackboneWorker implements Runnable {
     /* AS associated with this worker */
     private final AS as;
 
-    /* converter to mark backbone nodes */
-    private final BackboneNodeConverter converter;
-
     /**
      * Creates a new worker instance to compute the backbone classification algorithms on a given AS.
      * Only converts the given as from the graph instance.
@@ -67,7 +63,6 @@ class BackboneWorker implements Runnable {
      */
     BackboneWorker(AS as) {
         this.as = as;
-        converter = new BackboneNodeConverter();
     }
 
     @Override
@@ -97,7 +92,7 @@ class BackboneWorker implements Runnable {
         List<EdgeNode> toConvert = as.getEdgeNodes().parallelStream().filter(r -> r.getDegree() >= averageDegree).collect(Collectors.toList());
 
         for (EdgeNode r : toConvert) {
-            converter.convert(r);
+            r.convertToBackboneNode();
         }
     }
 
@@ -133,7 +128,7 @@ class BackboneWorker implements Runnable {
             if (node instanceof BackboneNode && predecessors.get(node) instanceof EdgeNode) {
                 Node predecessor = predecessors.get(node);
                 while (predecessor instanceof EdgeNode) {
-                    converter.convert(predecessor);
+                    predecessor.convertToBackboneNode();
 
                     predecessor = predecessors.get(predecessor);
                 }

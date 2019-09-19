@@ -26,7 +26,6 @@ package emufog.backbone;
 import emufog.graph.AS;
 import emufog.graph.Edge;
 import emufog.graph.Graph;
-import emufog.graph.BackboneNodeConverter;
 import java.util.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,12 +83,10 @@ public class BackboneClassifier {
      * This methods marks all cross-AS edge's endpoints as backbone nodes.
      */
     private static void markASEdgeNodes(Graph graph) {
-        BackboneNodeConverter converter = new BackboneNodeConverter();
-
         for (Edge e : graph.getEdges()) {
             if (e.isCrossASEdge()) {
-                converter.convert(e.getSource());
-                converter.convert(e.getDestination());
+                e.getSource().convertToBackboneNode();
+                e.getDestination().convertToBackboneNode();
             }
         }
     }
