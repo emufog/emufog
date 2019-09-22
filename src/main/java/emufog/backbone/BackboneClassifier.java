@@ -53,7 +53,7 @@ public class BackboneClassifier {
         // 1st step sequentially
         LOG.debug("Start Backbone Classification");
         long start = System.nanoTime();
-        markASEdgeNodes(graph);
+        convertCrossAsEdges(graph.getEdges());
         long stop = System.nanoTime();
         if (graph.getSettings().timeMeasuring) {
             LOG.info("Graph Step 1 - Time: {}", intervalToString(start, stop));
@@ -80,10 +80,12 @@ public class BackboneClassifier {
     }
 
     /**
-     * This methods marks all cross-AS edge's endpoints as backbone nodes.
+     * This methods converts all cross-AS edge's endpoints to backbone nodes.
+     *
+     * @param edges collection of edges to check
      */
-    private static void markASEdgeNodes(Graph graph) {
-        for (Edge e : graph.getEdges()) {
+    private static void convertCrossAsEdges(Collection<Edge> edges) {
+        for (Edge e : edges) {
             if (e.isCrossASEdge()) {
                 e.getSource().convertToBackboneNode();
                 e.getDestination().convertToBackboneNode();
