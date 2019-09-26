@@ -48,10 +48,14 @@ import java.util.Map;
  */
 public class MaxiNetExporter implements IGraphExporter {
 
-    /* list of all lines of the respective file in top down order */
+    /**
+     * list of all lines of the respective file in top down order
+     */
     private final List<String> lines;
 
-    /* mapping of edges to their respective connector */
+    /**
+     * mapping of edges to their respective connector
+     */
     private final Map<Edge, String> connectors;
 
     /**
@@ -81,7 +85,7 @@ public class MaxiNetExporter implements IGraphExporter {
         // check the file ending of the given path
         PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.py");
         if (!matcher.matches(path)) {
-            throw new IllegalArgumentException("The file name for MaxiNet hat to be a python file (.py)");
+            throw new IllegalArgumentException("The file name for MaxiNet has to be a python file (.py)");
         }
 
         // initialize empty sets to start the writing
@@ -89,27 +93,38 @@ public class MaxiNetExporter implements IGraphExporter {
         connectors.clear();
 
         // begin to write the python file
-        setupImports();
-
-        addBlankLine();
+        lines.add("#!/usr/bin/env python2");
+        lines.add("");
+        lines.add("import time");
+        lines.add("");
+        lines.add("from MaxiNet.Frontend import maxinet");
+        lines.add("from MaxiNet.Frontend.container import Docker");
+        lines.add("from mininet.topo import Topo");
+        lines.add("from mininet.node import OVSSwitch");
+        lines.add("");
         lines.add("topo = Topo()");
+        lines.add("");
+
         addHosts(graph);
+
         addSwitches(graph);
+
         addConnectors(graph);
+
         addLinks(graph);
-        setupExperiment();
+
+        lines.add("");
+        lines.add("# create experiment");
+        lines.add("cluster = maxinet.Cluster()");
+        lines.add("exp = maxinet.Experiment(cluster, topo, switch=OVSSwitch)");
+        lines.add("exp.setup()");
 
         // set the overwrite option if feature is set in the settings file
         StandardOpenOption overwrite = settings.overwriteExperimentFile ? StandardOpenOption.TRUNCATE_EXISTING : StandardOpenOption.APPEND;
         // write output in UTF-8 to the specified file
         Files.write(file.toPath(), lines, StandardCharsets.UTF_8, StandardOpenOption.CREATE, overwrite);
-    }
-
-    /**
-     * Adds a blank line to the output file.
-     */
-    private void addBlankLine() {
-        lines.add("");
+        lines.clear();
+        connectors.clear();
     }
 
     /**
@@ -118,7 +133,6 @@ public class MaxiNetExporter implements IGraphExporter {
      * @param graph graph to export
      */
     private void addHosts(Graph graph) {
-        addBlankLine();
         lines.add("# add hosts");
 
         graph.getNodes().stream().filter(Node::hasEmulationSettings).forEach(n -> {
@@ -139,7 +153,7 @@ public class MaxiNetExporter implements IGraphExporter {
      * @param graph graph to export
      */
     private void addSwitches(Graph graph) {
-        addBlankLine();
+        lines.add("");
         lines.add("# add switches");
 
         List<Node> nodes = new ArrayList<>();
@@ -154,7 +168,7 @@ public class MaxiNetExporter implements IGraphExporter {
      * @param graph graph to export
      */
     private void addConnectors(Graph graph) {
-        addBlankLine();
+        lines.add("");
         lines.add("# add connectors");
 
         int counter = 0;
@@ -174,7 +188,7 @@ public class MaxiNetExporter implements IGraphExporter {
      * @param graph graph to export
      */
     private void addLinks(Graph graph) {
-        addBlankLine();
+        lines.add("");
         lines.add("# add links");
 
         for (Edge e : graph.getEdges()) {
@@ -198,30 +212,5 @@ public class MaxiNetExporter implements IGraphExporter {
      */
     private void addLink(String source, String destination, float latency, float bandwidth) {
         lines.add(String.format("topo.addLink(%s, %s, delay='%fms', bw=%f)", source, destination, latency, bandwidth));
-    }
-
-    /**
-     * Writes the necessary imports at the top of the output file.
-     */
-    private void setupImports() {
-        lines.add("#!/usr/bin/env python2");
-        addBlankLine();
-        lines.add("import time");
-        addBlankLine();
-        lines.add("from MaxiNet.Frontend import maxinet");
-        lines.add("from MaxiNet.Frontend.container import Docker");
-        lines.add("from mininet.topo import Topo");
-        lines.add("from mininet.node import OVSSwitch");
-    }
-
-    /**
-     * Writes the lines to setup and start an experiment in MaxiNet.
-     */
-    private void setupExperiment() {
-        addBlankLine();
-        lines.add("# create experiment");
-        lines.add("cluster = maxinet.Cluster()");
-        lines.add("exp = maxinet.Experiment(cluster, topo, switch=OVSSwitch)");
-        lines.add("exp.setup()");
     }
 }
