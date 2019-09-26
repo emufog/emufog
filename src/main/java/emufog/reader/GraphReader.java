@@ -35,7 +35,9 @@ import java.util.List;
  */
 public abstract class GraphReader {
 
-    /* the settings to use for the read in graph */
+    /**
+     * the settings to use for the read in graph
+     */
     protected final Settings settings;
 
     /**

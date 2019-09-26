@@ -59,20 +59,18 @@ public class BriteFormatReader extends GraphReader {
      * @throws IOException in case of an I/O error
      */
     private static void extractNodes(Graph graph, BufferedReader reader) throws IOException {
-        String line = reader.readLine();
-
-        while (!nullOrEmpty(line)) {
+        for (String line = reader.readLine(); !nullOrEmpty(line); line = reader.readLine()) {
             // split the line into pieces and parse them separately
             String[] values = line.split("\t");
-            if (values.length >= 7) {
-                int id = Integer.parseInt(values[0]);
-                int as = Integer.parseInt(values[5]);
-                AS system = graph.getOrCreateAutonomousSystem(as);
-                // create a new router object
-                graph.createEdgeNode(id, system);
+            if (values.length < 7) {
+                throw new IOException("The node line '" + line + "' does not contain seven columns.");
             }
 
-            line = reader.readLine();
+            int id = Integer.parseInt(values[0]);
+            int as = Integer.parseInt(values[5]);
+            AS system = graph.getOrCreateAutonomousSystem(as);
+            // create a new edge node
+            graph.createEdgeNode(id, system);
         }
     }
 
@@ -85,28 +83,24 @@ public class BriteFormatReader extends GraphReader {
      * @throws IOException in case of an I/O error
      */
     private static void extractEdges(Graph graph, BufferedReader reader) throws IOException {
-        String line = reader.readLine();
-
-        while (!nullOrEmpty(line)) {
+        for (String line = reader.readLine(); !nullOrEmpty(line); line = reader.readLine()) {
             // split the line into pieces and parse them separately
             String[] values = line.split("\t");
-            if (values.length >= 9) {
-                int id = Integer.parseInt(values[0]);
-                int from = Integer.parseInt(values[1]);
-                int to = Integer.parseInt(values[2]);
-                float delay = Float.parseFloat(values[4]);
-                float bandwidth = Float.parseFloat(values[5]);
-
-                // get the source and destination nodes from the existing graph
-                EdgeNode fromNode = graph.getEdgeNode(from);
-                EdgeNode toNode = graph.getEdgeNode(to);
-                if (fromNode != null && toNode != null) {
-                    // create the new edge object
-                    graph.createEdge(id, fromNode, toNode, delay, bandwidth);
-                }
+            if (values.length < 9) {
+                throw new IOException("The edge node '" + line + "' does not contain nine columns.");
             }
 
-            line = reader.readLine();
+            int id = Integer.parseInt(values[0]);
+            int from = Integer.parseInt(values[1]);
+            int to = Integer.parseInt(values[2]);
+            float delay = Float.parseFloat(values[4]);
+            float bandwidth = Float.parseFloat(values[5]);
+
+            // get the source and destination nodes from the existing graph
+            EdgeNode fromNode = graph.getEdgeNode(from);
+            EdgeNode toNode = graph.getEdgeNode(to);
+            // create the new edge
+            graph.createEdge(id, fromNode, toNode, delay, bandwidth);
         }
     }
 
@@ -119,7 +113,7 @@ public class BriteFormatReader extends GraphReader {
             throw new IllegalArgumentException("The BRITE reader only supports one input file.");
         }
 
-        final Graph graph = new Graph(settings);
+        Graph graph = new Graph(settings);
 
         BufferedReader reader = new BufferedReader(new FileReader(files.get(0).toFile()));
 

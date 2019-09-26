@@ -34,7 +34,6 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,7 +113,7 @@ public class CaidaFormatReader extends GraphReader {
 
         nodeCoordinates = new HashMap<>();
 
-        final Graph graph = new Graph(settings);
+        Graph graph = new Graph(settings);
 
         // read in the nodes
         Files.lines(nodesFile, charset).forEach(this::processNodeLine);
@@ -317,9 +316,7 @@ public class CaidaFormatReader extends GraphReader {
      * @return the file of the list matching the extension or {@code null} if not found
      */
     private static Path getFileWithEnding(List<Path> files, String fileExtension) {
-        Optional<Path> query = files.stream().filter(x -> x.toString().endsWith(fileExtension)).findFirst();
-
-        return query.orElse(null);
+        return files.stream().filter(x -> x.toString().endsWith(fileExtension)).findFirst().orElse(null);
     }
 
     private float getLatency(Node from, Node to) {
