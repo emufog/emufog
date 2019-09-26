@@ -23,30 +23,30 @@
  */
 package emufog.reader;
 
+import emufog.config.Config;
 import emufog.graph.Graph;
-import emufog.settings.Settings;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
 /**
- * Abstract class providing the settings required for all input readers.
+ * Abstract class providing the config required for all input readers.
  */
 public abstract class GraphReader {
 
     /**
-     * the settings to use for the read in graph
+     * the config to use for the read in graph
      */
-    protected final Settings settings;
+    protected final Config config;
 
     /**
-     * Creates a new instance associated with the given settings.
+     * Creates a new instance associated with the given config.
      *
-     * @param settings settings to use for the new graph
+     * @param config config to use for the new graph
      */
-    GraphReader(Settings settings) {
-        this.settings = settings;
+    GraphReader(Config config) {
+        this.config = config;
     }
 
     /**

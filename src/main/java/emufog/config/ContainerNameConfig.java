@@ -21,19 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.settings;
+package emufog.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Docker type for host devices extending the abstract container type with scaling
- * factor and the device count.
+ * Name of a container consisting of the name of the image and the version to use.
  */
-class DeviceTypeConfig extends ContainerTypeConfig {
+class ContainerNameConfig {
 
-    @JsonProperty("scaling-factor")
-    int scalingFactor;
+    @JsonProperty("name")
+    String name;
 
-    @JsonProperty("average-device-count")
-    int averageDeviceCount;
+    @JsonProperty("version")
+    String version;
 }

@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.settings;
+package emufog.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

@@ -21,18 +21,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.settings;
+package emufog.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Collection;
 
 /**
- * Name of a container consisting of the name of the image and the version to use.
+ * Top level config object of the YAML document.
  */
-class ContainerNameConfig {
+class EmuFogConfig {
 
-    @JsonProperty("name")
-    String name;
+    @JsonProperty("base-address")
+    String baseAddress;
 
-    @JsonProperty("version")
-    String version;
+    @JsonProperty("overwrite-experiment-file")
+    boolean overWriteOutputFile;
+
+    @JsonProperty("max-fog-nodes")
+    int maxFogNodes;
+
+    @JsonProperty("cost-threshold")
+    float costThreshold;
+
+    @JsonProperty("host-device-latency")
+    float hostDeviceLatency;
+
+    @JsonProperty("host-device-bandwidth")
+    float hostDeviceBandwidth;
+
+    @JsonProperty("thread-count")
+    int threadCount;
+
+    @JsonProperty("paralleled-fog-building")
+    boolean paralleledFogBuilding;
+
+    @JsonProperty("time-measuring")
+    boolean timeMeasuring;
+
+    @JsonProperty("device-node-types")
+    Collection<DeviceTypeConfig> deviceNodeTypes;
+
+    @JsonProperty("fog-node-types")
+    Collection<FogTypeConfig> fogNodeTypes;
 }

@@ -70,7 +70,7 @@ public class EdgeNode extends Node {
 
     /**
      * Returns the device count of this edge node.
-     * The count includes the scaling factor given by the settings.
+     * The count includes the scaling factor given by the config.
      *
      * @return device count
      */

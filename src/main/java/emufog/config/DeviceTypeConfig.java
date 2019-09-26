@@ -21,46 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.settings;
+package emufog.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.Collection;
 
 /**
- * Top level settings object of the YAML document.
+ * Docker type for host devices extending the abstract container type with scaling
+ * factor and the device count.
  */
-class SettingsConfig {
+class DeviceTypeConfig extends ContainerTypeConfig {
 
-    @JsonProperty("base-address")
-    String baseAddress;
+    @JsonProperty("scaling-factor")
+    int scalingFactor;
 
-    @JsonProperty("overwrite-experiment-file")
-    boolean overWriteOutputFile;
-
-    @JsonProperty("max-fog-nodes")
-    int maxFogNodes;
-
-    @JsonProperty("cost-threshold")
-    float costThreshold;
-
-    @JsonProperty("host-device-latency")
-    float hostDeviceLatency;
-
-    @JsonProperty("host-device-bandwidth")
-    float hostDeviceBandwidth;
-
-    @JsonProperty("thread-count")
-    int threadCount;
-
-    @JsonProperty("paralleled-fog-building")
-    boolean paralleledFogBuilding;
-
-    @JsonProperty("time-measuring")
-    boolean timeMeasuring;
-
-    @JsonProperty("device-node-types")
-    Collection<DeviceTypeConfig> deviceNodeTypes;
-
-    @JsonProperty("fog-node-types")
-    Collection<FogTypeConfig> fogNodeTypes;
+    @JsonProperty("average-device-count")
+    int averageDeviceCount;
 }

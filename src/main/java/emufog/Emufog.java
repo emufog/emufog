@@ -24,6 +24,7 @@
 package emufog;
 
 import emufog.backbone.BackboneClassifier;
+import emufog.config.Config;
 import emufog.export.IGraphExporter;
 import emufog.export.MaxiNetExporter;
 import emufog.fog.FogNodeClassifier;
@@ -33,8 +34,7 @@ import emufog.graph.Graph;
 import emufog.reader.BriteFormatReader;
 import emufog.reader.CaidaFormatReader;
 import emufog.reader.GraphReader;
-import emufog.settings.Settings;
-import emufog.settings.YamlReader;
+import emufog.config.YamlReader;
 import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,23 +87,23 @@ public class Emufog {
             return;
         }
 
-        // read in the settings file
-        Settings settings;
+        // read in the config file
+        Config config;
         try {
-            settings = YamlReader.read(arguments.settingsPath);
+            config = YamlReader.read(arguments.configPath);
         } catch (Exception e) {
-            LOG.error("Failed to read in the configuration file: {}", arguments.settingsPath, e);
+            LOG.error("Failed to read in the configuration file: {}", arguments.configPath, e);
             return;
         }
 
         // determines the respective format reader
-        GraphReader reader = getReader(arguments.inputType, settings);
+        GraphReader reader = getReader(arguments.inputType, config);
 
         // read in the graph with the graph reader
         long start = System.nanoTime();
         Graph graph = reader.readGraph(arguments.files);
         long end = System.nanoTime();
-        if (settings.timeMeasuring) {
+        if (config.timeMeasuring) {
             LOG.info("Time to read in the graph: {}", intervalToString(start, end));
         }
         LOG.info("##############################################################");
@@ -116,7 +116,7 @@ public class Emufog {
         start = System.nanoTime();
         BackboneClassifier.identifyBackbone(graph);
         end = System.nanoTime();
-        if (settings.timeMeasuring) {
+        if (config.timeMeasuring) {
             LOG.info("Time to determine the backbone of the topology: {}", intervalToString(start, end));
         }
         LOG.info("##############################################################");
@@ -137,8 +137,8 @@ public class Emufog {
             exporter.exportGraph(graph, arguments.output);
         } else {
             // no fog placement found, aborting
-            LOG.warn("Unable to find a fog placement with the provided settings.");
-            LOG.warn("Consider using different settings.");
+            LOG.warn("Unable to find a fog placement with the provided config.");
+            LOG.warn("Consider using different config.");
         }
     }
 
@@ -146,16 +146,16 @@ public class Emufog {
      * Returns the reader matching the given type from the command line.
      *
      * @param type     topology type to read in
-     * @param settings settings object to use for the reader
+     * @param config config object to use for the reader
      * @return graph reader matching the type or null if not found
      */
-    private static GraphReader getReader(String type, Settings settings) throws IllegalArgumentException {
+    private static GraphReader getReader(String type, Config config) throws IllegalArgumentException {
         String s = type.trim().toLowerCase();
         switch (s) {
             case "brite":
-                return new BriteFormatReader(settings);
+                return new BriteFormatReader(config);
             case "caida":
-                return new CaidaFormatReader(settings);
+                return new CaidaFormatReader(config);
             default:
                 throw new IllegalArgumentException("Unsupported Input Format: " + s);
         }

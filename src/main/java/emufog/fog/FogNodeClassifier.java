@@ -23,8 +23,8 @@
  */
 package emufog.fog;
 
+import emufog.config.Config;
 import emufog.graph.Graph;
-import emufog.settings.Settings;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -42,9 +42,9 @@ public class FogNodeClassifier {
     private final Graph graph;
 
     /**
-     * settings to use for the fog node classification
+     * config to use for the fog node classification
      */
-    final Settings settings;
+    final Config config;
 
     /**
      * counter of remaining fog nodes to place in the graph, atomic for parallel access
@@ -63,8 +63,8 @@ public class FogNodeClassifier {
         }
 
         this.graph = graph;
-        settings = graph.getSettings();
-        counter = new AtomicInteger(settings.maxFogNodes);
+        config = graph.getConfig();
+        counter = new AtomicInteger(config.maxFogNodes);
     }
 
     /**

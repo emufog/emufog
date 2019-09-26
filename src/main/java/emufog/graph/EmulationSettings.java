@@ -26,7 +26,7 @@ package emufog.graph;
 import emufog.container.ContainerType;
 
 /**
- * This class represents the settings to use emulating a node of the graph.
+ * This class represents the config to use emulating a node of the graph.
  */
 public class EmulationSettings {
 
@@ -41,7 +41,7 @@ public class EmulationSettings {
     private final ContainerType containerType;
 
     /**
-     * Creates a new instance of the emulation settings object using the given IP and container image.
+     * Creates a new instance of the emulation config object using the given IP and container image.
      *
      * @param ip            ip address to use
      * @param containerType container image to use

@@ -34,8 +34,8 @@ import picocli.CommandLine.Option;
  */
 class Arguments {
 
-    @Option(names = {"--settings", "-s"}, description = "settings file to use")
-    Path settingsPath = Paths.get("src", "main", "resources", "application.yaml");
+    @Option(names = {"--config", "-c"}, description = "config file to use")
+    Path configPath = Paths.get("src", "main", "resources", "application.yaml");
 
     @Option(names = {"--type", "-t"}, description = "input format to read in")
     String inputType;

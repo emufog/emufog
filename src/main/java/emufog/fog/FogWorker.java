@@ -28,7 +28,7 @@ import emufog.graph.Edge;
 import emufog.graph.EdgeDeviceNode;
 import emufog.graph.EdgeNode;
 import emufog.graph.Node;
-import emufog.settings.Settings;
+import emufog.config.Config;
 import emufog.util.Tuple;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,9 +61,9 @@ class FogWorker {
     private final FogNodeClassifier classifier;
 
     /**
-     * the settings to use for the fog node placement algorithm
+     * the config to use for the fog node placement algorithm
      */
-    private final Settings settings;
+    private final Config config;
 
     /**
      * mapping of nodes from the underlying graph to their respective base nodes
@@ -72,7 +72,7 @@ class FogWorker {
 
     /**
      * Creates new worker for the fog node placement algorithm that processes the given
-     * autonomous system. Uses the fog node classifier and its settings to run the
+     * autonomous system. Uses the fog node classifier and its config to run the
      * algorithm.
      *
      * @param as         autonomous system to process
@@ -81,7 +81,7 @@ class FogWorker {
     FogWorker(AS as, FogNodeClassifier classifier) {
         this.as = as;
         this.classifier = classifier;
-        settings = classifier.settings;
+        config = classifier.config;
         nodes = new HashMap<>();
     }
 
@@ -98,7 +98,7 @@ class FogWorker {
         long start = System.nanoTime();
         // calculate connection costs from the edge device nodes
         startingNodes.forEach(this::calculateConnectionCosts);
-        if (settings.timeMeasuring) {
+        if (config.timeMeasuring) {
             LOG.info("Time to calculate connection costs for edge devices for {}: {}", as, intervalToString(start, System.nanoTime()));
         }
 
@@ -116,7 +116,7 @@ class FogWorker {
             start = System.nanoTime();
             // find the next fog node for the remaining starting nodes
             BaseNode fogNode = getNextFogNode(startingNodes);
-            if (settings.timeMeasuring) {
+            if (config.timeMeasuring) {
                 LOG.info("Time to find next fog node for {}: {}", as, intervalToString(start, System.nanoTime()));
             }
 
@@ -126,7 +126,7 @@ class FogWorker {
             start = System.nanoTime();
             // remove all covered nodes from the graph
             removeAllCoveredNodes(fogNode, startingNodes);
-            if (settings.timeMeasuring) {
+            if (config.timeMeasuring) {
                 LOG.info("Time to remove the covered nodes for {}: {}", as, intervalToString(start, System.nanoTime()));
             }
 
@@ -150,8 +150,8 @@ class FogWorker {
         long start = System.nanoTime();
         // find the optimal fog type for the remaining nodes in the graph
         List<BaseNode> fogNodes = new ArrayList<>(nodes.values());
-        fogNodes.forEach(n -> n.findFogType(settings.fogNodeTypes));
-        if (settings.timeMeasuring) {
+        fogNodes.forEach(n -> n.findFogType(config.fogNodeTypes));
+        if (config.timeMeasuring) {
             LOG.info("Time to find possible fog types for {}: {}", as, intervalToString(start, System.nanoTime()));
         }
 
@@ -160,7 +160,7 @@ class FogWorker {
         fogNodes.sort(new FogComparator());
         // retrieve the nextLevels optimal node
         BaseNode next = fogNodes.get(0);
-        if (settings.timeMeasuring) {
+        if (config.timeMeasuring) {
             LOG.info("Time to find the fog node placement for {}: {}", as, intervalToString(start, System.nanoTime()));
         }
 
@@ -200,7 +200,7 @@ class FogWorker {
 
     /**
      * Calculates the connection costs to all nodes that are within the cost threshold
-     * defined in the associated settings {@link #settings}. To calculate the costs
+     * defined in the associated config {@link #config}. To calculate the costs
      * the function uses the dijksta algorithm starting from the given node.
      *
      * @param node node to calculate the connection costs for
@@ -230,7 +230,7 @@ class FogWorker {
                 }
                 // abort on costs above the threshold
                 float nextCosts = currentCosts + calculateCosts(e);
-                if (nextCosts > settings.costThreshold) {
+                if (nextCosts > config.costThreshold) {
                     continue;
                 }
 

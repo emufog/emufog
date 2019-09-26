@@ -23,12 +23,12 @@
  */
 package emufog.export;
 
+import emufog.config.Config;
 import emufog.container.ContainerType;
 import emufog.graph.Edge;
 import emufog.graph.EmulationSettings;
 import emufog.graph.Graph;
 import emufog.graph.Node;
-import emufog.settings.Settings;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -76,9 +76,9 @@ public class MaxiNetExporter implements IGraphExporter {
         }
 
         // check if file exists and can be overwritten
-        Settings settings = graph.getSettings();
+        Config config = graph.getConfig();
         File file = path.toFile();
-        if (!settings.overwriteExperimentFile && file.exists()) {
+        if (!config.overwriteExperimentFile && file.exists()) {
             throw new IllegalArgumentException("The given file already exist. Please provide a valid path");
         }
 
@@ -119,8 +119,8 @@ public class MaxiNetExporter implements IGraphExporter {
         lines.add("exp = maxinet.Experiment(cluster, topo, switch=OVSSwitch)");
         lines.add("exp.setup()");
 
-        // set the overwrite option if feature is set in the settings file
-        StandardOpenOption overwrite = settings.overwriteExperimentFile ? StandardOpenOption.TRUNCATE_EXISTING : StandardOpenOption.APPEND;
+        // set the overwrite option if feature is set in the config file
+        StandardOpenOption overwrite = config.overwriteExperimentFile ? StandardOpenOption.TRUNCATE_EXISTING : StandardOpenOption.APPEND;
         // write output in UTF-8 to the specified file
         Files.write(file.toPath(), lines, StandardCharsets.UTF_8, StandardOpenOption.CREATE, overwrite);
         lines.clear();

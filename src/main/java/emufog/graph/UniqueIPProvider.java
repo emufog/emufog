@@ -23,11 +23,11 @@
  */
 package emufog.graph;
 
-import emufog.settings.Settings;
+import emufog.config.Config;
 
 /**
  * The UniqueIPProvider calculates IP address within the subnet
- * address space defined in the base address of the given settings.
+ * address space defined in the base address of the given config.
  */
 class UniqueIPProvider {
 
@@ -38,12 +38,12 @@ class UniqueIPProvider {
 
     /**
      * Creates a new IP provider with the base address of the
-     * subnet from the given settings.
+     * subnet from the given config.
      *
-     * @param settings settings for the subnet
+     * @param config config for the subnet
      */
-    UniqueIPProvider(Settings settings) {
-        lastIP = settings.baseAddress;
+    UniqueIPProvider(Config config) {
+        lastIP = config.baseAddress;
     }
 
     /**

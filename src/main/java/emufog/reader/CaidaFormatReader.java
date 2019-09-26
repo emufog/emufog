@@ -23,10 +23,10 @@
  */
 package emufog.reader;
 
+import emufog.config.Config;
 import emufog.graph.AS;
 import emufog.graph.Graph;
 import emufog.graph.Node;
-import emufog.settings.Settings;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -75,12 +75,12 @@ public class CaidaFormatReader extends GraphReader {
     private Map<Integer, Coordinates> nodeCoordinates;
 
     /**
-     * Creates a new reader for the Caida topology. The given settings are used to create a new graph.
+     * Creates a new reader for the Caida topology. The given config are used to create a new graph.
      *
-     * @param settings settings to use for the read in graph.
+     * @param config config to use for the read in graph.
      */
-    public CaidaFormatReader(Settings settings) {
-        super(settings);
+    public CaidaFormatReader(Config config) {
+        super(config);
 
         // initialize charset according to https://en.wikipedia.org/wiki/ISO/IEC_8859-1
         charset = Charset.forName("ISO-8859-1");
@@ -113,7 +113,7 @@ public class CaidaFormatReader extends GraphReader {
 
         nodeCoordinates = new HashMap<>();
 
-        Graph graph = new Graph(settings);
+        Graph graph = new Graph(config);
 
         // read in the nodes
         Files.lines(nodesFile, charset).forEach(this::processNodeLine);

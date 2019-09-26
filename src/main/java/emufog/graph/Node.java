@@ -48,7 +48,7 @@ public abstract class Node {
     final List<Edge> edges;
 
     /**
-     * emulation settings for this node
+     * emulation config for this node
      */
     EmulationSettings emulationSettings;
 
@@ -65,9 +65,9 @@ public abstract class Node {
     }
 
     /**
-     * Returns the emulation settings associated. If there are none returns {@code null}.
+     * Returns the emulation config associated. If there are none returns {@code null}.
      *
-     * @return emulation settings or {@code null}
+     * @return emulation config or {@code null}
      */
     public EmulationSettings getEmulationNode() {
         return emulationSettings;
@@ -117,7 +117,7 @@ public abstract class Node {
     }
 
     /**
-     * Returns identification if this node can be emulated with existing settings.
+     * Returns identification if this node can be emulated with existing config.
      *
      * @return true if it can be emulated, false otherwise
      */
@@ -146,7 +146,7 @@ public abstract class Node {
     /**
      * Converts and replaces this node with a edge device node.
      *
-     * @param emulationSettings emulation settings to use to create a new edge device node
+     * @param emulationSettings emulation config to use to create a new edge device node
      * @return the newly converted edge device node
      */
     public EdgeDeviceNode convertToEdgeDeviceNode(EmulationSettings emulationSettings) {

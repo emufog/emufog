@@ -32,9 +32,9 @@ class EdgeDeviceNodeConverter extends NodeConverter {
 
     /**
      * Creates a new EdgeDeviceNodeConverter instance to convert an existing node and
-     * replace it with the given emulation settings.
+     * replace it with the given emulation config.
      *
-     * @param emulationSettings emulation settings of the newly created node
+     * @param emulationSettings emulation config of the newly created node
      */
     private EdgeDeviceNodeConverter(EmulationSettings emulationSettings) {
         this.emulationSettings = emulationSettings;
@@ -66,7 +66,7 @@ class EdgeDeviceNodeConverter extends NodeConverter {
      * replaced by the new node.
      *
      * @param oldNode           old node to replace by an edge device node
-     * @param emulationSettings emulation settings to set for the new node
+     * @param emulationSettings emulation config to set for the new node
      * @return newly created edge device node instance
      */
     static EdgeDeviceNode convertToEdgeDeviceNode(Node oldNode, EmulationSettings emulationSettings) {

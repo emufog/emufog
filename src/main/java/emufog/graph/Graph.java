@@ -23,9 +23,9 @@
  */
 package emufog.graph;
 
+import emufog.config.Config;
 import emufog.container.DeviceType;
 import emufog.container.FogType;
-import emufog.settings.Settings;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -53,9 +53,9 @@ public class Graph {
     private final List<AS> systems;
 
     /**
-     * settings associated with the graph
+     * config associated with the graph
      */
-    private final Settings settings;
+    private final Config config;
 
     /**
      * provider of unique IP addresses for emulation
@@ -74,31 +74,31 @@ public class Graph {
 
     /**
      * Creates a new basic graph instance.
-     * Uses the given settings for the classification algorithms.
+     * Uses the given config for the classification algorithms.
      *
-     * @param settings settings to use for the graph
-     * @throws IllegalArgumentException if the settings object is {@code null}
+     * @param config config to use for the graph
+     * @throws IllegalArgumentException if the config object is {@code null}
      */
-    public Graph(Settings settings) throws IllegalArgumentException {
-        if (settings == null) {
-            throw new IllegalArgumentException("Unable to initialize the graph object without settings.");
+    public Graph(Config config) throws IllegalArgumentException {
+        if (config == null) {
+            throw new IllegalArgumentException("Unable to initialize the graph object without config.");
         }
 
         edges = new ArrayList<>();
         systems = new ArrayList<>();
-        this.settings = settings;
-        IPprovider = new UniqueIPProvider(settings);
+        this.config = config;
+        IPprovider = new UniqueIPProvider(config);
         nodeIDprovider = new UniqueIDProvider();
         edgeIDprovider = new UniqueIDProvider();
     }
 
     /**
-     * Returns the settings the graph object uses.
+     * Returns the config the graph object uses.
      *
-     * @return settings object
+     * @return config object
      */
-    public Settings getSettings() {
-        return settings;
+    public Config getConfig() {
+        return config;
     }
 
     /**
@@ -315,12 +315,12 @@ public class Graph {
     }
 
     /**
-     * Assigns the devices specified in the settings to the edge nodes on a random base.
+     * Assigns the devices specified in the config to the edge nodes on a random base.
      */
     public void assignEdgeDevices() {
         Random random = new Random();
 
-        for (DeviceType type : settings.deviceNodeTypes) {
+        for (DeviceType type : config.deviceNodeTypes) {
             float upper = Math.abs(type.averageDeviceCount) * 2;
 
             for (EdgeNode r : getEdgeNodes()) {
@@ -330,7 +330,7 @@ public class Graph {
                 for (int i = 0; i < count; ++i) {
                     EdgeDeviceNode device = createEdgeDeviceNode(nodeIDprovider.getNextID(), r.as, type);
 
-                    createEdge(edgeIDprovider.getNextID(), r, device, settings.edgeDeviceDelay, settings.edgeDeviceBandwidth);
+                    createEdge(edgeIDprovider.getNextID(), r, device, config.edgeDeviceDelay, config.edgeDeviceBandwidth);
                 }
             }
         }

@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.settings;
+package emufog.config;
 
 import emufog.container.DeviceType;
 import emufog.container.FogType;
@@ -34,10 +34,10 @@ import java.util.stream.Collectors;
 import static emufog.util.StringUtils.nullOrEmpty;
 
 /**
- * The settings class contains all different settings used within the application.
- * An instance of this class can be read in from a valid settings file.
+ * The config class contains all different config used within the application.
+ * An instance of this class can be read in from a valid config file.
  */
-public class Settings {
+public class Config {
 
     /* base IPv4 address of the network's subnet */
     public final String baseAddress;
@@ -72,11 +72,11 @@ public class Settings {
     public final boolean timeMeasuring;
 
     /**
-     * Creates a new instance of the Settings class using the read in config object.
+     * Creates a new instance of the Config class using the read in config object.
      *
      * @param config config object containing the required information
      */
-    Settings(SettingsConfig config) {
+    Config(EmuFogConfig config) {
         baseAddress = config.baseAddress;
         overwriteExperimentFile = config.overWriteOutputFile;
         maxFogNodes = config.maxFogNodes;
@@ -102,7 +102,7 @@ public class Settings {
         }
         fogNodeTypes = new ArrayList<>(fogTypes.values());
 
-        deviceNodeTypes = config.deviceNodeTypes.stream().map(Settings::mapDeviceType).collect(Collectors.toList());
+        deviceNodeTypes = config.deviceNodeTypes.stream().map(Config::mapDeviceType).collect(Collectors.toList());
     }
 
     /**

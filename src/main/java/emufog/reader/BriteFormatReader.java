@@ -23,10 +23,10 @@
  */
 package emufog.reader;
 
+import emufog.config.Config;
 import emufog.graph.AS;
 import emufog.graph.Graph;
 import emufog.graph.EdgeNode;
-import emufog.settings.Settings;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -43,12 +43,12 @@ public class BriteFormatReader extends GraphReader {
 
     /**
      * Creates a new BriteFormatReader to read in the BRITE format.
-     * The settings provided will be used for the read in graph.
+     * The config provided will be used for the read in graph.
      *
-     * @param settings settings for the newly generated graph
+     * @param config config for the newly generated graph
      */
-    public BriteFormatReader(Settings settings) {
-        super(settings);
+    public BriteFormatReader(Config config) {
+        super(config);
     }
 
     /**
@@ -113,7 +113,7 @@ public class BriteFormatReader extends GraphReader {
             throw new IllegalArgumentException("The BRITE reader only supports one input file.");
         }
 
-        Graph graph = new Graph(settings);
+        Graph graph = new Graph(config);
 
         BufferedReader reader = new BufferedReader(new FileReader(files.get(0).toFile()));
 

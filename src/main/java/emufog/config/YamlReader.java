@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.settings;
+package emufog.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -31,20 +31,20 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 
 /**
- * This reader reads in YAML documents to build settings object for EmuFog.
+ * This reader reads in YAML documents to build config object for EmuFog.
  */
 public class YamlReader {
 
     /**
      * Reads in the given YAML file and parses the content.
-     * Creates and returns a new settings object with it.
+     * Creates and returns a new config object with it.
      *
      * @param path path to YAML file
-     * @return settings object or null if impossible to read
+     * @return config object or null if impossible to read
      * @throws IllegalArgumentException if the given path is null
      * @throws IOException              in case of an error while parsing
      */
-    public static Settings read(Path path) throws IllegalArgumentException, IOException {
+    public static Config read(Path path) throws IllegalArgumentException, IOException {
         if (path == null) {
             throw new IllegalArgumentException("The given file path is not initialized.");
         }
@@ -54,12 +54,12 @@ public class YamlReader {
         }
         // parse YAML document to a java object
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        SettingsConfig loadedConfig = mapper.readValue(path.toFile(), SettingsConfig.class);
+        EmuFogConfig loadedConfig = mapper.readValue(path.toFile(), EmuFogConfig.class);
         if (loadedConfig == null) {
             throw new IllegalArgumentException("Failed to parse the YAML file: " + path);
         }
 
-        // create the actual settings object with the information of the read in objects
-        return new Settings(loadedConfig);
+        // create the actual config object with the information of the read in objects
+        return new Config(loadedConfig);
     }
 }
