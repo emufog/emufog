@@ -45,7 +45,7 @@ public class BackboneClassifier {
      *
      * @throws IllegalArgumentException thrown if graph is {@code null}
      */
-    public static void identifyBackbone(final Graph graph) throws IllegalArgumentException {
+    public static void identifyBackbone(Graph graph) throws IllegalArgumentException {
         if (graph == null) {
             throw new IllegalArgumentException("The graph object is not initialized.");
         }
@@ -54,9 +54,8 @@ public class BackboneClassifier {
         LOG.debug("Start Backbone Classification");
         long start = System.nanoTime();
         convertCrossAsEdges(graph.getEdges());
-        long stop = System.nanoTime();
         if (graph.getSettings().timeMeasuring) {
-            LOG.info("Graph Step 1 - Time: {}", intervalToString(start, stop));
+            LOG.info("Graph Step 1 - Time: {}", intervalToString(start, System.nanoTime()));
         }
         LOG.debug("Backbone Size: {}", graph.getBackboneNodes().size());
         LOG.debug("Edge Size: {}", graph.getEdgeNodes().size());
@@ -65,13 +64,9 @@ public class BackboneClassifier {
 
         // 2nd step in parallel
         start = System.nanoTime();
-        systems.parallelStream().forEach(as -> {
-            BackboneWorker worker = new BackboneWorker(as);
-            worker.run();
-        });
-        stop = System.nanoTime();
+        systems.parallelStream().forEach(as -> new BackboneWorker(as).identifyBackbone());
         if (graph.getSettings().timeMeasuring) {
-            LOG.info("Graph Step 2 - Time: {}", intervalToString(start, stop));
+            LOG.info("Graph Step 2 - Time: {}", intervalToString(start, System.nanoTime()));
         }
         LOG.debug("Backbone Size: {}", graph.getBackboneNodes().size());
         LOG.debug("Edge Size: {}", graph.getEdgeNodes().size());

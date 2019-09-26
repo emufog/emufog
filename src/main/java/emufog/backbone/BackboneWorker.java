@@ -45,14 +45,18 @@ import static emufog.util.ConversionsUtils.intervalToString;
  * This worker class operates on a single AS of the graph so it can used in parallel.
  * Executes the 2nd and 3rd step of the classification algorithm.
  */
-class BackboneWorker implements Runnable {
+class BackboneWorker {
 
     private static final Logger LOG = LoggerFactory.getLogger(BackboneWorker.class);
 
-    /* percentage of the average degree to compare to */
+    /**
+     * percentage of the average degree to compare to
+     */
     private static final float BACKBONE_DEGREE_PERCENTAGE = 0.6f;
 
-    /* AS associated with this worker */
+    /**
+     * AS to process by this worker
+     */
     private final AS as;
 
     /**
@@ -65,21 +69,18 @@ class BackboneWorker implements Runnable {
         this.as = as;
     }
 
-    @Override
-    public void run() {
+    void identifyBackbone() {
         //2nd step
         long start = System.nanoTime();
         convertHighDegrees();
-        long end = System.nanoTime();
-        LOG.info("{} Step 2 - Time: {}", as, intervalToString(start, end));
+        LOG.info("{} Step 2 - Time: {}", as, intervalToString(start, System.nanoTime()));
         LOG.info("{} Backbone Size: {}", as, as.getBackboneNodes().size());
         LOG.info("{} Edge Size: {}", as, as.getEdgeNodes().size());
 
         // 3rd step
         start = System.nanoTime();
-        buildSingleBackbone();
-        end = System.nanoTime();
-        LOG.info("{} Step 3 - Time: {}", as, intervalToString(start, end));
+        connectBackbone();
+        LOG.info("{} Step 3 - Time: {}", as, intervalToString(start, System.nanoTime()));
         LOG.info("{} Backbone Size: {}", as, as.getBackboneNodes().size());
         LOG.info("{} Edge Size: {}", as, as.getEdgeNodes().size());
     }
@@ -88,18 +89,17 @@ class BackboneWorker implements Runnable {
      * Converts nodes with an above average degree to a backbone node.
      */
     private void convertHighDegrees() {
-        final double averageDegree = calculateAverageDegree() * BACKBONE_DEGREE_PERCENTAGE;
-        List<EdgeNode> toConvert = as.getEdgeNodes().parallelStream().filter(r -> r.getDegree() >= averageDegree).collect(Collectors.toList());
-
-        for (EdgeNode r : toConvert) {
-            r.convertToBackboneNode();
+        double averageDegree = calculateAverageDegree() * BACKBONE_DEGREE_PERCENTAGE;
+        List<EdgeNode> toConvert = as.getEdgeNodes().stream().filter(r -> r.getDegree() >= averageDegree).collect(Collectors.toList());
+        for (EdgeNode e : toConvert) {
+            e.convertToBackboneNode();
         }
     }
 
     /**
      * Creates a single connected backbone by using the Breadth-First-Algorithm.
      */
-    private void buildSingleBackbone() {
+    private void connectBackbone() {
         Collection<BackboneNode> backboneNodes = as.getBackboneNodes();
         if (backboneNodes.isEmpty()) {
             return;
@@ -180,7 +180,7 @@ class BackboneWorker implements Runnable {
         int n = backboneNodes.size() + edgeNodes.size();
 
         if (n == 0) {
-            return 0.f;
+            return 0.d;
         }
 
         return (double) sum / n;
