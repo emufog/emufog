@@ -60,17 +60,17 @@ public class Graph {
     /**
      * provider of unique IP addresses for emulation
      */
-    private final UniqueIPProvider IPprovider;
+    private final UniqueIPProvider ipProvider;
 
     /**
      * provider of unique node IDs
      */
-    private final UniqueIDProvider nodeIDprovider;
+    private final UniqueIDProvider nodeIdProvider;
 
     /**
      * provider of unique edge IDs
      */
-    private final UniqueIDProvider edgeIDprovider;
+    private final UniqueIDProvider edgeIdProvider;
 
     /**
      * Creates a new basic graph instance.
@@ -87,9 +87,9 @@ public class Graph {
         edges = new ArrayList<>();
         systems = new ArrayList<>();
         this.config = config;
-        IPprovider = new UniqueIPProvider(config);
-        nodeIDprovider = new UniqueIDProvider();
-        edgeIDprovider = new UniqueIDProvider();
+        ipProvider = new UniqueIPProvider(config);
+        nodeIdProvider = new UniqueIDProvider();
+        edgeIdProvider = new UniqueIDProvider();
     }
 
     /**
@@ -268,7 +268,7 @@ public class Graph {
         }
         validateAndMarkNodeInput(id, as);
 
-        EmulationSettings emulationSettings = new EmulationSettings(IPprovider.getNextIPV4Address(), image);
+        EmulationSettings emulationSettings = new EmulationSettings(ipProvider.getNextIPV4Address(), image);
         EdgeDeviceNode edgeDevice = new EdgeDeviceNode(id, as, emulationSettings);
         as.addDevice(edgeDevice);
 
@@ -293,14 +293,14 @@ public class Graph {
             throw new IllegalArgumentException("The source and destination nodes cannot be null.");
         }
 
-        if (edgeIDprovider.isUsed(id)) {
+        if (edgeIdProvider.isUsed(id)) {
             LOG.warn("The edge id: {} is already in use", id);
-            id = edgeIDprovider.getNextID();
+            id = edgeIdProvider.getNextID();
             LOG.warn("Assigning new edge id: {}", id);
         }
 
         Edge edge = new Edge(id, from, to, delay, bandwidth);
-        edgeIDprovider.markIDused(id);
+        edgeIdProvider.markIDused(id);
         edges.add(edge);
 
         //TODO fix scaling factor
@@ -328,9 +328,13 @@ public class Graph {
                 int count = (int) (random.nextFloat() * upper);
 
                 for (int i = 0; i < count; ++i) {
-                    EdgeDeviceNode device = createEdgeDeviceNode(nodeIDprovider.getNextID(), r.as, type);
+                    EdgeDeviceNode device = createEdgeDeviceNode(nodeIdProvider.getNextID(), r.as, type);
 
-                    createEdge(edgeIDprovider.getNextID(), r, device, config.hostDeviceLatency, config.hostDeviceBandwidth);
+                    createEdge(edgeIdProvider.getNextID(),
+                        r,
+                        device,
+                        config.hostDeviceLatency,
+                        config.hostDeviceBandwidth);
                 }
             }
         }
@@ -352,11 +356,11 @@ public class Graph {
         if (type == null) {
             throw new IllegalArgumentException("The given fog type is not initialized.");
         }
-        if (!nodeIDprovider.isUsed(node.id)) {
+        if (!nodeIdProvider.isUsed(node.id)) {
             throw new IllegalArgumentException("This graph object does not contain the given node.");
         }
 
-        node.emulationSettings = new EmulationSettings(IPprovider.getNextIPV4Address(), type);
+        node.emulationSettings = new EmulationSettings(ipProvider.getNextIPV4Address(), type);
     }
 
     /**
@@ -371,10 +375,10 @@ public class Graph {
         if (as == null) {
             throw new IllegalArgumentException("The autonomous system is null.");
         }
-        if (nodeIDprovider.isUsed(id)) {
+        if (nodeIdProvider.isUsed(id)) {
             throw new IllegalArgumentException("The node ID: " + id + " is already in use.");
         }
 
-        nodeIDprovider.markIDused(id);
+        nodeIdProvider.markIDused(id);
     }
 }
