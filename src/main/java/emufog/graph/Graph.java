@@ -330,7 +330,7 @@ public class Graph {
                 for (int i = 0; i < count; ++i) {
                     EdgeDeviceNode device = createEdgeDeviceNode(nodeIDprovider.getNextID(), r.as, type);
 
-                    createEdge(edgeIDprovider.getNextID(), r, device, config.edgeDeviceDelay, config.edgeDeviceBandwidth);
+                    createEdge(edgeIDprovider.getNextID(), r, device, config.hostDeviceLatency, config.hostDeviceBandwidth);
                 }
             }
         }

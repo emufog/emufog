@@ -34,7 +34,6 @@ import emufog.graph.Graph;
 import emufog.reader.BriteFormatReader;
 import emufog.reader.CaidaFormatReader;
 import emufog.reader.GraphReader;
-import emufog.config.YamlReader;
 import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,7 +89,7 @@ public class Emufog {
         // read in the config file
         Config config;
         try {
-            config = YamlReader.read(arguments.configPath);
+            config = Config.updateConfig(arguments.configPath);
         } catch (Exception e) {
             LOG.error("Failed to read in the configuration file: {}", arguments.configPath, e);
             return;
@@ -103,9 +102,7 @@ public class Emufog {
         long start = System.nanoTime();
         Graph graph = reader.readGraph(arguments.files);
         long end = System.nanoTime();
-        if (config.timeMeasuring) {
-            LOG.info("Time to read in the graph: {}", intervalToString(start, end));
-        }
+        LOG.debug("Time to read in the graph: {}", intervalToString(start, end));
         LOG.info("##############################################################");
         // print graph details for information purposes
         LOG.info("Number of nodes in the graph: {}", graph.getEdgeNodes().size());
@@ -116,9 +113,7 @@ public class Emufog {
         start = System.nanoTime();
         BackboneClassifier.identifyBackbone(graph);
         end = System.nanoTime();
-        if (config.timeMeasuring) {
-            LOG.info("Time to determine the backbone of the topology: {}", intervalToString(start, end));
-        }
+        LOG.debug("Time to determine the backbone of the topology: {}", intervalToString(start, end));
         LOG.info("##############################################################");
         LOG.info("Number of backbone nodes identified: {}", graph.getBackboneNodes().size());
         LOG.info("##############################################################");
@@ -145,7 +140,7 @@ public class Emufog {
     /**
      * Returns the reader matching the given type from the command line.
      *
-     * @param type     topology type to read in
+     * @param type   topology type to read in
      * @param config config object to use for the reader
      * @return graph reader matching the type or null if not found
      */

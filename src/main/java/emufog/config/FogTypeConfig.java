@@ -31,15 +31,26 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 class FogTypeConfig extends ContainerTypeConfig {
 
-    @JsonProperty("id")
-    int id;
+    final int id;
 
-    @JsonProperty("maximum-connections")
-    int maximumConnections;
+    final int maximumConnections;
 
-    @JsonProperty("costs")
-    float costs;
+    final float costs;
 
-    @JsonProperty("dependencies")
-    int[] dependencies;
+    final int[] dependencies;
+
+    FogTypeConfig(
+        @JsonProperty("container-image") ContainerNameConfig containerImage,
+        @JsonProperty("memory-limit") int memoryLimit,
+        @JsonProperty("cpu-share") float cpuShare,
+        @JsonProperty("id") int id,
+        @JsonProperty("maximum-connections") int maximumConnections,
+        @JsonProperty("costs") float costs,
+        @JsonProperty("dependencies") int[] dependencies) {
+        super(containerImage, memoryLimit, cpuShare);
+        this.id = id;
+        this.maximumConnections = maximumConnections;
+        this.costs = costs;
+        this.dependencies = dependencies;
+    }
 }

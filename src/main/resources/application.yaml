@@ -4,9 +4,7 @@ max-fog-nodes: 100
 cost-threshold: 6
 host-device-latency: 0
 host-device-bandwidth: 1000
-#thread-count: 1
 paralleled-fog-building: false
-time-measuring: false
 device-node-types:
   - container-image:
       name: ubuntu

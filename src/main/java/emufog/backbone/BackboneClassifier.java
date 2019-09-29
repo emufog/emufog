@@ -54,9 +54,7 @@ public class BackboneClassifier {
         LOG.debug("Start Backbone Classification");
         long start = System.nanoTime();
         convertCrossAsEdges(graph.getEdges());
-        if (graph.getConfig().timeMeasuring) {
-            LOG.info("Graph Step 1 - Time: {}", intervalToString(start, System.nanoTime()));
-        }
+        LOG.debug("Graph Step 1 - Time: {}", intervalToString(start, System.nanoTime()));
         LOG.debug("Backbone Size: {}", graph.getBackboneNodes().size());
         LOG.debug("Edge Size: {}", graph.getEdgeNodes().size());
 
@@ -65,9 +63,7 @@ public class BackboneClassifier {
         // 2nd step in parallel
         start = System.nanoTime();
         systems.parallelStream().forEach(as -> new BackboneWorker(as).identifyBackbone());
-        if (graph.getConfig().timeMeasuring) {
-            LOG.info("Graph Step 2 - Time: {}", intervalToString(start, System.nanoTime()));
-        }
+        LOG.debug("Graph Step 2 - Time: {}", intervalToString(start, System.nanoTime()));
         LOG.debug("Backbone Size: {}", graph.getBackboneNodes().size());
         LOG.debug("Edge Size: {}", graph.getEdgeNodes().size());
 

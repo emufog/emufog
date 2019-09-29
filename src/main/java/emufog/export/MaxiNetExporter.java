@@ -78,7 +78,7 @@ public class MaxiNetExporter implements IGraphExporter {
         // check if file exists and can be overwritten
         Config config = graph.getConfig();
         File file = path.toFile();
-        if (!config.overwriteExperimentFile && file.exists()) {
+        if (!config.overWriteOutputFile && file.exists()) {
             throw new IllegalArgumentException("The given file already exist. Please provide a valid path");
         }
 
@@ -120,7 +120,7 @@ public class MaxiNetExporter implements IGraphExporter {
         lines.add("exp.setup()");
 
         // set the overwrite option if feature is set in the config file
-        StandardOpenOption overwrite = config.overwriteExperimentFile ? StandardOpenOption.TRUNCATE_EXISTING : StandardOpenOption.APPEND;
+        StandardOpenOption overwrite = config.overWriteOutputFile ? StandardOpenOption.TRUNCATE_EXISTING : StandardOpenOption.APPEND;
         // write output in UTF-8 to the specified file
         Files.write(file.toPath(), lines, StandardCharsets.UTF_8, StandardOpenOption.CREATE, overwrite);
         lines.clear();

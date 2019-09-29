@@ -31,9 +31,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 class DeviceTypeConfig extends ContainerTypeConfig {
 
-    @JsonProperty("scaling-factor")
-    int scalingFactor;
+    final int scalingFactor;
 
-    @JsonProperty("average-device-count")
-    int averageDeviceCount;
+    final int averageDeviceCount;
+
+    public DeviceTypeConfig(
+        @JsonProperty("container-image") ContainerNameConfig containerImage,
+        @JsonProperty("memory-limit") int memoryLimit,
+        @JsonProperty("cpu-share") float cpuShare,
+        @JsonProperty("scaling-factor") int scalingFactor,
+        @JsonProperty("average-device-count") int averageDeviceCount) {
+        super(containerImage, memoryLimit, cpuShare);
+        this.scalingFactor = scalingFactor;
+        this.averageDeviceCount = averageDeviceCount;
+    }
 }

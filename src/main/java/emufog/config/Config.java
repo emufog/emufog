@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2018 emufog contributors
+ * Copyright (c) 2019 emufog contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,86 +23,88 @@
  */
 package emufog.config;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import emufog.container.DeviceType;
 import emufog.container.FogType;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static emufog.util.StringUtils.nullOrEmpty;
 
 /**
- * The config class contains all different config used within the application.
- * An instance of this class can be read in from a valid config file.
+ * Top level config object of the YAML document.
  */
 public class Config {
 
-    /* base IPv4 address of the network's subnet */
+    private static Config INSTANCE;
+
     public final String baseAddress;
 
-    /* indicates whether the output file can be overwritten or not */
-    public final boolean overwriteExperimentFile;
+    public final boolean overWriteOutputFile;
 
-    /* list of all possible fog node types to deploy in the network */
-    public final List<FogType> fogNodeTypes;
-
-    /* list of all different device types to deploy at the edge of the network */
-    public final List<DeviceType> deviceNodeTypes;
-
-    /* maximal number of fog nodes to place in the network */
     public final int maxFogNodes;
 
-    /* upper threshold of the cost function to limit the fog node placement */
     public final float costThreshold;
 
-    /* latency delay between a host device and the edge node */
-    public final float edgeDeviceDelay;
+    public final float hostDeviceLatency;
 
-    /* bandwidth between a host device and the edge node */
-    public final float edgeDeviceBandwidth;
+    public final float hostDeviceBandwidth;
 
-    /* number of threads to use for the backbone and fog placement */
-    public final int threadCount;
+    public final boolean paralleledFogBuilding;
 
-    /* indicator whether the fog graph should be build in parallel */
-    public final boolean fogGraphParallel;
+    public final List<DeviceType> deviceNodeTypes;
 
-    public final boolean timeMeasuring;
+    public final List<FogType> fogNodeTypes;
 
-    /**
-     * Creates a new instance of the Config class using the read in config object.
-     *
-     * @param config config object containing the required information
-     */
-    Config(EmuFogConfig config) {
-        baseAddress = config.baseAddress;
-        overwriteExperimentFile = config.overWriteOutputFile;
-        maxFogNodes = config.maxFogNodes;
-        costThreshold = config.costThreshold;
-        edgeDeviceDelay = config.hostDeviceLatency;
-        edgeDeviceBandwidth = config.hostDeviceBandwidth;
-        threadCount = config.threadCount;
-        fogGraphParallel = config.paralleledFogBuilding;
-        timeMeasuring = config.timeMeasuring;
+    Config(
+        @JsonProperty("base-address") String baseAddress,
+        @JsonProperty("overwrite-experiment-file") boolean overWriteOutputFile,
+        @JsonProperty("max-fog-nodes") int maxFogNodes,
+        @JsonProperty("cost-threshold") float costThreshold,
+        @JsonProperty("host-device-latency") float hostDeviceLatency,
+        @JsonProperty("host-device-bandwidth") float hostDeviceBandwidth,
+        @JsonProperty("paralleled-fog-building") boolean paralleledFogBuilding,
+        @JsonProperty("device-node-types") Collection<DeviceTypeConfig> deviceNodeTypes,
+        @JsonProperty("fog-node-types") Collection<FogTypeConfig> fogNodeTypes) {
+        this.baseAddress = baseAddress;
+        this.overWriteOutputFile = overWriteOutputFile;
+        this.maxFogNodes = maxFogNodes;
+        this.costThreshold = costThreshold;
+        this.hostDeviceLatency = hostDeviceLatency;
+        this.hostDeviceBandwidth = hostDeviceBandwidth;
+        this.paralleledFogBuilding = paralleledFogBuilding;
+        this.deviceNodeTypes = deviceNodeTypes.stream().map(Config::mapDeviceType).collect(Collectors.toList());
+        this.fogNodeTypes = fogNodeTypes.stream().map(Config::mapFogType).collect(Collectors.toList());
+    }
 
-        Map<Integer, FogType> fogTypes = new HashMap<>();
-        for (FogTypeConfig type : config.fogNodeTypes) {
-            fogTypes.put(type.id, mapFogType(type));
+    public static Config updateConfig(Path path) throws IOException {
+        if (path == null) {
+            throw new IllegalArgumentException("The given file path is not initialized.");
         }
-
-        for (FogTypeConfig fogType : config.fogNodeTypes) {
-            if (fogType.dependencies != null) {
-                FogType fogNodeType = fogTypes.get(fogType.id);
-                for (int id : fogType.dependencies) {
-                    fogNodeType.addDependency(fogTypes.get(id));
-                }
-            }
+        PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.yaml");
+        if (!matcher.matches(path)) {
+            throw new IllegalArgumentException("The file ending does not match .yaml.");
         }
-        fogNodeTypes = new ArrayList<>(fogTypes.values());
+        // parse YAML document to a java object
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        Config config = mapper.readValue(path.toFile(), Config.class);
+        if (config == null) {
+            throw new IOException("Failed to parse the YAML file: " + path);
+        }
+        INSTANCE = config;
 
-        deviceNodeTypes = config.deviceNodeTypes.stream().map(Config::mapDeviceType).collect(Collectors.toList());
+        return getConfig();
+    }
+
+    public static Config getConfig() {
+        return INSTANCE;
     }
 
     /**

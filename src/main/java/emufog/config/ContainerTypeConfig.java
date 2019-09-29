@@ -30,12 +30,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 class ContainerTypeConfig {
 
-    @JsonProperty("container-image")
-    ContainerNameConfig containerImage;
+    final ContainerNameConfig containerImage;
 
-    @JsonProperty("memory-limit")
-    int memoryLimit;
+    final int memoryLimit;
 
-    @JsonProperty("cpu-share")
-    float cpuShare;
+    final float cpuShare;
+
+    ContainerTypeConfig(
+        @JsonProperty("container-image") ContainerNameConfig containerImage,
+        @JsonProperty("memory-limit") int memoryLimit,
+        @JsonProperty("cpu-share") float cpuShare) {
+        this.containerImage = containerImage;
+        this.memoryLimit = memoryLimit;
+        this.cpuShare = cpuShare;
+    }
 }

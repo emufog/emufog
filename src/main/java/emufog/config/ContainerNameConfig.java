@@ -30,9 +30,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 class ContainerNameConfig {
 
-    @JsonProperty("name")
-    String name;
+    final String name;
 
-    @JsonProperty("version")
-    String version;
+    final String version;
+
+    ContainerNameConfig(@JsonProperty("name") String name, @JsonProperty("version") String version) {
+        this.name = name;
+        this.version = version;
+    }
 }
