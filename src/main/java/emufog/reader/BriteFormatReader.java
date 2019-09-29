@@ -39,17 +39,7 @@ import static emufog.util.StringUtils.nullOrEmpty;
  * The reader reads in a graph object from the BRITE file format specified
  * in the documentation (https://www.cs.bu.edu/brite/user_manual/node29.html).
  */
-public class BriteFormatReader extends GraphReader {
-
-    /**
-     * Creates a new BriteFormatReader to read in the BRITE format.
-     * The config provided will be used for the read in graph.
-     *
-     * @param config config for the newly generated graph
-     */
-    public BriteFormatReader(Config config) {
-        super(config);
-    }
+public class BriteFormatReader implements GraphReader {
 
     /**
      * Reads in all the nodes from the BRITE file and adds them to the given graph.
@@ -113,7 +103,7 @@ public class BriteFormatReader extends GraphReader {
             throw new IllegalArgumentException("The BRITE reader only supports one input file.");
         }
 
-        Graph graph = new Graph(config);
+        Graph graph = new Graph(Config.getConfig());
 
         BufferedReader reader = new BufferedReader(new FileReader(files.get(0).toFile()));
 

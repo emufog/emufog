@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This reader can read in the CAIDA topology an build a graph based on that data.
  */
-public class CaidaFormatReader extends GraphReader {
+public class CaidaFormatReader implements GraphReader {
 
     private static final Logger LOG = LoggerFactory.getLogger(CaidaFormatReader.class);
 
@@ -75,13 +75,9 @@ public class CaidaFormatReader extends GraphReader {
     private Map<Integer, Coordinates> nodeCoordinates;
 
     /**
-     * Creates a new reader for the Caida topology. The given config are used to create a new graph.
-     *
-     * @param config config to use for the read in graph.
+     * Creates a new reader for the Caida topology.
      */
-    public CaidaFormatReader(Config config) {
-        super(config);
-
+    public CaidaFormatReader() {
         // initialize charset according to https://en.wikipedia.org/wiki/ISO/IEC_8859-1
         charset = Charset.forName("ISO-8859-1");
     }
@@ -113,7 +109,7 @@ public class CaidaFormatReader extends GraphReader {
 
         nodeCoordinates = new HashMap<>();
 
-        Graph graph = new Graph(config);
+        Graph graph = new Graph(Config.getConfig());
 
         // read in the nodes
         Files.lines(nodesFile, charset).forEach(this::processNodeLine);

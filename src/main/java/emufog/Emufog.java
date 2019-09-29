@@ -87,16 +87,15 @@ public class Emufog {
         }
 
         // read in the config file
-        Config config;
         try {
-            config = Config.updateConfig(arguments.configPath);
+            Config.updateConfig(arguments.configPath);
         } catch (Exception e) {
             LOG.error("Failed to read in the configuration file: {}", arguments.configPath, e);
             return;
         }
 
         // determines the respective format reader
-        GraphReader reader = getReader(arguments.inputType, config);
+        GraphReader reader = getReader(arguments.inputType);
 
         // read in the graph with the graph reader
         long start = System.nanoTime();
@@ -140,17 +139,17 @@ public class Emufog {
     /**
      * Returns the reader matching the given type from the command line.
      *
-     * @param type   topology type to read in
-     * @param config config object to use for the reader
-     * @return graph reader matching the type or null if not found
+     * @param type topology type to read in
+     * @return graph reader matching the type
+     * @throws IllegalArgumentException thrown if the type is unsupported
      */
-    private static GraphReader getReader(String type, Config config) throws IllegalArgumentException {
+    private static GraphReader getReader(String type) throws IllegalArgumentException {
         String s = type.trim().toLowerCase();
         switch (s) {
             case "brite":
-                return new BriteFormatReader(config);
+                return new BriteFormatReader();
             case "caida":
-                return new CaidaFormatReader(config);
+                return new CaidaFormatReader();
             default:
                 throw new IllegalArgumentException("Unsupported Input Format: " + s);
         }

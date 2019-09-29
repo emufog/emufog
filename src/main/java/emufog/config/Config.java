@@ -84,7 +84,7 @@ public class Config {
         this.fogNodeTypes = fogNodeTypes.stream().map(Config::mapFogType).collect(Collectors.toList());
     }
 
-    public static Config updateConfig(Path path) throws IOException {
+    public static void updateConfig(Path path) throws IOException {
         if (path == null) {
             throw new IllegalArgumentException("The given file path is not initialized.");
         }
@@ -99,8 +99,6 @@ public class Config {
             throw new IOException("Failed to parse the YAML file: " + path);
         }
         INSTANCE = config;
-
-        return getConfig();
     }
 
     public static Config getConfig() {

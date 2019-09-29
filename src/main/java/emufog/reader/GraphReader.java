@@ -23,39 +23,21 @@
  */
 package emufog.reader;
 
-import emufog.config.Config;
 import emufog.graph.Graph;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
-/**
- * Abstract class providing the config required for all input readers.
- */
-public abstract class GraphReader {
+public interface GraphReader {
 
     /**
-     * the config to use for the read in graph
-     */
-    protected final Config config;
-
-    /**
-     * Creates a new instance associated with the given config.
-     *
-     * @param config config to use for the new graph
-     */
-    GraphReader(Config config) {
-        this.config = config;
-    }
-
-    /**
-     * Reads in and returns a graph from a file base.
+     * Reads in the given list of files, parses the content and constructs a {@link Graph} object based on the file
+     * format. Returns the newly created instance.
      *
      * @param files list of files to read in
      * @return the read in graph structure
      * @throws IOException              throws exception in case there is a problem with reading in the respective file
      * @throws IllegalArgumentException throws exception if given file list is invalid
      */
-    public abstract Graph readGraph(List<Path> files) throws IOException, IllegalArgumentException;
+    Graph readGraph(List<Path> files) throws IOException, IllegalArgumentException;
 }
