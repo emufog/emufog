@@ -57,8 +57,6 @@ public class Config {
 
     public final float hostDeviceBandwidth;
 
-    public final boolean paralleledFogBuilding;
-
     public final List<DeviceType> deviceNodeTypes;
 
     public final List<FogType> fogNodeTypes;
@@ -70,7 +68,6 @@ public class Config {
         @JsonProperty("cost-threshold") float costThreshold,
         @JsonProperty("host-device-latency") float hostDeviceLatency,
         @JsonProperty("host-device-bandwidth") float hostDeviceBandwidth,
-        @JsonProperty("paralleled-fog-building") boolean paralleledFogBuilding,
         @JsonProperty("device-node-types") Collection<DeviceTypeConfig> deviceNodeTypes,
         @JsonProperty("fog-node-types") Collection<FogTypeConfig> fogNodeTypes) {
         this.baseAddress = baseAddress;
@@ -79,7 +76,6 @@ public class Config {
         this.costThreshold = costThreshold;
         this.hostDeviceLatency = hostDeviceLatency;
         this.hostDeviceBandwidth = hostDeviceBandwidth;
-        this.paralleledFogBuilding = paralleledFogBuilding;
         this.deviceNodeTypes = deviceNodeTypes.stream().map(Config::mapDeviceType).collect(Collectors.toList());
         this.fogNodeTypes = fogNodeTypes.stream().map(Config::mapFogType).collect(Collectors.toList());
     }
@@ -92,6 +88,7 @@ public class Config {
         if (!matcher.matches(path)) {
             throw new IllegalArgumentException("The file ending does not match .yaml.");
         }
+
         // parse YAML document to a java object
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         Config config = mapper.readValue(path.toFile(), Config.class);
@@ -101,6 +98,11 @@ public class Config {
         INSTANCE = config;
     }
 
+    /**
+     * Returns the currently active configuration object.
+     *
+     * @return current configuration
+     */
     public static Config getConfig() {
         return INSTANCE;
     }
@@ -115,7 +117,12 @@ public class Config {
         if (nullOrEmpty(f.containerImage.version)) {
             return new FogType(f.containerImage.name, f.maximumConnections, f.costs, f.memoryLimit, f.cpuShare);
         } else {
-            return new FogType(f.containerImage.name, f.containerImage.version, f.maximumConnections, f.costs, f.memoryLimit, f.cpuShare);
+            return new FogType(f.containerImage.name,
+                f.containerImage.version,
+                f.maximumConnections,
+                f.costs,
+                f.memoryLimit,
+                f.cpuShare);
         }
     }
 
@@ -127,9 +134,18 @@ public class Config {
      */
     private static DeviceType mapDeviceType(DeviceTypeConfig d) {
         if (nullOrEmpty(d.containerImage.version)) {
-            return new DeviceType(d.containerImage.name, d.scalingFactor, d.averageDeviceCount, d.memoryLimit, d.cpuShare);
+            return new DeviceType(d.containerImage.name,
+                d.scalingFactor,
+                d.averageDeviceCount,
+                d.memoryLimit,
+                d.cpuShare);
         } else {
-            return new DeviceType(d.containerImage.name, d.containerImage.version, d.scalingFactor, d.averageDeviceCount, d.memoryLimit, d.cpuShare);
+            return new DeviceType(d.containerImage.name,
+                d.containerImage.version,
+                d.scalingFactor,
+                d.averageDeviceCount,
+                d.memoryLimit,
+                d.cpuShare);
         }
     }
 }
