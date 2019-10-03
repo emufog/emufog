@@ -35,11 +35,14 @@ import emufog.reader.BriteFormatReader;
 import emufog.reader.CaidaFormatReader;
 import emufog.reader.GraphReader;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import static emufog.util.ConversionsUtils.intervalToString;
+import static emufog.util.StringUtils.nullOrEmpty;
 
 /**
  * The EmuFog main launcher class. Starts a new instance of the application with the given parameters
@@ -78,11 +81,18 @@ public class Emufog {
      */
     private static void runEmuFog(String[] args) throws IOException {
         // parse the command line arguments
-        final Arguments arguments = new Arguments();
+        Arguments arguments = new Arguments();
         try {
             new CommandLine(arguments).parseArgs(args);
         } catch (Exception e) {
             LOG.error("Failed to read in command line arguments.", e);
+            return;
+        }
+
+        // check the read in arguments
+        if (!checkArguments(arguments)) {
+            LOG.error("The arguments provided are invalid.");
+            LOG.error("Please see https://github.com/emufog/emufog/wiki for further information.");
             return;
         }
 
@@ -134,6 +144,35 @@ public class Emufog {
             LOG.warn("Unable to find a fog placement with the provided config.");
             LOG.warn("Consider using different config.");
         }
+    }
+
+    /**
+     * Checks the read in arguments from the command line. Either sets a default or prints an
+     * error if no argument is specified.
+     *
+     * @param arguments arguments to check
+     * @return {@code true} if arguments are valid to start, {@code false} if arguments are invalid
+     */
+    private static boolean checkArguments(Arguments arguments) {
+        boolean valid = true;
+        if (arguments.configPath == null) {
+            arguments.configPath = Paths.get("src", "main", "resources", "application.yaml");
+            LOG.info("No '--config' argument found. Will use {} as default.", arguments.configPath);
+        }
+        if (nullOrEmpty(arguments.inputType)) {
+            valid = false;
+            LOG.error("No '--type' argument found. Specify a valid input format.");
+        }
+        if (arguments.output == null) {
+            arguments.output = Paths.get("output.py");
+            LOG.info("No '--output' argument found. Will use {} as default.", arguments.output);
+        }
+        if (arguments.files == null || arguments.files.isEmpty()) {
+            valid = false;
+            LOG.error("No '--file' argument found. Provide at least one input file.");
+        }
+
+        return valid;
     }
 
     /**
