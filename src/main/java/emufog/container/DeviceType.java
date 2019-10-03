@@ -29,10 +29,14 @@ package emufog.container;
  */
 public class DeviceType extends ContainerType {
 
-    /* scaling factor of the container image to simulate multiple hosts */
+    /**
+     * scaling factor of the container image to simulate multiple hosts
+     */
     public final int scalingFactor;
 
-    /* average devices connected to an edge router */
+    /**
+     * average devices connected to an edge router
+     */
     public final float averageDeviceCount;
 
     /**
@@ -49,7 +53,13 @@ public class DeviceType extends ContainerType {
      * @throws IllegalArgumentException the container image name cannot be null and must
      *                                  match the pattern of a container container name
      */
-    public DeviceType(String containerName, String containerVersion, int scalingFactor, float averageDeviceCount, int memoryLimit, float cpuShare) throws IllegalArgumentException {
+    public DeviceType(
+        String containerName,
+        String containerVersion,
+        int scalingFactor,
+        float averageDeviceCount,
+        int memoryLimit,
+        float cpuShare) throws IllegalArgumentException {
         super(containerName, containerVersion, memoryLimit, cpuShare);
 
         this.scalingFactor = scalingFactor;
@@ -69,7 +79,9 @@ public class DeviceType extends ContainerType {
      * @throws IllegalArgumentException the container image name cannot be null and must
      *                                  match the pattern of a container container name
      */
-    public DeviceType(String containerName, int scalingFactor, float averageDeviceCount, int memoryLimit, float cpuShare) throws IllegalArgumentException {
+    public DeviceType(
+        String containerName, int scalingFactor, float averageDeviceCount, int memoryLimit, float cpuShare) throws
+                                                                                                            IllegalArgumentException {
         super(containerName, memoryLimit, cpuShare);
 
         this.scalingFactor = scalingFactor;

@@ -31,16 +31,24 @@ import static emufog.util.StringUtils.nullOrEmpty;
  */
 public abstract class ContainerType {
 
-    /* name of the container image */
+    /**
+     * name of the container image
+     */
     public final String name;
 
-    /* version of the container image */
+    /**
+     * version of the container image
+     */
     public final String version;
 
-    /* upper memory limit in Bytes for the container image */
+    /**
+     * upper memory limit in Bytes for the container image
+     */
     public final int memoryLimit;
 
-    /* maximum share of the underlying CPUs */
+    /**
+     * maximum share of the underlying CPUs
+     */
     public final float cpuShare;
 
     /**

@@ -29,10 +29,14 @@ package emufog.container;
  */
 public class FogType extends ContainerType {
 
-    /* maximal number of clients this image can serve, including */
+    /**
+     * maximal number of clients this image can serve, including
+     */
     public final int maxClients;
 
-    /* costs to deploy an instance of this image */
+    /**
+     * costs to deploy an instance of this image
+     */
     public final float costs;
 
     /**
