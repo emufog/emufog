@@ -46,7 +46,7 @@ import java.util.Map;
  * This class exports a graph object to a valid python file usable with the
  * MaxiNet (https://maxinet.github.io/) network emulation framework.
  */
-public class MaxiNetExporter implements IGraphExporter {
+public class MaxiNetExporter implements GraphExporter {
 
     /**
      * list of all lines of the respective file in top down order

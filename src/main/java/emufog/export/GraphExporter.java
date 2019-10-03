@@ -28,7 +28,7 @@ import emufog.graph.Graph;
 import java.io.IOException;
 import java.nio.file.Path;
 
-public interface IGraphExporter {
+public interface GraphExporter {
 
     /**
      * Exports the given graph object in an unspecified format.
