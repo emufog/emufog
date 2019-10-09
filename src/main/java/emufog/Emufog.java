@@ -35,7 +35,6 @@ import emufog.reader.BriteFormatReader;
 import emufog.reader.CaidaFormatReader;
 import emufog.reader.GraphReader;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -157,7 +156,7 @@ public class Emufog {
         boolean valid = true;
         if (arguments.configPath == null) {
             arguments.configPath = Paths.get("src", "main", "resources", "application.yaml");
-            LOG.info("No '--config' argument found. Will use {} as default.", arguments.configPath);
+            LOG.warn("No '--config' argument found. Will use {} as default.", arguments.configPath);
         }
         if (nullOrEmpty(arguments.inputType)) {
             valid = false;
@@ -165,7 +164,7 @@ public class Emufog {
         }
         if (arguments.output == null) {
             arguments.output = Paths.get("output.py");
-            LOG.info("No '--output' argument found. Will use {} as default.", arguments.output);
+            LOG.warn("No '--output' argument found. Will use {} as default.", arguments.output);
         }
         if (arguments.files == null || arguments.files.isEmpty()) {
             valid = false;
