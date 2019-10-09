@@ -1,8 +1,6 @@
 apply plugin: 'java'
 apply plugin: 'application'
 
-mainClassName = 'emufog.launcher.Emufog'
-
 repositories {
     mavenCentral()
 }
@@ -10,29 +8,26 @@ repositories {
 dependencies {
     compile 'info.picocli:picocli:4.0.0'
     compile 'org.slf4j:slf4j-api:1.7.26'
-    runtime 'ch.qos.logback:logback-classic:1.2.3'
     compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.9'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.9.9.1'
+
+    runtime 'ch.qos.logback:logback-classic:1.2.3'
 }
 
+mainClassName = 'emufog.Emufog'
+
 version = '1.0'
+
 jar {
     manifest {
         attributes(
                 'Implementation-Title': 'EmuFog',
                 'Implementation-Version': version,
-                'Main-Class': 'emufog.launcher.Emufog'
+                'Main-Class': 'emufog.Emufog'
         )
     }
-}
 
-task fatJar(type: Jar) {
-    manifest.from jar.manifest
-    classifier = 'fat'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
-}
-
-artifacts {
-    archives fatJar
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }
