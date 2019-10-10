@@ -5,4 +5,4 @@ jdk:
   - openjdk11
 
 script:
-  - ./gradlew build
+  - ./gradlew clean build
