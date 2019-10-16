@@ -292,15 +292,16 @@ public class Graph {
         if (from == null || to == null) {
             throw new IllegalArgumentException("The source and destination nodes cannot be null.");
         }
+        int edgeId = id;
 
-        if (edgeIdProvider.isUsed(id)) {
-            LOG.warn("The edge id: {} is already in use", id);
-            id = edgeIdProvider.getNextID();
-            LOG.warn("Assigning new edge id: {}", id);
+        if (edgeIdProvider.isUsed(edgeId)) {
+            LOG.warn("The edge id: {} is already in use", edgeId);
+            edgeId = edgeIdProvider.getNextID();
+            LOG.warn("Assigning new edge id: {}", edgeId);
         }
 
-        Edge edge = new Edge(id, from, to, delay, bandwidth);
-        edgeIdProvider.markIDused(id);
+        Edge edge = new Edge(edgeId, from, to, delay, bandwidth);
+        edgeIdProvider.markIDused(edgeId);
         edges.add(edge);
 
         //TODO fix scaling factor
