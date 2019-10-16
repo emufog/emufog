@@ -291,17 +291,14 @@ public class CaidaFormatReader implements GraphReader {
             return;
         }
 
-        float xPos, yPos;
         try {
-            xPos = Float.parseFloat(values[5]);
-            yPos = Float.parseFloat(values[6]);
+            float xPos = Float.parseFloat(values[5]);
+            float yPos = Float.parseFloat(values[6]);
+            nodeCoordinates.put(id, new Coordinates(xPos, yPos));
         } catch (NumberFormatException e) {
             LOG.debug("Failed to parse coordinates {} and {} to floats.", values[5], values[6]);
             coordinatesOutOfRange++;
-            return;
         }
-
-        nodeCoordinates.put(id, new Coordinates(xPos, yPos));
     }
 
     /**
