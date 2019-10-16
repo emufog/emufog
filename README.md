@@ -53,7 +53,6 @@ or by running a precompiled jar file e.g.
 java -jar build/libs/emufog-<version>-fat.jar
 ````
 
-
 The [wiki](https://github.com/emufog/emufog/wiki) explains how to use EmuFog in more detail.
 
 ## License
