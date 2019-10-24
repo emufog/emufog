@@ -118,7 +118,7 @@ class BaseNode {
     float getCosts(StartingNode node) {
         Tuple<BaseNode, Float> tuple = costs.get(node);
 
-        return tuple != null ? tuple.getValue() : Float.MAX_VALUE;
+        return tuple == null ? Float.MAX_VALUE : tuple.getValue();
     }
 
     /**
