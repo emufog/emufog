@@ -37,6 +37,7 @@ class EdgeDeviceNodeConverter extends NodeConverter {
      * @param emulationSettings emulation config of the newly created node
      */
     private EdgeDeviceNodeConverter(EmulationSettings emulationSettings) {
+        super();
         this.emulationSettings = emulationSettings;
     }
 
