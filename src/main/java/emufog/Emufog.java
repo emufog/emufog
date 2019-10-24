@@ -78,7 +78,7 @@ public class Emufog {
      * @param args arguments passed to the execution
      * @throws IOException thrown in case of a problem during the execution
      */
-    private static void runEmuFog(String[] args) throws IOException {
+    private static void runEmuFog(String... args) throws IOException {
         // parse the command line arguments
         Arguments arguments = new Arguments();
         try {
