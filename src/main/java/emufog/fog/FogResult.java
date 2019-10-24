@@ -61,7 +61,7 @@ public class FogResult {
      *
      * @return outcome status of the fog node placement
      */
-    public boolean getStatus() {
+    public boolean isStatus() {
         return status;
     }
 

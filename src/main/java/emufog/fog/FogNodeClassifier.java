@@ -82,7 +82,7 @@ public class FogNodeClassifier {
         List<FogResult> results = graph.getSystems().parallelStream().map(s -> new FogWorker(s, this).findFogNodes()).collect(Collectors.toList());
 
         // check if all part results are success
-        Optional<FogResult> optional = results.stream().filter(r -> !r.getStatus()).findFirst();
+        Optional<FogResult> optional = results.stream().filter(r -> !r.isStatus()).findFirst();
         if (!optional.isPresent()) {
             result.setSuccess();
             results.forEach(r -> result.addPlacements(r.getPlacements()));
