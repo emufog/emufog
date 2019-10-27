@@ -32,10 +32,14 @@ package emufog.util;
  */
 public class Tuple<K, V> {
 
-    /* the key or the first value of the tuple */
+    /**
+     * the key or the first value of the tuple
+     */
     private K key;
 
-    /* the second value of the tuple */
+    /**
+     * the second value of the tuple
+     */
     private V value;
 
     /**
