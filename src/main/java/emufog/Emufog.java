@@ -31,7 +31,7 @@ import emufog.fog.FogNodeClassifier;
 import emufog.fog.FogNodePlacement;
 import emufog.fog.FogResult;
 import emufog.graph.Graph;
-import emufog.reader.BriteFormatReader;
+import emufog.reader.brite.BriteFormatReader;
 import emufog.reader.CaidaFormatReader;
 import emufog.reader.GraphReader;
 import java.io.IOException;
