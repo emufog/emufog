@@ -42,8 +42,14 @@ import static emufog.util.StringUtils.nullOrEmpty;
  */
 public class BriteFormatReader implements GraphReader {
 
+    /**
+     * number of columns defined for a line containing a node
+     */
     private static final int NODE_COLUMNS = 7;
 
+    /**
+     * number of columns defined for a line containing an edge
+     */
     private static final int EDGE_COLUMNS = 9;
 
     /**
@@ -140,6 +146,7 @@ public class BriteFormatReader implements GraphReader {
 
     /**
      * Reads in a new graph object
+     *
      * @param files list of files to read in
      * @return read in graph object
      * @throws IOException              in case of an I/O error
