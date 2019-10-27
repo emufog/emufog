@@ -32,7 +32,7 @@ import emufog.fog.FogNodePlacement;
 import emufog.fog.FogResult;
 import emufog.graph.Graph;
 import emufog.reader.brite.BriteFormatReader;
-import emufog.reader.CaidaFormatReader;
+import emufog.reader.caida.CaidaFormatReader;
 import emufog.reader.GraphReader;
 import java.io.IOException;
 import java.nio.file.Paths;

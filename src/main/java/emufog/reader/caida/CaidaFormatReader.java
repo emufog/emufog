@@ -21,14 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.reader;
+package emufog.reader.caida;
 
 import emufog.config.Config;
 import emufog.graph.AS;
 import emufog.graph.Graph;
 import emufog.graph.Node;
+import emufog.reader.GraphReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -44,8 +46,19 @@ public class CaidaFormatReader implements GraphReader {
 
     private static final Logger LOG = LoggerFactory.getLogger(CaidaFormatReader.class);
 
+    /**
+     * initialize charset according to https://en.wikipedia.org/wiki/ISO/IEC_8859-1
+     */
+    private static final Charset CHARSET = StandardCharsets.ISO_8859_1;
+
+    private static final int NODE_COLUMNS = 7;
+
+    private static final int AS_COLUMNS = 3;
+
+    private static final int EDGE_COLUMNS = 4;
+
     /* number of times AS field exceeds the Integer range */
-    private int asOutOfRange;
+    private int asNoInteger;
 
     /* number of times no node has been found with an ID to assign an AS */
     private int noNodeFoundForAS;
@@ -54,7 +67,7 @@ public class CaidaFormatReader implements GraphReader {
     private int noNodeFoundForEdge;
 
     /* number of times ID field exceeds the Integer range */
-    private int idOutOfRange;
+    private int idsNoInteger;
 
     /* number of times a node line was skipped */
     private int nodeLineSkipped;
@@ -66,24 +79,16 @@ public class CaidaFormatReader implements GraphReader {
     private int linkLineSkipped;
 
     /* number of times coordinate field exceeds the Float range */
-    private int coordinatesOutOfRange;
-
-    /* charset to read in the caida files */
-    private final Charset charset;
+    private int coordinatesNoFloats;
 
     /* mapping from ID's to coordinates of the nodes */
     private Map<Integer, Coordinates> nodeCoordinates;
 
-    /**
-     * Creates a new reader for the Caida topology.
-     */
-    public CaidaFormatReader() {
-        // initialize charset according to https://en.wikipedia.org/wiki/ISO/IEC_8859-1
-        charset = Charset.forName("ISO-8859-1");
-    }
-
     @Override
     public Graph readGraph(List<Path> files) throws IOException, IllegalArgumentException {
+        if (files == null) {
+            throw new IllegalArgumentException("No input files provided.");
+        }
         Path nodesFile = getFileWithEnding(files, ".nodes.geo");
         if (nodesFile == null) {
             throw new IllegalArgumentException("The given files do not contain a .nodes.geo file.");
@@ -98,9 +103,9 @@ public class CaidaFormatReader implements GraphReader {
         }
 
         // initialize error counts
-        asOutOfRange = 0;
-        coordinatesOutOfRange = 0;
-        idOutOfRange = 0;
+        asNoInteger = 0;
+        coordinatesNoFloats = 0;
+        idsNoInteger = 0;
         noNodeFoundForAS = 0;
         noNodeFoundForEdge = 0;
         nodeLineSkipped = 0;
@@ -112,13 +117,13 @@ public class CaidaFormatReader implements GraphReader {
         Graph graph = new Graph(Config.getConfig());
 
         // read in the nodes
-        Files.lines(nodesFile, charset).forEach(this::processNodeLine);
+        Files.lines(nodesFile, CHARSET).forEach(this::processNodeLine);
 
         // read in the AS
-        Files.lines(asFile, charset).forEach(x -> processASLine(graph, x));
+        Files.lines(asFile, CHARSET).forEach(x -> processASLine(graph, x));
 
         // read in the edges
-        Files.lines(linkFile, charset).forEach(x -> processLinkLine(graph, x));
+        Files.lines(linkFile, CHARSET).forEach(x -> processLinkLine(graph, x));
 
         // log errors
         logResults();
@@ -131,9 +136,9 @@ public class CaidaFormatReader implements GraphReader {
      */
     private void logResults() {
         // additional logging for debugging
-        LOG.debug("ID out of Integer range: {}", idOutOfRange);
-        LOG.debug("AS out of Integer range: {}", asOutOfRange);
-        LOG.debug("Coordinates out of Float range: {}", coordinatesOutOfRange);
+        LOG.debug("ID out of Integer range: {}", idsNoInteger);
+        LOG.debug("AS out of Integer range: {}", asNoInteger);
+        LOG.debug("Coordinates out of Float range: {}", coordinatesNoFloats);
         LOG.debug("Number of times no nodes were found to assign an AS: {}", noNodeFoundForAS);
         LOG.debug("Number of times no nodes were found to build an edge: {}", noNodeFoundForEdge);
         LOG.debug("Nodes read without an AS: {}", nodeCoordinates.size());
@@ -149,13 +154,9 @@ public class CaidaFormatReader implements GraphReader {
      * @param line  current line to process
      */
     private void processLinkLine(Graph graph, String line) {
-        if (!line.startsWith("link ")) {
-            return;
-        }
-
         String[] values = line.split(" ");
-        if (values.length < 4) {
-            LOG.debug("The number of values in the column doesn't match the expectations of >= 4: {}", line);
+        if (values.length < EDGE_COLUMNS) {
+            LOG.debug("There are not {} columns in the link line: {}", EDGE_COLUMNS, line);
             linkLineSkipped++;
             return;
         }
@@ -167,7 +168,7 @@ public class CaidaFormatReader implements GraphReader {
             id = Integer.parseInt(linkStr);
         } catch (NumberFormatException e) {
             LOG.debug("Failed to parse the link id {} to an integer.", linkStr);
-            idOutOfRange++;
+            idsNoInteger++;
             return;
         }
 
@@ -183,7 +184,7 @@ public class CaidaFormatReader implements GraphReader {
                 sourceID = Integer.parseInt(sourceStr);
             } catch (NumberFormatException e) {
                 LOG.debug("Failed to parse the link's source id {} to an integer.", sourceStr);
-                idOutOfRange++;
+                idsNoInteger++;
                 return;
             }
 
@@ -198,7 +199,7 @@ public class CaidaFormatReader implements GraphReader {
                 destinationID = Integer.parseInt(destinationStr);
             } catch (NumberFormatException e) {
                 LOG.debug("Failed to parse the link's destination id {} to an integer.", destinationStr);
-                idOutOfRange++;
+                idsNoInteger++;
                 return;
             }
 
@@ -221,25 +222,20 @@ public class CaidaFormatReader implements GraphReader {
      * @param line  current line to process
      */
     private void processASLine(Graph graph, String line) {
-        if (!line.startsWith("node.AS ")) {
-            return;
-        }
-
         String[] values = line.split(" ");
-        if (values.length < 3) {
+        if (values.length < AS_COLUMNS) {
             asLineSkipped++;
-            LOG.debug("The number of values in the column doesn't match the expectations of >= 3: {}", line);
+            LOG.debug("There are not {} columns in the autonomous system line: {}", AS_COLUMNS, line);
             return;
         }
 
-        String nodeStr = values[1];
-        nodeStr = nodeStr.substring(1);
+        String nodeStr = values[1].substring(1);
         int id;
         try {
             id = Integer.parseInt(nodeStr);
         } catch (NumberFormatException e) {
             LOG.debug("Failed to parse the id {} to an integer.", nodeStr);
-            idOutOfRange++;
+            idsNoInteger++;
             return;
         }
 
@@ -248,14 +244,7 @@ public class CaidaFormatReader implements GraphReader {
             as = Integer.parseInt(values[2]);
         } catch (NumberFormatException e) {
             LOG.debug("Failed to parse the autonomous system id {} to an integer.", values[2]);
-            asOutOfRange++;
-            return;
-        }
-
-        Coordinates coordinates = nodeCoordinates.get(id);
-        if (coordinates == null) {
-            LOG.debug("No node coordinates were found for the node id: {}", id);
-            noNodeFoundForAS++;
+            asNoInteger++;
             return;
         }
 
@@ -269,13 +258,9 @@ public class CaidaFormatReader implements GraphReader {
      * @param line current line to process
      */
     private void processNodeLine(String line) {
-        if (!line.startsWith("node.geo ")) {
-            return;
-        }
-
         String[] values = line.split("\t");
-        if (values.length < 7) {
-            LOG.debug("The number of values in the column doesn't match the expectations of >= 7: {}", line);
+        if (values.length < NODE_COLUMNS) {
+            LOG.debug("There are not {} columns in the node line: {}", NODE_COLUMNS, line);
             nodeLineSkipped++;
             return;
         }
@@ -287,7 +272,7 @@ public class CaidaFormatReader implements GraphReader {
             id = Integer.parseInt(nodeStr);
         } catch (NumberFormatException e) {
             LOG.debug("Failed to parse the id {} to an integer.", nodeStr);
-            idOutOfRange++;
+            idsNoInteger++;
             return;
         }
 
@@ -297,7 +282,7 @@ public class CaidaFormatReader implements GraphReader {
             nodeCoordinates.put(id, new Coordinates(xPos, yPos));
         } catch (NumberFormatException e) {
             LOG.debug("Failed to parse coordinates {} and {} to floats.", values[5], values[6]);
-            coordinatesOutOfRange++;
+            coordinatesNoFloats++;
         }
     }
 
@@ -309,7 +294,10 @@ public class CaidaFormatReader implements GraphReader {
      * @return the file of the list matching the extension or {@code null} if not found
      */
     private static Path getFileWithEnding(List<Path> files, String fileExtension) {
-        return files.stream().filter(x -> x.toString().endsWith(fileExtension)).findFirst().orElse(null);
+        return files.stream()
+            .filter(f -> f != null && f.toString().endsWith(fileExtension))
+            .findFirst()
+            .orElse(null);
     }
 
     private float getLatency(Node from, Node to) {
@@ -319,12 +307,16 @@ public class CaidaFormatReader implements GraphReader {
     /**
      * Coordinates of a node in the graph. This class gets mapped to the respective ID of the node.
      */
-    class Coordinates {
+    static class Coordinates {
 
-        /* x coordinate */
+        /**
+         * x coordinate
+         */
         final float xPos;
 
-        /* y coordinate */
+        /**
+         * y coordinate
+         */
         final float yPos;
 
         /**
