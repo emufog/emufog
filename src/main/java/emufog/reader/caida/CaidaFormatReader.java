@@ -206,12 +206,13 @@ public class CaidaFormatReader implements GraphReader {
             Node from = graph.getEdgeNode(sourceID);
             Node to = graph.getEdgeNode(destinationID);
 
-            if (from != null && to != null) {
-                graph.createEdge(id, from, to, getLatency(from, to), 1000);
-            } else {
+            if (from == null || to == null) {
                 LOG.debug("To create a link source and destination must be found.");
                 noNodeFoundForEdge++;
+                return;
             }
+
+            graph.createEdge(id, from, to, getLatency(from, to), 1000);
         }
     }
 
