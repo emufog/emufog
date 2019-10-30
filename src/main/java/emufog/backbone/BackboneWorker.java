@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.backbone;
+package backbone;
 
 import emufog.graph.AS;
 import emufog.graph.BackboneNode;

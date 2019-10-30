@@ -12,6 +12,8 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-databind:2.9.9.1'
 
     runtime 'ch.qos.logback:logback-classic:1.2.3'
+
+    testCompile 'org.junit.jupiter:junit-jupiter:5.5.2'
 }
 
 mainClassName = 'emufog.Emufog'
@@ -30,4 +32,8 @@ jar {
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
+}
+
+test {
+    useJUnitPlatform()
 }
