@@ -26,12 +26,12 @@ package emufog.util;
 public class StringUtils {
 
     /**
-     * Checks if the given string is either {@code null} or empty("").
+     * Checks if the given string is either {@code null} or white spaces only.
      *
      * @param s string to check
      * @return true if the string is either {@code null} or empty
      */
     public static boolean nullOrEmpty(String s) {
-        return s == null || s.isEmpty();
+        return s == null || s.trim().isEmpty();
     }
 }
