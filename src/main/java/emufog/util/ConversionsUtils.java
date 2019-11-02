@@ -37,7 +37,7 @@ public class ConversionsUtils {
      * @param end   end point of the interval in ns
      * @return string representation of the interval to print
      */
-    public static String intervalToString(long start, long end) {
+    public static String formatTimeInterval(long start, long end) {
         long duration = Math.max(end - start, 0);
         StringBuilder sb = new StringBuilder();
         boolean started = false;
@@ -48,18 +48,18 @@ public class ConversionsUtils {
             started = true;
         }
 
-        long minutes = TimeUnit.MINUTES.convert(duration, TimeUnit.NANOSECONDS);
+        long minutes = TimeUnit.MINUTES.convert(duration, TimeUnit.NANOSECONDS) % 60;
         if (started || minutes > 0) {
             sb.append(minutes).append("min ");
             started = true;
         }
 
-        long seconds = TimeUnit.SECONDS.convert(duration, TimeUnit.NANOSECONDS);
+        long seconds = TimeUnit.SECONDS.convert(duration, TimeUnit.NANOSECONDS) % 60;
         if (started || seconds > 0) {
             sb.append(seconds).append("s ");
         }
 
-        long milliseconds = TimeUnit.MILLISECONDS.convert(duration, TimeUnit.NANOSECONDS);
+        long milliseconds = TimeUnit.MILLISECONDS.convert(duration, TimeUnit.NANOSECONDS) % 1000;
         sb.append(milliseconds).append("ms");
 
         return sb.toString();

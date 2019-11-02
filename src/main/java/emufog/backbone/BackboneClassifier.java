@@ -30,7 +30,7 @@ import java.util.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static emufog.util.ConversionsUtils.intervalToString;
+import static emufog.util.ConversionsUtils.formatTimeInterval;
 
 /**
  * This class runs the backbone classification algorithm on a graph instance.
@@ -54,7 +54,7 @@ public class BackboneClassifier {
         LOG.debug("Start Backbone Classification");
         long start = System.nanoTime();
         convertCrossAsEdges(graph.getEdges());
-        LOG.debug("Graph Step 1 - Time: {}", intervalToString(start, System.nanoTime()));
+        LOG.debug("Graph Step 1 - Time: {}", formatTimeInterval(start, System.nanoTime()));
         LOG.debug("Backbone Size: {}", graph.getBackboneNodes().size());
         LOG.debug("Edge Size: {}", graph.getEdgeNodes().size());
 
@@ -63,7 +63,7 @@ public class BackboneClassifier {
         // 2nd step in parallel
         start = System.nanoTime();
         systems.parallelStream().forEach(as -> new BackboneWorker(as).identifyBackbone());
-        LOG.debug("Graph Step 2 - Time: {}", intervalToString(start, System.nanoTime()));
+        LOG.debug("Graph Step 2 - Time: {}", formatTimeInterval(start, System.nanoTime()));
         LOG.debug("Backbone Size: {}", graph.getBackboneNodes().size());
         LOG.debug("Edge Size: {}", graph.getEdgeNodes().size());
 

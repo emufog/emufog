@@ -40,7 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
-import static emufog.util.ConversionsUtils.intervalToString;
+import static emufog.util.ConversionsUtils.formatTimeInterval;
 import static emufog.util.StringUtils.nullOrEmpty;
 
 /**
@@ -110,7 +110,7 @@ public class Emufog {
         long start = System.nanoTime();
         Graph graph = reader.readGraph(arguments.files);
         long end = System.nanoTime();
-        LOG.debug("Time to read in the graph: {}", intervalToString(start, end));
+        LOG.debug("Time to read in the graph: {}", formatTimeInterval(start, end));
         LOG.info("##############################################################");
         // print graph details for information purposes
         LOG.info("Number of nodes in the graph: {}", graph.getEdgeNodes().size());
@@ -121,7 +121,7 @@ public class Emufog {
         start = System.nanoTime();
         BackboneClassifier.identifyBackbone(graph);
         end = System.nanoTime();
-        LOG.debug("Time to determine the backbone of the topology: {}", intervalToString(start, end));
+        LOG.debug("Time to determine the backbone of the topology: {}", formatTimeInterval(start, end));
         LOG.info("##############################################################");
         LOG.info("Number of backbone nodes identified: {}", graph.getBackboneNodes().size());
         LOG.info("##############################################################");

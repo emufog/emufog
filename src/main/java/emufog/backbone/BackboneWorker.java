@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static emufog.util.ConversionsUtils.intervalToString;
+import static emufog.util.ConversionsUtils.formatTimeInterval;
 
 /**
  * This worker class operates on a single AS of the graph so it can used in parallel.
@@ -73,14 +73,14 @@ class BackboneWorker {
         //2nd step
         long start = System.nanoTime();
         convertHighDegrees();
-        LOG.info("{} Step 2 - Time: {}", as, intervalToString(start, System.nanoTime()));
+        LOG.info("{} Step 2 - Time: {}", as, formatTimeInterval(start, System.nanoTime()));
         LOG.info("{} Backbone Size: {}", as, as.getBackboneNodes().size());
         LOG.info("{} Edge Size: {}", as, as.getEdgeNodes().size());
 
         // 3rd step
         start = System.nanoTime();
         connectBackbone();
-        LOG.info("{} Step 3 - Time: {}", as, intervalToString(start, System.nanoTime()));
+        LOG.info("{} Step 3 - Time: {}", as, formatTimeInterval(start, System.nanoTime()));
         LOG.info("{} Backbone Size: {}", as, as.getBackboneNodes().size());
         LOG.info("{} Edge Size: {}", as, as.getEdgeNodes().size());
     }

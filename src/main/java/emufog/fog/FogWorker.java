@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static emufog.util.ConversionsUtils.intervalToString;
+import static emufog.util.ConversionsUtils.formatTimeInterval;
 
 /**
  * This class isolates the fog node placement algorithm of one of the autonomous systems
@@ -98,7 +98,7 @@ class FogWorker {
         long start = System.nanoTime();
         // calculate connection costs from the edge device nodes
         startingNodes.forEach(this::calculateConnectionCosts);
-        LOG.debug("Time to calculate connection costs for edge devices for {}: {}", as, intervalToString(start, System.nanoTime()));
+        LOG.debug("Time to calculate connection costs for edge devices for {}: {}", as, formatTimeInterval(start, System.nanoTime()));
 
         // initialize empty result set
         FogResult result = new FogResult();
@@ -114,7 +114,7 @@ class FogWorker {
             start = System.nanoTime();
             // find the next fog node for the remaining starting nodes
             BaseNode fogNode = getNextFogNode(startingNodes);
-            LOG.debug("Time to find next fog node for {}: {}", as, intervalToString(start, System.nanoTime()));
+            LOG.debug("Time to find next fog node for {}: {}", as, formatTimeInterval(start, System.nanoTime()));
 
             // reduce the remaining fog nodes available
             classifier.reduceRemainingNodes();
@@ -122,7 +122,7 @@ class FogWorker {
             start = System.nanoTime();
             // remove all covered nodes from the graph
             removeAllCoveredNodes(fogNode, startingNodes);
-            LOG.debug("Time to remove the covered nodes for {}: {}", as, intervalToString(start, System.nanoTime()));
+            LOG.debug("Time to remove the covered nodes for {}: {}", as, formatTimeInterval(start, System.nanoTime()));
 
             // add the new fog node to the partial result
             result.addPlacement(new FogNodePlacement(fogNode));
@@ -145,14 +145,14 @@ class FogWorker {
         // find the optimal fog type for the remaining nodes in the graph
         List<BaseNode> fogNodes = new ArrayList<>(nodes.values());
         fogNodes.forEach(n -> n.findFogType(config.fogNodeTypes));
-        LOG.debug("Time to find possible fog types for {}: {}", as, intervalToString(start, System.nanoTime()));
+        LOG.debug("Time to find possible fog types for {}: {}", as, formatTimeInterval(start, System.nanoTime()));
 
         start = System.nanoTime();
         // sort the possible fog nodes with a FogComparator
         fogNodes.sort(new FogComparator());
         // retrieve the nextLevels optimal node
         BaseNode next = fogNodes.get(0);
-        LOG.debug("Time to find the fog node placement for {}: {}", as, intervalToString(start, System.nanoTime()));
+        LOG.debug("Time to find the fog node placement for {}: {}", as, formatTimeInterval(start, System.nanoTime()));
 
         return next;
     }
