@@ -57,7 +57,6 @@ class UniqueIDProvider {
      */
     int getNextID() {
         current = bitSet.nextClearBit(current);
-        markIDused(current);
 
         return current;
     }

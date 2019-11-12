@@ -131,9 +131,9 @@ class BackboneWorker {
             visited.set(node.getID());
 
             // follow a trace via the predecessor to convert all on this way
-            if (node.getType() == BACKBONE_NODE && predecessors.get(node).getType() == EDGE_NODE) {
+            if (isOfType(node, BACKBONE_NODE) && isOfType(predecessors.get(node), EDGE_NODE)) {
                 Node predecessor = predecessors.get(node);
-                while (predecessor.getType() == EDGE_NODE) {
+                while (isOfType(predecessor, EDGE_NODE)) {
                     BackboneNodeConverter.convertToBackbone(predecessor);
 
                     predecessor = predecessors.get(predecessor);
@@ -154,7 +154,7 @@ class BackboneWorker {
 
                 if (seen.get(neighbor.getID())) {
                     // update the predecessor if necessary
-                    if (node.getType() == BACKBONE_NODE && predecessors.get(neighbor).getType() == EDGE_NODE) {
+                    if (isOfType(node, BACKBONE_NODE) && isOfType(predecessors.get(neighbor), EDGE_NODE)) {
                         predecessors.put(neighbor, node);
                     }
                 } else {
@@ -165,6 +165,10 @@ class BackboneWorker {
                 }
             }
         }
+    }
+
+    private static boolean isOfType(Node node, NodeType type) {
+        return node != null && node.getType() == type;
     }
 
     /**

@@ -36,7 +36,7 @@ class UniqueIDProviderTest {
         UniqueIDProvider provider = new UniqueIDProvider();
         assertFalse(provider.isUsed(0));
         assertEquals(0, provider.getNextID());
-        assertTrue(provider.isUsed(0));
+        assertFalse(provider.isUsed(0));
     }
 
     @Test
@@ -52,6 +52,6 @@ class UniqueIDProviderTest {
         UniqueIDProvider provider = new UniqueIDProvider();
         provider.markIDused(0);
         assertEquals(1, provider.getNextID());
-        assertTrue(provider.isUsed(1));
+        assertFalse(provider.isUsed(1));
     }
 }
