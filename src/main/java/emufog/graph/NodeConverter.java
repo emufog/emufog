@@ -26,7 +26,7 @@ package emufog.graph;
 /**
  * A node converter simplifies the conversion of a node to a different type.
  */
-abstract class NodeConverter {
+abstract class NodeConverter<T extends Node> {
 
     /**
      * Creates a new node based on the given old node.
@@ -35,22 +35,14 @@ abstract class NodeConverter {
      * @param oldNode node to create a new node from
      * @return the newly created node
      */
-    abstract Node createNewNode(Node oldNode);
+    abstract T createNewNode(Node oldNode);
 
     /**
      * Adds the new node to the respective list in the graph.
      *
      * @param newNode the new node to add
      */
-    abstract void addNodeToGraph(Node newNode);
-
-    /**
-     * Checks if the given node needs to be converted by the specific converter.
-     *
-     * @param oldNode node to check
-     * @return true if the given node needs to be converted
-     */
-    abstract boolean needsConversion(Node oldNode);
+    abstract void addNodeToGraph(T newNode);
 
     /**
      * Converts the given node to a different type and replace it in the associated graph.
@@ -59,22 +51,16 @@ abstract class NodeConverter {
      * @param oldNode node to convert
      * @return the replacing node or {@code null} if the given node is {@code null}
      */
-    Node convert(Node oldNode) {
+    T convert(Node oldNode) {
         if (oldNode == null) {
             return null;
         }
-        if (!needsConversion(oldNode)) {
-            return oldNode;
-        }
 
         // remove the old node from the graph
-        oldNode.as.removeNode(oldNode);
+        oldNode.getAS().removeNode(oldNode);
 
         // create a new node of the requested type
-        Node newNode = createNewNode(oldNode);
-
-        // update links from the old node
-        newNode.copyFromOldNode(oldNode);
+        T newNode = createNewNode(oldNode);
 
         // add the new node to the graph
         addNodeToGraph(newNode);

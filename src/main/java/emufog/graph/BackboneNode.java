@@ -29,18 +29,17 @@ package emufog.graph;
  */
 public class BackboneNode extends Node {
 
-    /**
-     * Creates a new backbone node.
-     *
-     * @param id unique identifier
-     * @param as autonomous system the belongs to
-     */
-    BackboneNode(int id, AS as) {
-        super(id, as);
+    BackboneNode(NodeAttributes attributes) {
+        super(attributes);
+    }
+
+    @Override
+    public NodeType getType() {
+        return NodeType.BACKBONE_NODE;
     }
 
     @Override
     public String getName() {
-        return "s" + id;
+        return "s" + getID();
     }
 }

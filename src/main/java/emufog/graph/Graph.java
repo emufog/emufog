@@ -26,12 +26,14 @@ package emufog.graph;
 import emufog.config.Config;
 import emufog.container.DeviceType;
 import emufog.container.FogType;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -230,7 +232,7 @@ public class Graph {
     public EdgeNode createEdgeNode(int id, AS as) throws IllegalArgumentException {
         validateAndMarkNodeInput(id, as);
 
-        EdgeNode edgeNode = new EdgeNode(id, as);
+        EdgeNode edgeNode = new EdgeNode(new NodeAttributes(id, as));
         as.addEdgeNode(edgeNode);
 
         return edgeNode;
@@ -247,7 +249,7 @@ public class Graph {
     public BackboneNode createBackboneNode(int id, AS as) throws IllegalArgumentException {
         validateAndMarkNodeInput(id, as);
 
-        BackboneNode backboneNode = new BackboneNode(id, as);
+        BackboneNode backboneNode = new BackboneNode(new NodeAttributes(id, as));
         as.addBackboneNode(backboneNode);
 
         return backboneNode;
@@ -269,7 +271,7 @@ public class Graph {
         validateAndMarkNodeInput(id, as);
 
         EmulationSettings emulationSettings = new EmulationSettings(ipProvider.getNextIPV4Address(), image);
-        EdgeDeviceNode edgeDevice = new EdgeDeviceNode(id, as, emulationSettings);
+        EdgeDeviceNode edgeDevice = new EdgeDeviceNode(new NodeAttributes(id, as), emulationSettings);
         as.addDevice(edgeDevice);
 
         return edgeDevice;
@@ -329,13 +331,13 @@ public class Graph {
                 int count = (int) (random.nextFloat() * upper);
 
                 for (int i = 0; i < count; ++i) {
-                    EdgeDeviceNode device = createEdgeDeviceNode(nodeIdProvider.getNextID(), r.as, type);
+                    EdgeDeviceNode device = createEdgeDeviceNode(nodeIdProvider.getNextID(), r.getAS(), type);
 
                     createEdge(edgeIdProvider.getNextID(),
-                        r,
-                        device,
-                        config.hostDeviceLatency,
-                        config.hostDeviceBandwidth);
+                            r,
+                            device,
+                            config.hostDeviceLatency,
+                            config.hostDeviceBandwidth);
                 }
             }
         }
@@ -357,11 +359,11 @@ public class Graph {
         if (type == null) {
             throw new IllegalArgumentException("The given fog type is not initialized.");
         }
-        if (!nodeIdProvider.isUsed(node.id)) {
+        if (!nodeIdProvider.isUsed(node.getID())) {
             throw new IllegalArgumentException("This graph object does not contain the given node.");
         }
 
-        node.emulationSettings = new EmulationSettings(ipProvider.getNextIPV4Address(), type);
+        node.setEmulationSettings(new EmulationSettings(ipProvider.getNextIPV4Address(), type));
     }
 
     /**

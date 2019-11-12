@@ -26,7 +26,7 @@ package emufog.graph;
 /**
  * This class convert an existing node to a edge device node in the graph.
  */
-class EdgeDeviceNodeConverter extends NodeConverter {
+public class EdgeDeviceNodeConverter extends NodeConverter<EdgeDeviceNode> {
 
     private final EmulationSettings emulationSettings;
 
@@ -38,27 +38,21 @@ class EdgeDeviceNodeConverter extends NodeConverter {
      */
     private EdgeDeviceNodeConverter(EmulationSettings emulationSettings) {
         super();
+        if (emulationSettings == null) {
+            throw new IllegalArgumentException("The emulation settings are null.");
+        }
+
         this.emulationSettings = emulationSettings;
     }
 
     @Override
-    Node createNewNode(Node oldNode) {
-        return new EdgeDeviceNode(oldNode.id, oldNode.as, emulationSettings);
+    EdgeDeviceNode createNewNode(Node oldNode) {
+        return new EdgeDeviceNode(oldNode.attributes, emulationSettings);
     }
 
     @Override
-    void addNodeToGraph(Node newNode) {
-        newNode.as.addDevice((EdgeDeviceNode) newNode);
-    }
-
-    @Override
-    boolean needsConversion(Node oldNode) {
-        return !(oldNode instanceof EdgeDeviceNode);
-    }
-
-    @Override
-    EdgeDeviceNode convert(Node oldNode) {
-        return (EdgeDeviceNode) super.convert(oldNode);
+    void addNodeToGraph(EdgeDeviceNode newNode) {
+        newNode.getAS().addDevice(newNode);
     }
 
     /**
@@ -70,7 +64,7 @@ class EdgeDeviceNodeConverter extends NodeConverter {
      * @param emulationSettings emulation config to set for the new node
      * @return newly created edge device node instance
      */
-    static EdgeDeviceNode convertToEdgeDeviceNode(Node oldNode, EmulationSettings emulationSettings) {
+    public static EdgeDeviceNode convertToEdgeDeviceNode(Node oldNode, EmulationSettings emulationSettings) {
         return new EdgeDeviceNodeConverter(emulationSettings).convert(oldNode);
     }
 }

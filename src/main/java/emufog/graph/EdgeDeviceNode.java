@@ -31,23 +31,20 @@ import emufog.container.DeviceType;
  */
 public class EdgeDeviceNode extends Node {
 
-    /**
-     * Creates a new edge device node.
-     * The edge device node must have an container image and IP address assigned.
-     *
-     * @param id                unique identifier
-     * @param as                autonomous system the belongs to
-     * @param emulationSettings emulation node associated with the edge device
-     */
-    EdgeDeviceNode(int id, AS as, EmulationSettings emulationSettings) {
-        super(id, as);
+    EdgeDeviceNode(NodeAttributes attributes, EmulationSettings emulationSettings) {
+        super(attributes);
 
-        this.emulationSettings = emulationSettings;
+        setEmulationSettings(emulationSettings);
+    }
+
+    @Override
+    public NodeType getType() {
+        return NodeType.EDGE_DEVICE_NODE;
     }
 
     @Override
     public String getName() {
-        return "h" + id;
+        return "h" + getID();
     }
 
     /**
@@ -56,11 +53,6 @@ public class EdgeDeviceNode extends Node {
      * @return device container type
      */
     DeviceType getContainerType() {
-        return (DeviceType) emulationSettings.getContainerType();
-    }
-
-    @Override
-    protected void copyFields(Node oldNode) {
-        edges.addAll(oldNode.edges);
+        return (DeviceType) getEmulationNode().getContainerType();
     }
 }

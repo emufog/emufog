@@ -47,12 +47,12 @@ public class Edge {
     /**
      * one end of the connection
      */
-    private Node from;
+    private final NodeAttributes from;
 
     /**
      * the other end of the connection
      */
-    private Node to;
+    private final NodeAttributes to;
 
     /**
      * Creates a new edge instance connecting two nodes of the graph.
@@ -66,13 +66,12 @@ public class Edge {
      */
     Edge(int id, Node from, Node to, float delay, float bandwidth) {
         this.id = id;
-        this.from = from;
-        this.to = to;
+        this.from = from.attributes;
+        this.to = to.attributes;
         this.delay = delay;
         this.bandwidth = bandwidth;
-
-        from.addEdge(this);
-        to.addEdge(this);
+        this.from.addEdge(this);
+        this.to.addEdge(this);
     }
 
     /**
@@ -99,7 +98,7 @@ public class Edge {
      * @return source/first node
      */
     public Node getSource() {
-        return from;
+        return from.getNode();
     }
 
     /**
@@ -108,7 +107,7 @@ public class Edge {
      * @return destination/second node
      */
     public Node getDestination() {
-        return to;
+        return to.getNode();
     }
 
     /**
@@ -119,11 +118,11 @@ public class Edge {
      * @return the other end of the connection or {@code null} if node is not part of this edge
      */
     public Node getDestinationForSource(Node node) {
-        if (from.equals(node)) {
-            return to;
+        if (from.equals(node.attributes)) {
+            return to.getNode();
         }
-        if (to.equals(node)) {
-            return from;
+        if (to.equals(node.attributes)) {
+            return from.getNode();
         }
 
         return null;
@@ -157,23 +156,5 @@ public class Edge {
     @Override
     public String toString() {
         return "Edge: " + id;
-    }
-
-    /**
-     * Sets the first/source node of the connection.
-     *
-     * @param source first/source node to set
-     */
-    void setSource(Node source) {
-        from = source;
-    }
-
-    /**
-     * Sets the second/destination node of the connection.
-     *
-     * @param destination second/destination node to set
-     */
-    void setDestination(Node destination) {
-        to = destination;
     }
 }

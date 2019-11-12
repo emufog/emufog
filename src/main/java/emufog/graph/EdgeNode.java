@@ -33,16 +33,15 @@ public class EdgeNode extends Node {
      */
     private int deviceCount;
 
-    /**
-     * Creates a new edge node instance.
-     *
-     * @param id unique identifier
-     * @param as autonomous system the belongs to
-     */
-    EdgeNode(int id, AS as) {
-        super(id, as);
+    EdgeNode(NodeAttributes attributes) {
+        super(attributes);
 
         deviceCount = 0;
+    }
+
+    @Override
+    public NodeType getType() {
+        return NodeType.EDGE_NODE;
     }
 
     /**
@@ -80,6 +79,6 @@ public class EdgeNode extends Node {
 
     @Override
     public String getName() {
-        return "r" + id;
+        return "r" + getID();
     }
 }

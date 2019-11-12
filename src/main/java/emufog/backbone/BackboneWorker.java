@@ -25,9 +25,11 @@ package emufog.backbone;
 
 import emufog.graph.AS;
 import emufog.graph.BackboneNode;
+import emufog.graph.BackboneNodeConverter;
 import emufog.graph.Edge;
 import emufog.graph.EdgeNode;
 import emufog.graph.Node;
+
 import java.util.ArrayDeque;
 import java.util.BitSet;
 import java.util.Collection;
@@ -36,9 +38,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.stream.Collectors;
+
+import emufog.graph.NodeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static emufog.graph.NodeType.BACKBONE_NODE;
+import static emufog.graph.NodeType.EDGE_NODE;
 import static emufog.util.ConversionsUtils.formatTimeInterval;
 
 /**
@@ -92,7 +98,7 @@ class BackboneWorker {
         double averageDegree = calculateAverageDegree() * BACKBONE_DEGREE_PERCENTAGE;
         List<EdgeNode> toConvert = as.getEdgeNodes().stream().filter(r -> r.getDegree() >= averageDegree).collect(Collectors.toList());
         for (EdgeNode e : toConvert) {
-            e.convertToBackboneNode();
+            BackboneNodeConverter.convertToBackbone(e);
         }
     }
 
@@ -125,10 +131,10 @@ class BackboneWorker {
             visited.set(node.getID());
 
             // follow a trace via the predecessor to convert all on this way
-            if (node instanceof BackboneNode && predecessors.get(node) instanceof EdgeNode) {
+            if (node.getType() == BACKBONE_NODE && predecessors.get(node).getType() == EDGE_NODE) {
                 Node predecessor = predecessors.get(node);
-                while (predecessor instanceof EdgeNode) {
-                    predecessor.convertToBackboneNode();
+                while (predecessor.getType() == EDGE_NODE) {
+                    BackboneNodeConverter.convertToBackbone(predecessor);
 
                     predecessor = predecessors.get(predecessor);
                 }
@@ -148,7 +154,7 @@ class BackboneWorker {
 
                 if (seen.get(neighbor.getID())) {
                     // update the predecessor if necessary
-                    if (node instanceof BackboneNode && predecessors.get(neighbor) instanceof EdgeNode) {
+                    if (node.getType() == BACKBONE_NODE && predecessors.get(neighbor).getType() == EDGE_NODE) {
                         predecessors.put(neighbor, node);
                     }
                 } else {
