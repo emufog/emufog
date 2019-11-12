@@ -70,6 +70,8 @@ public class Edge {
         this.to = to.attributes;
         this.delay = delay;
         this.bandwidth = bandwidth;
+        this.from.addEdge(this);
+        this.to.addEdge(this);
     }
 
     /**
