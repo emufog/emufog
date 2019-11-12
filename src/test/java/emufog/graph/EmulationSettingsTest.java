@@ -23,35 +23,36 @@
  */
 package emufog.graph;
 
+import emufog.container.ContainerType;
+import emufog.container.DeviceType;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-class UniqueIDProviderTest {
+class EmulationSettingsTest {
 
     @Test
-    void checkInit() {
-        UniqueIDProvider provider = new UniqueIDProvider();
-        assertFalse(provider.isUsed(0));
-        assertEquals(0, provider.getNextID());
-        assertTrue(provider.isUsed(0));
+    void testNullInit() {
+        EmulationSettings settings = new EmulationSettings(null, null);
+        assertNull(settings.getIP());
+        assertNull(settings.getContainerType());
     }
 
     @Test
-    void checkMarking() {
-        UniqueIDProvider provider = new UniqueIDProvider();
-        assertFalse(provider.isUsed(42));
-        provider.markIDused(42);
-        assertTrue(provider.isUsed(42));
+    void testEmptyIP() {
+        EmulationSettings settings = new EmulationSettings("", null);
+        assertEquals("", settings.getIP());
     }
 
     @Test
-    void checkNextIdCall() {
-        UniqueIDProvider provider = new UniqueIDProvider();
-        provider.markIDused(0);
-        assertEquals(1, provider.getNextID());
-        assertTrue(provider.isUsed(1));
+    void testInit() {
+        ContainerType container = new DeviceType("name", 1, 1.4F, 1024, 2.4F);
+        EmulationSettings settings = new EmulationSettings("1.2.3.4", container);
+        assertEquals("1.2.3.4", settings.getIP());
+        ContainerType actual = settings.getContainerType();
+        assertEquals("name", actual.name);
+        assertEquals(1024, actual.memoryLimit);
+        assertEquals(2.4F, actual.cpuShare);
     }
 }

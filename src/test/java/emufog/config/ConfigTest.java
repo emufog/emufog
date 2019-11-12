@@ -21,37 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.graph;
+package emufog.config;
 
+import java.nio.file.Paths;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-class UniqueIDProviderTest {
+class ConfigTest {
 
     @Test
-    void checkInit() {
-        UniqueIDProvider provider = new UniqueIDProvider();
-        assertFalse(provider.isUsed(0));
-        assertEquals(0, provider.getNextID());
-        assertTrue(provider.isUsed(0));
+    void updateNullPath() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> Config.updateConfig(null));
     }
 
     @Test
-    void checkMarking() {
-        UniqueIDProvider provider = new UniqueIDProvider();
-        assertFalse(provider.isUsed(42));
-        provider.markIDused(42);
-        assertTrue(provider.isUsed(42));
+    void testNotYamlFile() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> Config.updateConfig(Paths.get("file.txt")));
     }
 
     @Test
-    void checkNextIdCall() {
-        UniqueIDProvider provider = new UniqueIDProvider();
-        provider.markIDused(0);
-        assertEquals(1, provider.getNextID());
-        assertTrue(provider.isUsed(1));
+    void testDirectory() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> Config.updateConfig(Paths.get(".")));
     }
 }
