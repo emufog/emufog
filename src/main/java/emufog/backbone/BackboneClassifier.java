@@ -24,9 +24,12 @@
 package emufog.backbone;
 
 import emufog.graph.AS;
+import emufog.graph.BackboneNodeConverter;
 import emufog.graph.Edge;
 import emufog.graph.Graph;
+
 import java.util.Collection;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,8 +81,8 @@ public class BackboneClassifier {
     private static void convertCrossAsEdges(Collection<Edge> edges) {
         for (Edge e : edges) {
             if (e.isCrossASEdge()) {
-                e.getSource().convertToBackboneNode();
-                e.getDestination().convertToBackboneNode();
+                BackboneNodeConverter.convertToBackbone(e.getSource());
+                BackboneNodeConverter.convertToBackbone(e.getDestination());
             }
         }
     }

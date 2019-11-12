@@ -23,45 +23,24 @@
  */
 package emufog.graph;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents a general node of graph with the basic functionality.
+ * Represents a general node of  graph with the basic functionality.
  * Can connect to other nodes via edges and contains the geographically placement on a plain.
  */
 public abstract class Node {
 
-    /**
-     * unique identifier of the node
-     */
-    final int id;
-
-    /**
-     * autonomous system this node belongs to
-     */
-    final AS as;
-
-    /**
-     * list of edges associated with the node
-     */
-    final List<Edge> edges;
+    final NodeAttributes attributes;
 
     /**
      * emulation config for this node
      */
-    EmulationSettings emulationSettings;
+    private EmulationSettings emulationSettings;
 
-    /**
-     * Creates a node of the graph with the initial parameter given.
-     *
-     * @param id unique identifier
-     * @param as autonomous system the belongs to
-     */
-    Node(int id, AS as) {
-        this.id = id;
-        this.as = as;
-        edges = new ArrayList<>();
+    Node(NodeAttributes attributes) {
+        this.attributes = attributes;
+        this.attributes.setNode(this);
     }
 
     /**
@@ -79,7 +58,7 @@ public abstract class Node {
      * @return unique identifier
      */
     public int getID() {
-        return id;
+        return attributes.id;
     }
 
     /**
@@ -88,7 +67,7 @@ public abstract class Node {
      * @return list of the node's edges
      */
     public List<Edge> getEdges() {
-        return edges;
+        return attributes.edges;
     }
 
     /**
@@ -98,13 +77,15 @@ public abstract class Node {
      */
     public abstract String getName();
 
+    public abstract NodeType getType();
+
     /**
      * Returns the edge degree of the node.
      *
      * @return number of edges associated with the node
      */
     public int getDegree() {
-        return edges.size();
+        return getEdges().size();
     }
 
     /**
@@ -113,7 +94,7 @@ public abstract class Node {
      * @return node's AS
      */
     public AS getAS() {
-        return as;
+        return attributes.as;
     }
 
     /**
@@ -125,34 +106,6 @@ public abstract class Node {
         return emulationSettings != null;
     }
 
-    /**
-     * Converts and replaces this node with a backbone node.
-     *
-     * @return the newly converted backbone node
-     */
-    public BackboneNode convertToBackboneNode() {
-        return BackboneNodeConverter.convertToBackbone(this);
-    }
-
-    /**
-     * Converts and replaces this node with a edge node.
-     *
-     * @return the newly converted edge node
-     */
-    public EdgeNode convertToEdgeNode() {
-        return EdgeNodeConverter.convertToEdgeNode(this);
-    }
-
-    /**
-     * Converts and replaces this node with a edge device node.
-     *
-     * @param emulationSettings emulation config to use to create a new edge device node
-     * @return the newly converted edge device node
-     */
-    public EdgeDeviceNode convertToEdgeDeviceNode(EmulationSettings emulationSettings) {
-        return EdgeDeviceNodeConverter.convertToEdgeDeviceNode(this, emulationSettings);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Node)) {
@@ -161,12 +114,12 @@ public abstract class Node {
 
         Node other = (Node) o;
 
-        return id == other.id;
+        return attributes.equals(other.attributes);
     }
 
     @Override
     public int hashCode() {
-        return Integer.hashCode(id);
+        return attributes.hashCode();
     }
 
     @Override
@@ -174,41 +127,7 @@ public abstract class Node {
         return getName();
     }
 
-    /**
-     * Adds an edge to the array of edges associated with this node. Grows the array by one to add an edge.
-     *
-     * @param edge edge to add to node
-     */
-    void addEdge(Edge edge) {
-        edges.add(edge);
-    }
-
-    /**
-     * Copies the fields {@link #copyFields(Node)} from the old node and updates the references of
-     * the associated connections to match the new node instance.
-     *
-     * @param oldNode old node to copy fields from
-     */
-    void copyFromOldNode(Node oldNode) {
-        copyFields(oldNode);
-
-        // update the edges
-        for (Edge e : edges) {
-            if (e.getSource().equals(oldNode)) {
-                e.setSource(this);
-            } else {
-                e.setDestination(this);
-            }
-        }
-    }
-
-    /**
-     * Copies the required fields from the old node.
-     *
-     * @param oldNode old node to copy fields from
-     */
-    protected void copyFields(Node oldNode) {
-        edges.addAll(oldNode.edges);
-        emulationSettings = oldNode.emulationSettings;
+    void setEmulationSettings(EmulationSettings settings) {
+        emulationSettings = settings;
     }
 }

@@ -158,7 +158,7 @@ public class AS {
      * @param e edge node to add
      */
     void addEdgeNode(EdgeNode e) {
-        edgeNodes.put(e.id, e);
+        edgeNodes.put(e.getID(), e);
     }
 
     /**
@@ -167,7 +167,7 @@ public class AS {
      * @param b backbone node to add
      */
     void addBackboneNode(BackboneNode b) {
-        backboneNodes.put(b.id, b);
+        backboneNodes.put(b.getID(), b);
     }
 
     /**
@@ -176,7 +176,7 @@ public class AS {
      * @param d edge device node to add
      */
     void addDevice(EdgeDeviceNode d) {
-        edgeDeviceNodes.put(d.id, d);
+        edgeDeviceNodes.put(d.getID(), d);
     }
 
     /**
@@ -186,13 +186,13 @@ public class AS {
      * @return true if node could be deleted, false if not
      */
     boolean removeNode(Node node) {
-        boolean result = edgeNodes.remove(node.id) != null;
+        boolean result = edgeNodes.remove(node.getID()) != null;
 
         if (!result) {
-            result = backboneNodes.remove(node.id) != null;
+            result = backboneNodes.remove(node.getID()) != null;
         }
         if (!result) {
-            result = edgeDeviceNodes.remove(node.id) != null;
+            result = edgeDeviceNodes.remove(node.getID()) != null;
         }
 
         return result;

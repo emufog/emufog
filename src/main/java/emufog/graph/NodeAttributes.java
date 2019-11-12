@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2018 emufog contributors
+ * Copyright (c) 2019 emufog contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,32 +23,62 @@
  */
 package emufog.graph;
 
-/**
- * This class convert an existing node to a backbone node in the graph.
- */
-public class BackboneNodeConverter extends NodeConverter<BackboneNode> {
+import java.util.ArrayList;
+import java.util.List;
 
-    private static final BackboneNodeConverter INSTANCE = new BackboneNodeConverter();
-
-    @Override
-    BackboneNode createNewNode(Node oldNode) {
-        return new BackboneNode(oldNode.attributes);
-    }
-
-    @Override
-    void addNodeToGraph(BackboneNode newNode) {
-        newNode.getAS().addBackboneNode(newNode);
-    }
+class NodeAttributes {
 
     /**
-     * Converts an arbitrary node to a backbone node. If the node is already a backbone node
-     * it will just be returned. Otherwise the old node will be removed from the AS and
-     * replaced by the new node.
-     *
-     * @param oldNode old node to replace by a backbone node
-     * @return newly created backbone node instance
+     * unique identifier of the node
      */
-    public static BackboneNode convertToBackbone(Node oldNode) {
-        return INSTANCE.convert(oldNode);
+    final int id;
+
+    /**
+     * autonomous system this node belongs to
+     */
+    final AS as;
+
+    /**
+     * list of edges associated with the node
+     */
+    final List<Edge> edges;
+
+    /**
+     * the node object tied to the unique id
+     */
+    private Node node;
+
+    NodeAttributes(int id, AS as) {
+        this.id = id;
+        this.as = as;
+        edges = new ArrayList<>();
+    }
+
+    Node getNode() {
+        return node;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof NodeAttributes)) {
+            return false;
+        }
+
+        NodeAttributes other = (NodeAttributes) o;
+
+        return id == other.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(id);
+    }
+
+    void addEdge(Edge e) {
+        edges.add(e);
+    }
+
+    void setNode(Node node) {
+        this.node = node;
     }
 }
