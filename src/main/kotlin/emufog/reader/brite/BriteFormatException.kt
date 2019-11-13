@@ -21,19 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.reader;
+package emufog.reader.brite
+
+import emufog.reader.TopologyFormatException
 
 /**
- * This exception represents all format mismatches while parsing
- * the input files.
+ * This exception represents an error if the parsed file does not match the format defined in
+ * https://www.cs.bu.edu/brite/user_manual/node29.html.
  */
-public class TopologyFormatException extends RuntimeException {
+class BriteFormatException : TopologyFormatException {
 
-    public TopologyFormatException(String message) {
-        super(message);
-    }
+    internal constructor(message: String) : super(message)
 
-    public TopologyFormatException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    internal constructor(message: String, cause: Throwable) : super(message, cause)
 }

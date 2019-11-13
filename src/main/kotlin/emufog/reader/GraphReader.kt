@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2019 emufog contributors
+ * Copyright (c) 2018 emufog contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,21 +21,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.reader.brite;
+package emufog.reader
 
-import emufog.reader.TopologyFormatException;
+import emufog.graph.Graph
+import java.io.IOException
+import java.nio.file.Path
 
-/**
- * This exception represents an error if the parsed file does not match the
- * format defined in https://www.cs.bu.edu/brite/user_manual/node29.html.
- */
-public class BriteFormatException extends TopologyFormatException {
+interface GraphReader {
 
-    BriteFormatException(String message) {
-        super(message);
-    }
-
-    BriteFormatException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    /**
+     * Reads in the given list of files, parses the content and constructs a [Graph] object based
+     * on the file format. Returns the newly created instance.
+     *
+     * @param files list of files to read in
+     * @return the read in graph structure
+     * @throws IOException              throws exception in case there is a problem with reading in
+     * the respective file
+     * @throws IllegalArgumentException throws exception if given file list is invalid
+     * @throws TopologyFormatException  throws exception if the format does not match
+     */
+    @Throws(IOException::class, IllegalArgumentException::class, TopologyFormatException::class)
+    fun readGraph(files: List<Path>): Graph
 }
