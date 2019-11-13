@@ -26,6 +26,7 @@ package emufog.config
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import emufog.container.DeviceType
 import emufog.container.FogType
 import emufog.util.StringUtils.nullOrEmpty
@@ -74,7 +75,7 @@ class Config internal constructor(
             require(matcher.matches(path)) { "The file ending does not match .yaml." }
 
             // parse YAML document to a java object
-            val mapper = ObjectMapper(YAMLFactory())
+            val mapper = ObjectMapper(YAMLFactory()).registerKotlinModule()
             val config = mapper.readValue(path.toFile(), Config::class.java)
                 ?: throw IOException("Failed to parse the YAML file: $path")
             this.config = config
