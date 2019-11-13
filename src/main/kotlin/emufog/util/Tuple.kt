@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2019 emufog contributors
+ * Copyright (c) 2018 emufog contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,37 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.util;
+package emufog.util
 
-import org.junit.jupiter.api.Test;
+/**
+ * This class represents a generic tuple consisting of a key and a value. The
+ * property key is used to identify the instance for the [equals] and the
+ * [hashCode] functions.
+ *
+ * @constructor initializes the tuple with the given key and value
+ *
+ * @property key key or first element of the tuple
+ * @property value value or second element of the tuple
+ */
+data class Tuple<K, V>(var key: K, var value: V) {
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+    override fun equals(other: Any?): Boolean {
+        if (other === this) {
+            return true
+        }
+        if (other !is Tuple<*, *>) {
+            return false
+        }
 
-class StringUtilsTest {
-
-    @Test
-    void nullString() {
-        assertTrue(StringUtils.INSTANCE.nullOrEmpty(null));
+        return key == other.key
     }
 
-    @Test
-    void emptyString() {
-        assertTrue(StringUtils.INSTANCE.nullOrEmpty(""));
+    override fun hashCode(): Int {
+        return key.hashCode()
     }
 
-    @Test
-    void multiSpaceString() {
-        assertTrue(StringUtils.INSTANCE.nullOrEmpty("  "));
-    }
-
-    @Test
-    void someString() {
-        assertFalse(StringUtils.INSTANCE.nullOrEmpty("hello world"));
-    }
-
-    @Test
-    void tabString() {
-        assertTrue(StringUtils.INSTANCE.nullOrEmpty("\t"));
+    override fun toString(): String {
+        return "Tuple: <${key.toString()}, ${value.toString()}>"
     }
 }

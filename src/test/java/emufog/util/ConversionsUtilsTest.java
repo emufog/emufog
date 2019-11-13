@@ -24,6 +24,7 @@
 package emufog.util;
 
 import org.junit.jupiter.api.Test;
+import emufog.util.ConversionsUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -31,49 +32,49 @@ class ConversionsUtilsTest {
 
     @Test
     void formatLongIntervalZeroStart() {
-        String s = ConversionsUtils.formatTimeInterval(0, 4900000000000L);
+        String s = ConversionsUtils.INSTANCE.formatTimeInterval(0, 4900000000000L);
         assertEquals("1h 21min 40s 0ms", s);
     }
 
     @Test
     void formatLongIntervalNonZeroStart() {
-        String s = ConversionsUtils.formatTimeInterval(42, 4900000000042L);
+        String s = ConversionsUtils.INSTANCE.formatTimeInterval(42, 4900000000042L);
         assertEquals("1h 21min 40s 0ms", s);
     }
 
     @Test
     void formatMin() {
-        String s = ConversionsUtils.formatTimeInterval(0, 2520000000000L);
+        String s = ConversionsUtils.INSTANCE.formatTimeInterval(0, 2520000000000L);
         assertEquals("42min 0s 0ms", s);
     }
 
     @Test
     void formatSec() {
-        String s = ConversionsUtils.formatTimeInterval(0, 5000000000L);
+        String s = ConversionsUtils.INSTANCE.formatTimeInterval(0, 5000000000L);
         assertEquals("5s 0ms", s);
     }
 
     @Test
     void formatMilliSec() {
-        String s = ConversionsUtils.formatTimeInterval(0, 124000000L);
+        String s = ConversionsUtils.INSTANCE.formatTimeInterval(0, 124000000L);
         assertEquals("124ms", s);
     }
 
     @Test
     void formatEmptyInterval() {
-        String s = ConversionsUtils.formatTimeInterval(0, 0);
+        String s = ConversionsUtils.INSTANCE.formatTimeInterval(0, 0);
         assertEquals("0ms", s);
     }
 
     @Test
     void formatBelowOneMs() {
-        String s = ConversionsUtils.formatTimeInterval(0, 999);
+        String s = ConversionsUtils.INSTANCE.formatTimeInterval(0, 999);
         assertEquals("0ms", s);
     }
 
     @Test
     void formatNegativeInterval() {
-        String s = ConversionsUtils.formatTimeInterval(123456789, 1);
+        String s = ConversionsUtils.INSTANCE.formatTimeInterval(123456789, 1);
         assertEquals("0ms", s);
     }
 }
