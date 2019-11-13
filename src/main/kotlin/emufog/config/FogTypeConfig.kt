@@ -21,28 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.config;
+package emufog.config
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty
 
 /**
- * Docker type for host devices extending the abstract container type with scaling
- * factor and the device count.
+ * Container type for fog nodes with their respective dependencies and properties for
+ * the placement algorithm.
  */
-class DeviceTypeConfig extends ContainerTypeConfig {
-
-    final int scalingFactor;
-
-    final int averageDeviceCount;
-
-    public DeviceTypeConfig(
-        @JsonProperty("container-image") ContainerNameConfig containerImage,
-        @JsonProperty("memory-limit") int memoryLimit,
-        @JsonProperty("cpu-share") float cpuShare,
-        @JsonProperty("scaling-factor") int scalingFactor,
-        @JsonProperty("average-device-count") int averageDeviceCount) {
-        super(containerImage, memoryLimit, cpuShare);
-        this.scalingFactor = scalingFactor;
-        this.averageDeviceCount = averageDeviceCount;
-    }
-}
+internal class FogTypeConfig(
+    @JsonProperty("container-image") containerImage: ContainerNameConfig,
+    @JsonProperty("memory-limit") memoryLimit: Int,
+    @JsonProperty("cpu-share") cpuShare: Float,
+    @JsonProperty("maximum-connections") val maximumConnections: Int,
+    @JsonProperty("costs") val costs: Float
+) : ContainerTypeConfig(containerImage, memoryLimit, cpuShare)

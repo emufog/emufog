@@ -21,21 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.config;
+package emufog.config
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty
 
 /**
- * Name of a container consisting of the name of the image and the version to use.
+ * Abstract container type class for host devices and fog nodes.
  */
-class ContainerNameConfig {
-
-    final String name;
-
-    final String version;
-
-    ContainerNameConfig(@JsonProperty("name") String name, @JsonProperty("version") String version) {
-        this.name = name;
-        this.version = version;
-    }
-}
+internal open class ContainerTypeConfig(
+    @JsonProperty("container-image") val containerImage: ContainerNameConfig,
+    @JsonProperty("memory-limit") val memoryLimit: Int,
+    @JsonProperty("cpu-share") val cpuShare: Float
+)

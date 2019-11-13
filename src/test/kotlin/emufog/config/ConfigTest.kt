@@ -21,28 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.config;
+package emufog.config
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
+import java.nio.file.Paths
 
-/**
- * Container type for fog nodes with their respective dependencies and properties for
- * the placement algorithm.
- */
-class FogTypeConfig extends ContainerTypeConfig {
+internal class ConfigTest {
 
-    final int maximumConnections;
+    @Test
+    fun `test a not yaml file`() {
+        Assertions.assertThrows(IllegalArgumentException::class.java) { Config.updateConfig(Paths.get("file.txt")) }
+    }
 
-    final float costs;
-
-    FogTypeConfig(
-        @JsonProperty("container-image") ContainerNameConfig containerImage,
-        @JsonProperty("memory-limit") int memoryLimit,
-        @JsonProperty("cpu-share") float cpuShare,
-        @JsonProperty("maximum-connections") int maximumConnections,
-        @JsonProperty("costs") float costs) {
-        super(containerImage, memoryLimit, cpuShare);
-        this.maximumConnections = maximumConnections;
-        this.costs = costs;
+    @Test
+    fun `test a directory`() {
+        Assertions.assertThrows(IllegalArgumentException::class.java) { Config.updateConfig(Paths.get(".")) }
     }
 }
