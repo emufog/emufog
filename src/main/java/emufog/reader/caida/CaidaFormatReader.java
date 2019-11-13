@@ -114,7 +114,7 @@ public class CaidaFormatReader implements GraphReader {
 
         nodeCoordinates = new HashMap<>();
 
-        Graph graph = new Graph(Config.getConfig());
+        Graph graph = new Graph(Config.Companion.getConfig());
 
         // read in the nodes
         Files.lines(nodesFile, CHARSET).forEach(this::processNodeLine);

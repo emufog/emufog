@@ -97,7 +97,7 @@ public class Emufog {
 
         // read in the config file
         try {
-            Config.updateConfig(arguments.configPath);
+            Config.Companion.updateConfig(arguments.configPath);
         } catch (Exception e) {
             LOG.error("Failed to read in the configuration file: {}", arguments.configPath, e);
             return;
