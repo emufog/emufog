@@ -162,7 +162,7 @@ public class BriteFormatReader implements GraphReader {
             throw new IllegalArgumentException("The BRITE reader only supports one input file.");
         }
 
-        Graph graph = new Graph(Config.getConfig());
+        Graph graph = new Graph(Config.Companion.getConfig());
 
         BufferedReader reader = Files.newBufferedReader(files.get(0));
 
