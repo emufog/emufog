@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2018 emufog contributors
+ * Copyright (c) 2019 emufog contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,24 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.reader;
+package emufog.reader
 
-import emufog.graph.Graph;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.List;
+/**
+ * This exception represents all format mismatches while parsing the input files.
+ */
+open class TopologyFormatException : RuntimeException {
 
-public interface GraphReader {
+    constructor(message: String) : super(message)
 
-    /**
-     * Reads in the given list of files, parses the content and constructs a {@link Graph} object based on the file
-     * format. Returns the newly created instance.
-     *
-     * @param files list of files to read in
-     * @return the read in graph structure
-     * @throws IOException              throws exception in case there is a problem with reading in the respective file
-     * @throws IllegalArgumentException throws exception if given file list is invalid
-     * @throws TopologyFormatException  throws exception if the format does not match
-     */
-    Graph readGraph(List<Path> files) throws IOException, IllegalArgumentException, TopologyFormatException;
+    constructor(message: String, cause: Throwable) : super(message, cause)
 }
