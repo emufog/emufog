@@ -21,26 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.config;
+package emufog.config
 
-import java.nio.file.Paths;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import com.fasterxml.jackson.annotation.JsonProperty
 
-class ConfigTest {
-
-    @Test
-    void updateNullPath() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> Config.updateConfig(null));
-    }
-
-    @Test
-    void testNotYamlFile() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> Config.updateConfig(Paths.get("file.txt")));
-    }
-
-    @Test
-    void testDirectory() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> Config.updateConfig(Paths.get(".")));
-    }
-}
+/**
+ * Docker type for host devices extending the abstract container type with scaling
+ * factor and the device count.
+ */
+internal class DeviceTypeConfig(
+    @JsonProperty("container-image") containerImage: ContainerNameConfig,
+    @JsonProperty("memory-limit") memoryLimit: Int,
+    @JsonProperty("cpu-share") cpuShare: Float,
+    @param:JsonProperty("scaling-factor") val scalingFactor: Int,
+    @param:JsonProperty("average-device-count") val averageDeviceCount: Int
+) : ContainerTypeConfig(containerImage, memoryLimit, cpuShare)
