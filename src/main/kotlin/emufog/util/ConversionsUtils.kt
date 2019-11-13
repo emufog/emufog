@@ -21,47 +21,49 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.util;
+package emufog.util
 
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit
+import kotlin.math.max
 
-public class ConversionsUtils {
+object ConversionsUtils {
 
     /**
-     * Converts an interval of start and endpoint in nanoseconds to a
-     * string representing the duration in the format e.g. '1h 1min 1s 1ms'.
-     * Leading 0's will be dropped except for '0ms'. A negative interval will
-     * set to duration 0ns.
+     * Converts an interval of start and endpoint in nanoseconds to a string
+     * representing the duration in the format e.g. '1h 1min 1s 1ms'. Leading
+     * 0's will be dropped except for '0ms'. A negative interval will set to
+     * duration 0ns.
      *
      * @param start start point of the interval in ns
      * @param end   end point of the interval in ns
      * @return string representation of the interval to print
      */
-    public static String formatTimeInterval(long start, long end) {
-        long duration = Math.max(end - start, 0);
-        StringBuilder sb = new StringBuilder();
-        boolean started = false;
+    @JvmStatic
+    fun formatTimeInterval(start: Long, end: Long): String {
+        val duration = max(end - start, 0)
+        val sb = StringBuilder()
+        var started = false
 
-        long hours = TimeUnit.HOURS.convert(duration, TimeUnit.NANOSECONDS);
+        val hours = TimeUnit.HOURS.convert(duration, TimeUnit.NANOSECONDS)
         if (hours > 0) {
-            sb.append(hours).append("h ");
-            started = true;
+            sb.append(hours).append("h ")
+            started = true
         }
 
-        long minutes = TimeUnit.MINUTES.convert(duration, TimeUnit.NANOSECONDS) % 60;
+        val minutes = TimeUnit.MINUTES.convert(duration, TimeUnit.NANOSECONDS) % 60
         if (started || minutes > 0) {
-            sb.append(minutes).append("min ");
-            started = true;
+            sb.append(minutes).append("min ")
+            started = true
         }
 
-        long seconds = TimeUnit.SECONDS.convert(duration, TimeUnit.NANOSECONDS) % 60;
+        val seconds = TimeUnit.SECONDS.convert(duration, TimeUnit.NANOSECONDS) % 60
         if (started || seconds > 0) {
-            sb.append(seconds).append("s ");
+            sb.append(seconds).append("s ")
         }
 
-        long milliseconds = TimeUnit.MILLISECONDS.convert(duration, TimeUnit.NANOSECONDS) % 1000;
-        sb.append(milliseconds).append("ms");
+        val milliseconds = TimeUnit.MILLISECONDS.convert(duration, TimeUnit.NANOSECONDS) % 1000
+        sb.append(milliseconds).append("ms")
 
-        return sb.toString();
+        return sb.toString()
     }
 }

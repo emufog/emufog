@@ -1,31 +1,44 @@
-apply plugin: 'java'
-apply plugin: 'application'
+buildscript {
+    ext.kotlin_version = "1.3.50"
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+apply plugin: "kotlin"
+apply plugin: "application"
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    compile 'info.picocli:picocli:4.0.0'
-    compile 'org.slf4j:slf4j-api:1.7.26'
-    compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.9'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.9.9.1'
+    implementation "info.picocli:picocli:4.0.0"
+    implementation "org.slf4j:slf4j-api:1.7.26"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.9"
+    implementation "com.fasterxml.jackson.core:jackson-databind:2.9.9.1"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
-    runtime 'ch.qos.logback:logback-classic:1.2.3'
+    runtime "ch.qos.logback:logback-classic:1.2.3"
 
-    testCompile 'org.junit.jupiter:junit-jupiter:5.5.2'
+    testImplementation "org.junit.jupiter:junit-jupiter:5.5.2"
 }
 
-mainClassName = 'emufog.Emufog'
+mainClassName = "emufog.Emufog"
 
-version = '1.0'
+version = "1.0"
 
 jar {
     manifest {
         attributes(
-                'Implementation-Title': 'EmuFog',
-                'Implementation-Version': version,
-                'Main-Class': 'emufog.Emufog'
+                "Implementation-Title": "EmuFog",
+                "Implementation-Version": version,
+                "Main-Class": "emufog.Emufog"
         )
     }
 
@@ -36,4 +49,15 @@ jar {
 
 test {
     useJUnitPlatform()
+}
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }

@@ -96,7 +96,10 @@ class BackboneWorker {
      */
     private void convertHighDegrees() {
         double averageDegree = calculateAverageDegree() * BACKBONE_DEGREE_PERCENTAGE;
-        List<EdgeNode> toConvert = as.getEdgeNodes().stream().filter(r -> r.getDegree() >= averageDegree).collect(Collectors.toList());
+        List<EdgeNode> toConvert = as.getEdgeNodes()
+            .stream()
+            .filter(r -> r.getDegree() >= averageDegree)
+            .collect(Collectors.toList());
         for (EdgeNode e : toConvert) {
             BackboneNodeConverter.convertToBackbone(e);
         }

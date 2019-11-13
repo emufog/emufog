@@ -21,17 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.util;
+package emufog.util
 
-public class StringUtils {
+object StringUtils {
 
     /**
-     * Checks if the given string is either {@code null} or white spaces only.
+     * Checks if the given string is either `null` or white spaces only.
      *
      * @param s string to check
-     * @return true if the string is either {@code null} or empty
+     * @return `true` if the string is either `null` or empty
      */
-    public static boolean nullOrEmpty(String s) {
-        return s == null || s.trim().isEmpty();
-    }
+    @JvmStatic
+    fun nullOrEmpty(s: String?): Boolean = s.isNullOrBlank()
 }
