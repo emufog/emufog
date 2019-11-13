@@ -21,37 +21,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.util;
+package emufog.util
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Test
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 
-class StringUtilsTest {
+internal class StringUtilsTest {
 
     @Test
-    void nullString() {
-        assertTrue(StringUtils.INSTANCE.nullOrEmpty(null));
+    fun `check for null string`() {
+        assertTrue(StringUtils.nullOrEmpty(null))
     }
 
     @Test
-    void emptyString() {
-        assertTrue(StringUtils.INSTANCE.nullOrEmpty(""));
+    fun `check for empty string`() {
+        assertTrue(StringUtils.nullOrEmpty(""))
     }
 
     @Test
-    void multiSpaceString() {
-        assertTrue(StringUtils.INSTANCE.nullOrEmpty("  "));
+    fun `check for multi character empty string`() {
+        assertTrue(StringUtils.nullOrEmpty("  "))
     }
 
     @Test
-    void someString() {
-        assertFalse(StringUtils.INSTANCE.nullOrEmpty("hello world"));
+    fun `check for arbitrary string`() {
+        assertFalse(StringUtils.nullOrEmpty("hello world"))
     }
 
     @Test
-    void tabString() {
-        assertTrue(StringUtils.INSTANCE.nullOrEmpty("\t"));
+    fun `check tab character string`() {
+        assertTrue(StringUtils.nullOrEmpty("\t"))
     }
 }
