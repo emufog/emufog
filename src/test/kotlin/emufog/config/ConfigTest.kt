@@ -31,11 +31,15 @@ internal class ConfigTest {
 
     @Test
     fun `test a not yaml file`() {
-        Assertions.assertThrows(IllegalArgumentException::class.java) { Config.updateConfig(Paths.get("file.txt")) }
+        Assertions.assertThrows(IllegalArgumentException::class.java) {
+            Config.updateConfig(Paths.get("file.txt"))
+        }
     }
 
     @Test
     fun `test a directory`() {
-        Assertions.assertThrows(IllegalArgumentException::class.java) { Config.updateConfig(Paths.get(".")) }
+        Assertions.assertThrows(IllegalArgumentException::class.java) {
+            Config.updateConfig(Paths.get("."))
+        }
     }
 }
