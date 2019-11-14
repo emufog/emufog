@@ -23,7 +23,7 @@
  */
 package emufog.fog;
 
-import emufog.container.FogType;
+import emufog.container.FogContainer;
 import emufog.graph.Node;
 
 /**
@@ -40,7 +40,7 @@ public class FogNodePlacement {
     /**
      * type of the fog node
      */
-    private final FogType type;
+    private final FogContainer type;
 
     /**
      * Creates a new placement based on the given node and the associated
@@ -67,7 +67,7 @@ public class FogNodePlacement {
      *
      * @return fog node type to use
      */
-    public FogType getType() {
+    public FogContainer getType() {
         return type;
     }
 }

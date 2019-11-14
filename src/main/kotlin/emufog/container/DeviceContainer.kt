@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2019 emufog contributors
+ * Copyright (c) 2018 emufog contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,18 +21,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.config
-
-import com.fasterxml.jackson.annotation.JsonProperty
+package emufog.container
 
 /**
- * Docker type for host devices extending the abstract container type with scaling factor and the
- * device count.
+ * This container image represents a host device connected to an edge node router. By using the
+ * scaling factor you can simulate a higher load of multiple devices. Will be distributed based on
+ * the average count per router.
+ *
+ * @property name name of container image to deploy
+ * @property tag version tag of container image to deploy
+ * @property memoryLimit upper limit of memory to use in Bytes
+ * @property cpuShare share of the sum of available computing resources
+ * @property scalingFactor scaling factor of this container image, factor `>= 1`
+ * @property averageDeviceCount average number of devices of this image deployed to each edge node
  */
-internal class DeviceTypeConfig(
-    @JsonProperty("container-image") containerImage: ContainerNameConfig,
-    @JsonProperty("memory-limit") memoryLimit: Int,
-    @JsonProperty("cpu-share") cpuShare: Float,
-    @JsonProperty("scaling-factor") val scalingFactor: Int?,
-    @JsonProperty("average-device-count") val averageDeviceCount: Float
-) : ContainerTypeConfig(containerImage, memoryLimit, cpuShare)
+data class DeviceContainer(
+    override val name: String,
+    override val tag: String,
+    override val memoryLimit: Int,
+    override val cpuShare: Float,
+    val scalingFactor: Int,
+    val averageDeviceCount: Float
+) : Container

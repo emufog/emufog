@@ -23,8 +23,8 @@
  */
 package emufog.graph;
 
-import emufog.container.ContainerType;
-import emufog.container.DeviceType;
+import emufog.container.Container;
+import emufog.container.DeviceContainer;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,7 +36,7 @@ class EmulationSettingsTest {
     void testNullInit() {
         EmulationSettings settings = new EmulationSettings(null, null);
         assertNull(settings.getIP());
-        assertNull(settings.getContainerType());
+        assertNull(settings.getContainer());
     }
 
     @Test
@@ -47,12 +47,12 @@ class EmulationSettingsTest {
 
     @Test
     void testInit() {
-        ContainerType container = new DeviceType("name", 1, 1.4F, 1024, 2.4F);
+        Container container = new DeviceContainer("name", "latest", 1024, 2.4F, 1, 1.4F);
         EmulationSettings settings = new EmulationSettings("1.2.3.4", container);
         assertEquals("1.2.3.4", settings.getIP());
-        ContainerType actual = settings.getContainerType();
-        assertEquals("name", actual.name);
-        assertEquals(1024, actual.memoryLimit);
-        assertEquals(2.4F, actual.cpuShare);
+        Container actual = settings.getContainer();
+        assertEquals("name", actual.getName());
+        assertEquals(1024, actual.getMemoryLimit());
+        assertEquals(2.4F, actual.getCpuShare());
     }
 }

@@ -23,7 +23,7 @@
  */
 package emufog.fog;
 
-import emufog.container.FogType;
+import emufog.container.FogContainer;
 import emufog.graph.Node;
 import emufog.util.Tuple;
 import java.util.ArrayList;
@@ -65,7 +65,7 @@ class BaseNode {
     /**
      * the fog type with the optimal costs, device count ration
      */
-    private FogType type;
+    private FogContainer type;
 
     /**
      * number of devices covered by this node
@@ -104,7 +104,7 @@ class BaseNode {
      *
      * @return fog type associated
      */
-    FogType getType() {
+    FogContainer getType() {
         return type;
     }
 
@@ -158,7 +158,7 @@ class BaseNode {
      * @return average deployment costs
      */
     float getAverageDeploymentCosts() {
-        return type.costs / coveredCount;
+        return type.getCosts() / coveredCount;
     }
 
     /**
@@ -202,12 +202,12 @@ class BaseNode {
 
     /**
      * Finds a new optimal fog type for this node. Optimal solutions are calculated
-     * by the ratio of {@link FogType#costs} and the number of connections to that node.
+     * by the ratio of {@link FogContainer#costs} and the number of connections to that node.
      * Updates the {@link #modified} to {@code false} once set.
      *
      * @param fogTypes collection of possible fog types to assign
      */
-    void findFogType(Collection<FogType> fogTypes) {
+    void findFogType(Collection<FogContainer> fogTypes) {
         // skip reassigning on non modified nodes
         if (!modified) {
             return;
@@ -222,13 +222,13 @@ class BaseNode {
             deviceCount += n.getDeviceCount();
         }
 
-        for (FogType fogType : fogTypes) {
-            int connections = Math.min(deviceCount, fogType.maxClients);
+        for (FogContainer fogType : fogTypes) {
+            int connections = Math.min(deviceCount, fogType.getMaxClients());
 
-            if ((fogType.costs / connections) < costsPerConnection) {
+            if ((fogType.getCosts() / connections) < costsPerConnection) {
                 type = fogType;
                 coveredCount = connections;
-                costsPerConnection = type.costs / connections;
+                costsPerConnection = type.getCosts() / connections;
             }
         }
         LOG.debug("Set the fog type for {} to {}", node, type);

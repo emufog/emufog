@@ -24,7 +24,7 @@
 package emufog.export;
 
 import emufog.config.Config;
-import emufog.container.ContainerType;
+import emufog.container.Container;
 import emufog.graph.Edge;
 import emufog.graph.EmulationSettings;
 import emufog.graph.Graph;
@@ -137,13 +137,13 @@ public class MaxiNetExporter implements GraphExporter {
 
         graph.getNodes().stream().filter(Node::hasEmulationSettings).forEach(n -> {
             EmulationSettings emu = n.getEmulationNode();
-            ContainerType container = emu.getContainerType();
+            Container container = emu.getContainer();
             lines.add(String.format("%s = topo.addHost(\"%s\", cls=Docker, ip=\"%s\", dimage=\"%s\", mem_limit=%d)",
                 n.getName(),
                 n.getName(),
                 emu.getIP(),
-                container.name,
-                container.memoryLimit));
+                container.getName(),
+                container.getMemoryLimit()));
         });
     }
 

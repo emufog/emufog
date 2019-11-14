@@ -24,8 +24,8 @@
 package emufog.graph;
 
 import emufog.config.Config;
-import emufog.container.DeviceType;
-import emufog.container.FogType;
+import emufog.container.DeviceContainer;
+import emufog.container.FogContainer;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -264,7 +264,7 @@ public class Graph {
      * @return the newly created edge device
      * @throws IllegalArgumentException thrown if the ID is already in use or as or image is {@code null}
      */
-    public EdgeDeviceNode createEdgeDeviceNode(int id, AS as, DeviceType image) throws IllegalArgumentException {
+    public EdgeDeviceNode createEdgeDeviceNode(int id, AS as, DeviceContainer image) throws IllegalArgumentException {
         if (image == null) {
             throw new IllegalArgumentException("The given container image is not initialized.");
         }
@@ -308,10 +308,10 @@ public class Graph {
 
         //TODO fix scaling factor
         if (from instanceof EdgeNode && to instanceof EdgeDeviceNode) {
-            ((EdgeNode) from).incrementDeviceCount(((EdgeDeviceNode) to).getContainerType().scalingFactor);
+            ((EdgeNode) from).incrementDeviceCount(((EdgeDeviceNode) to).getContainerType().getScalingFactor());
         }
         if (from instanceof EdgeDeviceNode && to instanceof EdgeNode) {
-            ((EdgeNode) to).incrementDeviceCount(((EdgeDeviceNode) from).getContainerType().scalingFactor);
+            ((EdgeNode) to).incrementDeviceCount(((EdgeDeviceNode) from).getContainerType().getScalingFactor());
         }
 
         return edge;
@@ -323,8 +323,8 @@ public class Graph {
     public void assignEdgeDevices() {
         Random random = new Random();
 
-        for (DeviceType type : config.deviceNodeTypes) {
-            float upper = Math.abs(type.averageDeviceCount) * 2;
+        for (DeviceContainer type : config.deviceNodeTypes) {
+            float upper = Math.abs(type.getAverageDeviceCount()) * 2;
 
             for (EdgeNode r : getEdgeNodes()) {
                 // random distribution within the interval from 0 to count * 2
@@ -352,7 +352,7 @@ public class Graph {
      * @throws IllegalArgumentException if the parameters are {@code null}, the graph does not
      *                                  contain the given node
      */
-    public void placeFogNode(Node node, FogType type) throws IllegalArgumentException {
+    public void placeFogNode(Node node, FogContainer type) throws IllegalArgumentException {
         if (node == null) {
             throw new IllegalArgumentException("The given node is not initialized.");
         }

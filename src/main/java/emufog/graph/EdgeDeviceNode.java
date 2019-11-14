@@ -23,7 +23,7 @@
  */
 package emufog.graph;
 
-import emufog.container.DeviceType;
+import emufog.container.DeviceContainer;
 
 /**
  * This class represents a edge device. Each edge device has a container image
@@ -52,7 +52,7 @@ public class EdgeDeviceNode extends Node {
      *
      * @return device container type
      */
-    DeviceType getContainerType() {
-        return (DeviceType) getEmulationNode().getContainerType();
+    DeviceContainer getContainerType() {
+        return (DeviceContainer) getEmulationNode().getContainer();
     }
 }

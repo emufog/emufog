@@ -27,9 +27,8 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import emufog.container.DeviceType
-import emufog.container.FogType
-import emufog.util.StringUtils.nullOrEmpty
+import emufog.container.DeviceContainer
+import emufog.container.FogContainer
 import java.io.IOException
 import java.nio.file.FileSystems
 import java.nio.file.Path
@@ -49,14 +48,14 @@ class Config internal constructor(
 ) {
 
     @JvmField
-    val deviceNodeTypes: List<DeviceType>
+    val deviceNodeTypes: List<DeviceContainer>
 
     @JvmField
-    val fogNodeTypes: List<FogType>
+    val fogNodeTypes: List<FogContainer>
 
     init {
-        this.deviceNodeTypes = deviceNodeTypes.map { mapDeviceType(it) }
-        this.fogNodeTypes = fogNodeTypes.map { mapFogType(it) }
+        this.deviceNodeTypes = deviceNodeTypes.map { mapToDeviceContainer(it) }
+        this.fogNodeTypes = fogNodeTypes.map { mapToFogContainer(it) }
     }
 
     companion object {
@@ -84,43 +83,35 @@ class Config internal constructor(
         /**
          * Maps the configuration for a fog type to an instance of the model.
          *
-         * @param f fog type emufog.config to map to an object
+         * @param config fog type emufog.config to map to an object
          * @return mapped fog type object
          */
-        private fun mapFogType(f: FogTypeConfig): FogType {
-            return if (nullOrEmpty(f.containerImage.version)) {
-                FogType(f.containerImage.name, f.maximumConnections, f.costs, f.memoryLimit, f.cpuShare)
-            } else {
-                FogType(f.containerImage.name,
-                        f.containerImage.version,
-                        f.maximumConnections,
-                        f.costs,
-                        f.memoryLimit,
-                        f.cpuShare)
-            }
+        private fun mapToFogContainer(config: FogTypeConfig): FogContainer {
+            return FogContainer(
+                config.containerImage.name,
+                config.containerImage.version ?: "latest",
+                config.memoryLimit,
+                config.cpuShare,
+                config.maximumConnections,
+                config.costs
+            )
         }
 
         /**
          * Maps the configuration for a device type to an instance of the model.
          *
-         * @param d device type emufog.config to map to an object
+         * @param config device type emufog.config to map to an object
          * @return mapped device type object
          */
-        private fun mapDeviceType(d: DeviceTypeConfig): DeviceType {
-            return if (nullOrEmpty(d.containerImage.version)) {
-                DeviceType(d.containerImage.name,
-                           d.scalingFactor,
-                           d.averageDeviceCount.toFloat(),
-                           d.memoryLimit,
-                           d.cpuShare)
-            } else {
-                DeviceType(d.containerImage.name,
-                           d.containerImage.version,
-                           d.scalingFactor,
-                           d.averageDeviceCount.toFloat(),
-                           d.memoryLimit,
-                           d.cpuShare)
-            }
+        private fun mapToDeviceContainer(config: DeviceTypeConfig): DeviceContainer {
+            return DeviceContainer(
+                config.containerImage.name,
+                config.containerImage.version ?: "latest",
+                config.memoryLimit,
+                config.cpuShare,
+                config.scalingFactor ?: 1,
+                config.averageDeviceCount
+            )
         }
     }
 }

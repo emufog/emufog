@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2019 emufog contributors
+ * Copyright (c) 2018 emufog contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,18 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.config
-
-import com.fasterxml.jackson.annotation.JsonProperty
+package emufog.container
 
 /**
- * Docker type for host devices extending the abstract container type with scaling factor and the
- * device count.
+ * This fog container image represents a fog computing node in the topology. It can serve a fixed
+ * number of clients and is associated with deployment costs
+ *
+ * @property name name of container image to deploy
+ * @property tag version tag of container image to deploy
+ * @property memoryLimit upper limit of memory to use in Bytes
+ * @property cpuShare share of the sum of available computing resources
+ * @property maxClients maximum number of clients this container can serve
+ * @property costs costs to deploy this container in the topology
  */
-internal class DeviceTypeConfig(
-    @JsonProperty("container-image") containerImage: ContainerNameConfig,
-    @JsonProperty("memory-limit") memoryLimit: Int,
-    @JsonProperty("cpu-share") cpuShare: Float,
-    @JsonProperty("scaling-factor") val scalingFactor: Int?,
-    @JsonProperty("average-device-count") val averageDeviceCount: Float
-) : ContainerTypeConfig(containerImage, memoryLimit, cpuShare)
+data class FogContainer(
+    override val name: String,
+    override val tag: String,
+    override val memoryLimit: Int,
+    override val cpuShare: Float,
+    val maxClients: Int,
+    val costs: Float
+) : Container
