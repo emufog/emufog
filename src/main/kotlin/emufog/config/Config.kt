@@ -34,7 +34,16 @@ import java.nio.file.FileSystems
 import java.nio.file.Path
 
 /**
- * Top level emufog.config object of the YAML document.
+ * Top level configuration of EmuFog based on the given .yaml file.
+ *
+ * @property baseAddress base address of the logical network to start with
+ * @property overWriteOutputFile `true` if the experiment file should be overwritten
+ * @property maxFogNodes maximum number of fog nodes that can be placed in the topology
+ * @property costThreshold the threshold of the cost function to limit the placement
+ * @property hostDeviceLatency latency to use to connect edge devices to the edge
+ * @property hostDeviceBandwidth bandwidth to use to connect edge devices to the edge
+ * @property deviceNodeTypes list of possible device containers representing an edge device
+ * @property fogNodeTypes list of possible fog node types that can be placed in the topology
  */
 class Config internal constructor(
     @JvmField @JsonProperty("base-address") val baseAddress: String,
@@ -61,13 +70,19 @@ class Config internal constructor(
     companion object {
 
         /**
-         * Returns the currently active configuration object.
-         *
-         * @return current configuration
+         * current configuration from the most recent read in
          */
         var config: Config? = null
             private set
 
+        /**
+         * Reads in the configuration from the given [path] variable. Overwrites the current
+         * configuration [config] and returns it. The path needs to point to a .yaml file.
+         *
+         * @param path path to the config .yaml file
+         * @throws IOException thrown if the read in fails
+         * @throws IllegalArgumentException if the given path is not a .yaml file
+         */
         @Throws(IOException::class)
         fun updateConfig(path: Path) {
             val matcher = FileSystems.getDefault().getPathMatcher("glob:**.yaml")

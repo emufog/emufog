@@ -23,6 +23,9 @@
  */
 package emufog.util
 
+/**
+ * Util functions for strings.
+ */
 object StringUtils {
 
     /**
