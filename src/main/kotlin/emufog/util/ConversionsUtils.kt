@@ -26,6 +26,9 @@ package emufog.util
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
 
+/**
+ * Simple util functions to format the log output.
+ */
 object ConversionsUtils {
 
     /**

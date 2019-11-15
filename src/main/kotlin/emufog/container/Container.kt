@@ -38,5 +38,8 @@ interface Container {
     val memoryLimit: Int
     val cpuShare: Float
 
-    fun string() = "$name:$tag"
+    /**
+     * Returns the full name of the container in the form of name:tag.
+     */
+    fun fullName() = "$name:$tag"
 }
