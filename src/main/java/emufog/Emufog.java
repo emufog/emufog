@@ -185,7 +185,7 @@ public class Emufog {
         String s = type.trim().toLowerCase();
         switch (s) {
             case "brite":
-                return new BriteFormatReader();
+                return BriteFormatReader.INSTANCE;
             case "caida":
                 return new CaidaFormatReader();
             default:
