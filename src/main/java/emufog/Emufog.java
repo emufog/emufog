@@ -187,7 +187,7 @@ public class Emufog {
             case "brite":
                 return BriteFormatReader.INSTANCE;
             case "caida":
-                return new CaidaFormatReader();
+                return CaidaFormatReader.INSTANCE;
             default:
                 throw new IllegalArgumentException("Unsupported Input Format: " + s);
         }

@@ -32,12 +32,26 @@ import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
-import java.util.*
 
 /**
  * This reader can read in the CAIDA topology an build a graph based on that data.
  */
-class CaidaFormatReader : GraphReader {
+object CaidaFormatReader : GraphReader {
+
+    /**
+     * Reads in a graph from a Caida dataset. Such a dataset consists of a .nodes.geo, a .nodes.as
+     * and a .links file. The list of input files need to contain those three files.
+     *
+     * @param files the list of files to read in
+     * @return read in graph object
+     */
+    @Throws(IOException::class)
+    override fun readGraph(files: List<Path>): Graph {
+        return CaidaFormatReaderImpl(files).readGraph()
+    }
+}
+
+private class CaidaFormatReaderImpl(files: List<Path>) {
 
     /* number of times AS field exceeds the Integer range */
     private var asNoInteger: Int = 0
@@ -64,39 +78,34 @@ class CaidaFormatReader : GraphReader {
     private var coordinatesNoFloats: Int = 0
 
     /* mapping from ID's to coordinates of the nodes */
-    private var nodeCoordinates: MutableMap<Int, Coordinates>? = null
+    private val nodeCoordinates: MutableMap<Int, Coordinates> = HashMap()
 
-    @Throws(IOException::class, IllegalArgumentException::class)
-    override fun readGraph(files: List<Path>): Graph {
-        val nodesFile = getFileWithEnding(files, ".nodes.geo")
+    private val nodesFile: Path
+
+    private val asFile: Path
+
+    private val linkFile: Path
+
+    private val graph = Graph(Config.config)
+
+    init {
+        nodesFile = getFileWithEnding(files, ".nodes.geo")
             ?: throw IllegalArgumentException("The given files do not contain a .nodes.geo file.")
-        val asFile = getFileWithEnding(files, ".nodes.as")
+        asFile = getFileWithEnding(files, ".nodes.as")
             ?: throw IllegalArgumentException("The given files do not contain a .nodes.as file.")
-        val linkFile = getFileWithEnding(files, ".links")
+        linkFile = getFileWithEnding(files, ".links")
             ?: throw IllegalArgumentException("The given files do not contain a .links file.")
+    }
 
-        // initialize error counts
-        asNoInteger = 0
-        coordinatesNoFloats = 0
-        idsNoInteger = 0
-        noNodeFoundForAS = 0
-        noNodeFoundForEdge = 0
-        nodeLineSkipped = 0
-        asLineSkipped = 0
-        linkLineSkipped = 0
-
-        nodeCoordinates = HashMap()
-
-        val graph = Graph(Config.config)
-
+    internal fun readGraph(): Graph {
         // read in the nodes
         nodesFile.toFile().forEachLine(CHARSET) { processNodeLine(it) }
 
         // read in the AS
-        asFile.toFile().forEachLine(CHARSET) { processASLine(graph, it) }
+        asFile.toFile().forEachLine(CHARSET) { processASLine(it) }
 
         // read in the edges
-        linkFile.toFile().forEachLine(CHARSET) { processLinkLine(graph, it) }
+        linkFile.toFile().forEachLine(CHARSET) { processLinkLine(it) }
 
         // log errors
         logResults()
@@ -114,7 +123,7 @@ class CaidaFormatReader : GraphReader {
         LOG.debug("Coordinates out of Float range: {}", coordinatesNoFloats)
         LOG.debug("Number of times no nodes were found to assign an AS: {}", noNodeFoundForAS)
         LOG.debug("Number of times no nodes were found to build an edge: {}", noNodeFoundForEdge)
-        LOG.debug("Nodes read without an AS: {}", nodeCoordinates!!.size)
+        LOG.debug("Nodes read without an AS: {}", nodeCoordinates.size)
         LOG.debug("Number of node lines skipped: {}", nodeLineSkipped)
         LOG.debug("Number of AS lines skipped: {}", asLineSkipped)
         LOG.debug("Number of link lines skipped: {}", linkLineSkipped)
@@ -123,10 +132,9 @@ class CaidaFormatReader : GraphReader {
     /**
      * Reads in an edge of the graph.
      *
-     * @param graph graph to add the edge to
-     * @param line  current line to process
+     * @param line current line to process
      */
-    private fun processLinkLine(graph: Graph, line: String) {
+    private fun processLinkLine(line: String) {
         val values = line.split(" ".toRegex())
         if (values.size < EDGE_COLUMNS) {
             LOG.debug("There are not {} columns in the link line: {}", EDGE_COLUMNS, line)
@@ -134,12 +142,9 @@ class CaidaFormatReader : GraphReader {
             return
         }
 
-        var linkStr = values[1]
-        linkStr = linkStr.substring(1, linkStr.length - 1)
-        val id: Int
-        try {
-            id = linkStr.toInt()
-        } catch (e: NumberFormatException) {
+        val linkStr = values[1].substring(1, values[1].length - 1)
+        val id = linkStr.toIntOrNull()
+        if (id == null) {
             LOG.debug("Failed to parse the link id {} to an integer.", linkStr)
             idsNoInteger++
             return
@@ -152,10 +157,8 @@ class CaidaFormatReader : GraphReader {
                 end = sourceStr.length
             }
             sourceStr = sourceStr.substring(1, end)
-            val sourceID: Int
-            try {
-                sourceID = sourceStr.toInt()
-            } catch (e: NumberFormatException) {
+            val sourceID = sourceStr.toIntOrNull()
+            if (sourceID == null) {
                 LOG.debug("Failed to parse the link's source id {} to an integer.", sourceStr)
                 idsNoInteger++
                 return
@@ -167,12 +170,12 @@ class CaidaFormatReader : GraphReader {
                 end = destinationStr.length
             }
             destinationStr = destinationStr.substring(1, end)
-            val destinationID: Int
-            try {
-                destinationID = destinationStr.toInt()
-            } catch (e: NumberFormatException) {
-                LOG.debug("Failed to parse the link's destination id {} to an integer.",
-                          destinationStr)
+            val destinationID = destinationStr.toIntOrNull()
+            if (destinationID == null) {
+                LOG.debug(
+                    "Failed to parse the link's destination id {} to an integer.",
+                    destinationStr
+                )
                 idsNoInteger++
                 return
             }
@@ -193,33 +196,30 @@ class CaidaFormatReader : GraphReader {
     /**
      * Adapts the AS field of the node identified in the current line.
      *
-     * @param graph graph to modify the nodes from
-     * @param line  current line to process
+     * @param line current line to process
      */
-    private fun processASLine(graph: Graph, line: String) {
+    private fun processASLine(line: String) {
         val values = line.split(" ".toRegex())
         if (values.size < AS_COLUMNS) {
             asLineSkipped++
-            LOG.debug("There are not {} columns in the autonomous system line: {}",
-                      AS_COLUMNS,
-                      line)
+            LOG.debug(
+                "There are not {} columns in the autonomous system line: {}",
+                AS_COLUMNS,
+                line
+            )
             return
         }
 
         val nodeStr = values[1].substring(1)
-        val id: Int
-        try {
-            id = nodeStr.toInt()
-        } catch (e: NumberFormatException) {
+        val id = nodeStr.toIntOrNull()
+        if (id == null) {
             LOG.debug("Failed to parse the id {} to an integer.", nodeStr)
             idsNoInteger++
             return
         }
 
-        val system: Int
-        try {
-            system = values[2].toInt()
-        } catch (e: NumberFormatException) {
+        val system = values[2].toIntOrNull()
+        if (system == null) {
             LOG.debug("Failed to parse the autonomous system id {} to an integer.", values[2])
             asNoInteger++
             return
@@ -241,30 +241,35 @@ class CaidaFormatReader : GraphReader {
             return
         }
 
-        var nodeStr = values[0]
-        nodeStr = nodeStr.substring(10, nodeStr.length - 1)
-        val id: Int
-        try {
-            id = nodeStr.toInt()
-        } catch (e: NumberFormatException) {
+        val nodeStr = values[0].substring(10, values[0].length - 1)
+        val id = nodeStr.toIntOrNull()
+        if (id == null) {
             LOG.debug("Failed to parse the id {} to an integer.", nodeStr)
             idsNoInteger++
             return
         }
 
         try {
-            val xPos = values[5].toFloat()
-            val yPos = values[6].toFloat()
-            nodeCoordinates!![id] = Coordinates(xPos, yPos)
+            nodeCoordinates[id] = Coordinates(values[5].toFloat(), values[6].toFloat())
         } catch (e: NumberFormatException) {
             LOG.debug("Failed to parse coordinates {} and {} to floats.", values[5], values[6])
             coordinatesNoFloats++
         }
-
     }
 
     private fun getLatency(from: Node, to: Node): Float {
-        return 1f
+        return 1F
+    }
+
+    /**
+     * Returns the path of the file matching the giving file extension at the end.
+     *
+     * @param files list of possible files
+     * @param fileExtension file extension to match
+     * @return the file of the list matching the extension or `null` if not found
+     */
+    private fun getFileWithEnding(files: List<Path>, fileExtension: String): Path? {
+        return files.firstOrNull { it.toString().endsWith(fileExtension) }
     }
 
     /**
@@ -288,16 +293,5 @@ class CaidaFormatReader : GraphReader {
         private const val AS_COLUMNS = 3
 
         private const val EDGE_COLUMNS = 4
-
-        /**
-         * Returns the path of the file matching the giving file extension at the end.
-         *
-         * @param files         list of possible files
-         * @param fileExtension file extension to match
-         * @return the file of the list matching the extension or `null` if not found
-         */
-        private fun getFileWithEnding(files: List<Path>, fileExtension: String): Path? {
-            return files.firstOrNull { it.toString().endsWith(fileExtension) }
-        }
     }
 }
