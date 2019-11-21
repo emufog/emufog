@@ -131,9 +131,9 @@ public class Emufog {
 
         // find the fog node placements
         FogResult result = new FogNodeClassifier(graph).placeFogNodes();
-        if (result.isStatus()) {
+        if (result.getStatus()) {
             for (FogNodePlacement placement : result.getPlacements()) {
-                graph.placeFogNode(placement.getNode(), placement.getType());
+                graph.placeFogNode(placement.node, placement.type);
             }
 
             GraphExporter exporter = new MaxiNetExporter();

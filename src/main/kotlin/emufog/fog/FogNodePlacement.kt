@@ -21,32 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.fog;
+package emufog.fog
 
-import java.util.Comparator;
+import emufog.container.FogContainer
+import emufog.graph.Node
 
 /**
- * This comparator compares {@link BaseNode} based on their connection costs for
- * a certain starting node. Connection costs are based on {@link BaseNode#getCosts(StartingNode)}.
+ * This class represents a placement of a fog node in the graph. The result contains the node and the type of fog node
+ * to use.
+ *
+ * @property node node where the container should be placed
+ * @property type fog container to deploy at that position
  */
-class CostComparator implements Comparator<BaseNode> {
+class FogNodePlacement internal constructor(node: BaseNode) {
 
-    /**
-     * starting node to calculate the costs for
-     */
-    private final StartingNode startingNode;
+    val node: Node = node.node
 
-    /**
-     * Creates a new connection costs comparator for the given starting node.
-     *
-     * @param node starting node to retrieve connection costs for
-     */
-    CostComparator(StartingNode node) {
-        startingNode = node;
-    }
-
-    @Override
-    public int compare(BaseNode o1, BaseNode o2) {
-        return Float.compare(o1.getCosts(startingNode), o2.getCosts(startingNode));
-    }
+    val type: FogContainer? = node.type
 }
