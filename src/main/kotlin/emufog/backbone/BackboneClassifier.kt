@@ -55,7 +55,7 @@ object BackboneClassifier {
 
         // 2nd step in parallel
         start = System.nanoTime()
-        graph.systems.parallelStream().forEach { BackboneWorker(it).identifyBackbone() }
+        graph.systems.parallelStream().forEach { BackboneWorker.identifyBackbone(it) }
         LOG.debug("Graph Step 2 - Time: {}", formatTimeInterval(start, System.nanoTime()))
         LOG.debug("Backbone Size: {}", graph.backboneNodes.size)
         LOG.debug("Edge Size: {}", graph.edgeNodes.size)

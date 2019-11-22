@@ -38,34 +38,27 @@ import java.util.Queue
 /**
  * This worker class operates on a single AS of the graph so it can used in parallel.
  * Executes the 2nd and 3rd step of the classification algorithm.
- *
- * @property system autonomous system to process
  */
-internal class BackboneWorker(private val system: AS) {
+internal object BackboneWorker {
 
-    companion object {
+    private val LOG = LoggerFactory.getLogger(BackboneWorker::class.java)
 
-        private val LOG = LoggerFactory.getLogger(BackboneWorker::class.java)
+    /**
+     * percentage of the average degree to compare to
+     */
+    private const val BACKBONE_DEGREE_PERCENTAGE = 0.6f
 
-        /**
-         * percentage of the average degree to compare to
-         */
-        private const val BACKBONE_DEGREE_PERCENTAGE = 0.6f
-
-        private fun Node?.isType(type: NodeType) = this != null && this.type == type
-    }
-
-    internal fun identifyBackbone() {
+    internal fun identifyBackbone(system: AS) {
         //2nd step
         var start = System.nanoTime()
-        convertHighDegrees()
+        convertHighDegrees(system)
         LOG.info("{} Step 2 - Time: {}", system, formatTimeInterval(start, System.nanoTime()))
         LOG.info("{} Backbone Size: {}", system, system.backboneNodes.size)
         LOG.info("{} Edge Size: {}", system, system.edgeNodes.size)
 
         // 3rd step
         start = System.nanoTime()
-        connectBackbone()
+        BackboneConnector(system).connectBackbone()
         LOG.info("{} Step 3 - Time: {}", system, formatTimeInterval(start, System.nanoTime()))
         LOG.info("{} Backbone Size: {}", system, system.backboneNodes.size)
         LOG.info("{} Edge Size: {}", system, system.edgeNodes.size)
@@ -74,70 +67,10 @@ internal class BackboneWorker(private val system: AS) {
     /**
      * Converts nodes with an above average degree to a backbone node.
      */
-    private fun convertHighDegrees() {
-        val averageDegree = calculateAverageDegree() * BACKBONE_DEGREE_PERCENTAGE
+    private fun convertHighDegrees(system: AS) {
+        val averageDegree = calculateAverageDegree(system) * BACKBONE_DEGREE_PERCENTAGE
         val toConvert = system.edgeNodes.filter { it.degree >= averageDegree }
         toConvert.forEach { BackboneNodeConverter.convertToBackbone(it) }
-    }
-
-    /**
-     * Creates a single connected backbone by using the Breadth-First-Algorithm.
-     */
-    private fun connectBackbone() {
-        val backboneNodes = system.backboneNodes
-        if (backboneNodes.isEmpty()) {
-            return
-        }
-
-        // bit sets to check for visited nodes and nodes in the queue
-        val visited = BitSet()
-        val seen = BitSet()
-        val queue: Queue<Node> = ArrayDeque()
-        // map nodes to their respective predecessors
-        val predecessors: MutableMap<Node, Node?> = HashMap()
-        // start with any backbone node
-        var node: Node = backboneNodes.first()
-        predecessors[node] = null
-        queue.add(node)
-        while (!queue.isEmpty()) {
-            node = queue.poll()
-            if (visited[node.id]) {
-                continue
-            }
-            visited.set(node.id)
-
-            // follow a trace via the predecessor to convert all on this way
-            if (node.isType(BACKBONE_NODE) && predecessors[node].isType(EDGE_NODE)) {
-                var predecessor = predecessors[node]
-                while (predecessor.isType(EDGE_NODE)) {
-                    BackboneNodeConverter.convertToBackbone(predecessor)
-                    predecessor = predecessors[predecessor]
-                }
-            }
-
-            // add or update neighborhood
-            for (e in node.edges) {
-                if (e.isCrossASEdge) {
-                    continue
-                }
-                val neighbor = e.getDestinationForSource(node)
-                // avoid visiting twice
-                if (visited[neighbor.id]) {
-                    continue
-                }
-                if (seen[neighbor.id]) {
-                    // update the predecessor if necessary
-                    if (node.isType(BACKBONE_NODE) && predecessors[neighbor].isType(EDGE_NODE)) {
-                        predecessors[neighbor] = node
-                    }
-                } else {
-                    // push a new node to the queue
-                    predecessors[neighbor] = node
-                    queue.add(neighbor)
-                    seen.set(neighbor.id)
-                }
-            }
-        }
     }
 
     /**
@@ -145,7 +78,7 @@ internal class BackboneWorker(private val system: AS) {
      *
      * @return the average degree
      */
-    private fun calculateAverageDegree(): Double {
+    private fun calculateAverageDegree(system: AS): Double {
         val edgeNodes = system.edgeNodes
         val backboneNodes = system.backboneNodes
         val n = backboneNodes.size + edgeNodes.size
@@ -157,5 +90,77 @@ internal class BackboneWorker(private val system: AS) {
         edgeNodes.forEach { sum += it.degree }
         backboneNodes.forEach { sum += it.degree }
         return sum.toDouble() / n
+    }
+}
+
+private class BackboneConnector(private val system: AS) {
+
+    private val visited = BitSet()
+
+    private val seen = BitSet()
+
+    private val queue: Queue<Node> = ArrayDeque()
+
+    private val predecessors: MutableMap<Node, Node?> = HashMap()
+
+    private fun Node?.isType(type: NodeType) = this != null && this.type == type
+
+    /**
+     * Creates a single connected backbone by using the Breadth-First-Algorithm.
+     */
+    internal fun connectBackbone() {
+        val backboneNodes = system.backboneNodes
+        if (backboneNodes.isEmpty()) {
+            return
+        }
+
+        // start with any backbone node
+        val node: Node = backboneNodes.first()
+        predecessors[node] = null
+        queue.add(node)
+        while (!queue.isEmpty()) {
+            processNode(queue.poll())
+        }
+    }
+
+    private fun processNode(node: Node) {
+        if (visited[node.id]) {
+            return
+        }
+        visited.set(node.id)
+
+        // follow a trace via the predecessor to convert all on this way
+        if (node.isType(BACKBONE_NODE) && predecessors[node].isType(EDGE_NODE)) {
+            connectTwoBackbones(node)
+        }
+
+        // add or update neighborhood
+        node.edges
+            .filter { !it.isCrossASEdge }
+            .map { it.getDestinationForSource(node) }
+            .filter { !visited[it.id] }
+            .forEach { updateNeighborNode(it, node) }
+    }
+
+    private fun updateNeighborNode(neighbor: Node, node: Node) {
+        if (seen[neighbor.id]) {
+            // update the predecessor if necessary
+            if (node.isType(BACKBONE_NODE) && predecessors[neighbor].isType(EDGE_NODE)) {
+                predecessors[neighbor] = node
+            }
+        } else {
+            // push a new node to the queue
+            predecessors[neighbor] = node
+            queue.add(neighbor)
+            seen.set(neighbor.id)
+        }
+    }
+
+    private fun connectTwoBackbones(node: Node) {
+        var predecessor = predecessors[node]
+        while (predecessor.isType(EDGE_NODE)) {
+            BackboneNodeConverter.convertToBackbone(predecessor)
+            predecessor = predecessors[predecessor]
+        }
     }
 }
