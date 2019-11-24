@@ -136,7 +136,7 @@ public class Emufog {
                 graph.placeFogNode(placement.getNode(), placement.getType());
             }
 
-            GraphExporter exporter = new MaxiNetExporter();
+            GraphExporter exporter = MaxiNetExporter.INSTANCE;
             exporter.exportGraph(graph, arguments.output);
         } else {
             // no fog placement found, aborting

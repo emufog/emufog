@@ -21,22 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.export;
+package emufog.export
 
-import emufog.graph.Graph;
+import emufog.graph.Graph
+import java.io.IOException
+import java.nio.file.Path
 
-import java.io.IOException;
-import java.nio.file.Path;
-
-public interface GraphExporter {
+interface GraphExporter {
 
     /**
      * Exports the given graph object in an unspecified format.
      *
      * @param graph the graph to export
-     * @param path  path to export the graph to
+     * @param path path to export the graph to
      * @throws IllegalArgumentException throws exception if the input parameters are invalid
-     * @throws IOException              throws exception if an error occurs when writing to disk
+     * @throws IOException throws exception if an error occurs when writing to disk
      */
-    void exportGraph(Graph graph, Path path) throws IllegalArgumentException, IOException;
+    @Throws(IllegalArgumentException::class, IOException::class)
+    fun exportGraph(graph: Graph, path: Path)
 }
