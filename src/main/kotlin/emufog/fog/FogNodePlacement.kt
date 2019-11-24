@@ -37,5 +37,5 @@ class FogNodePlacement internal constructor(node: BaseNode) {
 
     val node: Node = node.node
 
-    val type: FogContainer? = node.type
+    val type: FogContainer = node.type!!
 }

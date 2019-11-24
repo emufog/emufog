@@ -130,10 +130,10 @@ public class Emufog {
         graph.assignEdgeDevices();
 
         // find the fog node placements
-        FogResult result = new FogNodeClassifier(graph).placeFogNodes();
+        FogResult result = new FogNodeClassifier(graph).findPossibleFogNodes();
         if (result.getStatus()) {
             for (FogNodePlacement placement : result.getPlacements()) {
-                graph.placeFogNode(placement.node, placement.type);
+                graph.placeFogNode(placement.getNode(), placement.getType());
             }
 
             GraphExporter exporter = new MaxiNetExporter();

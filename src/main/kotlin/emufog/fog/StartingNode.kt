@@ -24,28 +24,22 @@
 package emufog.fog
 
 import emufog.graph.EdgeNode
-import java.util.HashSet
 
 /**
- * A starting node represents a starting point in the fog node placement algorithm.
- * Such a node is based on a [EdgeNode] and wraps it for the algorithm
- * execution.
+ * A starting node represents a starting point in the fog node placement algorithm. Such a node is based on a
+ * [EdgeNode] and wraps it for the algorithm execution.
  */
 internal class StartingNode(node: EdgeNode) : BaseNode(node) {
+
     /**
      * set of all nodes that reachable from this starting node
      */
-    private val reachableNodes: MutableSet<BaseNode?>
-    /**
-     * Returns the device count connected to the underlying [EdgeNode] remaining
-     * to be covered by a fog node.
-     *
-     * @return device count to cover
-     */
+    private val reachableNodes: MutableSet<BaseNode> = HashSet()
+
     /**
      * number of devices connected to the edge node
      */
-    var deviceCount: Int
+    var deviceCount: Int = node.deviceCount
         private set
 
     /**
@@ -63,7 +57,7 @@ internal class StartingNode(node: EdgeNode) : BaseNode(node) {
      *
      * @return all nodes that are reachable from this node
      */
-    fun getReachableNodes(): Set<BaseNode?> {
+    fun getReachableNodes(): Set<BaseNode> {
         return reachableNodes
     }
 
@@ -72,7 +66,7 @@ internal class StartingNode(node: EdgeNode) : BaseNode(node) {
      *
      * @param node possible fog node
      */
-    fun addPossibleNode(node: BaseNode?) {
+    fun addPossibleNode(node: BaseNode) {
         reachableNodes.add(node)
         modified = true
     }
@@ -82,7 +76,7 @@ internal class StartingNode(node: EdgeNode) : BaseNode(node) {
      *
      * @param node fog node to remove
      */
-    fun removePossibleNode(node: BaseNode?) {
+    fun removePossibleNode(node: BaseNode) {
         modified = reachableNodes.remove(node)
     }
 
@@ -90,19 +84,6 @@ internal class StartingNode(node: EdgeNode) : BaseNode(node) {
      * Notifies all possible nodes of this edge node that the node does not have to be covered any more.
      */
     fun notifyPossibleNodes() {
-        for (node in reachableNodes) {
-            node!!.removeStartingNode(this)
-        }
-    }
-
-    /**
-     * Creates a new starting node for the given edge node. The device count is
-     * initialized with the edge node's device count.
-     *
-     * @param node edge node to create a starting node for
-     */
-    init {
-        reachableNodes = HashSet()
-        deviceCount = node.deviceCount
+        reachableNodes.forEach { it.removeStartingNode(this) }
     }
 }

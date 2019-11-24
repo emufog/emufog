@@ -34,9 +34,9 @@ import kotlin.streams.toList
 class FogNodeClassifier(private val graph: Graph) {
 
     /**
-     * config to use for the fog node classification
+     * the graph's config to use for the fog node classification
      */
-    private val config: Config = graph.config
+    internal val config: Config = graph.config
 
     /**
      * counter of remaining fog nodes to place in the graph, atomic for parallel access
@@ -45,18 +45,21 @@ class FogNodeClassifier(private val graph: Graph) {
 
     /**
      * Runs the fog node placement algorithm on the graph associated with this instance. All autonomous systems of the
-     * graph are processed in parallel and the partial results are combined to a final outcome.
+     * graph are processed in parallel and the partial results are combined to a final outcome. The [Graph] instance
+     * provided to this class will not be modified.
      *
      * @return result object of the fog node placement
      */
-    fun placeFogNodes(): FogResult { // init empty failed result
+    fun findPossibleFogNodes(): FogResult {
+        // init empty failed result
         val result = FogResult()
         // process all systems in parallel
-        val results = graph.systems.parallelStream().map { FogWorker(it, this).findFogNodes() }
+        val results = graph.systems.parallelStream()
+            .map { FogWorker(it, this).findFogNodes() }
             .toList()
         // check if all part results are success
         val failed = results.firstOrNull { !it.status }
-        if (failed != null) {
+        if (failed == null) {
             result.setSuccess()
             results.forEach { result.addPlacements(it.placements) }
         }
