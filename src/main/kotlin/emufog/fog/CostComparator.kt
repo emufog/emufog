@@ -21,34 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.fog;
-
-import java.util.Comparator;
+package emufog.fog
 
 /**
- * Custom comparator to sort {@link BaseNode} for an optimal fog node placement.
- * The comparator uses two properties. First the comparator sorts descending
- * according to the average deployment costs and in case they are equal
- * the comparator sorts descending to the average connection costs.
+ * This comparator compares [BaseNode] based on their connection costs for a certain starting node. Connection costs
+ * are based on [BaseNode.getCosts].
+ *
+ * @property startingNode node to get the connection costs for
  */
-class FogComparator implements Comparator<BaseNode> {
+internal class CostComparator(private val startingNode: StartingNode) : Comparator<BaseNode> {
 
-    @Override
-    public int compare(BaseNode o1, BaseNode o2) {
-        float cost1 = o1.getAverageDeploymentCosts();
-        float cost2 = o2.getAverageDeploymentCosts();
-
-        if (cost1 < cost2) {
-            return -1;
-        }
-
-        if (cost2 < cost1) {
-            return 1;
-        }
-
-        cost1 = o1.getAverageConnectionCosts();
-        cost2 = o2.getAverageConnectionCosts();
-
-        return Float.compare(cost1, cost2);
+    override fun compare(o1: BaseNode, o2: BaseNode): Int {
+        return o1.getCosts(startingNode).compareTo(o2.getCosts(startingNode))
     }
 }

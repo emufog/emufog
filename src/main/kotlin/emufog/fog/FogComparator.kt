@@ -21,53 +21,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.fog;
-
-import emufog.container.FogContainer;
-import emufog.graph.Node;
+package emufog.fog
 
 /**
- * This class represents a placement of a fog node in the graph.
- * The result contains the node and the type of fog node to use.
+ * Custom comparator to sort [BaseNode] for an optimal fog node placement. The comparator uses two properties. First
+ * the comparator sorts descending according to the average deployment costs and in case they are equal the comparator
+ * sorts descending to the average connection costs.
  */
-public class FogNodePlacement {
-
-    /**
-     * node where the fog node should be placed
-     */
-    private final Node node;
-
-    /**
-     * type of the fog node
-     */
-    private final FogContainer type;
-
-    /**
-     * Creates a new placement based on the given node and the associated
-     * fog node type.
-     *
-     * @param node node to base the placement on
-     */
-    FogNodePlacement(BaseNode node) {
-        this.node = node.node;
-        type = node.getType();
-    }
-
-    /**
-     * Returns the node object in the graph where to place the fog node.
-     *
-     * @return node instance in the graph
-     */
-    public Node getNode() {
-        return node;
-    }
-
-    /**
-     * Returns the fog node type that should be used.
-     *
-     * @return fog node type to use
-     */
-    public FogContainer getType() {
-        return type;
+internal class FogComparator : Comparator<BaseNode> {
+    override fun compare(o1: BaseNode, o2: BaseNode): Int {
+        var cost1 = o1.averageDeploymentCosts
+        var cost2 = o2.averageDeploymentCosts
+        if (cost1 < cost2) {
+            return -1
+        }
+        if (cost2 < cost1) {
+            return 1
+        }
+        cost1 = o1.averageConnectionCosts
+        cost2 = o2.averageConnectionCosts
+        return cost1.compareTo(cost2)
     }
 }
