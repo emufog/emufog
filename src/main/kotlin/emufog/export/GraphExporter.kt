@@ -27,6 +27,9 @@ import emufog.graph.Graph
 import java.io.IOException
 import java.nio.file.Path
 
+/**
+ * Generic interface to write the final [Graph] object to a file. The implementation depends on the output format.
+ */
 interface GraphExporter {
 
     /**
