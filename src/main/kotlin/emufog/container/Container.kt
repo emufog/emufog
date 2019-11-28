@@ -41,5 +41,5 @@ interface Container {
     /**
      * Returns the full name of the container in the form of name:tag.
      */
-    fun fullName() = "$name:$tag"
+    fun fullName(): String = "$name:$tag"
 }
