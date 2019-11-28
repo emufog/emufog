@@ -110,13 +110,10 @@ private class BriteFormatReaderImpl internal constructor(path: Path) {
     private fun parseNode(line: String) {
         val values = line.split(regex)
         if (values.size < NODE_COLUMNS) {
-            throw BriteFormatException(
-                "The node line '$line' does not contain $NODE_COLUMNS columns."
-            )
+            throw BriteFormatException("The node line '$line' does not contain $NODE_COLUMNS columns.")
         }
 
         val id = values[0].asInt { "Failed to parse the id: ${values[0]}" }
-
         val asId = values[5].asInt { "Failed to parse the autonomous system: ${values[5]}" }
 
         // create a new edge node
@@ -141,24 +138,19 @@ private class BriteFormatReaderImpl internal constructor(path: Path) {
     private fun parseEdge(line: String) {
         val values = line.split(regex)
         if (values.size < EDGE_COLUMNS) {
-            throw BriteFormatException(
-                "The edge node '$line' does not contain $EDGE_COLUMNS columns."
-            )
+            throw BriteFormatException("The edge node '$line' does not contain $EDGE_COLUMNS columns.")
         }
 
         val id = values[0].asInt { "Failed to parse the id: ${values[0]}" }
-
         val from = values[1].asInt { "Failed to parse the link's source id: ${values[1]}" }
-
         val to = values[2].asInt { "Failed to parse the link's destinations id: ${values[2]}" }
-
         val delay = values[4].asFloat { "Failed to parse the link's latency: ${values[4]}" }
-
         val bandwidth = values[5].asFloat { "Failed to parse the link's bandwidth: ${values[5]}" }
 
         // get the source and destination nodes from the existing graph
         val fromNode = graph.getEdgeNode(from)
         val toNode = graph.getEdgeNode(to)
+
         // create the new edge
         graph.createEdge(id, fromNode, toNode, delay, bandwidth)
     }
