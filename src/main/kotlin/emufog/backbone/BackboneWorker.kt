@@ -69,8 +69,7 @@ internal object BackboneWorker {
      */
     private fun convertHighDegrees(system: AS) {
         val averageDegree = calculateAverageDegree(system) * BACKBONE_DEGREE_PERCENTAGE
-        val toConvert = system.edgeNodes.filter { it.degree >= averageDegree }
-        toConvert.forEach { BackboneNodeConverter.convertToBackbone(it) }
+        system.edgeNodes.filter { it.degree >= averageDegree }.forEach { BackboneNodeConverter.convertToBackbone(it) }
     }
 
     /**
