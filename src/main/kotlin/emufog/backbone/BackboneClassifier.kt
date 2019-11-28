@@ -39,11 +39,8 @@ object BackboneClassifier {
     /**
      * Starts the backbone classification algorithm on the given graph.
      * Modifies the graph including backbone and edge of the network.
-     *
-     * @throws IllegalArgumentException thrown if graph is `null`
      */
     @JvmStatic
-    @Throws(IllegalArgumentException::class)
     fun identifyBackbone(graph: Graph) {
         // 1st step sequentially
         LOG.debug("Start Backbone Classification")
