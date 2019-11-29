@@ -27,7 +27,6 @@ package emufog.graph
  * The node type represents an enumeration of possible types of nodes.
  */
 enum class NodeType {
-
     BACKBONE_NODE,
     EDGE_NODE,
     EDGE_DEVICE_NODE

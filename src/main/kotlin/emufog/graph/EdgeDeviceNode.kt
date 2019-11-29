@@ -29,9 +29,9 @@ import emufog.container.DeviceContainer
  * This class represents a edge device. Each edge device has a container image
  * associated to run the application specific code.
  */
-class EdgeDeviceNode internal constructor(attributes: NodeBaseAttributes,emulationSettings: EmulationSettings) : Node(attributes) {
+class EdgeDeviceNode internal constructor(attributes: NodeBaseAttributes, emulationNode: EmulationNode) : Node(attributes) {
 
-    override var type: NodeType=NodeType.EDGE_DEVICE_NODE
+    override val type: NodeType=NodeType.EDGE_DEVICE_NODE
 
     override val name: String="h$id"
 
@@ -41,9 +41,9 @@ class EdgeDeviceNode internal constructor(attributes: NodeBaseAttributes,emulati
      * @return device container type
      */
     val containerType: DeviceContainer
-        get()=emulationSettings!!.container as DeviceContainer
+        get()=emulationNode!!.container as DeviceContainer
 
     init {
-        this.emulationSettings=emulationSettings
+        this.emulationNode=emulationNode
     }
 }

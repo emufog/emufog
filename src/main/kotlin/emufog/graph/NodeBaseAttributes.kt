@@ -23,15 +23,20 @@
  */
 package emufog.graph
 
+/**
+ * Basic attributes of a [Node] in the graph. The node is defined by the unique identifier [id]. The actual
+ * representation of the [Node] can be retrieved via [node].
+ */
 internal class NodeBaseAttributes(
-        /**
-         * unique identifier of the node
-         */
-        val id: Int,
-        /**
-         * autonomous system this node belongs to
-         */
-        val system: AS) {
+    /**
+     * unique identifier of the node
+     */
+    val id: Int,
+    /**
+     * autonomous system this node belongs to
+     */
+    val system: AS
+) {
 
     /**
      * private mutable list of edges to be modified
@@ -42,29 +47,29 @@ internal class NodeBaseAttributes(
      * list of edges associated with the node
      */
     val edges: List<Edge>
-        get()=edgesMutable
+        get() = edgesMutable
 
     init {
-        edgesMutable=ArrayList()
+        edgesMutable = ArrayList()
     }
 
     /**
-     * the node object tied to the unique id
+     * the [Node] object tied to the unique id
      */
-    var node: Node?=null //TODO
+    var node: Node? = null
 
     /**
      * Adds an [Edge] to the list of edges [edges].
      */
-    fun addEdge(e: Edge)=edgesMutable.add(e)
+    fun addEdge(e: Edge) = edgesMutable.add(e)
 
     override fun equals(other: Any?): Boolean {
         if (other !is NodeBaseAttributes) {
             return false
         }
 
-        return id==other.id
+        return id == other.id
     }
 
-    override fun hashCode(): Int=id
+    override fun hashCode(): Int = id
 }

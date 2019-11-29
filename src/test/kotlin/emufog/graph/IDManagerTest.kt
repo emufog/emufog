@@ -29,27 +29,28 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 internal class IDManagerTest {
+
     @Test
-    fun checkInit() {
-        val manager=IDManager()
+    fun `constructor test`() {
+        val manager = IDManager()
         assertFalse(manager.isUsed(0))
-        assertEquals(0,manager.getNextID())
-        assertFalse(manager.isUsed(0))
+        assertEquals(0, manager.getNextID())
+        assertTrue(manager.isUsed(0))
     }
 
     @Test
-    fun checkMarking() {
-        val manager=IDManager()
+    fun `set function should set id to true`() {
+        val manager = IDManager()
         assertFalse(manager.isUsed(42))
         manager.setUsed(42)
         assertTrue(manager.isUsed(42))
     }
 
     @Test
-    fun checkNextIdCall() {
-        val manager=IDManager()
+    fun `next ID should not set the ID as used`() {
+        val manager = IDManager()
         manager.setUsed(0)
-        assertEquals(1,manager.getNextID())
-        assertFalse(manager.isUsed(1))
+        assertEquals(1, manager.getNextID())
+        assertTrue(manager.isUsed(1))
     }
 }

@@ -31,30 +31,30 @@ class EdgeNode internal constructor(attributes: NodeBaseAttributes) : Node(attri
     /**
      * number of devices connected to this edge node
      */
-    var deviceCount=0
+    var deviceCount = 0
         private set
 
-    override var type: NodeType=NodeType.EDGE_NODE
+    override val type: NodeType = NodeType.EDGE_NODE
 
-    override val name: String="r$id"
+    override val name: String = "r$id"
 
     /**
      * Returns indication whether this edge node has devices connected.
      *
      * @return true if there are devices connected, false otherwise
      */
-    fun hasDevices(): Boolean=deviceCount > 0
+    fun hasDevices(): Boolean = deviceCount > 0
 
     /**
-     * Increments the device counter by the given number.
-     * Will be ignored if negative.
+     * Increments the device counter by the given number. Will be ignored if negative.
      *
      * @param n the number to increase the device count
      */
-    fun incrementDeviceCount(n: Int) {
+    internal fun incrementDeviceCount(n: Int) {
         if (n < 0) {
             return
         }
-        deviceCount+=n
+
+        deviceCount += n
     }
 }

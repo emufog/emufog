@@ -26,26 +26,10 @@ package emufog.graph
 /**
  * This class convert an existing node to a edge device node in the graph.
  */
-class EdgeDeviceNodeConverter private constructor(private val emulationSettings: EmulationSettings)
-    : NodeConverter<EdgeDeviceNode>() {
-
-    companion object {
-        /**
-         * Converts an arbitrary node to an edge device node. If the node is already an edge device
-         * node it will just be returned. Otherwise the old node will be removed from the AS and
-         * replaced by the new node.
-         *
-         * @param oldNode           old node to replace by an edge device node
-         * @param emulationSettings emulation config to set for the new node
-         * @return newly created edge device node instance
-         */
-        fun convertToEdgeDeviceNode(oldNode: Node,emulationSettings: EmulationSettings): EdgeDeviceNode {
-            return EdgeDeviceNodeConverter(emulationSettings).convert(oldNode)
-        }
-    }
+class EdgeDeviceNodeConverter(private val emulationNode: EmulationNode) : NodeConverter<EdgeDeviceNode>() {
 
     override fun createNewNode(oldNode: Node): EdgeDeviceNode {
-        return EdgeDeviceNode(oldNode.attributes,emulationSettings)
+        return EdgeDeviceNode(oldNode.attributes, emulationNode)
     }
 
     override fun addNodeToGraph(newNode: EdgeDeviceNode) {

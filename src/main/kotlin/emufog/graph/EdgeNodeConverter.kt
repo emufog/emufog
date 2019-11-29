@@ -35,16 +35,4 @@ object EdgeNodeConverter : NodeConverter<EdgeNode>() {
     override fun addNodeToGraph(newNode: EdgeNode) {
         newNode.system.addEdgeNode(newNode)
     }
-
-    /**
-     * Converts an arbitrary node to an edge node. If the node is already an edge node
-     * it will just be returned. Otherwise the old node will be removed from the AS and
-     * replaced by the new node.
-     *
-     * @param oldNode old node to replace by an edge node
-     * @return newly created edge node instance
-     */
-    fun convertToEdgeNode(oldNode: Node): EdgeNode {
-        return convert(oldNode)
-    }
 }

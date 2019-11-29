@@ -69,7 +69,8 @@ internal object BackboneWorker {
      */
     private fun convertHighDegrees(system: AS) {
         val averageDegree = calculateAverageDegree(system) * BACKBONE_DEGREE_PERCENTAGE
-        system.edgeNodes.filter { it.degree >= averageDegree }.forEach { BackboneNodeConverter.convertToBackbone(it) }
+        val toConvert = system.edgeNodes.filter { it.degree >= averageDegree }
+        toConvert.forEach { BackboneNodeConverter.convert(it) }
     }
 
     /**
@@ -158,7 +159,7 @@ private class BackboneConnector(private val system: AS) {
     private fun connectTwoBackbones(node: Node) {
         var predecessor = predecessors[node]
         while (predecessor.isType(EDGE_NODE)) {
-            BackboneNodeConverter.convertToBackbone(predecessor!!)
+            BackboneNodeConverter.convert(predecessor!!)
             predecessor = predecessors[predecessor]
         }
     }

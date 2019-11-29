@@ -24,12 +24,12 @@
 package emufog.graph
 
 /**
- * A backbone node is part of the backbone of a network and cannot connect to host devices directly.
- * It can still though be a fog computing node.
+ * A backbone node is part of the backbone of a network and cannot connect to host devices directly. It can still
+ * though be a fog computing node.
  */
 class BackboneNode internal constructor(attributes: NodeBaseAttributes) : Node(attributes) {
 
-    override var type: NodeType=NodeType.BACKBONE_NODE
+    override val type: NodeType = NodeType.BACKBONE_NODE
 
-    override val name: String="s$id"
+    override val name: String = "s$id"
 }

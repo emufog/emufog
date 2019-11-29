@@ -33,61 +33,62 @@ abstract class Node internal constructor(internal val attributes: NodeBaseAttrib
      * unique identifier of the node
      */
     val id: Int
-        get()=attributes.id
+        get() = attributes.id
 
     /**
      * list of edges connected to that node
      */
     val edges: List<Edge>
-        get()=attributes.edges
+        get() = attributes.edges
+
+    /**
+     * the edge degree of the node. Is based on the number of nodes this node is connected to via edges
+     */
+    val degree: Int
+        get() = edges.size
 
     /**
      * autonomous system this node belongs to
      */
     val system: AS
-        get()=attributes.system
+        get() = attributes.system
 
-    var emulationSettings: EmulationSettings?=null
+    /**
+     * emulation configuration of the node, can be unset
+     */
+    var emulationNode: EmulationNode? = null
         internal set
 
     /**
      * the type of the node
      */
-    abstract var type: NodeType
-        protected set
+    abstract val type: NodeType
 
     /**
-     * the name of the node.
+     * the name of the node
      */
     abstract val name: String
 
     init {
-        attributes.node=this
+        attributes.node = this
     }
-
-
-
-    /**
-     * Returns the edge degree of the node. Is based on the number of nodes this node is connected to via edges.
-     */
-    fun getDegree(): Int=edges.size
 
     /**
      * Returns identification if this node can be emulated with existing config.
      *
      * @return true if it can be emulated, false otherwise
      */
-    fun hasEmulationSettings(): Boolean=emulationSettings!=null
+    fun hasEmulationSettings(): Boolean = emulationNode != null
 
     override fun equals(other: Any?): Boolean {
         if (other !is Node) {
             return false
         }
 
-        return id==other.id
+        return id == other.id
     }
 
-    override fun hashCode(): Int=id
+    override fun hashCode(): Int = id
 
-    override fun toString(): String=name
+    override fun toString(): String = name
 }

@@ -35,16 +35,4 @@ object BackboneNodeConverter : NodeConverter<BackboneNode>() {
     override fun addNodeToGraph(newNode: BackboneNode) {
         newNode.system.addBackboneNode(newNode)
     }
-
-    /**
-     * Converts an arbitrary node to a backbone node. If the node is already a backbone node
-     * it will just be returned. Otherwise the old node will be removed from the AS and
-     * replaced by the new node.
-     *
-     * @param oldNode old node to replace by a backbone node
-     * @return newly created backbone node instance
-     */
-    fun convertToBackbone(oldNode: Node): BackboneNode {
-        return convert(oldNode)
-    }
 }

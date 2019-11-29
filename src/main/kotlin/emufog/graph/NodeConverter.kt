@@ -55,7 +55,7 @@ abstract class NodeConverter<T : Node> {
         oldNode.system.removeNode(oldNode)
 
         // create a new node of the requested type
-        val newNode=createNewNode(oldNode)
+        val newNode = createNewNode(oldNode)
 
         // add the new node to the graph
         addNodeToGraph(newNode)

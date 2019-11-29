@@ -24,43 +24,54 @@
 package emufog.graph
 
 /**
- * This class represents an autonomous system of the network graph. Hence it's a sub graph of
- * the total graph providing access to its nodes.
+ * This class represents an autonomous system of the network graph. Hence it's a sub graph of the total graph providing
+ * access to its nodes.
  */
 class AS internal constructor(
-        /**
-         * unique identifier of the autonomous system
-         */
-        val id: Int) {
+
+    /**
+     * unique identifier of the autonomous system
+     */
+    val id: Int
+) {
 
     /**
      * mapping of edge nodes in the autonomous system
      */
-    private val edges: MutableMap<Int,EdgeNode>
+    private val edges: MutableMap<Int, EdgeNode>
 
+    /**
+     * all edge nodes in this autonomous system
+     */
     val edgeNodes: Collection<EdgeNode>
-        get()=edges.values
+        get() = edges.values
 
     /**
      * mapping of backbone nodes in the autonomous system
      */
-    private val backbones: MutableMap<Int,BackboneNode>
+    private val backbones: MutableMap<Int, BackboneNode>
 
+    /**
+     * all backbone nodes in this autonomous system
+     */
     val backboneNodes: Collection<BackboneNode>
-        get()=backbones.values
+        get() = backbones.values
 
     /**
      * mapping of edge device nodes in the autonomous system
      */
-    private val edgeDevices: MutableMap<Int,EdgeDeviceNode>
+    private val edgeDevices: MutableMap<Int, EdgeDeviceNode>
 
+    /**
+     * all edge device nodes in this autonomous system
+     */
     val edgeDeviceNodes: Collection<EdgeDeviceNode>
-        get()=edgeDevices.values
+        get() = edgeDevices.values
 
     init {
-        edges=HashMap()
-        backbones=HashMap()
-        edgeDevices=HashMap()
+        edges = HashMap()
+        backbones = HashMap()
+        edgeDevices = HashMap()
     }
 
     /**
@@ -69,7 +80,7 @@ class AS internal constructor(
      * @param id the edge node's ID
      * @return node object or `null` if not found
      */
-    fun getEdgeNode(id: Int): EdgeNode?=edges[id]
+    fun getEdgeNode(id: Int): EdgeNode? = edges[id]
 
     /**
      * Returns the backbone node associated with the given ID from the AS.
@@ -77,7 +88,7 @@ class AS internal constructor(
      * @param id the backbone node's ID
      * @return node object or `null` if not found
      */
-    fun getBackboneNode(id: Int): BackboneNode?=backbones[id]
+    fun getBackboneNode(id: Int): BackboneNode? = backbones[id]
 
     /**
      * Returns the edge device node associated with the given ID from the AS.
@@ -85,7 +96,7 @@ class AS internal constructor(
      * @param id the edge device node's ID
      * @return node object or `null` if not found
      */
-    fun getEdgeDeviceNode(id: Int): EdgeDeviceNode?=edgeDevices[id]
+    fun getEdgeDeviceNode(id: Int): EdgeDeviceNode? = edgeDevices[id]
 
     /**
      * Adds an edge node to the AS.
@@ -93,7 +104,7 @@ class AS internal constructor(
      * @param e edge node to add
      */
     internal fun addEdgeNode(e: EdgeNode) {
-        edges[e.id]=e
+        edges[e.id] = e
     }
 
     /**
@@ -102,7 +113,7 @@ class AS internal constructor(
      * @param b backbone node to add
      */
     internal fun addBackboneNode(b: BackboneNode) {
-        backbones[b.id]=b
+        backbones[b.id] = b
     }
 
     /**
@@ -111,25 +122,35 @@ class AS internal constructor(
      * @param d edge device node to add
      */
     internal fun addDevice(d: EdgeDeviceNode) {
-        edgeDevices[d.id]=d
+        edgeDevices[d.id] = d
     }
 
     /**
      * Removes a node from the AS.
      *
      * @param node node to remove
-     * @return true if node could be deleted, false if not
+     * @return `true` if node could be deleted, `false` if not
      */
     internal fun removeNode(node: Node): Boolean {
-        var result=edges.remove(node.id)!=null
+        var result = edges.remove(node.id) != null
         if (!result) {
-            result=backbones.remove(node.id)!=null
+            result = backbones.remove(node.id) != null
         }
         if (!result) {
-            result=edgeDevices.remove(node.id)!=null
+            result = edgeDevices.remove(node.id) != null
         }
 
         return result
+    }
+
+    /**
+     * Returns if this instance of an autonomous system contains the given node.
+     *
+     * @param node node to check for
+     * @return `true` if the as contains this node, `false` otherwise
+     */
+    internal fun containsNode(node: Node): Boolean {
+        return backbones.containsKey(node.id) || edges.containsKey(node.id) || edgeDevices.containsKey(node.id)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -137,10 +158,10 @@ class AS internal constructor(
             return false
         }
 
-        return id==other.id
+        return id == other.id
     }
 
-    override fun hashCode(): Int=Integer.hashCode(id)
+    override fun hashCode(): Int = id
 
-    override fun toString(): String="AS: $id"
+    override fun toString(): String = "AS: $id"
 }

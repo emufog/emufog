@@ -26,29 +26,29 @@ package emufog.graph
 import java.util.BitSet
 
 /**
- * The UniqueIDProvider keeps track of all IDs in use and calculates based
- * on that data the next available ID such that all IDs are unique.
+ * The ID manager keeps track of all IDs in use and calculates based on that data the next available ID such that all
+ * IDs are unique.
  */
 class IDManager {
 
     /**
      * the current ID is the last one in use
      */
-    private var current: Int=0
+    private var current: Int = 0
 
     /**
      * set to keep track of all used IDs
      */
-    private val bitSet: BitSet=BitSet()
+    private val bitSet: BitSet = BitSet()
 
     /**
-     * Calculates and returns the next available unique ID.
-     * The ID is not marked as used.
+     * Calculates and returns the next available unique ID. The ID is marked as used.
      *
      * @return the new ID
      */
     fun getNextID(): Int {
-        current=bitSet.nextClearBit(current)
+        current = bitSet.nextClearBit(current)
+        setUsed(current)
 
         return current
     }
@@ -59,7 +59,7 @@ class IDManager {
      * @param id the ID already in use
      */
     fun setUsed(id: Int) {
-        bitSet[id]=true
+        bitSet[id] = true
     }
 
     /**
@@ -68,5 +68,5 @@ class IDManager {
      * @param id ID to check
      * @return true if the ID already used, false otherwise
      */
-    fun isUsed(id: Int): Boolean=bitSet[id]
+    fun isUsed(id: Int): Boolean = bitSet[id]
 }

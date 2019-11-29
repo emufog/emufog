@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2019 emufog contributors
+ * Copyright (c) 2018 emufog contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,26 +24,19 @@
 package emufog.graph
 
 import emufog.container.Container
-import emufog.container.DeviceContainer
-import emufog.container.FogContainer
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
 
-internal class EmulationSettingsTest {
+/**
+ * This class represents the config to use emulating a node of the graph.
+ */
+data class EmulationNode(
 
-    @Test
-    fun testEmptyIP() {
-        val actual=EmulationSettings("",FogContainer("debian","latest",1024,1.5F,1,1F))
-        assertEquals("",actual.ip)
-    }
+    /**
+     * IP address to use
+     */
+    val ip: String,
 
-    @Test
-    fun testInit() {
-        val container: Container=DeviceContainer("name","latest",1024,2.4f,1,1.4f)
-        val actual=EmulationSettings("1.2.3.4",container)
-        assertEquals("1.2.3.4",actual.ip)
-        assertEquals("name",actual.container.name)
-        assertEquals(1024,actual.container.memoryLimit)
-        assertEquals(2.4f,actual.container.cpuShare)
-    }
-}
+    /**
+     * container image containing the application to emulate
+     */
+    val container: Container
+)

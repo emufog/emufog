@@ -28,37 +28,54 @@ package emufog.graph
  * Latency and bandwidth apply to both directions.
  */
 class Edge internal constructor(
-        /**
-         * unique identifier of the edge object
-         */
-        val id: Int,
-        /**
-         * one end of the connection
-         */
-        from: Node,
-        /**
-         * the other end of the connection
-         */
-        to: Node,
-        /**
-         * latency delay on this edge in ms
-         */
-        val delay: Float,
-        /**
-         * bandwidth of the connection on Mbit/s
-         */
-        val bandwidth: Float
+
+    /**
+     * unique identifier of the edge object
+     */
+    val id: Int,
+
+    /**
+     * one end of the connection
+     */
+    from: Node,
+
+    /**
+     * the other end of the connection
+     */
+    to: Node,
+
+    /**
+     * latency delay on this edge in ms
+     */
+    val delay: Float,
+
+    /**
+     * bandwidth of the connection on Mbit/s
+     */
+    val bandwidth: Float
 ) {
 
-    private val fromAttributes: NodeBaseAttributes=from.attributes
+    /**
+     * base attributes defining the source of the edge
+     */
+    private val fromAttributes: NodeBaseAttributes = from.attributes
 
+    /**
+     * the source of the edge, one end of the link
+     */
     val source: Node
-        get()=fromAttributes.node!!
+        get() = fromAttributes.node!!
 
-    private val toAttributes: NodeBaseAttributes=to.attributes
+    /**
+     * base attributes defining the destination of the edge
+     */
+    private val toAttributes: NodeBaseAttributes = to.attributes
 
+    /**
+     * the destination of the edge, other end of the link
+     */
     val destination: Node
-        get()=toAttributes.node!!
+        get() = toAttributes.node!!
 
     init {
         this.fromAttributes.addEdge(this)
@@ -66,17 +83,17 @@ class Edge internal constructor(
     }
 
     /**
-     * Returns the other end of the connection for the given node.
-     * In case the node is not part of the connection the method returns {@code null}.
+     * Returns the other end of the connection for the given node. In case the node is not part of the connection the
+     * method returns `null`.
      *
      * @param node node to find the partner for
-     * @return the other end of the connection or {@code null} if node is not part of this edge
+     * @return the other end of the connection or `null` if node is not part of this edge
      */
     fun getDestinationForSource(node: Node): Node? {
-        if (fromAttributes==node.attributes) {
+        if (fromAttributes == node.attributes) {
             return toAttributes.node
         }
-        if (toAttributes==node.attributes) {
+        if (toAttributes == node.attributes) {
             return fromAttributes.node
         }
 
@@ -86,9 +103,9 @@ class Edge internal constructor(
     /**
      * Indicates whether this edge connects two different ASs or not.
      *
-     * @return true if edge is connecting different ASs, false otherwise
+     * @return `true` if edge is connecting different ASs, `false` otherwise
      */
-    fun isCrossASEdge()=source.system!=destination.system
+    fun isCrossASEdge() = source.system != destination.system
 
     @Override
     override fun equals(other: Any?): Boolean {
@@ -96,12 +113,12 @@ class Edge internal constructor(
             return false
         }
 
-        return id==other.id
+        return id == other.id
     }
 
     @Override
-    override fun hashCode(): Int=id
+    override fun hashCode(): Int = id
 
     @Override
-    override fun toString(): String="Edge: $id"
+    override fun toString(): String = "Edge: $id"
 }
