@@ -65,7 +65,7 @@ object BackboneClassifier {
      * @param edges collection of edges to check
      */
     private fun convertCrossAsEdges(edges: Collection<Edge>) {
-        edges.filter { it.isCrossASEdge }.forEach {
+        edges.filter { it.isCrossASEdge() }.forEach {
             BackboneNodeConverter.convertToBackbone(it.source)
             BackboneNodeConverter.convertToBackbone(it.destination)
         }

@@ -135,10 +135,10 @@ private class BackboneConnector(private val system: AS) {
 
         // add or update neighborhood
         node.edges
-            .filter { !it.isCrossASEdge }
+            .filter { !it.isCrossASEdge() }
             .map { it.getDestinationForSource(node) }
-            .filter { !visited[it.id] }
-            .forEach { updateNeighborNode(it, node) }
+            .filter { it != null && !visited[it.id] }
+            .forEach { updateNeighborNode(it!!, node) }
     }
 
     private fun updateNeighborNode(neighbor: Node, node: Node) {
@@ -158,7 +158,7 @@ private class BackboneConnector(private val system: AS) {
     private fun connectTwoBackbones(node: Node) {
         var predecessor = predecessors[node]
         while (predecessor.isType(EDGE_NODE)) {
-            BackboneNodeConverter.convertToBackbone(predecessor)
+            BackboneNodeConverter.convertToBackbone(predecessor!!)
             predecessor = predecessors[predecessor]
         }
     }

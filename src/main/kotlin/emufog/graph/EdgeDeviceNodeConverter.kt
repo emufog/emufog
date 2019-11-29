@@ -21,34 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.graph;
+package emufog.graph
 
 /**
- * This class convert an existing node to a edge node in the graph.
+ * This class convert an existing node to a edge device node in the graph.
  */
-public class EdgeNodeConverter extends NodeConverter<EdgeNode> {
+class EdgeDeviceNodeConverter private constructor(private val emulationSettings: EmulationSettings)
+    : NodeConverter<EdgeDeviceNode>() {
 
-    private static final EdgeNodeConverter INSTANCE = new EdgeNodeConverter();
-
-    @Override
-    EdgeNode createNewNode(Node oldNode) {
-        return new EdgeNode(oldNode.attributes);
+    companion object {
+        /**
+         * Converts an arbitrary node to an edge device node. If the node is already an edge device
+         * node it will just be returned. Otherwise the old node will be removed from the AS and
+         * replaced by the new node.
+         *
+         * @param oldNode           old node to replace by an edge device node
+         * @param emulationSettings emulation config to set for the new node
+         * @return newly created edge device node instance
+         */
+        fun convertToEdgeDeviceNode(oldNode: Node,emulationSettings: EmulationSettings): EdgeDeviceNode {
+            return EdgeDeviceNodeConverter(emulationSettings).convert(oldNode)
+        }
     }
 
-    @Override
-    void addNodeToGraph(EdgeNode newNode) {
-        newNode.getAS().addEdgeNode(newNode);
+    override fun createNewNode(oldNode: Node): EdgeDeviceNode {
+        return EdgeDeviceNode(oldNode.attributes,emulationSettings)
     }
 
-    /**
-     * Converts an arbitrary node to an edge node. If the node is already an edge node
-     * it will just be returned. Otherwise the old node will be removed from the AS and
-     * replaced by the new node.
-     *
-     * @param oldNode old node to replace by an edge node
-     * @return newly created edge node instance
-     */
-    public static EdgeNode convertToEdgeNode(Node oldNode) {
-        return INSTANCE.convert(oldNode);
+    override fun addNodeToGraph(newNode: EdgeDeviceNode) {
+        newNode.system.addDevice(newNode)
     }
 }

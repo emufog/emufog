@@ -206,12 +206,12 @@ internal class FogWorker(
 
             // check all edges leaving the current node
             current.node.edges
-                .filter { !it.isCrossASEdge }
+                .filter { !it.isCrossASEdge() }
                 .forEach {
                     val neighbor = it.getDestinationForSource(current.node)
 
                     // ignore host devices as they are not considered to be possible nodes
-                    if (neighbor is EdgeDeviceNode) {
+                    if (neighbor == null || neighbor is EdgeDeviceNode) {
                         return
                     }
 

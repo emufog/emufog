@@ -21,25 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.graph;
+package emufog.graph
+
+import emufog.container.Container
 
 /**
- * A backbone node is part of the backbone of a network and cannot connect to host devices directly.
- * It can still though be a fog computing node.
+ * This class represents the config to use emulating a node of the graph.
  */
-public class BackboneNode extends Node {
-
-    BackboneNode(NodeAttributes attributes) {
-        super(attributes);
-    }
-
-    @Override
-    public NodeType getType() {
-        return NodeType.BACKBONE_NODE;
-    }
-
-    @Override
-    public String getName() {
-        return "s" + getID();
-    }
-}
+data class EmulationSettings(
+        /**
+         * IP address to use
+         */
+        val ip: String,
+        /**
+         * container image containing the application to emulate
+         */
+        val container: Container)

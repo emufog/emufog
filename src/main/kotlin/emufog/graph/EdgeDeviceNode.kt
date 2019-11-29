@@ -21,51 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.graph;
+package emufog.graph
 
-import emufog.container.Container;
+import emufog.container.DeviceContainer
 
 /**
- * This class represents the config to use emulating a node of the graph.
+ * This class represents a edge device. Each edge device has a container image
+ * associated to run the application specific code.
  */
-public class EmulationSettings {
+class EdgeDeviceNode internal constructor(attributes: NodeBaseAttributes,emulationSettings: EmulationSettings) : Node(attributes) {
+
+    override var type: NodeType=NodeType.EDGE_DEVICE_NODE
+
+    override val name: String="h$id"
 
     /**
-     * IP address to use
-     */
-    private final String ip;
-
-    /**
-     * container image containing the application to emulate
-     */
-    private final Container container;
-
-    /**
-     * Creates a new instance of the emulation config object using the given IP and container image.
+     * Returns the container type for this edge device node. The type is always a device type instance.
      *
-     * @param ip            ip address to use
-     * @param container container image to use
+     * @return device container type
      */
-    EmulationSettings(String ip, Container container) {
-        this.ip = ip;
-        this.container = container;
-    }
+    val containerType: DeviceContainer
+        get()=emulationSettings!!.container as DeviceContainer
 
-    /**
-     * Returns the IP address of the emulated node.
-     *
-     * @return IP address
-     */
-    public String getIP() {
-        return ip;
-    }
-
-    /**
-     * Returns the container image to emulate.
-     *
-     * @return container image
-     */
-    public Container getContainer() {
-        return container;
+    init {
+        this.emulationSettings=emulationSettings
     }
 }

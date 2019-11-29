@@ -21,38 +21,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.graph;
-
-import emufog.container.DeviceContainer;
+package emufog.graph
 
 /**
- * This class represents a edge device. Each edge device has a container image
- * associated to run the application specific code.
+ * This class convert an existing node to a backbone node in the graph.
  */
-public class EdgeDeviceNode extends Node {
+object BackboneNodeConverter : NodeConverter<BackboneNode>() {
 
-    EdgeDeviceNode(NodeAttributes attributes, EmulationSettings emulationSettings) {
-        super(attributes);
-
-        setEmulationSettings(emulationSettings);
+    override fun createNewNode(oldNode: Node): BackboneNode {
+        return BackboneNode(oldNode.attributes)
     }
 
-    @Override
-    public NodeType getType() {
-        return NodeType.EDGE_DEVICE_NODE;
-    }
-
-    @Override
-    public String getName() {
-        return "h" + getID();
+    override fun addNodeToGraph(newNode: BackboneNode) {
+        newNode.system.addBackboneNode(newNode)
     }
 
     /**
-     * Returns the container type for this edge device node. The type is always a device type instance.
+     * Converts an arbitrary node to a backbone node. If the node is already a backbone node
+     * it will just be returned. Otherwise the old node will be removed from the AS and
+     * replaced by the new node.
      *
-     * @return device container type
+     * @param oldNode old node to replace by a backbone node
+     * @return newly created backbone node instance
      */
-    DeviceContainer getContainerType() {
-        return (DeviceContainer) getEmulationNode().getContainer();
+    fun convertToBackbone(oldNode: Node): BackboneNode {
+        return convert(oldNode)
     }
 }

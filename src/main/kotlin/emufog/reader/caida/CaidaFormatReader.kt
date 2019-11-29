@@ -86,7 +86,7 @@ private class CaidaFormatReaderImpl(files: List<Path>) {
 
     private val linkFile: Path
 
-    private val graph = Graph(Config.config)
+    private val graph = Graph(Config.config!!)
 
     init {
         nodesFile = getFileWithEnding(files, ".nodes.geo")

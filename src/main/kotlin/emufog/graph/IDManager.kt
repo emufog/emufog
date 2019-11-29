@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2019 emufog contributors
+ * Copyright (c) 2018 emufog contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,64 +21,52 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.graph;
+package emufog.graph
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.BitSet
 
-class NodeAttributes {
-
-    /**
-     * unique identifier of the node
-     */
-    final int id;
+/**
+ * The UniqueIDProvider keeps track of all IDs in use and calculates based
+ * on that data the next available ID such that all IDs are unique.
+ */
+class IDManager {
 
     /**
-     * autonomous system this node belongs to
+     * the current ID is the last one in use
      */
-    final AS as;
+    private var current: Int=0
 
     /**
-     * list of edges associated with the node
+     * set to keep track of all used IDs
      */
-    final List<Edge> edges;
+    private val bitSet: BitSet=BitSet()
 
     /**
-     * the node object tied to the unique id
+     * Calculates and returns the next available unique ID.
+     * The ID is not marked as used.
+     *
+     * @return the new ID
      */
-    private Node node;
+    fun getNextID(): Int {
+        current=bitSet.nextClearBit(current)
 
-    NodeAttributes(int id, AS as) {
-        this.id = id;
-        this.as = as;
-        edges = new ArrayList<>();
+        return current
     }
 
-    Node getNode() {
-        return node;
+    /**
+     * Marks an ID as used so it cannot be assigned to another object.
+     *
+     * @param id the ID already in use
+     */
+    fun setUsed(id: Int) {
+        bitSet[id]=true
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof NodeAttributes)) {
-            return false;
-        }
-
-        NodeAttributes other = (NodeAttributes) o;
-
-        return id == other.id;
-    }
-
-    @Override
-    public int hashCode() {
-        return Integer.hashCode(id);
-    }
-
-    void addEdge(Edge e) {
-        edges.add(e);
-    }
-
-    void setNode(Node node) {
-        this.node = node;
-    }
+    /**
+     * Checks if the given ID is already in use.
+     *
+     * @param id ID to check
+     * @return true if the ID already used, false otherwise
+     */
+    fun isUsed(id: Int): Boolean=bitSet[id]
 }

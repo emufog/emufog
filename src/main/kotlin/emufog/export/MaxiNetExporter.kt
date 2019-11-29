@@ -104,7 +104,7 @@ private class MaxiNetExporterImpl internal constructor(private val graph: Graph,
         graph.nodes
             .filter { it.hasEmulationSettings() }
             .forEach {
-                val emu = it.emulationNode
+                val emu = it.emulationSettings!!
                 val container = emu.container
                 writer.writeln(
                     String.format(

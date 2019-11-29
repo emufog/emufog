@@ -21,62 +21,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.graph;
-
-import java.util.BitSet;
+package emufog.graph
 
 /**
- * The UniqueIDProvider keeps track of all IDs in use and calculates based
- * on that data the next available ID such that all IDs are unique.
+ * This class convert an existing node to a edge node in the graph.
  */
-class UniqueIDProvider {
+object EdgeNodeConverter : NodeConverter<EdgeNode>() {
 
-    /**
-     * the current ID is the last one in use
-     */
-    private int current;
+    override fun createNewNode(oldNode: Node): EdgeNode {
+        return EdgeNode(oldNode.attributes)
+    }
 
-    /**
-     * set to keep track of all used IDs
-     */
-    private final BitSet bitSet;
-
-    /**
-     * Creates a new ID provider.
-     */
-    UniqueIDProvider() {
-        current = 0;
-        bitSet = new BitSet();
+    override fun addNodeToGraph(newNode: EdgeNode) {
+        newNode.system.addEdgeNode(newNode)
     }
 
     /**
-     * Calculates and returns the next available unique ID.
-     * The ID is not marked as used.
+     * Converts an arbitrary node to an edge node. If the node is already an edge node
+     * it will just be returned. Otherwise the old node will be removed from the AS and
+     * replaced by the new node.
      *
-     * @return the new ID
+     * @param oldNode old node to replace by an edge node
+     * @return newly created edge node instance
      */
-    int getNextID() {
-        current = bitSet.nextClearBit(current);
-
-        return current;
-    }
-
-    /**
-     * Marks an ID as used so it cannot be assigned to another object.
-     *
-     * @param id the ID already in use
-     */
-    void markIDused(int id) {
-        bitSet.set(id, true);
-    }
-
-    /**
-     * Checks if the given ID is already in use.
-     *
-     * @param id ID to check
-     * @return true if the ID already used, false otherwise
-     */
-    boolean isUsed(int id) {
-        return bitSet.get(id);
+    fun convertToEdgeNode(oldNode: Node): EdgeNode {
+        return convert(oldNode)
     }
 }

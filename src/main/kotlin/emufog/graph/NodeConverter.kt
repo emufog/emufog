@@ -21,64 +21,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.graph;
+package emufog.graph
 
 /**
- * The edge node class represents a node of the graph host devices can connect to.
+ * A node converter simplifies the conversion of a node to a different type.
  */
-public class EdgeNode extends Node {
+abstract class NodeConverter<T : Node> {
 
     /**
-     * number of devices connected to this edge node
-     */
-    private int deviceCount;
-
-    EdgeNode(NodeAttributes attributes) {
-        super(attributes);
-
-        deviceCount = 0;
-    }
-
-    @Override
-    public NodeType getType() {
-        return NodeType.EDGE_NODE;
-    }
-
-    /**
-     * Returns indication whether this edge node has devices connected.
+     * Creates a new node based on the given old node. The type of the new node is based on the subclass of [Node].
      *
-     * @return true if there are devices connected, false otherwise
+     * @param oldNode node to create a new node from
+     * @return the newly created node
      */
-    public boolean hasDevices() {
-        return deviceCount > 0;
-    }
+    protected abstract fun createNewNode(oldNode: Node): T
 
     /**
-     * Increments the device counter by the given number.
-     * Will be ignored if negative.
+     * Adds the new node to the respective list in the graph.
      *
-     * @param n the number to increase the device count
+     * @param newNode the new node to add
      */
-    void incrementDeviceCount(int n) {
-        if (n < 0) {
-            return;
-        }
-
-        deviceCount += n;
-    }
+    protected abstract fun addNodeToGraph(newNode: T)
 
     /**
-     * Returns the device count of this edge node.
-     * The count includes the scaling factor given by the config.
+     * Converts the given node to a different type and replace it in the associated graph. If the node is already an
+     * instance of the requested class the method just returns this object.
      *
-     * @return device count
+     * @param oldNode node to convert
+     * @return the replacing node
      */
-    public int getDeviceCount() {
-        return deviceCount;
-    }
+    fun convert(oldNode: Node): T {
+        // remove the old node from the graph
+        oldNode.system.removeNode(oldNode)
 
-    @Override
-    public String getName() {
-        return "r" + getID();
+        // create a new node of the requested type
+        val newNode=createNewNode(oldNode)
+
+        // add the new node to the graph
+        addNodeToGraph(newNode)
+
+        return newNode
     }
 }
