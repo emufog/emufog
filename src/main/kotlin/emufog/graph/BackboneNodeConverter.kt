@@ -28,11 +28,7 @@ package emufog.graph
  */
 object BackboneNodeConverter : NodeConverter<BackboneNode>() {
 
-    override fun createNewNode(oldNode: Node): BackboneNode {
-        return BackboneNode(oldNode.attributes)
-    }
-
-    override fun addNodeToGraph(newNode: BackboneNode) {
-        newNode.system.addBackboneNode(newNode)
+    override fun convert(oldNode: Node): BackboneNode {
+        return oldNode.system.replaceByBackboneNode(oldNode)
     }
 }

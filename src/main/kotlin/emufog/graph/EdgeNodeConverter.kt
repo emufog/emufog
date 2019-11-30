@@ -28,11 +28,7 @@ package emufog.graph
  */
 object EdgeNodeConverter : NodeConverter<EdgeNode>() {
 
-    override fun createNewNode(oldNode: Node): EdgeNode {
-        return EdgeNode(oldNode.attributes)
-    }
-
-    override fun addNodeToGraph(newNode: EdgeNode) {
-        newNode.system.addEdgeNode(newNode)
+    override fun convert(oldNode: Node): EdgeNode {
+        return oldNode.system.replaceByEdgeNode(oldNode)
     }
 }

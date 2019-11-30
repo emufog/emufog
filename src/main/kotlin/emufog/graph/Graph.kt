@@ -48,12 +48,12 @@ class Graph(val config: Config) {
     val edges: List<Edge>
         get() = edgesMutable
 
-    private val systemsMutable: MutableList<AS>
+    private val systemsMutable: MutableSet<AS>
 
     /**
-     * list of all autonomous systems
+     * set of all autonomous systems
      */
-    val systems: List<AS>
+    val systems: Set<AS>
         get() = systemsMutable
 
     /**
@@ -97,7 +97,7 @@ class Graph(val config: Config) {
 
     init {
         edgesMutable = ArrayList()
-        systemsMutable = ArrayList()
+        systemsMutable = HashSet()
     }
 
     /**
@@ -133,9 +133,7 @@ class Graph(val config: Config) {
      * @param id id to query for
      * @return autonomous system or `null` if not present
      */
-    fun getAutonomousSystem(id: Int): AS? {
-        return systemsMutable.firstOrNull { it.id == id }
-    }
+    fun getAutonomousSystem(id: Int): AS? = systemsMutable.firstOrNull { it.id == id }
 
     /**
      * Gets or creates a new autonomous system with the given id in the graph.
@@ -163,12 +161,9 @@ class Graph(val config: Config) {
      */
     @Throws(IllegalArgumentException::class)
     fun createEdgeNode(id: Int, system: AS): EdgeNode {
-        require(containsAS(system)) { "The as: ${system.id} is not part of the graph." }
-        setNodeId(id)
-        val edgeNode = EdgeNode(NodeBaseAttributes(id, system))
-        system.addEdgeNode(edgeNode)
+        validateCreateInput(id, system)
 
-        return edgeNode
+        return system.createEdgeNode(id)
     }
 
     /**
@@ -181,12 +176,9 @@ class Graph(val config: Config) {
      */
     @Throws(IllegalArgumentException::class)
     fun createBackboneNode(id: Int, system: AS): BackboneNode {
-        require(containsAS(system)) { "The as: ${system.id} is not part of the graph." }
-        setNodeId(id)
-        val backboneNode = BackboneNode(NodeBaseAttributes(id, system))
-        system.addBackboneNode(backboneNode)
+        validateCreateInput(id, system)
 
-        return backboneNode
+        return system.createBackboneNode(id)
     }
 
     /**
@@ -200,13 +192,9 @@ class Graph(val config: Config) {
      */
     @Throws(IllegalArgumentException::class)
     fun createEdgeDeviceNode(id: Int, system: AS, image: DeviceContainer): EdgeDeviceNode {
-        require(containsAS(system)) { "The as: ${system.id} is not part of the graph." }
-        setNodeId(id)
-        val emulationSettings = EmulationNode(ipManager.nextIPV4Address(), image)
-        val edgeDevice = EdgeDeviceNode(NodeBaseAttributes(id, system), emulationSettings)
-        system.addDevice(edgeDevice)
+        validateCreateInput(id, system)
 
-        return edgeDevice
+        return system.createEdgeDeviceNode(id, EmulationNode(ipManager.nextIPV4Address(), image))
     }
 
     /**
@@ -221,8 +209,8 @@ class Graph(val config: Config) {
      * @return the newly created edge
      */
     fun createEdge(id: Int, from: Node, to: Node, delay: Float, bandwidth: Float): Edge {
-        require(containsNode(from)) { "The node: ${from.id} is not part of this graph." }
-        require(containsNode(to)) { "The node: ${to.id} is not part of this graph." }
+        validateNodeInGraph(from)
+        validateNodeInGraph(to)
 
         var edgeId = id
         if (edgeIdManager.isUsed(edgeId)) {
@@ -269,38 +257,40 @@ class Graph(val config: Config) {
      * will be assigned.
      *
      * @param node node to place a fog node at
-     * @param type fog type to set the node to
+     * @param container fog type to set the node to
      */
-    fun placeFogNode(node: Node, type: FogContainer) {
-        require(containsNode(node)) { "The node: ${node.id} is not part of this graph." }
-        node.emulationNode = EmulationNode(ipManager.nextIPV4Address(), type)
+    fun placeFogNode(node: Node, container: FogContainer) {
+        validateNodeInGraph(node)
+
+        node.emulationNode = EmulationNode(ipManager.nextIPV4Address(), container)
     }
 
     /**
-     * Checks if this instance contains the given [AS] object in the [systems].
-     *
-     * @param system autonomous system of the graph
-     * @return `true` if this instance contains the given as, `false` otherwise
-     */
-    private fun containsAS(system: AS): Boolean = systems.contains(system)
-
-    /**
-     * Checks if any of the associated autonomous systems contains the given node.
+     * Validates if the node's autonomous system is part of the graph and if that system contains the node.
      *
      * @param node node to check for
-     * @return `true` if the node is part of the graph, `false` otherwise
+     * @throws IllegalArgumentException if the node and the node's system are not valid
      */
-    private fun containsNode(node: Node): Boolean = systems.firstOrNull { it.containsNode(node) } != null
+    private fun validateNodeInGraph(node: Node) {
+        require(systems.contains(node.system)) {
+            "The node's: ${node.id} autonomous system: ${node.system.id} is not part of the graph."
+        }
+        require(node.system.containsNode(node)) { "The node: ${node.id} is not part ot the graph." }
+    }
 
     /**
-     * Validates if the given is is not already in use in [nodeIdManager]. If not sets it as used.
+     * Validates if the given id is is not already in use in [nodeIdManager]. If not sets it as used. Also validates if
+     * the given [AS] is part of the graph.
      *
      * @param id id to validate and set
-     * @throws IllegalArgumentException thrown if the id already in use
+     * @param system autonomous system to validate
+     * @throws IllegalArgumentException thrown if the id already in use or as is not part of the graph
      */
     @Throws(IllegalArgumentException::class)
-    private fun setNodeId(id: Int) {
+    private fun validateCreateInput(id: Int, system: AS) {
+        require(systems.contains(system)) { "The as: ${system.id} is not part of the graph." }
         require(!nodeIdManager.isUsed(id)) { "The node ID: $id is already in use." }
+
         nodeIdManager.setUsed(id)
     }
 }

@@ -28,11 +28,7 @@ package emufog.graph
  */
 class EdgeDeviceNodeConverter(private val emulationNode: EmulationNode) : NodeConverter<EdgeDeviceNode>() {
 
-    override fun createNewNode(oldNode: Node): EdgeDeviceNode {
-        return EdgeDeviceNode(oldNode.attributes, emulationNode)
-    }
-
-    override fun addNodeToGraph(newNode: EdgeDeviceNode) {
-        newNode.system.addDevice(newNode)
+    override fun convert(oldNode: Node): EdgeDeviceNode {
+        return oldNode.system.replaceByEdgeDeviceNode(oldNode, emulationNode)
     }
 }

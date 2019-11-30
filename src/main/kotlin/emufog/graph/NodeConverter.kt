@@ -29,37 +29,11 @@ package emufog.graph
 abstract class NodeConverter<T : Node> {
 
     /**
-     * Creates a new node based on the given old node. The type of the new node is based on the subclass of [Node].
-     *
-     * @param oldNode node to create a new node from
-     * @return the newly created node
-     */
-    protected abstract fun createNewNode(oldNode: Node): T
-
-    /**
-     * Adds the new node to the respective list in the graph.
-     *
-     * @param newNode the new node to add
-     */
-    protected abstract fun addNodeToGraph(newNode: T)
-
-    /**
      * Converts the given node to a different type and replace it in the associated graph. If the node is already an
      * instance of the requested class the method just returns this object.
      *
      * @param oldNode node to convert
      * @return the replacing node
      */
-    fun convert(oldNode: Node): T {
-        // remove the old node from the graph
-        oldNode.system.removeNode(oldNode)
-
-        // create a new node of the requested type
-        val newNode = createNewNode(oldNode)
-
-        // add the new node to the graph
-        addNodeToGraph(newNode)
-
-        return newNode
-    }
+    abstract fun convert(oldNode: Node): T
 }
