@@ -23,24 +23,23 @@
  */
 package emufog;
 
-import java.nio.file.Path;
-import java.util.List;
-import picocli.CommandLine.Option;
+import picocli.CommandLine.Option
+import java.nio.file.Path
 
 /**
  * Arguments to read in from the command line.
  */
 class Arguments {
 
-    @Option(names = {"--config", "-c"}, description = "config file to use")
-    Path configPath;
+    @Option(names = ["--config", "-c"], description = ["config file to use"])
+    var configPath: Path? = null
 
-    @Option(names = {"--type", "-t"}, description = "input format to read in")
-    String inputType;
+    @Option(names = ["--type", "-t"], description = ["input format to read in"])
+    var inputType: String? = null
 
-    @Option(names = {"--output", "-o"}, description = "path to the output file")
-    Path output;
+    @Option(names = ["--output", "-o"], description = ["path to the output file"])
+    var output: Path? = null
 
-    @Option(names = {"--file", "-f"}, description = "files to read in")
-    List<Path> files;
+    @Option(names = ["--file", "-f"], description = ["files to read in"])
+    var files: MutableList<Path> = mutableListOf()
 }

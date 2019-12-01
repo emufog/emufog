@@ -42,7 +42,7 @@ internal class IPManager(config: Config) {
      * @return IP address
      */
     fun nextIPV4Address(): String {
-        val nums = lastIP.split("\\.")
+        val nums = lastIP.split(".")
         var i: Int = (nums[0].toInt() shl 24 or (nums[2].toInt() shl 8) or (nums[1].toInt() shl 16) or nums[3].toInt())
         +1
 
