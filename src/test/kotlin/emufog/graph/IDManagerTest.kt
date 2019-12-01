@@ -35,7 +35,7 @@ internal class IDManagerTest {
         val manager = IDManager()
         assertFalse(manager.isUsed(0))
         assertEquals(0, manager.getNextID())
-        assertTrue(manager.isUsed(0))
+        assertFalse(manager.isUsed(0))
     }
 
     @Test
@@ -51,6 +51,6 @@ internal class IDManagerTest {
         val manager = IDManager()
         manager.setUsed(0)
         assertEquals(1, manager.getNextID())
-        assertTrue(manager.isUsed(1))
+        assertFalse(manager.isUsed(1))
     }
 }

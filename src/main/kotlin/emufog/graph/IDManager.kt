@@ -42,13 +42,12 @@ class IDManager {
     private val bitSet: BitSet = BitSet()
 
     /**
-     * Calculates and returns the next available unique ID. The ID is marked as used.
+     * Calculates and returns the next available unique ID. The ID is not marked as used.
      *
      * @return the new ID
      */
     fun getNextID(): Int {
         current = bitSet.nextClearBit(current)
-        setUsed(current)
 
         return current
     }
