@@ -21,38 +21,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.graph;
-
-import emufog.container.DeviceContainer;
+package emufog.graph
 
 /**
- * This class represents a edge device. Each edge device has a container image
- * associated to run the application specific code.
+ * The edge node class represents a node of the graph host devices can connect to.
  */
-public class EdgeDeviceNode extends Node {
-
-    EdgeDeviceNode(NodeAttributes attributes, EmulationSettings emulationSettings) {
-        super(attributes);
-
-        setEmulationSettings(emulationSettings);
-    }
-
-    @Override
-    public NodeType getType() {
-        return NodeType.EDGE_DEVICE_NODE;
-    }
-
-    @Override
-    public String getName() {
-        return "h" + getID();
-    }
+class EdgeNode internal constructor(attributes: NodeBaseAttributes) : Node(attributes) {
 
     /**
-     * Returns the container type for this edge device node. The type is always a device type instance.
-     *
-     * @return device container type
+     * number of devices connected to this edge node
      */
-    DeviceContainer getContainerType() {
-        return (DeviceContainer) getEmulationNode().getContainer();
+    var deviceCount = 0
+        private set
+
+    override val type: NodeType = NodeType.EDGE_NODE
+
+    override val name: String = "r$id"
+
+    /**
+     * Returns indication whether this edge node has devices connected.
+     *
+     * @return true if there are devices connected, false otherwise
+     */
+    fun hasDevices(): Boolean = deviceCount > 0
+
+    /**
+     * Increments the device counter by the given number. Will be ignored if negative.
+     *
+     * @param n the number to increase the device count
+     */
+    internal fun incrementDeviceCount(n: Int) {
+        if (n < 0) {
+            return
+        }
+
+        deviceCount += n
     }
 }

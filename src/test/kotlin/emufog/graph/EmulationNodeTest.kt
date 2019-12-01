@@ -21,37 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.graph;
+package emufog.graph
 
-import org.junit.jupiter.api.Test;
+import emufog.container.Container
+import emufog.container.DeviceContainer
+import emufog.container.FogContainer
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-class UniqueIDProviderTest {
+internal class EmulationNodeTest {
 
     @Test
-    void checkInit() {
-        UniqueIDProvider provider = new UniqueIDProvider();
-        assertFalse(provider.isUsed(0));
-        assertEquals(0, provider.getNextID());
-        assertFalse(provider.isUsed(0));
+    fun `empty IP string`() {
+        val actual = EmulationNode("", FogContainer("debian", "latest", 1024, 1.5F, 1, 1F))
+        assertEquals("", actual.ip)
     }
 
     @Test
-    void checkMarking() {
-        UniqueIDProvider provider = new UniqueIDProvider();
-        assertFalse(provider.isUsed(42));
-        provider.markIDused(42);
-        assertTrue(provider.isUsed(42));
-    }
-
-    @Test
-    void checkNextIdCall() {
-        UniqueIDProvider provider = new UniqueIDProvider();
-        provider.markIDused(0);
-        assertEquals(1, provider.getNextID());
-        assertFalse(provider.isUsed(1));
+    fun `constructor test`() {
+        val container: Container = DeviceContainer("name", "latest", 1024, 2.4f, 1, 1.4f)
+        val actual = EmulationNode("1.2.3.4", container)
+        assertEquals("1.2.3.4", actual.ip)
+        assertEquals("name", actual.container.name)
+        assertEquals(1024, actual.container.memoryLimit)
+        assertEquals(2.4f, actual.container.cpuShare)
     }
 }

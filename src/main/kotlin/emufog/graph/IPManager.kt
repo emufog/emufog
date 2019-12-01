@@ -21,47 +21,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.graph;
+package emufog.graph
 
-import emufog.config.Config;
+import emufog.config.Config
 
 /**
- * The UniqueIPProvider calculates IP address within the subnet
- * address space defined in the base address of the given config.
+ * The IP manager calculates IP address within the subnet address space defined in the base address of the given
+ * config. Keeps track of the last recent IP.
  */
-class UniqueIPProvider {
+internal class IPManager(config: Config) {
 
     /**
      * the last assigned IP in the network
      */
-    private String lastIP;
-
-    /**
-     * Creates a new IP provider with the base address of the
-     * subnet from the given config.
-     *
-     * @param config config for the subnet
-     */
-    UniqueIPProvider(Config config) {
-        lastIP = config.baseAddress;
-    }
+    private var lastIP: String = config.baseAddress
 
     /**
      * Calculates and returns the next available IP address in the subnet.
      *
      * @return IP address
      */
-    String getNextIPV4Address() {
-        String[] nums = lastIP.split("\\.");
-        int i = (Integer.parseInt(nums[0]) << 24 | Integer.parseInt(nums[2]) << 8 | Integer.parseInt(nums[1]) << 16 | Integer.parseInt(nums[3])) + 1;
+    fun nextIPV4Address(): String {
+        val nums = lastIP.split("\\.")
+        var i: Int = (nums[0].toInt() shl 24 or (nums[2].toInt() shl 8) or (nums[1].toInt() shl 16) or nums[3].toInt())
+        +1
 
         // If you wish to skip over .255 addresses.
-        if ((byte) i == -1) {
-            i++;
+        if (i.toByte() == (-1).toByte()) {
+            i++
         }
 
-        lastIP = String.format("%d.%d.%d.%d", i >>> 24 & 0xFF, i >> 16 & 0xFF, i >> 8 & 0xFF, i & 0xFF);
+        lastIP = String.format("%d.%d.%d.%d", i ushr 24 and 0xFF, i shr 16 and 0xFF, i shr 8 and 0xFF, i and 0xFF)
 
-        return lastIP;
+        return lastIP
     }
 }

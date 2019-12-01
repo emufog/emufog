@@ -21,25 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.graph;
+package emufog.graph
 
 /**
- * A backbone node is part of the backbone of a network and cannot connect to host devices directly.
- * It can still though be a fog computing node.
+ * A node converter simplifies the conversion of a node to a different type.
  */
-public class BackboneNode extends Node {
+interface NodeConverter<T : Node> {
 
-    BackboneNode(NodeAttributes attributes) {
-        super(attributes);
-    }
-
-    @Override
-    public NodeType getType() {
-        return NodeType.BACKBONE_NODE;
-    }
-
-    @Override
-    public String getName() {
-        return "s" + getID();
-    }
+    /**
+     * Converts the given node to a different type and replace it in the associated graph. If the node is already an
+     * instance of the requested class the method just returns this object.
+     *
+     * @param oldNode node to convert
+     * @return the replacing node
+     */
+    fun convert(oldNode: Node): T
 }

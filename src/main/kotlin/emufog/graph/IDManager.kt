@@ -21,64 +21,52 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.graph;
+package emufog.graph
+
+import java.util.BitSet
 
 /**
- * The edge node class represents a node of the graph host devices can connect to.
+ * The ID manager keeps track of all IDs in use and calculates based on that data the next available ID such that all
+ * IDs are unique.
  */
-public class EdgeNode extends Node {
+class IDManager {
 
     /**
-     * number of devices connected to this edge node
+     * the current ID is the last one in use
      */
-    private int deviceCount;
-
-    EdgeNode(NodeAttributes attributes) {
-        super(attributes);
-
-        deviceCount = 0;
-    }
-
-    @Override
-    public NodeType getType() {
-        return NodeType.EDGE_NODE;
-    }
+    private var current: Int = 0
 
     /**
-     * Returns indication whether this edge node has devices connected.
+     * set to keep track of all used IDs
+     */
+    private val bitSet: BitSet = BitSet()
+
+    /**
+     * Calculates and returns the next available unique ID. The ID is marked as used.
      *
-     * @return true if there are devices connected, false otherwise
+     * @return the new ID
      */
-    public boolean hasDevices() {
-        return deviceCount > 0;
+    fun getNextID(): Int {
+        current = bitSet.nextClearBit(current)
+        setUsed(current)
+
+        return current
     }
 
     /**
-     * Increments the device counter by the given number.
-     * Will be ignored if negative.
+     * Marks an ID as used so it cannot be assigned to another object.
      *
-     * @param n the number to increase the device count
+     * @param id the ID already in use
      */
-    void incrementDeviceCount(int n) {
-        if (n < 0) {
-            return;
-        }
-
-        deviceCount += n;
+    fun setUsed(id: Int) {
+        bitSet[id] = true
     }
 
     /**
-     * Returns the device count of this edge node.
-     * The count includes the scaling factor given by the config.
+     * Checks if the given ID is already in use.
      *
-     * @return device count
+     * @param id ID to check
+     * @return true if the ID already used, false otherwise
      */
-    public int getDeviceCount() {
-        return deviceCount;
-    }
-
-    @Override
-    public String getName() {
-        return "r" + getID();
-    }
+    fun isUsed(id: Int): Boolean = bitSet[id]
 }

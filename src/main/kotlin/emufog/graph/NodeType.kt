@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2018 emufog contributors
+ * Copyright (c) 2019 emufog contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,34 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.graph;
+package emufog.graph
 
 /**
- * This class convert an existing node to a backbone node in the graph.
+ * The node type represents an enumeration of possible types of nodes.
  */
-public class BackboneNodeConverter extends NodeConverter<BackboneNode> {
-
-    private static final BackboneNodeConverter INSTANCE = new BackboneNodeConverter();
-
-    @Override
-    BackboneNode createNewNode(Node oldNode) {
-        return new BackboneNode(oldNode.attributes);
-    }
-
-    @Override
-    void addNodeToGraph(BackboneNode newNode) {
-        newNode.getAS().addBackboneNode(newNode);
-    }
-
-    /**
-     * Converts an arbitrary node to a backbone node. If the node is already a backbone node
-     * it will just be returned. Otherwise the old node will be removed from the AS and
-     * replaced by the new node.
-     *
-     * @param oldNode old node to replace by a backbone node
-     * @return newly created backbone node instance
-     */
-    public static BackboneNode convertToBackbone(Node oldNode) {
-        return INSTANCE.convert(oldNode);
-    }
+enum class NodeType {
+    BACKBONE_NODE,
+    EDGE_NODE,
+    EDGE_DEVICE_NODE
 }

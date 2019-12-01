@@ -21,38 +21,55 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.graph;
+package emufog.graph
 
-import emufog.container.Container;
-import emufog.container.DeviceContainer;
-import org.junit.jupiter.api.Test;
+/**
+ * Basic attributes of a [Node] in the graph. The node is defined by the unique identifier [id]. The actual
+ * representation of the [Node] can be retrieved via [node].
+ */
+internal class NodeBaseAttributes(
+    /**
+     * unique identifier of the node
+     */
+    val id: Int,
+    /**
+     * autonomous system this node belongs to
+     */
+    val system: AS
+) {
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+    /**
+     * private mutable list of edges to be modified
+     */
+    private val edgesMutable: MutableList<Edge>
 
-class EmulationSettingsTest {
+    /**
+     * list of edges associated with the node
+     */
+    val edges: List<Edge>
+        get() = edgesMutable
 
-    @Test
-    void testNullInit() {
-        EmulationSettings settings = new EmulationSettings(null, null);
-        assertNull(settings.getIP());
-        assertNull(settings.getContainer());
+    init {
+        edgesMutable = ArrayList()
     }
 
-    @Test
-    void testEmptyIP() {
-        EmulationSettings settings = new EmulationSettings("", null);
-        assertEquals("", settings.getIP());
+    /**
+     * the [Node] object tied to the unique id
+     */
+    var node: Node? = null
+
+    /**
+     * Adds an [Edge] to the list of edges [edges].
+     */
+    fun addEdge(e: Edge) = edgesMutable.add(e)
+
+    override fun equals(other: Any?): Boolean {
+        if (other !is NodeBaseAttributes) {
+            return false
+        }
+
+        return id == other.id
     }
 
-    @Test
-    void testInit() {
-        Container container = new DeviceContainer("name", "latest", 1024, 2.4F, 1, 1.4F);
-        EmulationSettings settings = new EmulationSettings("1.2.3.4", container);
-        assertEquals("1.2.3.4", settings.getIP());
-        Container actual = settings.getContainer();
-        assertEquals("name", actual.getName());
-        assertEquals(1024, actual.getMemoryLimit());
-        assertEquals(2.4F, actual.getCpuShare());
-    }
+    override fun hashCode(): Int = id
 }

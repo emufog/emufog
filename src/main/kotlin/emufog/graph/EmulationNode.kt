@@ -21,62 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.graph;
+package emufog.graph
 
-import java.util.BitSet;
+import emufog.container.Container
 
 /**
- * The UniqueIDProvider keeps track of all IDs in use and calculates based
- * on that data the next available ID such that all IDs are unique.
+ * This class represents the config to use emulating a node of the graph.
  */
-class UniqueIDProvider {
+data class EmulationNode(
 
     /**
-     * the current ID is the last one in use
+     * IP address to use
      */
-    private int current;
+    val ip: String,
 
     /**
-     * set to keep track of all used IDs
+     * container image containing the application to emulate
      */
-    private final BitSet bitSet;
-
-    /**
-     * Creates a new ID provider.
-     */
-    UniqueIDProvider() {
-        current = 0;
-        bitSet = new BitSet();
-    }
-
-    /**
-     * Calculates and returns the next available unique ID.
-     * The ID is not marked as used.
-     *
-     * @return the new ID
-     */
-    int getNextID() {
-        current = bitSet.nextClearBit(current);
-
-        return current;
-    }
-
-    /**
-     * Marks an ID as used so it cannot be assigned to another object.
-     *
-     * @param id the ID already in use
-     */
-    void markIDused(int id) {
-        bitSet.set(id, true);
-    }
-
-    /**
-     * Checks if the given ID is already in use.
-     *
-     * @param id ID to check
-     * @return true if the ID already used, false otherwise
-     */
-    boolean isUsed(int id) {
-        return bitSet.get(id);
-    }
-}
+    val container: Container
+)

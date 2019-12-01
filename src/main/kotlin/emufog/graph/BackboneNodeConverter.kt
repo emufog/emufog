@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2019 emufog contributors
+ * Copyright (c) 2018 emufog contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,13 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.graph;
+package emufog.graph
 
 /**
- * The node type represents
+ * This class convert an existing node to a backbone node in the graph.
  */
-public enum NodeType {
-    BACKBONE_NODE,
-    EDGE_NODE,
-    EDGE_DEVICE_NODE
+object BackboneNodeConverter : NodeConverter<BackboneNode> {
+
+    override fun convert(oldNode: Node): BackboneNode {
+        return oldNode.system.replaceByBackboneNode(oldNode)
+    }
 }

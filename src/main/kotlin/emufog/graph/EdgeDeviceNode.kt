@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2019 emufog contributors
+ * Copyright (c) 2018 emufog contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,64 +21,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.graph;
+package emufog.graph
 
-import java.util.ArrayList;
-import java.util.List;
+import emufog.container.DeviceContainer
 
-class NodeAttributes {
+/**
+ * This class represents a edge device. Each edge device has a container image associated to run the application
+ * specific code.
+ */
+class EdgeDeviceNode internal constructor(
+    attributes: NodeBaseAttributes,
+    emulationNode: EmulationNode
+) : Node(attributes) {
 
-    /**
-     * unique identifier of the node
-     */
-    final int id;
+    override val type: NodeType = NodeType.EDGE_DEVICE_NODE
 
-    /**
-     * autonomous system this node belongs to
-     */
-    final AS as;
-
-    /**
-     * list of edges associated with the node
-     */
-    final List<Edge> edges;
+    override val name: String = "h$id"
 
     /**
-     * the node object tied to the unique id
+     * Returns the container type for this edge device node. The type is always a device type instance.
+     *
+     * @return device container type
      */
-    private Node node;
+    val containerType: DeviceContainer
+        get() = emulationNode!!.container as DeviceContainer
 
-    NodeAttributes(int id, AS as) {
-        this.id = id;
-        this.as = as;
-        edges = new ArrayList<>();
-    }
-
-    Node getNode() {
-        return node;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof NodeAttributes)) {
-            return false;
-        }
-
-        NodeAttributes other = (NodeAttributes) o;
-
-        return id == other.id;
-    }
-
-    @Override
-    public int hashCode() {
-        return Integer.hashCode(id);
-    }
-
-    void addEdge(Edge e) {
-        edges.add(e);
-    }
-
-    void setNode(Node node) {
-        this.node = node;
+    init {
+        this.emulationNode = emulationNode
     }
 }

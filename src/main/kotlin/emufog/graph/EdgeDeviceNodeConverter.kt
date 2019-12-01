@@ -21,51 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.graph;
-
-import emufog.container.Container;
+package emufog.graph
 
 /**
- * This class represents the config to use emulating a node of the graph.
+ * This class convert an existing node to a edge device node in the graph.
  */
-public class EmulationSettings {
+class EdgeDeviceNodeConverter(private val emulationNode: EmulationNode) : NodeConverter<EdgeDeviceNode> {
 
-    /**
-     * IP address to use
-     */
-    private final String ip;
-
-    /**
-     * container image containing the application to emulate
-     */
-    private final Container container;
-
-    /**
-     * Creates a new instance of the emulation config object using the given IP and container image.
-     *
-     * @param ip            ip address to use
-     * @param container container image to use
-     */
-    EmulationSettings(String ip, Container container) {
-        this.ip = ip;
-        this.container = container;
-    }
-
-    /**
-     * Returns the IP address of the emulated node.
-     *
-     * @return IP address
-     */
-    public String getIP() {
-        return ip;
-    }
-
-    /**
-     * Returns the container image to emulate.
-     *
-     * @return container image
-     */
-    public Container getContainer() {
-        return container;
+    override fun convert(oldNode: Node): EdgeDeviceNode {
+        return oldNode.system.replaceByEdgeDeviceNode(oldNode, emulationNode)
     }
 }

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2018 emufog contributors
+ * Copyright (c) 2019 emufog contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,34 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.graph;
+package emufog.graph
 
-/**
- * This class convert an existing node to a edge node in the graph.
- */
-public class EdgeNodeConverter extends NodeConverter<EdgeNode> {
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
 
-    private static final EdgeNodeConverter INSTANCE = new EdgeNodeConverter();
+internal class IDManagerTest {
 
-    @Override
-    EdgeNode createNewNode(Node oldNode) {
-        return new EdgeNode(oldNode.attributes);
+    @Test
+    fun `constructor test`() {
+        val manager = IDManager()
+        assertFalse(manager.isUsed(0))
+        assertEquals(0, manager.getNextID())
+        assertTrue(manager.isUsed(0))
     }
 
-    @Override
-    void addNodeToGraph(EdgeNode newNode) {
-        newNode.getAS().addEdgeNode(newNode);
+    @Test
+    fun `set function should set id to true`() {
+        val manager = IDManager()
+        assertFalse(manager.isUsed(42))
+        manager.setUsed(42)
+        assertTrue(manager.isUsed(42))
     }
 
-    /**
-     * Converts an arbitrary node to an edge node. If the node is already an edge node
-     * it will just be returned. Otherwise the old node will be removed from the AS and
-     * replaced by the new node.
-     *
-     * @param oldNode old node to replace by an edge node
-     * @return newly created edge node instance
-     */
-    public static EdgeNode convertToEdgeNode(Node oldNode) {
-        return INSTANCE.convert(oldNode);
+    @Test
+    fun `next ID should not set the ID as used`() {
+        val manager = IDManager()
+        manager.setUsed(0)
+        assertEquals(1, manager.getNextID())
+        assertTrue(manager.isUsed(1))
     }
 }
