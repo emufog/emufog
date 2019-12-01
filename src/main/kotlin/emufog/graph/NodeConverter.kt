@@ -26,7 +26,7 @@ package emufog.graph
 /**
  * A node converter simplifies the conversion of a node to a different type.
  */
-abstract class NodeConverter<T : Node> {
+interface NodeConverter<T : Node> {
 
     /**
      * Converts the given node to a different type and replace it in the associated graph. If the node is already an
@@ -35,5 +35,5 @@ abstract class NodeConverter<T : Node> {
      * @param oldNode node to convert
      * @return the replacing node
      */
-    abstract fun convert(oldNode: Node): T
+    fun convert(oldNode: Node): T
 }

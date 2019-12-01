@@ -67,7 +67,7 @@ private class BriteFormatReaderImpl internal constructor(path: Path) {
 
     private val reader: BufferedReader = path.toFile().bufferedReader()
 
-    private val graph: Graph = Graph(Config.config)
+    private val graph: Graph = Graph(Config.config!!)
 
     private val regex: Regex = "\t".toRegex()
 
@@ -149,7 +149,9 @@ private class BriteFormatReaderImpl internal constructor(path: Path) {
 
         // get the source and destination nodes from the existing graph
         val fromNode = graph.getEdgeNode(from)
+        require(fromNode != null) { "The link starting node: $from is not part of the graph." }
         val toNode = graph.getEdgeNode(to)
+        require(toNode != null) { "The link ending node: $from is not part of the graph." }
 
         // create the new edge
         graph.createEdge(id, fromNode, toNode, delay, bandwidth)

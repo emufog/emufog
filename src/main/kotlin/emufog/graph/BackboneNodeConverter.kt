@@ -26,7 +26,7 @@ package emufog.graph
 /**
  * This class convert an existing node to a backbone node in the graph.
  */
-object BackboneNodeConverter : NodeConverter<BackboneNode>() {
+object BackboneNodeConverter : NodeConverter<BackboneNode> {
 
     override fun convert(oldNode: Node): BackboneNode {
         return oldNode.system.replaceByBackboneNode(oldNode)

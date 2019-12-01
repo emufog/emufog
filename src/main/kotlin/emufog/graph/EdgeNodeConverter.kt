@@ -26,7 +26,7 @@ package emufog.graph
 /**
  * This class convert an existing node to a edge node in the graph.
  */
-object EdgeNodeConverter : NodeConverter<EdgeNode>() {
+object EdgeNodeConverter : NodeConverter<EdgeNode> {
 
     override fun convert(oldNode: Node): EdgeNode {
         return oldNode.system.replaceByEdgeNode(oldNode)
