@@ -26,7 +26,7 @@ package emufog
 import emufog.backbone.BackboneClassifier
 import emufog.config.Config
 import emufog.export.GraphExporter
-import emufog.export.MaxiNetExporter
+import emufog.export.maxinet.MaxiNetExporter
 import emufog.fog.FogNodeClassifier
 import emufog.reader.GraphReader
 import emufog.reader.brite.BriteFormatReader

@@ -21,8 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.export
+package emufog.export.maxinet
 
+import emufog.export.GraphExporter
 import emufog.graph.Edge
 import emufog.graph.Graph
 import java.io.BufferedWriter
@@ -112,7 +113,7 @@ private class MaxiNetExporterImpl internal constructor(private val graph: Graph,
                         it.name,
                         it.name,
                         emu.ip,
-                        container.name,
+                        container.fullName(),
                         container.memoryLimit
                     )
                 )
