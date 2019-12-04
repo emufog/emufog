@@ -61,7 +61,7 @@ internal class NodeBaseAttributes(
     /**
      * Adds an [Edge] to the list of edges [edges].
      */
-    fun addEdge(e: Edge) = edgesMutable.add(e)
+    fun addEdge(e: Edge): Boolean = edgesMutable.add(e)
 
     override fun equals(other: Any?): Boolean {
         if (other !is NodeBaseAttributes) {

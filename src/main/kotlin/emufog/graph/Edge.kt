@@ -105,7 +105,7 @@ class Edge internal constructor(
      *
      * @return `true` if edge is connecting different ASs, `false` otherwise
      */
-    fun isCrossASEdge() = source.system != destination.system
+    fun isCrossASEdge(): Boolean = source.system != destination.system
 
     @Override
     override fun equals(other: Any?): Boolean {
