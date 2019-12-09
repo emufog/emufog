@@ -6,7 +6,7 @@ jdk:
 
 script:
   - ./gradlew build
-  - ./gradlew codeCoverageReport
+  - ./gradlew jacocoTestReport
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
