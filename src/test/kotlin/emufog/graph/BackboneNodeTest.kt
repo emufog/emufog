@@ -34,9 +34,7 @@ internal class BackboneNodeTest {
 
     private val defaultAS = AS(0)
 
-    private val defaultAttributes = NodeBaseAttributes(1, defaultAS)
-
-    private val defaultNode = BackboneNode(defaultAttributes)
+    private val defaultNode = BackboneNode(1, defaultAS)
 
     @Test
     fun `test the node type`() {
@@ -78,14 +76,13 @@ internal class BackboneNodeTest {
 
     @Test
     fun `add links to the node base attributes`() {
-        val attributes = NodeBaseAttributes(2, AS(42))
-        val node = BackboneNode(attributes)
-        val node2 = BackboneNode(NodeBaseAttributes(3, AS(12)))
+        val node = BackboneNode(2, AS(42))
+        val node2 = BackboneNode(3, AS(12))
         assertTrue(node.edges.isEmpty())
         assertEquals(0, node.degree)
 
-        Edge(1, node, node2, 2F, 3F)
-        Edge(2, node2, node, 2.5F, 31F)
+        node.addEdge(Edge(1, node, node2, 2F, 3F))
+        node.addEdge(Edge(2, node2, node, 2.5F, 31F))
 
         assertFalse(node.edges.isEmpty())
         assertEquals(2, node.degree)
@@ -93,8 +90,8 @@ internal class BackboneNodeTest {
 
     @Test
     fun `test the equals function`() {
-        val node2 = BackboneNode(defaultAttributes)
-        val node3 = BackboneNode(NodeBaseAttributes(35, defaultAS))
+        val node2 = BackboneNode(1, defaultAS)
+        val node3 = BackboneNode(35, defaultAS)
 
         assertTrue(node2 == defaultNode)
         assertFalse(node2 === defaultNode)
@@ -104,8 +101,7 @@ internal class BackboneNodeTest {
 
     @Test
     fun `test the set of emulation configurations`() {
-        val attributes = NodeBaseAttributes(2, AS(42))
-        val node = BackboneNode(attributes)
+        val node = BackboneNode(2, AS(42))
         assertFalse(node.hasEmulationSettings())
         assertNull(node.emulationNode)
         val container = FogContainer("abc", "tag", 1024, 1F, 1, 1.5F)

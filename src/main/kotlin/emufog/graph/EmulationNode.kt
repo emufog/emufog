@@ -28,7 +28,7 @@ import emufog.container.Container
 /**
  * This class represents the config to use emulating a node of the graph.
  */
-data class EmulationNode(
+open class EmulationNode(
 
     /**
      * IP address to use
@@ -38,5 +38,5 @@ data class EmulationNode(
     /**
      * container image containing the application to emulate
      */
-    val container: Container
+    open val container: Container
 )

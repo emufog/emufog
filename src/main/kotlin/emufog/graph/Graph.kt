@@ -194,7 +194,7 @@ class Graph(val config: Config) {
     fun createEdgeDeviceNode(id: Int, system: AS, image: DeviceContainer): EdgeDeviceNode {
         validateCreateInput(id, system)
 
-        return system.createEdgeDeviceNode(id, EmulationNode(ipManager.nextIPV4Address(), image))
+        return system.createEdgeDeviceNode(id, EdgeEmulationNode(ipManager.nextIPV4Address(), image))
     }
 
     /**
@@ -220,6 +220,8 @@ class Graph(val config: Config) {
         }
 
         val edge = Edge(edgeId, from, to, delay, bandwidth)
+        from.addEdge(edge)
+        to.addEdge(edge)
         edgeIdManager.setUsed(edgeId)
         edgesMutable.add(edge)
 

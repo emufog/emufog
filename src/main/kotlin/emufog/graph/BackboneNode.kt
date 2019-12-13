@@ -27,7 +27,12 @@ package emufog.graph
  * A backbone node is part of the backbone of a network and cannot connect to host devices directly. It can still
  * though be a fog computing node.
  */
-class BackboneNode internal constructor(attributes: NodeBaseAttributes) : Node(attributes) {
+class BackboneNode internal constructor(
+        id: Int,
+        system: AS,
+        edges: List<Edge> = emptyList(),
+        emulationNode: EmulationNode? = null
+) : Node(id, system, edges, emulationNode) {
 
     override val type: NodeType = NodeType.BACKBONE_NODE
 
