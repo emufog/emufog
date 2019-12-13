@@ -83,7 +83,7 @@ class Edge internal constructor(
      * @return the other end of the connection or `null` if node is not part of this edge
      */
     fun getDestinationForSource(node: Node): Node? {
-        return when(node.id) {
+        return when (node.id) {
             sourceId -> destination
             destinationId -> source
             else -> null

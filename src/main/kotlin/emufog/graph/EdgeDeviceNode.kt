@@ -30,13 +30,13 @@ import emufog.container.DeviceContainer
  * specific code.
  */
 class EdgeDeviceNode internal constructor(
-        id: Int,
-        system: AS,
-        edges: List<Edge> = emptyList(),
-        emulationNode: EdgeEmulationNode
+    id: Int,
+    system: AS,
+    edges: List<Edge> = emptyList(),
+    emulationNode: EdgeEmulationNode
 ) : Node(id, system, edges, emulationNode) {
 
-    private val edgeEmulationNode = emulationNode
+    private val edgeEmulationNode: EdgeEmulationNode = emulationNode
 
     override val type: NodeType = NodeType.EDGE_DEVICE_NODE
 

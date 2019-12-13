@@ -27,10 +27,10 @@ package emufog.graph
  * The edge node class represents a node of the graph host devices can connect to.
  */
 class EdgeNode internal constructor(
-        id: Int,
-        system: AS,
-        edges: List<Edge> = emptyList(),
-        emulationNode: EmulationNode? = null
+    id: Int,
+    system: AS,
+    edges: List<Edge> = emptyList(),
+    emulationNode: EmulationNode? = null
 ) : Node(id, system, edges, emulationNode) {
 
     /**

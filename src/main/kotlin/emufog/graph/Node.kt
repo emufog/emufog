@@ -28,20 +28,20 @@ package emufog.graph
  * hold an [EmulationNode] if that node needs emulation.
  */
 abstract class Node internal constructor(
-        /**
-         * unique identifier of the node
-         */
-        val id: Int,
-        /**
-         * autonomous system this node belongs to
-         */
-        val system: AS,
-        edges: List<Edge>,
-        /**
-         * emulation configuration of the node, can be unset
-         */
-        var emulationNode: EmulationNode?
-        ) {
+    /**
+     * unique identifier of the node
+     */
+    val id: Int,
+    /**
+     * autonomous system this node belongs to
+     */
+    val system: AS,
+    edges: List<Edge>,
+    /**
+     * emulation configuration of the node, can be unset
+     */
+    var emulationNode: EmulationNode?
+) {
 
     private val edgesMutable: MutableList<Edge> = edges.toMutableList()
 
