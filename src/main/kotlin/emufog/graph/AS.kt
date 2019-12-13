@@ -38,7 +38,7 @@ class AS internal constructor(
     /**
      * mapping of edge nodes in the autonomous system
      */
-    private val edges: MutableMap<Int, EdgeNode>
+    private val edges: MutableMap<Int, EdgeNode> = hashMapOf()
 
     /**
      * all edge nodes in this autonomous system
@@ -49,7 +49,7 @@ class AS internal constructor(
     /**
      * mapping of backbone nodes in the autonomous system
      */
-    private val backbones: MutableMap<Int, BackboneNode>
+    private val backbones: MutableMap<Int, BackboneNode> = hashMapOf()
 
     /**
      * all backbone nodes in this autonomous system
@@ -60,19 +60,13 @@ class AS internal constructor(
     /**
      * mapping of edge device nodes in the autonomous system
      */
-    private val edgeDevices: MutableMap<Int, EdgeDeviceNode>
+    private val edgeDevices: MutableMap<Int, EdgeDeviceNode> = hashMapOf()
 
     /**
      * all edge device nodes in this autonomous system
      */
     val edgeDeviceNodes: Collection<EdgeDeviceNode>
         get() = edgeDevices.values
-
-    init {
-        edges = HashMap()
-        backbones = HashMap()
-        edgeDevices = HashMap()
-    }
 
     /**
      * Returns the edge node associated with the given ID from the AS.
@@ -99,14 +93,38 @@ class AS internal constructor(
     fun getEdgeDeviceNode(id: Int): EdgeDeviceNode? = edgeDevices[id]
 
     /**
+     * Returns the node associated with the given ID from the AS.
+     *
+     * @param id the node's ID
+     * @return node object or `null` if not found
+     */
+    fun getNode(id: Int): Node? = edges[id] ?: backbones[id] ?: edgeDevices[id]
+
+    fun replaceByEdgeNode(node: Node): EdgeNode {
+        removeNodeForReplacement(node)
+
+        return createEdgeNode(node.id, node.edges, node.emulationNode)
+    }
+
+    fun replaceByBackboneNode(node: Node): BackboneNode {
+        removeNodeForReplacement(node)
+
+        return createBackboneNode(node.id, node.edges, node.emulationNode)
+    }
+
+    fun replaceByEdgeDeviceNode(node: Node, emulationNode: EdgeEmulationNode): EdgeDeviceNode {
+        removeNodeForReplacement(node)
+
+        return createEdgeDeviceNode(node.id, node.edges, emulationNode)
+    }
+
+    /**
      * Creates and returns a new edge node in the autonomous system.
      *
      * @param id id of the new node
      * @return newly created edge node
      */
-    internal fun createEdgeNode(id: Int): EdgeNode {
-        return createEdgeNode(NodeBaseAttributes(id, this))
-    }
+    internal fun createEdgeNode(id: Int): EdgeNode = createEdgeNode(id, emptyList(), null)
 
     /**
      * Creates and returns a new backbone node in the autonomous system.
@@ -114,9 +132,7 @@ class AS internal constructor(
      * @param id id of the new node
      * @return newly created backbone node
      */
-    internal fun createBackboneNode(id: Int): BackboneNode {
-        return createBackboneNode(NodeBaseAttributes(id, this))
-    }
+    internal fun createBackboneNode(id: Int): BackboneNode = createBackboneNode(id, emptyList(), null)
 
     /**
      * Creates and returns a new edge device node in the autonomous system.
@@ -124,26 +140,18 @@ class AS internal constructor(
      * @param id id of the new node
      * @return newly created edge device node
      */
-    internal fun createEdgeDeviceNode(id: Int, emulationNode: EmulationNode): EdgeDeviceNode {
-        return createEdgeDeviceNode(NodeBaseAttributes(id, this), emulationNode)
+    internal fun createEdgeDeviceNode(id: Int, emulationNode: EdgeEmulationNode): EdgeDeviceNode {
+        return createEdgeDeviceNode(id, emptyList(), emulationNode)
     }
 
-    internal fun replaceByEdgeNode(node: Node): EdgeNode {
-        removeNodeForReplacement(node)
-
-        return createEdgeNode(node.attributes)
-    }
-
-    internal fun replaceByBackboneNode(node: Node): BackboneNode {
-        removeNodeForReplacement(node)
-
-        return createBackboneNode(node.attributes)
-    }
-
-    internal fun replaceByEdgeDeviceNode(node: Node, emulationNode: EmulationNode): EdgeDeviceNode {
-        removeNodeForReplacement(node)
-
-        return createEdgeDeviceNode(node.attributes, emulationNode)
+    /**
+     * Returns if this instance of an autonomous system contains the given node.
+     *
+     * @param node node to check for
+     * @return `true` if the as contains this node, `false` otherwise
+     */
+    internal fun containsNode(node: Node): Boolean {
+        return backbones.containsKey(node.id) || edges.containsKey(node.id) || edgeDevices.containsKey(node.id)
     }
 
     private fun removeNodeForReplacement(node: Node) {
@@ -154,25 +162,25 @@ class AS internal constructor(
         }
     }
 
-    private fun createEdgeNode(baseAttributes: NodeBaseAttributes): EdgeNode {
-        val edgeNode = EdgeNode(baseAttributes)
-        edges[edgeNode.id] = edgeNode
+    private fun createEdgeDeviceNode(id: Int, edges: List<Edge>, emulationNode: EdgeEmulationNode): EdgeDeviceNode {
+        val edgeDeviceNode = EdgeDeviceNode(id, this, edges, emulationNode)
+        edgeDevices[edgeDeviceNode.id] = edgeDeviceNode
 
-        return edgeNode
+        return edgeDeviceNode
     }
 
-    private fun createBackboneNode(baseAttributes: NodeBaseAttributes): BackboneNode {
-        val backboneNode = BackboneNode(baseAttributes)
+    private fun createBackboneNode(id: Int, edges: List<Edge>, emulationNode: EmulationNode?): BackboneNode {
+        val backboneNode = BackboneNode(id, this, edges, emulationNode)
         backbones[backboneNode.id] = backboneNode
 
         return backboneNode
     }
 
-    private fun createEdgeDeviceNode(baseAttributes: NodeBaseAttributes, emulationNode: EmulationNode): EdgeDeviceNode {
-        val edgeDeviceNode = EdgeDeviceNode(baseAttributes, emulationNode)
-        edgeDevices[edgeDeviceNode.id] = edgeDeviceNode
+    private fun createEdgeNode(id: Int, edges: List<Edge>, emulationNode: EmulationNode?): EdgeNode {
+        val edgeNode = EdgeNode(id, this, edges, emulationNode)
+        this.edges[edgeNode.id] = edgeNode
 
-        return edgeDeviceNode
+        return edgeNode
     }
 
     /**
@@ -181,17 +189,8 @@ class AS internal constructor(
      * @param node node to remove
      * @return `true` if node could be deleted, `false` if not
      */
-    private fun removeNode(node: Node): Boolean = edges.remove(node.id) != null || backbones.remove(node.id) != null ||
-        edgeDevices.remove(node.id) != null
-
-    /**
-     * Returns if this instance of an autonomous system contains the given node.
-     *
-     * @param node node to check for
-     * @return `true` if the as contains this node, `false` otherwise
-     */
-    internal fun containsNode(node: Node): Boolean {
-        return backbones.containsKey(node.id) || edges.containsKey(node.id) || edgeDevices.containsKey(node.id)
+    private fun removeNode(node: Node): Boolean {
+        return edges.remove(node.id) != null || backbones.remove(node.id) != null || edgeDevices.remove(node.id) != null
     }
 
     override fun equals(other: Any?): Boolean {

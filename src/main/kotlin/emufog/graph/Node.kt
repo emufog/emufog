@@ -24,40 +24,38 @@
 package emufog.graph
 
 /**
- * Represents a general node of the graph with the basic functionality. Can connect to other nodes via edges and
- * contains the geographically placement on a plain.
+ * Represents a general node of the graph with the basic functionality. Can connect to other nodes via edges. Can also
+ * hold an [EmulationNode] if that node needs emulation.
  */
-abstract class Node internal constructor(internal val attributes: NodeBaseAttributes) {
-
+abstract class Node internal constructor(
     /**
      * unique identifier of the node
      */
-    val id: Int
-        get() = attributes.id
+    val id: Int,
+    /**
+     * autonomous system this node belongs to
+     */
+    val system: AS,
+    edges: List<Edge>,
+    /**
+     * emulation configuration of the node, can be unset
+     */
+    var emulationNode: EmulationNode?
+) {
+
+    private val edgesMutable: MutableList<Edge> = edges.toMutableList()
 
     /**
      * list of edges connected to that node
      */
     val edges: List<Edge>
-        get() = attributes.edges
+        get() = edgesMutable
 
     /**
      * the edge degree of the node. Is based on the number of nodes this node is connected to via edges
      */
     val degree: Int
         get() = edges.size
-
-    /**
-     * autonomous system this node belongs to
-     */
-    val system: AS
-        get() = attributes.system
-
-    /**
-     * emulation configuration of the node, can be unset
-     */
-    var emulationNode: EmulationNode? = null
-        internal set
 
     /**
      * the type of the node
@@ -69,16 +67,16 @@ abstract class Node internal constructor(internal val attributes: NodeBaseAttrib
      */
     abstract val name: String
 
-    init {
-        attributes.node = this
-    }
-
     /**
      * Returns identification if this node can be emulated with existing config.
      *
      * @return true if it can be emulated, false otherwise
      */
     fun hasEmulationSettings(): Boolean = emulationNode != null
+
+    internal fun addEdge(edge: Edge) {
+        edgesMutable.add(edge)
+    }
 
     override fun equals(other: Any?): Boolean {
         if (other !is Node) {

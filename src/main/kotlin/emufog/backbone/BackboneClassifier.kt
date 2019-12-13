@@ -23,9 +23,9 @@
  */
 package emufog.backbone
 
-import emufog.graph.BackboneNodeConverter
 import emufog.graph.Edge
 import emufog.graph.Graph
+import emufog.graph.Node
 import emufog.util.ConversionsUtils.formatTimeInterval
 import org.slf4j.LoggerFactory
 
@@ -66,8 +66,10 @@ object BackboneClassifier {
      */
     private fun convertCrossAsEdges(edges: Collection<Edge>) {
         edges.filter { it.isCrossASEdge() }.forEach {
-            BackboneNodeConverter.convert(it.source)
-            BackboneNodeConverter.convert(it.destination)
+            it.source.toBackboneNode()
+            it.destination.toBackboneNode()
         }
     }
+
+    private fun Node.toBackboneNode() = this.system.replaceByBackboneNode(this)
 }

@@ -24,7 +24,6 @@
 package emufog.backbone
 
 import emufog.graph.AS
-import emufog.graph.BackboneNodeConverter
 import emufog.graph.Node
 import emufog.graph.NodeType
 import emufog.graph.NodeType.BACKBONE_NODE
@@ -70,7 +69,7 @@ internal object BackboneWorker {
     private fun convertHighDegrees(system: AS) {
         val averageDegree = calculateAverageDegree(system) * BACKBONE_DEGREE_PERCENTAGE
         val toConvert = system.edgeNodes.filter { it.degree >= averageDegree }
-        toConvert.forEach { BackboneNodeConverter.convert(it) }
+        toConvert.forEach { it.system.replaceByBackboneNode(it) }
     }
 
     /**
@@ -159,8 +158,10 @@ private class BackboneConnector(private val system: AS) {
     private fun connectTwoBackbones(node: Node) {
         var predecessor = predecessors[node]
         while (predecessor.isType(EDGE_NODE)) {
-            BackboneNodeConverter.convert(predecessor!!)
+            predecessor.toBackboneNode()
             predecessor = predecessors[predecessor]
         }
     }
+
+    private fun Node?.toBackboneNode() = this?.let { system.replaceByBackboneNode(this) }
 }

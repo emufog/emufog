@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2018 emufog contributors
+ * Copyright (c) 2019 emufog contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,12 +23,9 @@
  */
 package emufog.graph
 
-/**
- * This class convert an existing node to a backbone node in the graph.
- */
-object BackboneNodeConverter : NodeConverter<BackboneNode> {
+import emufog.container.DeviceContainer
 
-    override fun convert(oldNode: Node): BackboneNode {
-        return oldNode.system.replaceByBackboneNode(oldNode)
-    }
+class EdgeEmulationNode(ip: String, deviceContainer: DeviceContainer) : EmulationNode(ip, deviceContainer) {
+
+    override val container: DeviceContainer = deviceContainer
 }

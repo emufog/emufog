@@ -55,32 +55,25 @@ class Edge internal constructor(
     val bandwidth: Float
 ) {
 
-    /**
-     * base attributes defining the source of the edge
-     */
-    private val fromAttributes: NodeBaseAttributes = from.attributes
+    private val sourceSystem: AS = from.system
+
+    private val destinationSystem: AS = to.system
+
+    private val sourceId: Int = from.id
+
+    private val destinationId: Int = to.id
 
     /**
      * the source of the edge, one end of the link
      */
     val source: Node
-        get() = fromAttributes.node!!
-
-    /**
-     * base attributes defining the destination of the edge
-     */
-    private val toAttributes: NodeBaseAttributes = to.attributes
+        get() = getNode(sourceId, sourceSystem)
 
     /**
      * the destination of the edge, other end of the link
      */
     val destination: Node
-        get() = toAttributes.node!!
-
-    init {
-        this.fromAttributes.addEdge(this)
-        this.toAttributes.addEdge(this)
-    }
+        get() = getNode(destinationId, destinationSystem)
 
     /**
      * Returns the other end of the connection for the given node. In case the node is not part of the connection the
@@ -90,14 +83,11 @@ class Edge internal constructor(
      * @return the other end of the connection or `null` if node is not part of this edge
      */
     fun getDestinationForSource(node: Node): Node? {
-        if (fromAttributes == node.attributes) {
-            return toAttributes.node
+        return when (node.id) {
+            sourceId -> destination
+            destinationId -> source
+            else -> null
         }
-        if (toAttributes == node.attributes) {
-            return fromAttributes.node
-        }
-
-        return null
     }
 
     /**
@@ -105,9 +95,15 @@ class Edge internal constructor(
      *
      * @return `true` if edge is connecting different ASs, `false` otherwise
      */
-    fun isCrossASEdge(): Boolean = source.system != destination.system
+    fun isCrossASEdge(): Boolean = sourceSystem != destinationSystem
 
-    @Override
+    private fun getNode(id: Int, system: AS): Node {
+        val node = system.getNode(id)
+        requireNotNull(node) { "The node: $id does not exist in $system" }
+
+        return node
+    }
+
     override fun equals(other: Any?): Boolean {
         if (other !is Edge) {
             return false
@@ -116,9 +112,7 @@ class Edge internal constructor(
         return id == other.id
     }
 
-    @Override
     override fun hashCode(): Int = id
 
-    @Override
     override fun toString(): String = "Edge: $id"
 }
