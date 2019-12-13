@@ -36,11 +36,10 @@ import kotlin.random.Random
 class Graph(val config: Config) {
 
     companion object {
-
         private val LOG = LoggerFactory.getLogger(Graph::class.java)
     }
 
-    private val edgesMutable: MutableList<Edge>
+    private val edgesMutable: MutableList<Edge> = arrayListOf()
 
     /**
      * list of all edges in the graph
@@ -48,7 +47,7 @@ class Graph(val config: Config) {
     val edges: List<Edge>
         get() = edgesMutable
 
-    private val systemsMutable: MutableSet<AS>
+    private val systemsMutable: MutableSet<AS> = hashSetOf()
 
     /**
      * set of all autonomous systems
@@ -94,11 +93,6 @@ class Graph(val config: Config) {
      */
     val nodes: Set<Node>
         get() = edgeNodes.union(backboneNodes).union(hostDevices)
-
-    init {
-        edgesMutable = ArrayList()
-        systemsMutable = HashSet()
-    }
 
     /**
      * Returns the edge device node with the given identifier or `null` if not in the graph.
