@@ -24,26 +24,20 @@
 package emufog.graph
 
 import emufog.container.DeviceContainer
-import emufog.container.FogContainer
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
-internal class EmulationNodeTest {
+internal class EdgeEmulationNodeTest {
+
+    private val defaultDeviceContainer = DeviceContainer("name", "tag", 1, 1F, 1, 1F)
+
+    private val defaultEmulationNode = EdgeEmulationNode("1.2.3.4", defaultDeviceContainer)
 
     @Test
-    fun `empty IP string`() {
-        val actual = EmulationNode("", FogContainer("debian", "latest", 1024, 1.5F, 1, 1F))
-        assertEquals("", actual.ip)
-    }
-
-    @Test
-    fun `constructor test`() {
-        val container = DeviceContainer("name", "latest", 1024, 2.4f, 1, 1.4f)
-        val actual = EmulationNode("1.2.3.4", container)
-        assertEquals("1.2.3.4", actual.ip)
-        assertEquals("name", actual.container.name)
-        assertEquals(1024, actual.container.memoryLimit)
-        assertEquals(2.4f, actual.container.cpuShare)
-        assertEquals(container, actual.container)
+    fun `the container should be a device container`() {
+        val emulationNode: EmulationNode = defaultEmulationNode
+        assertTrue(emulationNode.container is DeviceContainer)
+        assertEquals(defaultDeviceContainer, emulationNode.container)
     }
 }

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2019 emufog contributors
+ * Copyright (c) 2018 emufog contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,25 +31,25 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
-internal class BackboneNodeTest {
+internal class EdgeNodeTest {
 
     private val defaultAS = AS(0)
 
-    private val defaultNode = BackboneNode(1, defaultAS)
+    private val defaultNode = EdgeNode(1, defaultAS)
 
     @Test
-    fun `the node type should be backbone node`() {
-        assertEquals(NodeType.BACKBONE_NODE, defaultNode.type)
+    fun `the node type should be edge node`() {
+        assertEquals(NodeType.EDGE_NODE, defaultNode.type)
     }
 
     @Test
-    fun `the nodes name should return s1`() {
-        assertEquals("s1", defaultNode.name)
+    fun `the nodes name should return r1`() {
+        assertEquals("r1", defaultNode.name)
     }
 
     @Test
     fun `toString should return s1`() {
-        assertEquals("s1", defaultNode.toString())
+        assertEquals("r1", defaultNode.toString())
     }
 
     @Test
@@ -73,6 +73,8 @@ internal class BackboneNodeTest {
         assertEquals(0, defaultNode.degree)
         assertNull(defaultNode.emulationNode)
         assertFalse(defaultNode.hasEmulationSettings())
+        assertFalse(defaultNode.hasDevices())
+        assertEquals(0, defaultNode.deviceCount)
     }
 
     @Test
@@ -87,7 +89,7 @@ internal class BackboneNodeTest {
 
     @Test
     fun `add links to the node base attributes`() {
-        val node = BackboneNode(2, AS(42))
+        val node = EdgeNode(2, AS(42))
         assertTrue(node.edges.isEmpty())
         assertEquals(0, node.degree)
 
@@ -100,7 +102,7 @@ internal class BackboneNodeTest {
 
     @Test
     fun `equals with different node with same id should return true`() {
-        val node = BackboneNode(1, defaultAS)
+        val node = EdgeNode(1, defaultAS)
 
         assertTrue(node == defaultNode)
         assertFalse(node === defaultNode)
@@ -108,7 +110,7 @@ internal class BackboneNodeTest {
 
     @Test
     fun `equals with different node with different id should return false`() {
-        val node = BackboneNode(35, defaultAS)
+        val node = EdgeNode(35, defaultAS)
 
         assertFalse(node == defaultNode)
         assertFalse(node === defaultNode)
@@ -127,21 +129,21 @@ internal class BackboneNodeTest {
     @Test
     fun `equals with edge device node with same id should return true`() {
         val container = DeviceContainer("docker", "tag", 1, 1F, 1, 1F)
-        val node = EdgeDeviceNode(1, defaultAS, emptyList(), EdgeEmulationNode("1.2.3.4", container))
+        val node = EdgeNode(1, defaultAS, emptyList(), EdgeEmulationNode("1.2.3.4", container))
 
         assertTrue(node.equals(defaultNode))
     }
 
     @Test
-    fun `equals with edge node with same id should return true`() {
-        val node = EdgeNode(1, defaultAS)
+    fun `equals with backbone node with same id should return true`() {
+        val node = BackboneNode(1, defaultAS)
 
         assertTrue(node.equals(defaultNode))
     }
 
     @Test
     fun `set of emulation configurations should update`() {
-        val node = BackboneNode(2, AS(42))
+        val node = EdgeNode(2, AS(42))
         assertFalse(node.hasEmulationSettings())
         assertNull(node.emulationNode)
         val container = FogContainer("abc", "tag", 1024, 1F, 1, 1.5F)
@@ -149,5 +151,23 @@ internal class BackboneNodeTest {
         node.emulationNode = emulationNode
         assertTrue(node.hasEmulationSettings())
         assertEquals(emulationNode, node.emulationNode)
+    }
+
+    @Test
+    fun `incrementDeviceCount should update the deviceCount by n`() {
+        val node = EdgeNode(2, defaultAS)
+        assertEquals(0, node.deviceCount)
+        node.incrementDeviceCount(42)
+        assertEquals(42, node.deviceCount)
+        node.incrementDeviceCount(42)
+        assertEquals(84, node.deviceCount)
+    }
+
+    @Test
+    fun `incrementDeviceCount should ignore negative n`() {
+        val node = EdgeNode(2, defaultAS)
+        assertEquals(0, node.deviceCount)
+        node.incrementDeviceCount(-42)
+        assertEquals(0, node.deviceCount)
     }
 }

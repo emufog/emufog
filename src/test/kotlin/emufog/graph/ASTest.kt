@@ -24,7 +24,6 @@
 package emufog.graph
 
 import emufog.container.DeviceContainer
-import emufog.container.FogContainer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -45,17 +44,17 @@ internal class ASTest {
     }
 
     @Test
-    fun `test the hashCode function`() {
+    fun `hashCode function should return id`() {
         assertEquals(0, defaultSystem.hashCode())
     }
 
     @Test
-    fun `test the toString function`() {
+    fun `toString function should include the id`() {
         assertEquals("AS: 0", defaultSystem.toString())
     }
 
     @Test
-    fun `test equals with different system with same id`() {
+    fun `equals with different system with same id`() {
         val system = AS(0)
 
         assertTrue(system == defaultSystem)
@@ -63,7 +62,7 @@ internal class ASTest {
     }
 
     @Test
-    fun `test equals with different system with different id`() {
+    fun `equals with different system with different id`() {
         val system = AS(1)
 
         assertFalse(system == defaultSystem)
@@ -71,12 +70,12 @@ internal class ASTest {
     }
 
     @Test
-    fun `test equals with same object`() {
+    fun `equals with same object`() {
         assertTrue(defaultSystem == defaultSystem)
     }
 
     @Test
-    fun `test equals with null`() {
+    fun `equals with null`() {
         assertFalse(defaultSystem.equals(null))
     }
 
@@ -108,7 +107,7 @@ internal class ASTest {
     fun `create an edge device node`() {
         val system = AS(1)
         val container = DeviceContainer("docker", "tag", 1, 1F, 1, 1F)
-        val edgeDeviceNode = system.createEdgeDeviceNode(42, EmulationNode("1.2.3.4", container))
+        val edgeDeviceNode = system.createEdgeDeviceNode(42, EdgeEmulationNode("1.2.3.4", container))
         assertEquals(42, edgeDeviceNode.id)
         val actual = system.getEdgeDeviceNode(42)
         assertNotNull(actual)
@@ -118,22 +117,22 @@ internal class ASTest {
     }
 
     @Test
-    fun `test containsNode on empty AS`() {
-        assertFalse(defaultSystem.containsNode(BackboneNode(NodeBaseAttributes(1, defaultSystem))))
+    fun `containsNode on empty AS should return false`() {
+        assertFalse(defaultSystem.containsNode(BackboneNode(1, defaultSystem)))
     }
 
     @Test
-    fun `test get backbone node that does not exist`() {
+    fun `getBackboneNode that does not exist should return null`() {
         assertNull(defaultSystem.getBackboneNode(42))
     }
 
     @Test
-    fun `test get edge node that does not exist`() {
+    fun `getEdgeNode that does not exist should return null`() {
         assertNull(defaultSystem.getEdgeNode(42))
     }
 
     @Test
-    fun `test get edge device node that does not exist`() {
+    fun `getEdgeDeviceNode that does not exist should return null`() {
         assertNull(defaultSystem.getEdgeDeviceNode(42))
     }
 
@@ -155,8 +154,8 @@ internal class ASTest {
     fun `replace a backbone node with an edge device node`() {
         val system = AS(1)
         val backboneNode = system.createBackboneNode(42)
-        val container = FogContainer("abc", "tag", 1024, 1F, 1, 1.5F)
-        val emulationNode = EmulationNode("1.2.3.4", container)
+        val container = DeviceContainer("abc", "tag", 1024, 1F, 1, 1.5F)
+        val emulationNode = EdgeEmulationNode("1.2.3.4", container)
         val edgeDeviceNode = system.replaceByEdgeDeviceNode(backboneNode, emulationNode)
         assertTrue(backboneNode.equals(edgeDeviceNode))
         assertEquals(42, edgeDeviceNode.id)
