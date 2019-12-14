@@ -1,6 +1,7 @@
 # EmuFog
 
 [![Build Status](https://travis-ci.org/emufog/emufog.svg?branch=master)](https://travis-ci.org/emufog/emufog)
+[![MIT License](https://img.shields.io/badge/license-MIT-green "MIT License")](LICENSE)
 
 EmuFog helps to test fog computing applications more efficiently.
 Instead of actual deploying large network topologies with your application to test, EmuFog helps to generate networks that can be emulated easily with [MaxiNet](https://maxinet.github.io/), a distributed version of the popular [Mininet](https://mininet.org/).
