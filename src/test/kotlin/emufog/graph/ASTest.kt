@@ -26,10 +26,12 @@ package emufog.graph
 import emufog.container.DeviceContainer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 internal class ASTest {
 
@@ -57,7 +59,7 @@ internal class ASTest {
     fun `equals with different system with same id`() {
         val system = AS(0)
 
-        assertTrue(system == defaultSystem)
+        assertEquals(system, defaultSystem)
         assertFalse(system === defaultSystem)
     }
 
@@ -65,18 +67,18 @@ internal class ASTest {
     fun `equals with different system with different id`() {
         val system = AS(1)
 
-        assertFalse(system == defaultSystem)
+        assertNotEquals(system, defaultSystem)
         assertFalse(system === defaultSystem)
     }
 
     @Test
     fun `equals with same object`() {
-        assertTrue(defaultSystem == defaultSystem)
+        assertEquals(defaultSystem, defaultSystem)
     }
 
     @Test
     fun `equals with null`() {
-        assertFalse(defaultSystem.equals(null))
+        assertNotEquals(defaultSystem, null)
     }
 
     @Test
@@ -141,7 +143,7 @@ internal class ASTest {
         val system = AS(1)
         val backboneNode = system.createBackboneNode(42)
         val edgeNode = system.replaceByEdgeNode(backboneNode)
-        assertTrue(backboneNode.equals(edgeNode))
+        assertEquals(backboneNode, edgeNode)
         assertEquals(42, edgeNode.id)
         assertEquals(system, edgeNode.system)
         assertNull(system.getBackboneNode(42))
@@ -157,7 +159,7 @@ internal class ASTest {
         val container = DeviceContainer("abc", "tag", 1024, 1F, 1, 1.5F)
         val emulationNode = EdgeEmulationNode("1.2.3.4", container)
         val edgeDeviceNode = system.replaceByEdgeDeviceNode(backboneNode, emulationNode)
-        assertTrue(backboneNode.equals(edgeDeviceNode))
+        assertEquals(backboneNode, edgeDeviceNode)
         assertEquals(42, edgeDeviceNode.id)
         assertEquals(system, edgeDeviceNode.system)
         assertEquals(emulationNode, edgeDeviceNode.emulationNode)
@@ -173,12 +175,26 @@ internal class ASTest {
         val system = AS(1)
         val edgeNode = system.createEdgeNode(42)
         val backboneNode = system.replaceByBackboneNode(edgeNode)
-        assertTrue(edgeNode.equals(backboneNode))
+        assertEquals(edgeNode, backboneNode)
         assertEquals(42, backboneNode.id)
         assertEquals(system, backboneNode.system)
         assertNull(system.getEdgeNode(42))
         assertNull(system.edgeNodes.firstOrNull { it === edgeNode })
         assertEquals(backboneNode, system.getBackboneNode(42))
         assertTrue(system.backboneNodes.contains(backboneNode))
+    }
+
+    @Test
+    fun `replacement call should fail with an exception of node is not part of the AS`() {
+        val node = AS(1024).createBackboneNode(1)
+        assertThrows<IllegalArgumentException> { defaultSystem.replaceByEdgeNode(node) }
+    }
+
+    @Test
+    fun `replacement call should fail with an exception if node cannot be removed from the AS`() {
+        val system1 = AS(0)
+        val system2 = AS(0)
+        val node = system1.createBackboneNode(1)
+        assertThrows<IllegalStateException> { system2.replaceByEdgeNode(node) }
     }
 }

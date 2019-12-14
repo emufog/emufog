@@ -23,22 +23,22 @@
  */
 package emufog.config
 
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.nio.file.Paths
 
 internal class ConfigTest {
 
     @Test
     fun `test a not yaml file`() {
-        Assertions.assertThrows(IllegalArgumentException::class.java) {
+        assertThrows<IllegalArgumentException> {
             Config.updateConfig(Paths.get("file.txt"))
         }
     }
 
     @Test
     fun `test a directory`() {
-        Assertions.assertThrows(IllegalArgumentException::class.java) {
+        assertThrows<IllegalArgumentException> {
             Config.updateConfig(Paths.get("."))
         }
     }

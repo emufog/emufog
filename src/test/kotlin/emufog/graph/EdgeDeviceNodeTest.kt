@@ -28,6 +28,7 @@ import emufog.container.FogContainer
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
@@ -111,7 +112,7 @@ internal class EdgeDeviceNodeTest {
     fun `equals with different node with same id should return true`() {
         val node = EdgeDeviceNode(1, AS(42), emulationNode = defaultEmulationNode)
 
-        assertTrue(node == defaultNode)
+        assertEquals(node, defaultNode)
         assertFalse(node === defaultNode)
     }
 
@@ -119,32 +120,32 @@ internal class EdgeDeviceNodeTest {
     fun `equals with different node with different id should return false`() {
         val node = EdgeDeviceNode(35, defaultAS, emulationNode = defaultEmulationNode)
 
-        assertFalse(node == defaultNode)
+        assertNotEquals(node, defaultNode)
         assertFalse(node === defaultNode)
     }
 
     @Test
     fun `equals with same object should return true`() {
-        assertTrue(defaultNode == defaultNode)
+        assertEquals(defaultNode, defaultNode)
     }
 
     @Test
     fun `equals with null should return false`() {
-        assertFalse(defaultNode.equals(null))
+        assertNotEquals(defaultNode, null)
     }
 
     @Test
     fun `equals with edge device node with same id should return true`() {
         val node = BackboneNode(1, defaultAS)
 
-        assertTrue(node.equals(defaultNode))
+        assertEquals(node, defaultNode)
     }
 
     @Test
     fun `equals with edge node with same id should return true`() {
         val node = EdgeNode(1, defaultAS)
 
-        assertTrue(node.equals(defaultNode))
+        assertEquals(node, defaultNode)
     }
 
     @Test
