@@ -28,6 +28,7 @@ dependencies {
     runtime "ch.qos.logback:logback-classic:1.2.3"
 
     testImplementation "org.junit.jupiter:junit-jupiter:5.5.2"
+    testImplementation "io.mockk:mockk:1.9.3"
 }
 
 mainClassName = "emufog.Emufog"

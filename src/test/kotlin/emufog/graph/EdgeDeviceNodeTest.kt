@@ -25,32 +25,36 @@ package emufog.graph
 
 import emufog.container.DeviceContainer
 import emufog.container.FogContainer
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotEquals
-import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
-internal class BackboneNodeTest {
+internal class EdgeDeviceNodeTest {
 
     private val defaultAS = AS(0)
 
-    private val defaultNode = BackboneNode(1, defaultAS)
+    private val defaultContainer = DeviceContainer("docker", "tag", 1, 1F, 1, 1F)
+
+    private val defaultEmulationNode = EdgeEmulationNode("1.2.3.4", defaultContainer)
+
+    private val defaultNode = EdgeDeviceNode(1, defaultAS, emulationNode = defaultEmulationNode)
 
     @Test
-    fun `the node type should be backbone node`() {
-        assertEquals(NodeType.BACKBONE_NODE, defaultNode.type)
+    fun `the node type should be edge device`() {
+        assertEquals(NodeType.EDGE_DEVICE_NODE, defaultNode.type)
     }
 
     @Test
-    fun `the nodes name should return s1`() {
-        assertEquals("s1", defaultNode.name)
+    fun `the nodes name should return h1`() {
+        assertEquals("h1", defaultNode.name)
     }
 
     @Test
-    fun `toString should return s1`() {
-        assertEquals("s1", defaultNode.toString())
+    fun `toString should return h11`() {
+        assertEquals("h1", defaultNode.toString())
     }
 
     @Test
@@ -64,6 +68,11 @@ internal class BackboneNodeTest {
     }
 
     @Test
+    fun `the device's container should be equal to the emulation node`() {
+        assertEquals(defaultContainer, defaultNode.containerType)
+    }
+
+    @Test
     fun `test the autonomous system of the node`() {
         assertEquals(defaultAS, defaultNode.system)
     }
@@ -72,8 +81,8 @@ internal class BackboneNodeTest {
     fun `test the empty init function`() {
         assertTrue(defaultNode.edges.isEmpty())
         assertEquals(0, defaultNode.degree)
-        assertNull(defaultNode.emulationNode)
-        assertFalse(defaultNode.hasEmulationSettings())
+        assertEquals(defaultEmulationNode, defaultNode.emulationNode)
+        assertTrue(defaultNode.hasEmulationSettings())
     }
 
     @Test
@@ -82,13 +91,13 @@ internal class BackboneNodeTest {
         val node = BackboneNode(0, defaultAS, listOf(edge))
         assertFalse(node.edges.isEmpty())
         assertEquals(1, node.degree)
-        assertNull(node.emulationNode)
+        Assertions.assertNull(node.emulationNode)
         assertFalse(node.hasEmulationSettings())
     }
 
     @Test
     fun `add links to the node base attributes`() {
-        val node = BackboneNode(2, AS(42))
+        val node = EdgeDeviceNode(2, AS(42), emulationNode = defaultEmulationNode)
         assertTrue(node.edges.isEmpty())
         assertEquals(0, node.degree)
 
@@ -101,7 +110,7 @@ internal class BackboneNodeTest {
 
     @Test
     fun `equals with different node with same id should return true`() {
-        val node = BackboneNode(1, defaultAS)
+        val node = EdgeDeviceNode(1, AS(42), emulationNode = defaultEmulationNode)
 
         assertEquals(node, defaultNode)
         assertFalse(node === defaultNode)
@@ -109,7 +118,7 @@ internal class BackboneNodeTest {
 
     @Test
     fun `equals with different node with different id should return false`() {
-        val node = BackboneNode(35, defaultAS)
+        val node = EdgeDeviceNode(35, defaultAS, emulationNode = defaultEmulationNode)
 
         assertNotEquals(node, defaultNode)
         assertFalse(node === defaultNode)
@@ -127,8 +136,7 @@ internal class BackboneNodeTest {
 
     @Test
     fun `equals with edge device node with same id should return true`() {
-        val container = DeviceContainer("docker", "tag", 1, 1F, 1, 1F)
-        val node = EdgeDeviceNode(1, defaultAS, emptyList(), EdgeEmulationNode("1.2.3.4", container))
+        val node = BackboneNode(1, defaultAS)
 
         assertEquals(node, defaultNode)
     }
@@ -142,9 +150,7 @@ internal class BackboneNodeTest {
 
     @Test
     fun `set of emulation configurations should update`() {
-        val node = BackboneNode(2, AS(42))
-        assertFalse(node.hasEmulationSettings())
-        assertNull(node.emulationNode)
+        val node = EdgeDeviceNode(2, AS(42), emulationNode = defaultEmulationNode)
         val container = FogContainer("abc", "tag", 1024, 1F, 1, 1.5F)
         val emulationNode = EmulationNode("1.2.3.4", container)
         node.emulationNode = emulationNode

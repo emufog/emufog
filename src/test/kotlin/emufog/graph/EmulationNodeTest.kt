@@ -23,7 +23,6 @@
  */
 package emufog.graph
 
-import emufog.container.Container
 import emufog.container.DeviceContainer
 import emufog.container.FogContainer
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -39,11 +38,12 @@ internal class EmulationNodeTest {
 
     @Test
     fun `constructor test`() {
-        val container: Container = DeviceContainer("name", "latest", 1024, 2.4f, 1, 1.4f)
+        val container = DeviceContainer("name", "latest", 1024, 2.4f, 1, 1.4f)
         val actual = EmulationNode("1.2.3.4", container)
         assertEquals("1.2.3.4", actual.ip)
         assertEquals("name", actual.container.name)
         assertEquals(1024, actual.container.memoryLimit)
         assertEquals(2.4f, actual.container.cpuShare)
+        assertEquals(container, actual.container)
     }
 }

@@ -21,25 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.config
+package emufog.graph
 
+import emufog.container.DeviceContainer
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import java.nio.file.Paths
 
-internal class ConfigTest {
+internal class EdgeEmulationNodeTest {
 
-    @Test
-    fun `test a not yaml file`() {
-        assertThrows<IllegalArgumentException> {
-            Config.updateConfig(Paths.get("file.txt"))
-        }
-    }
+    private val defaultDeviceContainer = DeviceContainer("name", "tag", 1, 1F, 1, 1F)
+
+    private val defaultEmulationNode = EdgeEmulationNode("1.2.3.4", defaultDeviceContainer)
 
     @Test
-    fun `test a directory`() {
-        assertThrows<IllegalArgumentException> {
-            Config.updateConfig(Paths.get("."))
-        }
+    fun `the container should be a device container`() {
+        val emulationNode: EmulationNode = defaultEmulationNode
+        assertTrue(emulationNode.container is DeviceContainer)
+        assertEquals(defaultDeviceContainer, emulationNode.container)
     }
 }
