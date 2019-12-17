@@ -46,20 +46,18 @@ import java.nio.file.Path
  * @property fogNodeTypes list of possible fog node types that can be placed in the topology
  */
 class Config internal constructor(
-    @JvmField @JsonProperty("base-address") val baseAddress: String,
-    @JvmField @JsonProperty("overwrite-experiment-file") val overWriteOutputFile: Boolean,
-    @JvmField @JsonProperty("max-fog-nodes") val maxFogNodes: Int,
-    @JvmField @JsonProperty("cost-threshold") val costThreshold: Float,
-    @JvmField @JsonProperty("host-device-latency") val hostDeviceLatency: Float,
-    @JvmField @JsonProperty("host-device-bandwidth") val hostDeviceBandwidth: Float,
+    @JsonProperty("base-address") val baseAddress: String,
+    @JsonProperty("overwrite-experiment-file") val overWriteOutputFile: Boolean,
+    @JsonProperty("max-fog-nodes") val maxFogNodes: Int,
+    @JsonProperty("cost-threshold") val costThreshold: Float,
+    @JsonProperty("host-device-latency") val hostDeviceLatency: Float,
+    @JsonProperty("host-device-bandwidth") val hostDeviceBandwidth: Float,
     @JsonProperty("device-node-types") deviceNodeTypes: Collection<DeviceTypeConfig>,
     @JsonProperty("fog-node-types") fogNodeTypes: Collection<FogTypeConfig>
 ) {
 
-    @JvmField
     val deviceNodeTypes: List<DeviceContainer>
 
-    @JvmField
     val fogNodeTypes: List<FogContainer>
 
     init {
