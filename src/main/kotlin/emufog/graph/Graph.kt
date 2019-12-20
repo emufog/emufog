@@ -135,15 +135,7 @@ class Graph(val config: Config) {
      * @param id unique id of the as
      * @return autonomous system with the id
      */
-    fun getOrCreateAutonomousSystem(id: Int): AS {
-        var system = getAutonomousSystem(id)
-        if (system == null) {
-            system = AS(id)
-            systemsMutable.add(system)
-        }
-
-        return system
-    }
+    fun getOrCreateAutonomousSystem(id: Int): AS = getAutonomousSystem(id) ?: AS(id).also { systemsMutable.add(it) }
 
     /**
      * Creates a new edge node in the graph.

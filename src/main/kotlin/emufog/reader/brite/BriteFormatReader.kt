@@ -26,8 +26,6 @@ package emufog.reader.brite
 import emufog.config.Config
 import emufog.graph.Graph
 import emufog.reader.GraphReader
-import java.io.BufferedReader
-import java.io.IOException
 import java.nio.file.Path
 
 /**
@@ -42,7 +40,6 @@ object BriteFormatReader : GraphReader {
      * @param files the list of input files must only contain one file path
      * @throws BriteFormatException throw if format does not match the BRITE standard
      */
-    @Throws(IOException::class, BriteFormatException::class)
     override fun readGraph(files: List<Path>): Graph {
         require(files.isNotEmpty()) { "No files given to read in." }
         require(files.size == 1) { "The BRITE reader only supports one input file." }
@@ -63,32 +60,39 @@ private class BriteFormatReaderImpl internal constructor(path: Path) {
          * number of columns defined for a line containing an edge
          */
         private const val EDGE_COLUMNS = 9
+
+        private val regex = "\t".toRegex()
+
+        private inline fun <T> String.toType(f: String.() -> T, exceptionMsg: () -> String): T {
+            try {
+                return f()
+            } catch (e: NumberFormatException) {
+                throw BriteFormatException(exceptionMsg(), e)
+            }
+        }
+
+        private inline fun String.asInt(msg: () -> String) = toType(String::toInt, msg)
+
+        private inline fun String.asFloat(msg: () -> String) = toType(String::toFloat, msg)
     }
 
-    private val reader: BufferedReader = path.toFile().bufferedReader()
+    private val reader = path.toFile().bufferedReader()
 
-    private val graph: Graph = Graph(Config.config!!)
+    private val graph = Graph(Config.config!!)
 
-    private val regex: Regex = "\t".toRegex()
-
-    private fun nextLine(): String? = reader.readLine()
-
-    @Throws(IOException::class, BriteFormatException::class)
     internal fun readGraph(): Graph {
-        var line = nextLine()
-        while (line != null) {
-            // read in the nodes of the graph
-            if (line.startsWith("Nodes:")) {
+        val lambda: (String) -> Unit = {
+            if (it.startsWith("Nodes:")) {
                 parseNodes()
             }
 
             // read in the edges of the graph
-            if (line.startsWith("Edges:")) {
+            if (it.startsWith("Edges:")) {
                 parseEdges()
             }
-
-            line = nextLine()
         }
+
+        iterateLines(lambda)
 
         return graph
     }
@@ -96,17 +100,14 @@ private class BriteFormatReaderImpl internal constructor(path: Path) {
     /**
      * Reads in all the nodes from the BRITE file and adds them to the given graph.
      */
-    @Throws(IOException::class, BriteFormatException::class)
-    private fun parseNodes() {
-        var line = nextLine()
-        while (!line.isNullOrBlank()) {
-            // split the line into pieces and parse them separately
-            parseNode(line)
-            line = nextLine()
-        }
-    }
+    private fun parseNodes() = iterateLines({ parseNode(it) }, { !this.isNullOrBlank() })
 
-    @Throws(BriteFormatException::class)
+    /**
+     * Reads in all the edges from the BRITE file and adds them to the given graph. The
+     * required nodes have to present in the given graph.
+     */
+    private fun parseEdges() = iterateLines({ parseEdge(it) }, { !this.isNullOrBlank() })
+
     private fun parseNode(line: String) {
         val values = line.split(regex)
         if (values.size < NODE_COLUMNS) {
@@ -120,21 +121,6 @@ private class BriteFormatReaderImpl internal constructor(path: Path) {
         graph.createEdgeNode(id, graph.getOrCreateAutonomousSystem(asId))
     }
 
-    /**
-     * Reads in all the edges from the BRITE file and adds them to the given graph. The
-     * required nodes have to present in the given graph.
-     */
-    @Throws(IOException::class, BriteFormatException::class)
-    private fun parseEdges() {
-        var line = nextLine()
-        while (!line.isNullOrBlank()) {
-            // split the line into pieces and parse them separately
-            parseEdge(line)
-            line = nextLine()
-        }
-    }
-
-    @Throws(BriteFormatException::class)
     private fun parseEdge(line: String) {
         val values = line.split(regex)
         if (values.size < EDGE_COLUMNS) {
@@ -149,26 +135,21 @@ private class BriteFormatReaderImpl internal constructor(path: Path) {
 
         // get the source and destination nodes from the existing graph
         val fromNode = graph.getEdgeNode(from)
-        require(fromNode != null) { "The link starting node: $from is not part of the graph." }
+        check(fromNode != null) { "The link starting node: $from is not part of the graph." }
         val toNode = graph.getEdgeNode(to)
-        require(toNode != null) { "The link ending node: $from is not part of the graph." }
+        check(toNode != null) { "The link ending node: $from is not part of the graph." }
 
         // create the new edge
         graph.createEdge(id, fromNode, toNode, delay, bandwidth)
     }
 
-    @Throws(BriteFormatException::class)
-    private fun <T> String.toType(f: (String) -> T, exceptionMsg: () -> String): T {
-        try {
-            return f(this)
-        } catch (e: NumberFormatException) {
-            throw BriteFormatException(exceptionMsg(), e)
+    private fun nextLine(): String? = reader.readLine()
+
+    private fun iterateLines(block: (String) -> Unit, condition: String?.() -> Boolean = { true }) {
+        var line = nextLine()
+        while (line != null && line.condition()) {
+            block(line)
+            line = nextLine()
         }
     }
-
-    @Throws(BriteFormatException::class)
-    private fun String.asInt(msg: () -> String) = toType(String::toInt, msg)
-
-    @Throws(BriteFormatException::class)
-    private fun String.asFloat(msg: () -> String) = toType(String::toFloat, msg)
 }
