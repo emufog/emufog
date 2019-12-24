@@ -40,7 +40,6 @@ object BackboneClassifier {
      * Starts the backbone classification algorithm on the given graph.
      * Modifies the graph including backbone and edge of the network.
      */
-    @JvmStatic
     fun identifyBackbone(graph: Graph) {
         // 1st step sequentially
         LOG.debug("Start Backbone Classification")
@@ -52,7 +51,7 @@ object BackboneClassifier {
 
         // 2nd step in parallel
         start = System.nanoTime()
-        graph.systems.parallelStream().forEach { BackboneWorker.identifyBackbone(it) }
+        graph.systems.forEach { BackboneWorker.identifyBackbone(it) }
         LOG.debug("Graph Step 2 - Time: {}", formatTimeInterval(start, System.nanoTime()))
         LOG.debug("Backbone Size: {}", graph.backboneNodes.size)
         LOG.debug("Edge Size: {}", graph.edgeNodes.size)
@@ -70,6 +69,6 @@ object BackboneClassifier {
             it.destination.toBackboneNode()
         }
     }
-
-    private fun Node.toBackboneNode() = this.system.replaceByBackboneNode(this)
 }
+
+internal fun Node?.toBackboneNode() = this?.let { system.replaceByBackboneNode(this) }
