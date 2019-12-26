@@ -42,11 +42,6 @@ internal object BackboneWorker {
 
     private val LOG = LoggerFactory.getLogger(BackboneWorker::class.java)
 
-    /**
-     * percentage of the average degree to compare to
-     */
-    private const val BACKBONE_DEGREE_PERCENTAGE = 0.6f
-
     internal fun identifyBackbone(system: AS) {
         //2nd step
         var start = System.nanoTime()
@@ -67,9 +62,10 @@ internal object BackboneWorker {
      * Converts nodes with an above average degree to a backbone node.
      */
     private fun convertHighDegrees(system: AS) {
-        val averageDegree = calculateAverageDegree(system) * BACKBONE_DEGREE_PERCENTAGE
-        val toConvert = system.edgeNodes.filter { it.degree >= averageDegree }
-        toConvert.forEach { it.system.replaceByBackboneNode(it) }
+        val averageDegree = calculateAverageDegree(system)
+        system.edgeNodes
+            .filter { it.degree > averageDegree }
+            .forEach { it.toBackboneNode() }
     }
 
     /**
@@ -78,17 +74,17 @@ internal object BackboneWorker {
      * @return the average degree
      */
     private fun calculateAverageDegree(system: AS): Double {
-        val edgeNodes = system.edgeNodes
-        val backboneNodes = system.backboneNodes
-        val n = backboneNodes.size + edgeNodes.size
-        if (n == 0) {
-            return 0.0
+        var average = 0.0
+        var count = 0
+        val updateAverage: (Node) -> Unit = {
+            count++
+            average += (it.degree - average) / count
         }
 
-        var sum: Long = 0
-        edgeNodes.forEach { sum += it.degree }
-        backboneNodes.forEach { sum += it.degree }
-        return sum.toDouble() / n
+        system.edgeNodes.forEach { updateAverage(it) }
+        system.backboneNodes.forEach { updateAverage(it) }
+
+        return average
     }
 }
 
@@ -100,7 +96,7 @@ private class BackboneConnector(private val system: AS) {
 
     private val queue: Queue<Node> = ArrayDeque()
 
-    private val predecessors: MutableMap<Node, Node?> = HashMap()
+    private val predecessors: MutableMap<Node, Node?> = hashMapOf()
 
     private fun Node?.isType(type: NodeType) = this != null && this.type == type
 
@@ -114,9 +110,11 @@ private class BackboneConnector(private val system: AS) {
         }
 
         // start with any backbone node
-        val node: Node = backboneNodes.first()
+        val node = backboneNodes.first()
         predecessors[node] = null
         queue.add(node)
+
+
         while (!queue.isEmpty()) {
             processNode(queue.poll())
         }
@@ -135,9 +133,9 @@ private class BackboneConnector(private val system: AS) {
 
         // add or update neighborhood
         node.edges
-            .filter { !it.isCrossASEdge() }
+            .filterNot { it.isCrossASEdge() }
             .map { it.getDestinationForSource(node) }
-            .filter { it != null && !visited[it.id] }
+            .filterNot { it == null || visited[it.id] }
             .forEach { updateNeighborNode(it!!, node) }
     }
 
@@ -162,6 +160,4 @@ private class BackboneConnector(private val system: AS) {
             predecessor = predecessors[predecessor]
         }
     }
-
-    private fun Node?.toBackboneNode() = this?.let { system.replaceByBackboneNode(this) }
 }
