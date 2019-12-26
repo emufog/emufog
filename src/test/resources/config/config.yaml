@@ -1,0 +1,28 @@
+base-address: 10.0.0.0
+overwrite-experiment-file: true
+max-fog-nodes: 100
+cost-threshold: 6
+host-device-latency: 0
+host-device-bandwidth: 1000
+device-node-types:
+  - container-image:
+      name: ubuntu
+      version: latest
+    scaling-factor: 1
+    average-device-count: 1
+    memory-limit: 524288000
+    cpu-share: 1
+fog-node-types:
+  - container-image:
+      name: ubuntu
+      version: trusty
+    maximum-connections: 1
+    costs: 1
+    memory-limit: 1048576000
+    cpu-share: 1
+  - container-image:
+      name: debian
+    maximum-connections: 5
+    costs: 2.5
+    memory-limit: 1048576000
+    cpu-share: 1.5

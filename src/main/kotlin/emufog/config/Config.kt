@@ -81,7 +81,6 @@ class Config internal constructor(
          * @throws IOException thrown if the read in fails
          * @throws IllegalArgumentException if the given path is not a .yaml file
          */
-        @Throws(IOException::class)
         fun updateConfig(path: Path) {
             val matcher = FileSystems.getDefault().getPathMatcher("glob:**.yaml")
             require(matcher.matches(path)) { "The file ending does not match .yaml." }

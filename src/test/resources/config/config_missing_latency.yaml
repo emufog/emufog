@@ -1,0 +1,7 @@
+base-address: 10.0.0.0
+overwrite-experiment-file: true
+max-fog-nodes: 100
+cost-threshold: 6
+host-device-bandwidth: 1000
+device-node-types:
+fog-node-types:
