@@ -42,11 +42,6 @@ internal object BackboneWorker {
 
     private val LOG = LoggerFactory.getLogger(BackboneWorker::class.java)
 
-    /**
-     * percentage of the average degree to compare to
-     */
-    private const val BACKBONE_DEGREE_PERCENTAGE = 0.6f
-
     internal fun identifyBackbone(system: AS) {
         //2nd step
         var start = System.nanoTime()
@@ -67,9 +62,9 @@ internal object BackboneWorker {
      * Converts nodes with an above average degree to a backbone node.
      */
     private fun convertHighDegrees(system: AS) {
-        val averageDegree = calculateAverageDegree(system) * BACKBONE_DEGREE_PERCENTAGE
+        val averageDegree = calculateAverageDegree(system)
         system.edgeNodes
-            .filter { it.degree >= averageDegree }
+            .filter { it.degree > averageDegree }
             .forEach { it.toBackboneNode() }
     }
 
@@ -81,14 +76,13 @@ internal object BackboneWorker {
     private fun calculateAverageDegree(system: AS): Double {
         var average = 0.0
         var count = 0
-        val lambda = { n: Node ->
-            Unit
-            count ++
-            average += (n.degree - average) / count
+        val updateAverage: (Node) -> Unit = {
+            count++
+            average += (it.degree - average) / count
         }
 
-        system.edgeNodes.forEach { lambda(it) }
-        system.backboneNodes.forEach { lambda(it) }
+        system.edgeNodes.forEach { updateAverage(it) }
+        system.backboneNodes.forEach { updateAverage(it) }
 
         return average
     }
@@ -121,7 +115,7 @@ private class BackboneConnector(private val system: AS) {
         queue.add(node)
 
 
-        while (! queue.isEmpty()) {
+        while (!queue.isEmpty()) {
             processNode(queue.poll())
         }
     }
@@ -142,7 +136,7 @@ private class BackboneConnector(private val system: AS) {
             .filterNot { it.isCrossASEdge() }
             .map { it.getDestinationForSource(node) }
             .filterNot { it == null || visited[it.id] }
-            .forEach { updateNeighborNode(it !!, node) }
+            .forEach { updateNeighborNode(it!!, node) }
     }
 
     private fun updateNeighborNode(neighbor: Node, node: Node) {
