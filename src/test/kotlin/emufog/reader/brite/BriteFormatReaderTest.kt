@@ -4,26 +4,36 @@ import emufog.config.Config
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
+import io.mockk.unmockkAll
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.TestInstance.Lifecycle
 import org.junit.jupiter.api.assertThrows
 import java.nio.file.Paths
 import kotlin.math.abs
 
+@TestInstance(Lifecycle.PER_CLASS)
 internal class BriteFormatReaderTest {
 
-    private val resourcePath = Paths.get("src", "test", "resources")
+    private val resourcePath = Paths.get("src", "test", "resources", "brite")
 
     private val config = mockk<Config> {
         every { baseAddress } returns "1.2.3.4"
     }
 
-    @BeforeEach
+    @BeforeAll
     fun mockConfig() {
         mockkObject(Config)
         every { Config.config } returns config
+    }
+
+    @AfterAll
+    fun resetMock() {
+        unmockkAll()
     }
 
     @Test
