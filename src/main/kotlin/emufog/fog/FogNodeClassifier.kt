@@ -23,7 +23,6 @@
  */
 package emufog.fog
 
-import emufog.config.Config
 import emufog.graph.Graph
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.streams.toList
@@ -36,12 +35,12 @@ class FogNodeClassifier(private val graph: Graph) {
     /**
      * the graph's config to use for the fog node classification
      */
-    internal val config: Config = graph.config
+    internal val config = graph.config
 
     /**
      * counter of remaining fog nodes to place in the graph, atomic for parallel access
      */
-    private val counter: AtomicInteger = AtomicInteger(config.maxFogNodes)
+    private val counter = AtomicInteger(config.maxFogNodes)
 
     /**
      * Runs the fog node placement algorithm on the graph associated with this instance. All autonomous systems of the
@@ -51,18 +50,18 @@ class FogNodeClassifier(private val graph: Graph) {
      * @return result object of the fog node placement
      */
     fun findPossibleFogNodes(): FogResult {
+        // process all systems in parallel
+        val results = graph.systems.parallelStream().map { FogWorker(it, this).findFogNodes() }.toList()
+
         // init empty failed result
         val result = FogResult()
-        // process all systems in parallel
-        val results = graph.systems.parallelStream()
-            .map { FogWorker(it, this).findFogNodes() }
-            .toList()
         // check if all part results are success
         val failed = results.firstOrNull { !it.status }
         if (failed == null) {
             result.setSuccess()
             results.forEach { result.addPlacements(it.placements) }
         }
+
         return result
     }
 
@@ -71,9 +70,7 @@ class FogNodeClassifier(private val graph: Graph) {
      *
      * @return `true` if there are, `false` if 0
      */
-    internal fun fogNodesLeft(): Boolean {
-        return counter.get() > 0
-    }
+    internal fun fogNodesLeft(): Boolean = counter.get() > 0
 
     /**
      * Decrements the remaining fog node to place by 1.

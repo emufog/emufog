@@ -29,17 +29,17 @@ package emufog.fog
  * sorts descending to the average connection costs.
  */
 internal class FogComparator : Comparator<BaseNode> {
+
     override fun compare(o1: BaseNode, o2: BaseNode): Int {
-        var cost1 = o1.averageDeploymentCosts
-        var cost2 = o2.averageDeploymentCosts
-        if (cost1 < cost2) {
-            return -1
+        val cost1 = o1.averageDeploymentCosts
+        checkNotNull(cost1) { "No deployment costs for node: ${o1.node.id}" }
+        val cost2 = o2.averageDeploymentCosts
+        checkNotNull(cost2) { "No deployment costs for node: ${o2.node.id}" }
+
+        return when {
+            cost1 < cost2 -> -1
+            cost2 < cost1 -> 1
+            else -> o1.averageConnectionCosts.compareTo(o2.averageConnectionCosts)
         }
-        if (cost2 < cost1) {
-            return 1
-        }
-        cost1 = o1.averageConnectionCosts
-        cost2 = o2.averageConnectionCosts
-        return cost1.compareTo(cost2)
     }
 }
