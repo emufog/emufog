@@ -23,7 +23,6 @@
  */
 package emufog.fog
 
-import emufog.config.Config
 import emufog.graph.AS
 import emufog.graph.Edge
 import emufog.graph.EdgeDeviceNode
@@ -32,7 +31,6 @@ import emufog.graph.Node
 import emufog.util.ConversionsUtils.formatTimeInterval
 import org.slf4j.LoggerFactory
 import java.util.PriorityQueue
-import java.util.Queue
 
 /**
  * This class isolates the fog node placement algorithm of one of the autonomous systems to run it independent of
@@ -64,11 +62,6 @@ internal class FogWorker(
             return edge.delay
         }
     }
-
-    /**
-     * the config to use for the fog node placement algorithm
-     */
-    private val config: Config = classifier.config
 
     /**
      * mapping of nodes from the underlying graph to their respective base nodes
@@ -140,13 +133,12 @@ internal class FogWorker(
         var start = System.nanoTime()
         // find the optimal fog type for the remaining nodes in the graph
         val fogNodes = nodes.values.toList()
-        fogNodes.forEach { it.findFogType(config.fogNodeTypes) }
+        fogNodes.forEach { it.findFogType(classifier.config.fogNodeTypes) }
         LOG.debug("Time to find possible fog types for {}: {}", system, formatTimeInterval(start, System.nanoTime()))
 
         start = System.nanoTime()
         // sort the possible fog nodes with a FogComparator
-        val sorted = fogNodes.sortedWith(FogComparator())
-        val next = sorted.first()
+        val next = fogNodes.sortedWith(FogComparator()).first()
         LOG.debug(
             "Time to find the fog node placement for {}: {}", system, formatTimeInterval(start, System.nanoTime())
         )
@@ -165,8 +157,8 @@ internal class FogWorker(
         // get covered nodes by the fog node placement
         val coveredNodes = fogNode.getCoveredStartingNodes()
         coveredNodes.forEach {
-            val coveredStartingNode = it.key
-            coveredStartingNode.decreaseDeviceCount(it.value)
+            val coveredStartingNode = it.first
+            coveredStartingNode.decreaseDeviceCount(it.second)
 
             // node is fully covered
             if (coveredStartingNode.deviceCount <= 0) {
@@ -174,7 +166,7 @@ internal class FogWorker(
                 nodes.remove(coveredStartingNode.node)
             }
 
-            coveredStartingNode.getReachableNodes()
+            coveredStartingNode.reachableNodes
                 .filter { n -> !n.hasConnections() }
                 .forEach { n -> nodes.remove(n.node) }
         }
@@ -183,8 +175,7 @@ internal class FogWorker(
         nodes.remove(fogNode.node)
 
         // remove all covered nodes from the edge nodes set
-        val toDelete = coveredNodes.map { it.key }
-        startingNodes.removeAll(toDelete)
+        startingNodes.removeAll(coveredNodes.map { it.first })
     }
 
     /**
@@ -196,17 +187,18 @@ internal class FogWorker(
     private fun calculateConnectionCosts(startingNode: StartingNode) {
         // push the starting node as a starting point in the queue
         startingNode.setCosts(startingNode, startingNode, 0f)
-        val queue: Queue<BaseNode> = PriorityQueue(CostComparator(startingNode))
+        val queue = PriorityQueue(CostComparator(startingNode))
         queue.add(startingNode)
 
         // using the dijkstra algorithm to iterate the graph
-        while (!queue.isEmpty()) {
+        while (queue.isNotEmpty()) {
             val current = queue.poll()
             val currentCosts = current.getCosts(startingNode)
+            checkNotNull(currentCosts) { "No costs associated with this node in the graph." }
 
             // check all edges leaving the current node
             current.node.edges
-                .filter { !it.isCrossASEdge() }
+                .filterNot { it.isCrossASEdge() }
                 .forEach {
                     val neighbor = it.getDestinationForSource(current.node)
 
@@ -217,13 +209,13 @@ internal class FogWorker(
 
                     // abort on costs above the threshold
                     val nextCosts = currentCosts + calculateCosts(it)
-                    if (nextCosts > config.costThreshold) {
+                    if (nextCosts > classifier.config.costThreshold) {
                         return
                     }
 
                     val neighborNode = getBaseNode(neighbor)
                     val neighborCosts = neighborNode.getCosts(startingNode)
-                    if (neighborCosts == Float.MAX_VALUE) {
+                    if (neighborCosts == null) {
                         // newly discovered node
                         neighborNode.setCosts(startingNode, current, nextCosts)
                         queue.add(neighborNode)
@@ -242,9 +234,7 @@ internal class FogWorker(
      * @param node node to get the base node for
      * @return base node instance for the given node
      */
-    private fun getBaseNode(node: Node): BaseNode {
-        return nodes.computeIfAbsent(node) { BaseNode(it) }
-    }
+    private fun getBaseNode(node: Node): BaseNode = nodes.computeIfAbsent(node) { BaseNode(it) }
 
     /**
      * Creates and returns a new starting node based on the given edge node. Adds the newly created node to the mapping

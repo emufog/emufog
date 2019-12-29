@@ -25,7 +25,6 @@ package emufog.fog
 
 import emufog.container.FogContainer
 import emufog.graph.Node
-import emufog.util.Tuple
 import org.slf4j.LoggerFactory
 import kotlin.math.min
 
@@ -45,12 +44,12 @@ internal open class BaseNode(internal val node: Node) {
     /**
      * mapping of starting nodes to their respective tuple of predecessor in the path and the overall connection costs
      */
-    private val costs: MutableMap<StartingNode, Tuple<BaseNode, Float>> = HashMap()
+    private val costs: MutableMap<StartingNode, Pair<BaseNode, Float>> = HashMap()
 
     /**
      * indicator if the connections have been updated and therefore needs to be reevaluated
      */
-    var modified: Boolean = true
+    var modified = true
 
     /**
      * the fog type with the optimal costs, device count ration
@@ -61,7 +60,7 @@ internal open class BaseNode(internal val node: Node) {
     /**
      * number of devices covered by this node
      */
-    private var coveredCount: Int = 0
+    private var coveredCount = 0
 
     /**
      * average connection costs of all associated connections
@@ -78,19 +77,17 @@ internal open class BaseNode(internal val node: Node) {
     /**
      * Returns the average deployment costs for all edge nodes connected to this node
      */
-    val averageDeploymentCosts: Float
+    val averageDeploymentCosts: Float?
         get() = calcAverageDeploymentCosts()
 
     /**
      * Returns the connection costs for the given starting node. If this node is not connected to the given node
-     * [Float.MAX_VALUE] is returned.
+     * `null` is returned.
      *
      * @param node node to retrieve connection costs for
      * @return connection costs for the given node
      */
-    internal fun getCosts(node: StartingNode): Float {
-        return costs[node]?.value ?: Float.MAX_VALUE
-    }
+    internal fun getCosts(node: StartingNode): Float? = costs[node]?.second
 
     /**
      * Sets the connection costs for a path from the given starting node to this node. Requires the predecessor on the
@@ -101,7 +98,7 @@ internal open class BaseNode(internal val node: Node) {
      * @param costs connection costs
      */
     internal fun setCosts(node: StartingNode, predecessor: BaseNode, costs: Float) {
-        this.costs[node] = Tuple(predecessor, costs)
+        this.costs[node] = predecessor to costs
         node.addPossibleNode(this)
     }
 
@@ -110,9 +107,7 @@ internal open class BaseNode(internal val node: Node) {
      *
      * @return `true` if connections are available, `false` otherwise
      */
-    internal fun hasConnections(): Boolean {
-        return costs.isNotEmpty()
-    }
+    internal fun hasConnections(): Boolean = costs.isNotEmpty()
 
     /**
      * Returns a list of all covered starting nodes by this node. The list contains of a tuple of the starting node
@@ -120,17 +115,17 @@ internal open class BaseNode(internal val node: Node) {
      *
      * @return list of covered starting node and their respective device count
      */
-    internal fun getCoveredStartingNodes(): List<Tuple<StartingNode, Int>> {
+    internal fun getCoveredStartingNodes(): List<Pair<StartingNode, Int>> {
         // sort the connections based on their connection costs in ascending order
-        val startingNodes: List<StartingNode> = costs.keys.sortedBy { costs[it]!!.value }.map { it }
-        val result: MutableList<Tuple<StartingNode, Int>> = mutableListOf()
+        val startingNodes = costs.keys.sortedBy { costs[it]!!.second }.map { it }
+        val result = mutableListOf<Pair<StartingNode, Int>>()
         var remaining = coveredCount
 
         // pick starting nodes greedy that add up to coveredCount
         var i = 0
         while (i < startingNodes.size && remaining > 0) {
             val node = startingNodes[i]
-            result.add(Tuple(node, min(remaining, node.deviceCount)))
+            result.add(node to min(remaining, node.deviceCount))
             remaining -= node.deviceCount
             ++i
         }
@@ -175,8 +170,8 @@ internal open class BaseNode(internal val node: Node) {
             }
         }
 
-        require(type != null) { "The node's type is null." }
-        require(coveredCount > 0) { "No node is covered by this base node" }
+        checkNotNull(type) { "The node's type is null." }
+        check(coveredCount > 0) { "No node is covered by this base node" }
 
         LOG.debug("Set the fog type for {} to {}", node, type)
         calculateAverageCosts()
@@ -192,7 +187,7 @@ internal open class BaseNode(internal val node: Node) {
             return
         }
 
-        val sum: Double = costs.values.sumByDouble { it.value.toDouble() }
+        val sum = costs.values.sumByDouble { it.second.toDouble() }
         averageConnectionCosts = (sum / costs.size).toFloat()
     }
 
@@ -201,9 +196,9 @@ internal open class BaseNode(internal val node: Node) {
      *
      * @return average deployment costs
      */
-    private fun calcAverageDeploymentCosts(): Float {
+    private fun calcAverageDeploymentCosts(): Float? {
         if (type == null || coveredCount == 0) {
-            throw IllegalStateException("Nothing to cover. Hence no costs.")
+            return null
         }
 
         return type!!.costs / coveredCount
@@ -217,7 +212,5 @@ internal open class BaseNode(internal val node: Node) {
         return node == other.node
     }
 
-    override fun hashCode(): Int {
-        return node.hashCode()
-    }
+    override fun hashCode(): Int = node.hashCode()
 }
