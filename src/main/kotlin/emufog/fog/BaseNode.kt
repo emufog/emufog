@@ -44,7 +44,7 @@ internal open class BaseNode(internal val node: Node) {
     /**
      * mapping of starting nodes to their respective tuple of predecessor in the path and the overall connection costs
      */
-    private val costs: MutableMap<StartingNode, Pair<BaseNode, Float>> = HashMap()
+    private val costs: MutableMap<StartingNode, Float> = HashMap()
 
     /**
      * indicator if the connections have been updated and therefore needs to be reevaluated
@@ -87,18 +87,18 @@ internal open class BaseNode(internal val node: Node) {
      * @param node node to retrieve connection costs for
      * @return connection costs for the given node
      */
-    internal fun getCosts(node: StartingNode): Float? = costs[node]?.second
+    internal fun getCosts(node: StartingNode): Float? = costs[node]
 
     /**
      * Sets the connection costs for a path from the given starting node to this node. Requires the predecessor on the
      * path and the connection costs.
      *
      * @param node starting node in the connection path
-     * @param predecessor the predecessor on the connection path
      * @param costs connection costs
      */
-    internal fun setCosts(node: StartingNode, predecessor: BaseNode, costs: Float) {
-        this.costs[node] = predecessor to costs
+    internal fun setCosts(node: StartingNode, costs: Float) {
+        this.costs[node] = costs
+        calculateAverageConnectionCosts()
         node.addPossibleNode(this)
     }
 
@@ -117,7 +117,7 @@ internal open class BaseNode(internal val node: Node) {
      */
     internal fun getCoveredStartingNodes(): List<Pair<StartingNode, Int>> {
         // sort the connections based on their connection costs in ascending order
-        val startingNodes = costs.keys.sortedBy { costs[it]!!.second }.map { it }
+        val startingNodes = costs.keys.sortedBy { costs[it]!! }.map { it }
         val result = mutableListOf<Pair<StartingNode, Int>>()
         var remaining = coveredCount
 
@@ -141,6 +141,9 @@ internal open class BaseNode(internal val node: Node) {
      */
     internal fun removeStartingNode(node: StartingNode) {
         modified = costs.remove(node) != null
+        if (modified) {
+            calculateAverageConnectionCosts()
+        }
     }
 
     /**
@@ -174,20 +177,19 @@ internal open class BaseNode(internal val node: Node) {
         check(coveredCount > 0) { "No node is covered by this base node" }
 
         LOG.debug("Set the fog type for {} to {}", node, type)
-        calculateAverageCosts()
         modified = false
     }
 
     /**
      * Pre-calculates the average connection costs for all possible connections and sets the [averageConnectionCosts].
      */
-    private fun calculateAverageCosts() {
+    private fun calculateAverageConnectionCosts() {
         if (costs.isEmpty()) {
             averageConnectionCosts = 0F
             return
         }
 
-        val sum = costs.values.sumByDouble { it.second.toDouble() }
+        val sum = costs.values.sumByDouble { it.toDouble() }
         averageConnectionCosts = (sum / costs.size).toFloat()
     }
 
