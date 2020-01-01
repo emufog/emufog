@@ -186,7 +186,7 @@ internal class FogWorker(
      */
     private fun calculateConnectionCosts(startingNode: StartingNode) {
         // push the starting node as a starting point in the queue
-        startingNode.setCosts(startingNode, startingNode, 0f)
+        startingNode.setCosts(startingNode, 0F)
         val queue = PriorityQueue(CostComparator(startingNode))
         queue.add(startingNode)
 
@@ -217,11 +217,11 @@ internal class FogWorker(
                     val neighborCosts = neighborNode.getCosts(startingNode)
                     if (neighborCosts == null) {
                         // newly discovered node
-                        neighborNode.setCosts(startingNode, current, nextCosts)
+                        neighborNode.setCosts(startingNode, nextCosts)
                         queue.add(neighborNode)
                     } else if (nextCosts < neighborCosts) {
                         // update an already discovered node
-                        neighborNode.setCosts(startingNode, current, nextCosts)
+                        neighborNode.setCosts(startingNode, nextCosts)
                     }
                 }
         }

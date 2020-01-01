@@ -60,8 +60,7 @@ internal class StartingNode(node: EdgeNode) : BaseNode(node) {
      * @param node possible fog node
      */
     fun addPossibleNode(node: BaseNode) {
-        reachableNodesMutable.add(node)
-        modified = true
+        modified = reachableNodesMutable.add(node)
     }
 
     /**
