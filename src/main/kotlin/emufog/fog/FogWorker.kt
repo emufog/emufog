@@ -23,14 +23,16 @@
  */
 package emufog.fog
 
+import emufog.container.FogContainer
 import emufog.graph.AS
 import emufog.graph.Edge
 import emufog.graph.EdgeDeviceNode
 import emufog.graph.EdgeNode
 import emufog.graph.Node
+import emufog.util.BinaryMinHeap
 import emufog.util.ConversionsUtils.formatTimeInterval
+import emufog.util.Heap
 import org.slf4j.LoggerFactory
-import java.util.PriorityQueue
 
 /**
  * This class isolates the fog node placement algorithm of one of the autonomous systems to run it independent of
@@ -48,25 +50,8 @@ internal class FogWorker(
 ) {
 
     companion object {
-
         private val LOG = LoggerFactory.getLogger(FogWorker::class.java)
-
-        /**
-         * Calculates the costs for a given edge of the graph.
-         *
-         * @param edge edge to calculate the costs for
-         * @return costs of the given edge
-         */
-        private fun calculateCosts(edge: Edge): Float {
-            // currently using delay as a cost function
-            return edge.latency
-        }
     }
-
-    /**
-     * mapping of nodes from the underlying graph to their respective base nodes
-     */
-    private val nodes: MutableMap<Node, BaseNode> = HashMap()
 
     /**
      * Runs the fog node placement algorithm on the associated autonomous system and returns the overall result object.
@@ -74,108 +59,97 @@ internal class FogWorker(
      * @return result of the fog node placement
      */
     internal fun findFogNodes(): FogResult {
-        // map edge device nodes to their respective wrappers
-        val startingNodes = system.edgeNodes
-            .filter { it.hasDevices() }
-            .map { createStartingNode(it) }
-            .toMutableList()
+        // initialize empty result set
+        val result = FogResult().also { it.setSuccess() }
 
-        var start = System.nanoTime()
-        // calculate connection costs from the edge device nodes
-        startingNodes.forEach { calculateConnectionCosts(it) }
-        LOG.debug(
-            "Time to calculate connection costs for edge devices for {}: {}",
-            system,
-            formatTimeInterval(start, System.nanoTime())
+        val heap = FogHeap(
+            FogGraphBuilder(system, classifier.config.costThreshold).createFogGraph(),
+            classifier.config.fogNodeTypes
         )
 
-        // initialize empty result set
-        val result = FogResult()
-        result.setSuccess()
-
-        while (startingNodes.isNotEmpty()) {
+        while (!heap.isEmpty()) {
             // check if there are still fog nodes left to place
             if (!classifier.fogNodesLeft()) {
-                result.setFailure()
-                return result
+                return result.also { it.setFailure() }
             }
 
-            start = System.nanoTime()
+            val start = System.nanoTime()
             // find the next fog node for the remaining starting nodes
-            val fogNode = getNextFogNode(startingNodes)
+            val fogNode = heap.getNext()
             LOG.debug("Time to find next fog node for {}: {}", system, formatTimeInterval(start, System.nanoTime()))
 
             // reduce the remaining fog nodes available
             classifier.reduceRemainingNodes()
 
-            start = System.nanoTime()
-            // remove all covered nodes from the graph
-            removeAllCoveredNodes(fogNode, startingNodes)
-            LOG.debug(
-                "Time to remove the covered nodes for {}: {}", system, formatTimeInterval(start, System.nanoTime())
-            )
-            // add the new fog node to the partial result
             result.addPlacement(FogNodePlacement(fogNode))
         }
+
+        return result
+    }
+}
+
+private class FogHeap(baseNodes: Collection<BaseNode>, private val fogTypes: Collection<FogContainer>) {
+
+    private val heap: Heap<BaseNode> = BinaryMinHeap(FogComparator())
+
+    init {
+        for (it in baseNodes) {
+            it.determineFogType(fogTypes)
+            heap.add(it)
+        }
+    }
+
+    internal fun isEmpty(): Boolean = heap.isEmpty()
+
+    internal fun getNext(): BaseNode {
+        val result = heap.pop()
+        checkNotNull(result) { "The heap of fog nodes is empty." }
+
+        updateFogHeap(result)
+
         return result
     }
 
-    /**
-     * Calculates and returns the next fog node to place based on the given list of starting nodes that needs to be
-     * covered.
-     *
-     * @param startingNodes starting nodes that needs to be covered
-     * @return the next fog node to place
-     */
-    private fun getNextFogNode(startingNodes: List<StartingNode>): BaseNode {
-        LOG.debug("Remaining starting nodes to cover for {}: {}", system, startingNodes.size)
-
-        var start = System.nanoTime()
-        // find the optimal fog type for the remaining nodes in the graph
-        val fogNodes = nodes.values.toList()
-        fogNodes.forEach { it.findFogType(classifier.config.fogNodeTypes) }
-        LOG.debug("Time to find possible fog types for {}: {}", system, formatTimeInterval(start, System.nanoTime()))
-
-        start = System.nanoTime()
-        // sort the possible fog nodes with a FogComparator
-        val next = fogNodes.sortedWith(FogComparator()).first()
-        LOG.debug(
-            "Time to find the fog node placement for {}: {}", system, formatTimeInterval(start, System.nanoTime())
-        )
-
-        return next
-    }
-
-    /**
-     * Removes the not required nodes from the node mapping and the given starting nodes prevents unnecessary
-     * iterations.
-     *
-     * @param fogNode next fog node found
-     * @param startingNodes list of starting nodes to update
-     */
-    private fun removeAllCoveredNodes(fogNode: BaseNode, startingNodes: MutableList<StartingNode>) {
+    private fun updateFogHeap(result: BaseNode) {
+        val nodes = HashSet<BaseNode>()
+        val toRemove = HashSet<BaseNode>()
         // get covered nodes by the fog node placement
-        val coveredNodes = fogNode.getCoveredStartingNodes()
+        result.coveredNodes.forEach { it.first.decreaseDeviceCount(it.second) }
+        val coveredNodes = result.coveredNodes.map { it.first }.filter { it.deviceCount <= 0 }
+        toRemove.addAll(coveredNodes)
         coveredNodes.forEach {
-            val coveredStartingNode = it.first
-            coveredStartingNode.decreaseDeviceCount(it.second)
-
-            // node is fully covered
-            if (coveredStartingNode.deviceCount <= 0) {
-                coveredStartingNode.notifyPossibleNodes()
-                nodes.remove(coveredStartingNode.node)
-            }
-
-            coveredStartingNode.reachableNodes
-                .filter { n -> !n.hasConnections() }
-                .forEach { n -> nodes.remove(n.node) }
+            nodes.addAll(it.possibleNodes)
+            it.removeFromPossibleNodes()
         }
 
-        fogNode.startingNodes.forEach { it.removePossibleNode(fogNode) }
-        nodes.remove(fogNode.node)
+        toRemove.addAll(nodes.filterNot { it.hasConnections() })
+        val toUpdate = nodes.filter { !toRemove.contains(it) && it.modified }
 
-        // remove all covered nodes from the edge nodes set
-        startingNodes.removeAll(coveredNodes.map { it.first })
+        coveredNodes.forEach {
+            check(!toUpdate.contains(it)) { "toUpdate contains a covered starting node." }
+        }
+
+        check(toRemove.plus(toUpdate).size == toRemove.size + toUpdate.size) { "there is an overlap in remove and update" }
+        toRemove.forEach { heap.remove(it) }
+        toUpdate.forEach {
+            it.determineFogType(fogTypes)
+            heap.updateElement(it)
+        }
+    }
+}
+
+private class FogGraphBuilder(private val system: AS, private val threshold: Float) {
+
+    private val nodes: MutableMap<Node, BaseNode> = HashMap()
+
+    internal fun createFogGraph(): MutableCollection<BaseNode> {
+        // map edge device nodes to their respective wrappers
+        system.edgeNodes
+            .filter { it.hasDevices() }
+            .map { createStartingNode(it) }
+            .forEach { calculateConnectionCosts(it) }
+
+        return nodes.values
     }
 
     /**
@@ -187,54 +161,54 @@ internal class FogWorker(
     private fun calculateConnectionCosts(startingNode: StartingNode) {
         // push the starting node as a starting point in the queue
         startingNode.setCosts(startingNode, 0F)
-        val queue = PriorityQueue(CostComparator(startingNode))
-        queue.add(startingNode)
+        val heap = BinaryMinHeap(CostComparator(startingNode)).also { it.add(startingNode) }
 
         // using the dijkstra algorithm to iterate the graph
-        while (queue.isNotEmpty()) {
-            val current = queue.poll()
+        while (!heap.isEmpty()) {
+            val current = heap.pop()
+            checkNotNull(current) { "The heap of the Dijkstra Algorithm is empty." }
             val currentCosts = current.getCosts(startingNode)
             checkNotNull(currentCosts) { "No costs associated with this node in the graph." }
 
             // check all edges leaving the current node
             current.node.edges
                 .filterNot { it.isCrossASEdge() }
-                .forEach {
-                    val neighbor = it.getDestinationForSource(current.node)
-
-                    // ignore host devices as they are not considered to be possible nodes
-                    if (neighbor == null || neighbor is EdgeDeviceNode) {
-                        return
-                    }
-
-                    // abort on costs above the threshold
-                    val nextCosts = currentCosts + calculateCosts(it)
-                    if (nextCosts > classifier.config.costThreshold) {
-                        return
-                    }
-
-                    val neighborNode = getBaseNode(neighbor)
-                    val neighborCosts = neighborNode.getCosts(startingNode)
-                    if (neighborCosts == null) {
-                        // newly discovered node
-                        neighborNode.setCosts(startingNode, nextCosts)
-                        queue.add(neighborNode)
-                    } else if (nextCosts < neighborCosts) {
-                        // update an already discovered node
-                        neighborNode.setCosts(startingNode, nextCosts)
-                    }
-                }
+                .forEach { processEdge(it, heap, currentCosts, current, startingNode) }
         }
     }
 
-    /**
-     * Returns the base node based on the given node object. If it not yet mapped in [.nodes] the call will create new
-     * instance and return it.
-     *
-     * @param node node to get the base node for
-     * @return base node instance for the given node
-     */
-    private fun getBaseNode(node: Node): BaseNode = nodes.computeIfAbsent(node) { BaseNode(it) }
+    private fun processEdge(
+        edge: Edge,
+        heap: Heap<BaseNode>,
+        currentCosts: Float,
+        current: BaseNode,
+        startingNode: StartingNode
+    ) {
+        val neighbor = edge.getDestinationForSource(current.node)
+
+        // ignore host devices as they are not considered to be possible nodes
+        if (neighbor == null || neighbor is EdgeDeviceNode) {
+            return
+        }
+
+        // abort on costs above the threshold
+        val nextCosts = currentCosts + edge.getCosts()
+        if (nextCosts > threshold) {
+            return
+        }
+
+        val neighborNode = nodes.computeIfAbsent(neighbor) { BaseNode(it) }
+        val neighborCosts = neighborNode.getCosts(startingNode)
+        if (neighborCosts == null) {
+            // newly discovered node
+            neighborNode.setCosts(startingNode, nextCosts)
+            heap.add(neighborNode)
+        } else if (nextCosts < neighborCosts) {
+            // update an already discovered node
+            neighborNode.setCosts(startingNode, nextCosts)
+            heap.updateElement(neighborNode)
+        }
+    }
 
     /**
      * Creates and returns a new starting node based on the given edge node. Adds the newly created node to the mapping
@@ -246,6 +220,17 @@ internal class FogWorker(
     private fun createStartingNode(node: EdgeNode): StartingNode {
         val startingNode = StartingNode(node)
         nodes[node] = startingNode
+
         return startingNode
     }
+}
+
+/**
+ * Calculates the costs for a given edge of the graph.
+ *
+ * @return costs of the given edge
+ */
+private fun Edge.getCosts(): Float {
+    // currently using latency as a cost function
+    return this.delay
 }

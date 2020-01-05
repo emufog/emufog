@@ -34,10 +34,7 @@ internal class StartingNode(node: EdgeNode) : BaseNode(node) {
     /**
      * set of all nodes that reachable from this starting node
      */
-    private val reachableNodesMutable: MutableSet<BaseNode> = HashSet()
-
-    val reachableNodes: Set<BaseNode>
-        get() = reachableNodesMutable
+    val possibleNodes: MutableSet<BaseNode> = HashSet()
 
     /**
      * number of devices connected to the edge node
@@ -60,7 +57,7 @@ internal class StartingNode(node: EdgeNode) : BaseNode(node) {
      * @param node possible fog node
      */
     fun addPossibleNode(node: BaseNode) {
-        modified = reachableNodesMutable.add(node)
+        modified = possibleNodes.add(node) || modified
     }
 
     /**
@@ -69,13 +66,14 @@ internal class StartingNode(node: EdgeNode) : BaseNode(node) {
      * @param node fog node to remove
      */
     fun removePossibleNode(node: BaseNode) {
-        modified = reachableNodesMutable.remove(node)
+        modified = possibleNodes.remove(node) || modified
     }
 
     /**
      * Notifies all possible nodes of this edge node that the node does not have to be covered any more.
      */
-    fun notifyPossibleNodes() {
-        reachableNodesMutable.forEach { it.removeStartingNode(this) }
+    fun removeFromPossibleNodes() {
+        possibleNodes.forEach { it.removeStartingNode(this) }
+        possibleNodes.clear()
     }
 }

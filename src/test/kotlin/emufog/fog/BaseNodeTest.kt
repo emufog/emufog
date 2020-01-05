@@ -89,8 +89,8 @@ internal class BaseNodeTest {
         baseNode.setCosts(startingNode, 42F)
         assertEquals(42F, baseNode.getCosts(startingNode))
         assertTrue(baseNode.hasConnections())
-        assertEquals(1, startingNode.reachableNodes.size)
-        assertEquals(baseNode, startingNode.reachableNodes.first())
+        assertEquals(1, startingNode.possibleNodes.size)
+        assertEquals(baseNode, startingNode.possibleNodes.first())
     }
 
     @Test
@@ -113,7 +113,7 @@ internal class BaseNodeTest {
     fun `findFogType should abort on non modified nodes`() {
         val baseNode = BaseNode(node)
         baseNode.modified = false
-        baseNode.findFogType(emptyList())
+        baseNode.determineFogType(emptyList())
     }
 
     @Test
@@ -121,7 +121,7 @@ internal class BaseNodeTest {
         val baseNode = BaseNode(node)
         assertThrows<IllegalStateException> {
             val type = FogContainer("name", "tag", 1, 1F, 5, 1F)
-            baseNode.findFogType(listOf(type))
+            baseNode.determineFogType(listOf(type))
         }
     }
 
@@ -129,7 +129,7 @@ internal class BaseNodeTest {
     fun `findFogType should fail on no given fog types`() {
         val baseNode = BaseNode(node)
         assertThrows<IllegalStateException> {
-            baseNode.findFogType(emptyList())
+            baseNode.determineFogType(emptyList())
         }
     }
 
@@ -191,7 +191,7 @@ internal class BaseNodeTest {
 
         assertNull(baseNode.type)
         assertNull(baseNode.averageDeploymentCosts)
-        baseNode.findFogType(types)
+        baseNode.determineFogType(types)
 
         return baseNode
     }

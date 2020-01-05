@@ -51,7 +51,9 @@ class FogNodeClassifier(private val graph: Graph) {
      */
     fun findPossibleFogNodes(): FogResult {
         // process all systems in parallel
-        val results = graph.systems.parallelStream().map { FogWorker(it, this).findFogNodes() }.toList()
+        val results = graph.systems
+            .map { FogWorker(it, this).findFogNodes() }
+            .toList()
 
         // init empty failed result
         val result = FogResult()
