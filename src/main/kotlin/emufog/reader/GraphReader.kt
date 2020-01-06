@@ -24,26 +24,22 @@
 package emufog.reader
 
 import emufog.graph.Graph
-import java.io.IOException
 import java.nio.file.Path
 
 /**
- * Interface to read in a [Graph] object from the file system. Different topology formats need to
- * implement this interface.
+ * Interface to read in a [Graph] object from the file system. Different topology formats need to implement this
+ * interface.
  */
 interface GraphReader {
 
     /**
-     * Reads in the given list of files, parses the content and constructs a [Graph] object based
-     * on the file format. Returns the newly created instance.
+     * Reads in the given list of files, parses the content and constructs a [Graph] object based on the file format.
+     * Returns the newly created instance.
      *
      * @param files list of files to read in
      * @return the read in graph structure
-     * @throws IOException throws exception in case there is a problem with reading in the
-     * respective file
      * @throws IllegalArgumentException throws exception if given file list is invalid
      * @throws TopologyFormatException throws exception if the format does not match expectations
      */
-    @Throws(IOException::class, TopologyFormatException::class)
     fun readGraph(files: List<Path>): Graph
 }

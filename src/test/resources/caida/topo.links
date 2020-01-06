@@ -1,0 +1,16 @@
+# version: $Id: kapar.cc,v 1.165 2013/08/02 23:17:11 kkeys Exp $
+# version: $Id: PathLoader.cc,v 1.19 2012/01/04 20:44:46 kkeys Exp $
+# start time: 1418486124 (2014-12-13 07:55:24 PST)
+# command line: /home/kkeys/WIP/topology/archipelago/aliasResolution/midar/../kapar/kapar -il -py -r31 -sir -c0.5 -nv -adms -d1 -mn -lb -1a -oals -O /scratch/alias-resolution/run-20141203/kapar/midar-iff -z 24
+link L9700:  N1:1.231.4.30 N2
+link L9701:  N1:1.231.4.66 N14
+link L9702:  N2:1.231.4.122 N4
+link L9703:  N7:1.231.4.130 N5
+link L9704:  N5:1.231.4.162 N6
+link L9705:  N2:1.231.4.194 N1
+link L9706:  N9:1.231.4.226 N10
+link L9707:  N9:1.231.12.34 N2 N8
+link L9708:  N4:1.231.12.238 N2 N5
+link L9709:  N5:1.231.12.242 N1 N9
+link L9710:  N10:1.231.12.245 N4
+link L9711:  N3:1.231.12.246 N6
