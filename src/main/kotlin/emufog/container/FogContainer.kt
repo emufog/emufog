@@ -24,21 +24,25 @@
 package emufog.container
 
 /**
- * This fog container image represents a fog computing node in the topology. It can serve a fixed
- * number of clients and is associated with deployment costs
+ * This fog container image represents a fog computing node in the topology. It can serve a fixed number of clients and
+ * is associated with deployment costs.
  *
- * @property name name of container image to deploy
- * @property tag version tag of container image to deploy
- * @property memoryLimit upper limit of memory to use in Bytes
- * @property cpuShare share of the sum of available computing resources
- * @property maxClients maximum number of clients this container can serve
- * @property costs costs to deploy this container in the topology
+ * @property maxClients maximum number of clients this container can serve `>= 1`
+ * @property costs costs to deploy this container in the topology `>= 0`
+ * @throws IllegalArgumentException thrown if [memoryLimit] is `< 0`, [cpuShare] is `< 0`, [name] or [tag] are blank,
+ *  [maxClients] is `< 1`, [costs] is `< 0`
  */
-data class FogContainer(
-    override val name: String,
-    override val tag: String,
-    override val memoryLimit: Int,
-    override val cpuShare: Float,
+class FogContainer(
+    name: String,
+    tag: String,
+    memoryLimit: Int,
+    cpuShare: Float,
     val maxClients: Int,
     val costs: Float
-) : Container
+) : Container(name, tag, memoryLimit, cpuShare) {
+
+    init {
+        require(maxClients >= 1) { "The fog container's user capacity has to be greater equal than 1." }
+        require(costs >= 0) { "The fog container's deployment costs have to be positive." }
+    }
+}

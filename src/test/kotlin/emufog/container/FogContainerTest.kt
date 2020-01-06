@@ -25,6 +25,7 @@ package emufog.container
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 internal class FogContainerTest {
 
@@ -41,7 +42,49 @@ internal class FogContainerTest {
     }
 
     @Test
-    fun `fullname should return the correct concatenation`() {
+    fun `fullName should return the correct concatenation`() {
         assertEquals("name:tag", defaultContainer.fullName())
+    }
+
+    @Test
+    fun `empty name should throw an exception`() {
+        assertThrows<IllegalArgumentException> {
+            FogContainer("", "tag", 1024, 1F, 1, 5.5F)
+        }
+    }
+
+    @Test
+    fun `empty tag should throw an exception`() {
+        assertThrows<IllegalArgumentException> {
+            FogContainer("name", "", 1024, 1F, 1, 5.5F)
+        }
+    }
+
+    @Test
+    fun `negative memory should throw an exception`() {
+        assertThrows<IllegalArgumentException> {
+            FogContainer("name", "tag", -1024, 1F, 1, 5.5F)
+        }
+    }
+
+    @Test
+    fun `negative cpu share should throw an exception`() {
+        assertThrows<IllegalArgumentException> {
+            FogContainer("name", "tag", 1024, -1F, 1, 5.5F)
+        }
+    }
+
+    @Test
+    fun `user capacity of zero or less should throw an exception`() {
+        assertThrows<IllegalArgumentException> {
+            FogContainer("name", "tag", 1024, 1F, 0, 5.5F)
+        }
+    }
+
+    @Test
+    fun `deployment costs of less than zero should throw an exception`() {
+        assertThrows<IllegalArgumentException> {
+            FogContainer("name", "tag", 1024, 1F, 1, -1F)
+        }
     }
 }
