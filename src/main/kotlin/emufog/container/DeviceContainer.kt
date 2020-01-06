@@ -24,22 +24,25 @@
 package emufog.container
 
 /**
- * This container image represents a host device connected to an edge node router. By using the
- * scaling factor you can simulate a higher load of multiple devices. Will be distributed based on
- * the average count per router.
+ * This container image represents a host device connected to an edge node. By using the [scalingFactor] you can
+ * simulate a higher load of multiple devices. Will be distributed based on the average count per router.
  *
- * @property name name of container image to deploy
- * @property tag version tag of container image to deploy
- * @property memoryLimit upper limit of memory to use in Bytes
- * @property cpuShare share of the sum of available computing resources
  * @property scalingFactor scaling factor of this container image, factor `>= 1`
- * @property averageDeviceCount average number of devices of this image deployed to each edge node
+ * @property averageDeviceCount average number of devices of this image deployed to each edge node `> 0`
+ * @throws IllegalArgumentException thrown if [memoryLimit] is `< 0`, [cpuShare] is `< 0`, [name] or [tag] are blank,
+ *  [scalingFactor] is `< 1`, [averageDeviceCount] is `<= 0`
  */
-data class DeviceContainer(
-    override val name: String,
-    override val tag: String,
-    override val memoryLimit: Int,
-    override val cpuShare: Float,
+class DeviceContainer(
+    name: String,
+    tag: String,
+    memoryLimit: Int,
+    cpuShare: Float,
     val scalingFactor: Int,
     val averageDeviceCount: Float
-) : Container
+) : Container(name, tag, memoryLimit, cpuShare) {
+
+    init {
+        require(scalingFactor >= 1) { "The device container's scaling factor must be greater equal than 1." }
+        require(averageDeviceCount > 0) { "The device container's average count must be greater than 0." }
+    }
+}

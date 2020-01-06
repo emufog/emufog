@@ -24,19 +24,28 @@
 package emufog.container
 
 /**
- * Interface to represent a container that can be deployed in the final experiment. Consists of a
- * name and tag as well as limits on memory and cpu share.
+ * Abstract class of a container that can be deployed in the final experiment. Consists of a name and tag as well as
+ * limits on memory and cpu share.
  *
  * @property name name of container image to deploy
  * @property tag version tag of container image to deploy
- * @property memoryLimit upper limit of memory to use in Bytes
- * @property cpuShare share of the sum of available computing resources
+ * @property memoryLimit upper limit of memory to use in Bytes `>= 0`
+ * @property cpuShare share of the sum of available computing resources `>= 0`
+ * @throws IllegalArgumentException thrown if [memoryLimit] is `< 0`, [cpuShare] is `< 0`, [name] or [tag] are blank
  */
-interface Container {
-    val name: String
-    val tag: String
-    val memoryLimit: Int
+abstract class Container(
+    val name: String,
+    val tag: String,
+    val memoryLimit: Int,
     val cpuShare: Float
+) {
+
+    init {
+        require(name.isNotBlank()) { "The container's name can not be blank." }
+        require(tag.isNotBlank()) { "The container's tag can not be blank." }
+        require(memoryLimit >= 0) { "The container's memory limit can not be negative." }
+        require(cpuShare >= 0) { "The container's cpu share can not be negative." }
+    }
 
     /**
      * Returns the full name of the container in the form of name:tag.

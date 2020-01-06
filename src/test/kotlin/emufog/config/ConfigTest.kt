@@ -69,7 +69,7 @@ internal class ConfigTest {
         val hostBandwidth = 5F
         val devices = listOf(
             DeviceTypeConfig(ContainerNameConfig("device", "tag"), 1024, 1F, 1, 1.5F),
-            DeviceTypeConfig(ContainerNameConfig("device2", null), 0, 0F, 0, 0F)
+            DeviceTypeConfig(ContainerNameConfig("device2", null), 0, 0F, 2, 1.5F)
         )
         val fogNodes = listOf(FogTypeConfig(ContainerNameConfig("fog", "latest"), 10, 1F, 2, 1F))
 

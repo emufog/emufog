@@ -25,6 +25,7 @@ package emufog.container
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 internal class DeviceContainerTest {
 
@@ -41,7 +42,49 @@ internal class DeviceContainerTest {
     }
 
     @Test
-    fun `fullname should return the correct concatenation`() {
+    fun `fullName should return the correct concatenation`() {
         Assertions.assertEquals("name:tag", defaultContainer.fullName())
+    }
+
+    @Test
+    fun `empty name should throw an exception`() {
+        assertThrows<IllegalArgumentException> {
+            DeviceContainer("", "tag", 1024, 1F, 2, 1.8F)
+        }
+    }
+
+    @Test
+    fun `empty tag should throw an exception`() {
+        assertThrows<IllegalArgumentException> {
+            DeviceContainer("name", "", 1024, 1F, 2, 1.8F)
+        }
+    }
+
+    @Test
+    fun `negative memory should throw an exception`() {
+        assertThrows<IllegalArgumentException> {
+            DeviceContainer("name", "tag", -1024, 1F, 2, 1.8F)
+        }
+    }
+
+    @Test
+    fun `negative cpu share should throw an exception`() {
+        assertThrows<IllegalArgumentException> {
+            DeviceContainer("name", "tag", 1024, -1F, 2, 1.8F)
+        }
+    }
+
+    @Test
+    fun `scaling factor of zero or less should throw an exception`() {
+        assertThrows<IllegalArgumentException> {
+            DeviceContainer("name", "tag", 1024, 1F, 0, 1.8F)
+        }
+    }
+
+    @Test
+    fun `average device count of zero or less should throw an exception`() {
+        assertThrows<IllegalArgumentException> {
+            DeviceContainer("name", "tag", 1024, 1F, 2, 0F)
+        }
     }
 }
