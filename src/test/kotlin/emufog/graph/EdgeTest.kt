@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 internal class EdgeTest {
 
@@ -45,8 +46,22 @@ internal class EdgeTest {
         assertEquals(defaultSource, defaultEdge.source)
         assertEquals(defaultDestination, defaultDestination)
         assertEquals(4, defaultEdge.id)
-        assertEquals(10F, defaultEdge.delay)
+        assertEquals(10F, defaultEdge.latency)
         assertEquals(1000F, defaultEdge.bandwidth)
+    }
+
+    @Test
+    fun `negative latency should fail`() {
+        assertThrows<IllegalArgumentException> {
+            Edge(0, defaultSource, defaultDestination, -1F, 10F)
+        }
+    }
+
+    @Test
+    fun `negative bandwidth should fail`() {
+        assertThrows<IllegalArgumentException> {
+            Edge(0, defaultSource, defaultDestination, 10F, -1F)
+        }
     }
 
     @Test

@@ -26,52 +26,31 @@ package emufog.graph
 /**
  * This class represents an edge in the network graph. The connection between the two nodes is bidirectional.
  * Latency and bandwidth apply to both directions.
+ *
+ * @property id unique identifier of the edge object
+ * @property source the source of the edge, one end of the link
+ * @property destination the destination of the edge, other end of the link
+ * @property latency latency delay on this edge in ms `>= 0`
+ * @property bandwidth bandwidth of the connection in Mbit/s `>= 0`
  */
-class Edge internal constructor(
+class Edge internal constructor(val id: Int, from: Node, to: Node, val latency: Float, val bandwidth: Float) {
 
-    /**
-     * unique identifier of the edge object
-     */
-    val id: Int,
+    init {
+        require(latency >= 0) { "The edge's latency can not be negative." }
+        require(bandwidth >= 0) { "The edge's bandwidth can not be negative." }
+    }
 
-    /**
-     * one end of the connection
-     */
-    from: Node,
+    private val sourceSystem = from.system
 
-    /**
-     * the other end of the connection
-     */
-    to: Node,
+    private val destinationSystem = to.system
 
-    /**
-     * latency delay on this edge in ms
-     */
-    val delay: Float,
+    private val sourceId = from.id
 
-    /**
-     * bandwidth of the connection on Mbit/s
-     */
-    val bandwidth: Float
-) {
+    private val destinationId = to.id
 
-    private val sourceSystem: AS = from.system
-
-    private val destinationSystem: AS = to.system
-
-    private val sourceId: Int = from.id
-
-    private val destinationId: Int = to.id
-
-    /**
-     * the source of the edge, one end of the link
-     */
     val source: Node
         get() = getNode(sourceId, sourceSystem)
 
-    /**
-     * the destination of the edge, other end of the link
-     */
     val destination: Node
         get() = getNode(destinationId, destinationSystem)
 
@@ -99,7 +78,7 @@ class Edge internal constructor(
 
     private fun getNode(id: Int, system: AS): Node {
         val node = system.getNode(id)
-        requireNotNull(node) { "The node: $id does not exist in $system" }
+        checkNotNull(node) { "The node: $id does not exist in $system" }
 
         return node
     }

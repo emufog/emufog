@@ -38,8 +38,6 @@ internal class IPManager(config: Config) {
 
     /**
      * Calculates and returns the next available IP address in the subnet.
-     *
-     * @return IP address
      */
     fun nextIPV4Address(): String {
         val nums = lastIP.split(".")

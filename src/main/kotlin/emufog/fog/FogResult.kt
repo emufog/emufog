@@ -24,7 +24,7 @@
 package emufog.fog
 
 /**
- * This class represents the outcome of a fog node placement algorithm. If `true` the [.getPlacements] is returning the
+ * This class represents the outcome of a fog node placement algorithm. If `true` the [placements] is returning the
  * correct result. For `false` [placements] can be any intermediate result.
  *
  * @property status represents the success or failure of the placement

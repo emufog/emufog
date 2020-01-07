@@ -44,13 +44,8 @@ internal class EdgeNodeTest {
     }
 
     @Test
-    fun `the nodes name should return r1`() {
-        assertEquals("r1", defaultNode.name)
-    }
-
-    @Test
     fun `toString should return s1`() {
-        assertEquals("r1", defaultNode.toString())
+        assertEquals("Node: 1", defaultNode.toString())
     }
 
     @Test
@@ -149,7 +144,7 @@ internal class EdgeNodeTest {
         assertNull(node.emulationNode)
         val container = FogContainer("abc", "tag", 1024, 1F, 1, 1.5F)
         val emulationNode = EmulationNode("1.2.3.4", container)
-        node.emulationNode = emulationNode
+        node.setEmulationNode(emulationNode)
         assertTrue(node.hasEmulationSettings())
         assertEquals(emulationNode, node.emulationNode)
     }

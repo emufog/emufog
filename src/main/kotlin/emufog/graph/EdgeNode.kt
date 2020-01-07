@@ -25,6 +25,8 @@ package emufog.graph
 
 /**
  * The edge node class represents a node of the graph host devices can connect to.
+ *
+ * @property deviceCount number of devices connected to this edge node
  */
 class EdgeNode internal constructor(
     id: Int,
@@ -33,20 +35,13 @@ class EdgeNode internal constructor(
     emulationNode: EmulationNode? = null
 ) : Node(id, system, edges, emulationNode) {
 
-    /**
-     * number of devices connected to this edge node
-     */
     var deviceCount = 0
         private set
 
     override val type: NodeType = NodeType.EDGE_NODE
 
-    override val name: String = "r$id"
-
     /**
-     * Returns indication whether this edge node has devices connected.
-     *
-     * @return true if there are devices connected, false otherwise
+     * Returns whether this edge node has devices connected or not.
      */
     fun hasDevices(): Boolean = deviceCount > 0
 
