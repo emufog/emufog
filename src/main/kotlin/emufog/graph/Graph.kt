@@ -26,12 +26,22 @@ package emufog.graph
 import emufog.config.Config
 import emufog.container.DeviceContainer
 import emufog.container.FogContainer
+import emufog.util.IDManager
 import org.slf4j.LoggerFactory
 import kotlin.math.abs
 import kotlin.random.Random
 
 /**
- * The graph represents the topology of the network.
+ * The graph represents the overall topology of the network. A graph contains of multiple autonomous systems of [AS]
+ * and their respective nodes. Nodes can be connected via edges.
+ *
+ * @property config the config to use with that instance
+ * @property edges list of all edges in the graph
+ * @property systems set of all autonomous systems
+ * @property hostDevices all host devices of the graph
+ * @property edgeNodes all edge nodes of the graph
+ * @property backboneNodes all backbone nodes of the graph
+ * @property nodes all nodes of the graph
  */
 class Graph(val config: Config) {
 
@@ -39,60 +49,47 @@ class Graph(val config: Config) {
         private val LOG = LoggerFactory.getLogger(Graph::class.java)
     }
 
-    private val edgesMutable: MutableList<Edge> = arrayListOf()
+    private val edgesMutable: MutableList<Edge> = ArrayList()
 
-    /**
-     * list of all edges in the graph
-     */
     val edges: List<Edge>
         get() = edgesMutable
 
-    private val systemsMutable: MutableSet<AS> = hashSetOf()
+    private val systemsMutable: MutableSet<AS> = HashSet()
 
-    /**
-     * set of all autonomous systems
-     */
     val systems: Set<AS>
         get() = systemsMutable
 
     /**
      * provider of unique IP addresses for emulation
      */
-    private val ipManager: IPManager = IPManager(config)
+    private val ipManager = IPManager(config)
 
     /**
      * provider of unique node IDs
      */
-    private val nodeIdManager: IDManager = IDManager()
+    private val nodeIdManager = IDManager()
 
     /**
      * provider of unique edge IDs
      */
-    private val edgeIdManager: IDManager = IDManager()
+    private val edgeIdManager = IDManager()
 
-    /**
-     * all host devices of the graph.
-     */
     val hostDevices: List<EdgeDeviceNode>
         get() = systems.map { it.edgeDeviceNodes }.flatMap { it.toList() }
 
-    /**
-     * all edge nodes of the graph.
-     */
     val edgeNodes: List<EdgeNode>
         get() = systems.map { it.edgeNodes }.flatMap { it.toList() }
 
-    /**
-     * all backbone nodes of the graph.
-     */
     val backboneNodes: List<BackboneNode>
         get() = systems.map { it.backboneNodes }.flatMap { it.toList() }
 
-    /**
-     * all nodes of the graph
-     */
     val nodes: Set<Node>
         get() = edgeNodes.union(backboneNodes).union(hostDevices)
+
+    /**
+     * Returns the edge with the given id or `null` if not in the graph.
+     */
+    fun getEdge(id: Int): Edge? = edgesMutable.firstOrNull { it.id == id }
 
     /**
      * Returns the edge device node with the given identifier or `null` if not in the graph.
@@ -145,7 +142,6 @@ class Graph(val config: Config) {
      * @return the newly created edge node
      * @throws IllegalArgumentException if id is already in use or system not part of the graph
      */
-    @Throws(IllegalArgumentException::class)
     fun createEdgeNode(id: Int, system: AS): EdgeNode {
         validateCreateInput(id, system)
 
@@ -160,7 +156,6 @@ class Graph(val config: Config) {
      * @return the newly created backbone node
      * @throws IllegalArgumentException if id is already in use or system not part of the graph
      */
-    @Throws(IllegalArgumentException::class)
     fun createBackboneNode(id: Int, system: AS): BackboneNode {
         validateCreateInput(id, system)
 
@@ -176,7 +171,6 @@ class Graph(val config: Config) {
      * @return the newly created edge device
      * @throws IllegalArgumentException if id is already in use or system not part of the graph
      */
-    @Throws(IllegalArgumentException::class)
     fun createEdgeDeviceNode(id: Int, system: AS, image: DeviceContainer): EdgeDeviceNode {
         validateCreateInput(id, system)
 
@@ -198,6 +192,7 @@ class Graph(val config: Config) {
         validateNodeInGraph(from)
         validateNodeInGraph(to)
 
+        //TODO no reassign
         var edgeId = id
         if (edgeIdManager.isUsed(edgeId)) {
             LOG.warn("The edge id: {} is already in use", edgeId)
@@ -250,7 +245,7 @@ class Graph(val config: Config) {
     fun placeFogNode(node: Node, container: FogContainer) {
         validateNodeInGraph(node)
 
-        node.emulationNode = EmulationNode(ipManager.nextIPV4Address(), container)
+        node.setEmulationNode(EmulationNode(ipManager.nextIPV4Address(), container))
     }
 
     /**
@@ -274,7 +269,6 @@ class Graph(val config: Config) {
      * @param system autonomous system to validate
      * @throws IllegalArgumentException thrown if the id already in use or as is not part of the graph
      */
-    @Throws(IllegalArgumentException::class)
     private fun validateCreateInput(id: Int, system: AS) {
         require(systems.contains(system)) { "The as: ${system.id} is not part of the graph." }
         require(!nodeIdManager.isUsed(id)) { "The node ID: $id is already in use." }

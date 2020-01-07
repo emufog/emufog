@@ -135,7 +135,7 @@ internal class BriteFormatReaderTest {
         requireNotNull(edge23)
         assertEquals(13, edge23.source.id)
         assertEquals(2, edge23.destination.id)
-        assertTrue(floatEquals(0.8399260491500409F, edge23.delay))
+        assertTrue(floatEquals(0.8399260491500409F, edge23.latency))
         assertTrue(floatEquals(10F, edge23.bandwidth))
     }
 

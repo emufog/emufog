@@ -26,12 +26,16 @@ package emufog.export.maxinet
 import emufog.export.GraphExporter
 import emufog.graph.Edge
 import emufog.graph.Graph
+import emufog.graph.Node
+import emufog.graph.NodeType.BACKBONE_NODE
+import emufog.graph.NodeType.EDGE_DEVICE_NODE
+import emufog.graph.NodeType.EDGE_NODE
 import java.io.BufferedWriter
 import java.nio.file.FileSystems
 import java.nio.file.Path
 
 /**
- * This object exports a graph object to a valid python file usable with the MaxiNet (https://maxinet.github.io/)
+ * This object exports a graph object to a valid python file usable with the [MaxiNet](https://maxinet.github.io/)
  * network emulation framework.
  */
 object MaxiNetExporter : GraphExporter {
@@ -55,14 +59,14 @@ private class MaxiNetExporterImpl internal constructor(private val graph: Graph,
         val config = graph.config
         val file = path.toFile()
         require(!(!config.overWriteOutputFile && file.exists())) {
-            "The given file already exist. Please provide a valid path"
+            "The given file already exist. Please provide a valid path."
         }
 
         writer = path.toFile().bufferedWriter()
 
         // check the file ending of the given path
         val matcher = FileSystems.getDefault().getPathMatcher("glob:**.py")
-        require(matcher.matches(path)) { "The file name for MaxiNet has to be a python file (.py)" }
+        require(matcher.matches(path)) { "The file name for MaxiNet has to be a python file (.py)." }
     }
 
     private fun BufferedWriter.writeln(s: String) {
@@ -110,8 +114,8 @@ private class MaxiNetExporterImpl internal constructor(private val graph: Graph,
                 writer.writeln(
                     String.format(
                         "%s = topo.addHost(\"%s\", cls=Docker, ip=\"%s\", dimage=\"%s\", mem_limit=%d)",
-                        it.name,
-                        it.name,
+                        getName(it),
+                        getName(it),
                         emu.ip,
                         container.fullName(),
                         container.memoryLimit
@@ -128,7 +132,7 @@ private class MaxiNetExporterImpl internal constructor(private val graph: Graph,
         writer.writeln("# add switches")
         graph.edgeNodes.union(graph.backboneNodes)
             .filter { !it.hasEmulationSettings() }
-            .forEach { writer.writeln(String.format("%s = topo.addSwitch(\"%s\")", it.name, it.name)) }
+            .forEach { writer.writeln(String.format("%s = topo.addSwitch(\"%s\")", getName(it), getName(it))) }
     }
 
     /**
@@ -157,10 +161,10 @@ private class MaxiNetExporterImpl internal constructor(private val graph: Graph,
         graph.edges.forEach {
             if (connectors.containsKey(it)) {
                 val connector = connectors[it]
-                addLink(it.source.name, connector, it.delay / 2, it.bandwidth)
-                addLink(connector, it.destination.name, it.delay / 2, it.bandwidth)
+                addLink(getName(it.source), connector, it.latency / 2, it.bandwidth)
+                addLink(connector, getName(it.destination), it.latency / 2, it.bandwidth)
             } else {
-                addLink(it.source.name, it.destination.name, it.delay, it.bandwidth)
+                addLink(getName(it.source), getName(it.destination), it.latency, it.bandwidth)
             }
         }
     }
@@ -177,5 +181,15 @@ private class MaxiNetExporterImpl internal constructor(private val graph: Graph,
         writer.writeln(
             String.format("topo.addLink(%s, %s, delay='%fms', bw=%f)", source, destination, latency, bandwidth)
         )
+    }
+
+    private fun getName(node: Node): String {
+        val prefix = when (node.type) {
+            BACKBONE_NODE -> "s"
+            EDGE_NODE -> "r"
+            EDGE_DEVICE_NODE -> "h"
+        }
+
+        return prefix + node.id
     }
 }

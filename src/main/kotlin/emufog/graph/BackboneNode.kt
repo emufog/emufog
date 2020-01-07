@@ -35,6 +35,4 @@ class BackboneNode internal constructor(
 ) : Node(id, system, edges, emulationNode) {
 
     override val type: NodeType = NodeType.BACKBONE_NODE
-
-    override val name: String = "s$id"
 }

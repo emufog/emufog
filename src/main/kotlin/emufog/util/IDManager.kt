@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog.graph
+package emufog.util
 
 import java.util.BitSet
 
@@ -43,14 +43,8 @@ class IDManager {
 
     /**
      * Calculates and returns the next available unique ID. The ID is not marked as used.
-     *
-     * @return the new ID
      */
-    fun getNextID(): Int {
-        current = bitSet.nextClearBit(current)
-
-        return current
-    }
+    fun getNextID(): Int = bitSet.nextClearBit(current)
 
     /**
      * Marks an ID as used so it cannot be assigned to another object.
@@ -65,7 +59,7 @@ class IDManager {
      * Checks if the given ID is already in use.
      *
      * @param id ID to check
-     * @return true if the ID already used, false otherwise
+     * @return `true` if the ID already used, `false` otherwise
      */
     fun isUsed(id: Int): Boolean = bitSet[id]
 }

@@ -26,45 +26,26 @@ package emufog.graph
 /**
  * This class represents an autonomous system of the network graph. Hence it's a sub graph of the total graph providing
  * access to its nodes.
+ *
+ * @property id unique identifier of the autonomous system
+ * @property edgeNodes all edge nodes in this autonomous system
+ * @property backboneNodes all backbone nodes in this autonomous system
+ * @property edgeDeviceNodes all edge device nodes in this autonomous system
  */
-class AS internal constructor(
+class AS internal constructor(val id: Int) {
 
-    /**
-     * unique identifier of the autonomous system
-     */
-    val id: Int
-) {
+    private val edges: MutableMap<Int, EdgeNode> = HashMap()
 
-    /**
-     * mapping of edge nodes in the autonomous system
-     */
-    private val edges: MutableMap<Int, EdgeNode> = hashMapOf()
+    private val backbones: MutableMap<Int, BackboneNode> = HashMap()
 
-    /**
-     * all edge nodes in this autonomous system
-     */
+    private val edgeDevices: MutableMap<Int, EdgeDeviceNode> = HashMap()
+
     val edgeNodes: Collection<EdgeNode>
         get() = edges.values
 
-    /**
-     * mapping of backbone nodes in the autonomous system
-     */
-    private val backbones: MutableMap<Int, BackboneNode> = hashMapOf()
-
-    /**
-     * all backbone nodes in this autonomous system
-     */
     val backboneNodes: Collection<BackboneNode>
         get() = backbones.values
 
-    /**
-     * mapping of edge device nodes in the autonomous system
-     */
-    private val edgeDevices: MutableMap<Int, EdgeDeviceNode> = hashMapOf()
-
-    /**
-     * all edge device nodes in this autonomous system
-     */
     val edgeDeviceNodes: Collection<EdgeDeviceNode>
         get() = edgeDevices.values
 
@@ -100,18 +81,47 @@ class AS internal constructor(
      */
     fun getNode(id: Int): Node? = edges[id] ?: backbones[id] ?: edgeDevices[id]
 
+    /**
+     * Deletes the given node instance and replaces it with an edge node. The newly created edge node contains the same
+     * properties as the given node. The node has to be part of this autonomous system.
+     *
+     * @param node node to replace by an edge node
+     * @return the newly created edge node with the same properties
+     * @throws IllegalArgumentException if the node's system does not equal this object
+     * @throws IllegalStateException if the node is not part of this system
+     */
     fun replaceByEdgeNode(node: Node): EdgeNode {
         removeNodeForReplacement(node)
 
         return createEdgeNode(node.id, node.edges, node.emulationNode)
     }
 
+    /**
+     * Deletes the given node instance and replaces it with a backbone node. The newly created edge node contains the
+     * same properties as the given node. The node has to be part of this autonomous system.
+     *
+     * @param node node to replace by a backbone node
+     * @return the newly created backbone node with the same properties
+     * @throws IllegalArgumentException if the node's system does not equal this object
+     * @throws IllegalStateException if the node is not part of this system
+     */
     fun replaceByBackboneNode(node: Node): BackboneNode {
         removeNodeForReplacement(node)
 
         return createBackboneNode(node.id, node.edges, node.emulationNode)
     }
 
+    /**
+     * Deletes the given node instance and replaces it with an edge device node. The newly created edge node contains
+     * the same properties as the given node and also has the given edge emulation associated to it. The node has to be
+     * part of this autonomous system.
+     *
+     * @param node node to replace by an edge device node
+     * @param emulationNode the edge emulation node this device will need
+     * @return the newly created edge device node with the same properties
+     * @throws IllegalArgumentException if the node's system does not equal this object
+     * @throws IllegalStateException if the node is not part of this system
+     */
     fun replaceByEdgeDeviceNode(node: Node, emulationNode: EdgeEmulationNode): EdgeDeviceNode {
         removeNodeForReplacement(node)
 
@@ -183,12 +193,6 @@ class AS internal constructor(
         return edgeNode
     }
 
-    /**
-     * Removes a node from the AS.
-     *
-     * @param node node to remove
-     * @return `true` if node could be deleted, `false` if not
-     */
     private fun removeNode(node: Node): Boolean {
         return edges.remove(node.id) != null || backbones.remove(node.id) != null || edgeDevices.remove(node.id) != null
     }

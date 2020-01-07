@@ -48,13 +48,8 @@ internal class EdgeDeviceNodeTest {
     }
 
     @Test
-    fun `the nodes name should return h1`() {
-        assertEquals("h1", defaultNode.name)
-    }
-
-    @Test
     fun `toString should return h11`() {
-        assertEquals("h1", defaultNode.toString())
+        assertEquals("Node: 1", defaultNode.toString())
     }
 
     @Test
@@ -153,8 +148,8 @@ internal class EdgeDeviceNodeTest {
         val node = EdgeDeviceNode(2, AS(42), emulationNode = defaultEmulationNode)
         val container = FogContainer("abc", "tag", 1024, 1F, 1, 1.5F)
         val emulationNode = EmulationNode("1.2.3.4", container)
-        node.emulationNode = emulationNode
+        node.setEmulationNode(emulationNode)
         assertTrue(node.hasEmulationSettings())
-        assertEquals(emulationNode, node.emulationNode)
+        assertEquals(defaultEmulationNode, node.emulationNode)
     }
 }

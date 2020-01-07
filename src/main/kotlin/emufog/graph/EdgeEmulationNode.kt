@@ -25,6 +25,10 @@ package emufog.graph
 
 import emufog.container.DeviceContainer
 
+/**
+ * This class works as a [EmulationNode] but is used for device nodes only. The [container] is guaranteed to be a
+ * [DeviceContainer].
+ */
 class EdgeEmulationNode(ip: String, deviceContainer: DeviceContainer) : EmulationNode(ip, deviceContainer) {
 
     override val container: DeviceContainer = deviceContainer

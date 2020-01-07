@@ -59,7 +59,7 @@ internal class FogWorker(
          */
         private fun calculateCosts(edge: Edge): Float {
             // currently using delay as a cost function
-            return edge.delay
+            return edge.latency
         }
     }
 
