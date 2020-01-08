@@ -46,6 +46,15 @@ internal class ASTest {
     }
 
     @Test
+    fun `getNode should return the respective node`() {
+        val system = AS(0)
+
+        assertNull(system.getNode(1))
+        val node = system.createBackboneNode(1)
+        assertEquals(node, system.getNode(1))
+    }
+
+    @Test
     fun `hashCode function should return id`() {
         assertEquals(0, defaultSystem.hashCode())
     }
@@ -168,7 +177,6 @@ internal class ASTest {
         assertEquals(edgeDeviceNode, system.getEdgeDeviceNode(42))
         assertTrue(system.edgeDeviceNodes.contains(edgeDeviceNode))
     }
-
 
     @Test
     fun `replace an edge node with a backbone node`() {

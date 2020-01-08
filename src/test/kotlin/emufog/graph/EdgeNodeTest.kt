@@ -153,17 +153,22 @@ internal class EdgeNodeTest {
     fun `incrementDeviceCount should update the deviceCount by n`() {
         val node = EdgeNode(2, defaultAS)
         assertEquals(0, node.deviceCount)
+        assertFalse(node.hasDevices())
         node.incrementDeviceCount(42)
         assertEquals(42, node.deviceCount)
+        assertTrue(node.hasDevices())
         node.incrementDeviceCount(42)
         assertEquals(84, node.deviceCount)
+        assertTrue(node.hasDevices())
     }
 
     @Test
     fun `incrementDeviceCount should ignore negative n`() {
         val node = EdgeNode(2, defaultAS)
         assertEquals(0, node.deviceCount)
+        assertFalse(node.hasDevices())
         node.incrementDeviceCount(-42)
         assertEquals(0, node.deviceCount)
+        assertFalse(node.hasDevices())
     }
 }
