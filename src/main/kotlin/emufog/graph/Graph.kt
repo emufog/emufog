@@ -97,7 +97,7 @@ class Graph(val config: Config) {
      * @param id identifier of the edge device node
      */
     fun getEdgeDeviceNode(id: Int): EdgeDeviceNode? {
-        return systemsMutable.firstOrNull { it.getEdgeDeviceNode(id) != null }?.getEdgeDeviceNode(id)
+        return systemsMutable.mapNotNull { it.getEdgeDeviceNode(id) }.firstOrNull()
     }
 
     /**
@@ -106,7 +106,7 @@ class Graph(val config: Config) {
      * @param id identifier of the backbone node
      */
     fun getBackboneNode(id: Int): BackboneNode? {
-        return systemsMutable.firstOrNull { it.getBackboneNode(id) != null }?.getBackboneNode(id)
+        return systemsMutable.mapNotNull { it.getBackboneNode(id) }.firstOrNull()
     }
 
     /**
@@ -115,7 +115,7 @@ class Graph(val config: Config) {
      * @param id identifier of the edge node
      */
     fun getEdgeNode(id: Int): EdgeNode? {
-        return systemsMutable.firstOrNull { it.getEdgeNode(id) != null }?.getEdgeNode(id)
+        return systemsMutable.mapNotNull { it.getEdgeNode(id) }.firstOrNull()
     }
 
     /**
@@ -187,26 +187,24 @@ class Graph(val config: Config) {
      * @param delay delay of the edge
      * @param bandwidth bandwidth of the edge
      * @return the newly created edge
+     * @throws IllegalArgumentException if id is already in use, the nodes are not in the graph or an edge device node
+     * is connected to a non edge node
      */
     fun createEdge(id: Int, from: Node, to: Node, delay: Float, bandwidth: Float): Edge {
+        require(!edgeIdManager.isUsed(id)) { "The edge id: $id is already in use." }
         validateNodeInGraph(from)
         validateNodeInGraph(to)
-
-        //TODO no reassign
-        var edgeId = id
-        if (edgeIdManager.isUsed(edgeId)) {
-            LOG.warn("The edge id: {} is already in use", edgeId)
-            edgeId = edgeIdManager.getNextID()
-            LOG.warn("Assigning new edge id: {}", edgeId)
+        // edge devices only connect to the edge
+        if ((from is EdgeDeviceNode && to !is EdgeNode) || (to is EdgeDeviceNode && from !is EdgeNode)) {
+            throw IllegalArgumentException("A device node can only connect to an edge node.")
         }
 
-        val edge = Edge(edgeId, from, to, delay, bandwidth)
+        val edge = Edge(id, from, to, delay, bandwidth)
+        edgeIdManager.setUsed(id)
         from.addEdge(edge)
         to.addEdge(edge)
-        edgeIdManager.setUsed(edgeId)
         edgesMutable.add(edge)
 
-        //TODO fix scaling factor
         if (from is EdgeNode && to is EdgeDeviceNode) {
             from.incrementDeviceCount(to.containerType.scalingFactor)
         }

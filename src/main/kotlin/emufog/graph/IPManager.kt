@@ -28,29 +28,61 @@ import emufog.config.Config
 /**
  * The IP manager calculates IP address within the subnet address space defined in the base address of the given
  * config. Keeps track of the last recent IP.
+ * @throws IllegalArgumentException if the [Config.baseAddress] is in the wrong format
  */
 internal class IPManager(config: Config) {
 
-    /**
-     * the last assigned IP in the network
-     */
-    private var lastIP: String = config.baseAddress
+    private var byte1: Int
+
+    private var byte2: Int
+
+    private var byte3: Int
+
+    private var byte4: Int
+
+    init {
+        val splits = config.baseAddress.split(".")
+        require(splits.size == 4) { "The format of the IP is invalid." }
+        byte1 = splits[3].toInt()
+        byte2 = splits[2].toInt()
+        byte3 = splits[1].toInt()
+        byte4 = splits[0].toInt()
+    }
 
     /**
      * Calculates and returns the next available IP address in the subnet.
+     * @throws IllegalArgumentException if the the ip exceeds 254.254.254.254
      */
     fun nextIPV4Address(): String {
-        val nums = lastIP.split(".")
-        var i: Int = (nums[0].toInt() shl 24 or (nums[2].toInt() shl 8) or (nums[1].toInt() shl 16) or nums[3].toInt())
-        +1
+        if (byte1 != 254) {
+            byte1++
 
-        // If you wish to skip over .255 addresses.
-        if (i.toByte() == (-1).toByte()) {
-            i++
+            return getString()
+        }
+        byte1 = 0
+
+        if (byte2 != 254) {
+            byte2++
+
+            return getString()
+        }
+        byte2 = 0
+
+        if (byte3 != 254) {
+            byte3++
+
+            return getString()
+        }
+        byte3 = 0
+
+        if (byte4 != 254) {
+            byte4++
+
+            return getString()
         }
 
-        lastIP = String.format("%d.%d.%d.%d", i ushr 24 and 0xFF, i shr 16 and 0xFF, i shr 8 and 0xFF, i and 0xFF)
-
-        return lastIP
+        throw IllegalStateException("There is no next IPv4 after 254.254.254.254")
     }
+
+    private fun getString() = String.format("%d.%d.%d.%d", byte4, byte3, byte2, byte1)
 }

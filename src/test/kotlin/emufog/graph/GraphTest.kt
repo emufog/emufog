@@ -25,9 +25,12 @@ package emufog.graph
 
 import emufog.config.Config
 import emufog.container.DeviceContainer
+import emufog.container.FogContainer
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -212,5 +215,111 @@ internal class GraphTest {
         val graph = Graph(defaultConfig)
         val system = graph.getOrCreateAutonomousSystem(1)
         assertEquals(system, graph.getOrCreateAutonomousSystem(1))
+    }
+
+    @Test
+    fun `createEdge should fail on negative latency`() {
+        val graph = Graph(defaultConfig)
+        val system = graph.getOrCreateAutonomousSystem(0)
+        val source = graph.createBackboneNode(0, system)
+        val destination = graph.createBackboneNode(1, system)
+        assertThrows<IllegalArgumentException> {
+            graph.createEdge(0, source, destination, -1F, 10F)
+        }
+    }
+
+    @Test
+    fun `createEdge should fail on negative bandwidth`() {
+        val graph = Graph(defaultConfig)
+        val system = graph.getOrCreateAutonomousSystem(0)
+        val source = graph.createBackboneNode(0, system)
+        val destination = graph.createBackboneNode(1, system)
+        assertThrows<IllegalArgumentException> {
+            graph.createEdge(0, source, destination, 0F, -10F)
+        }
+    }
+
+    @Test
+    fun `createEdge should fail if source is not in graph`() {
+        val graph = Graph(defaultConfig)
+        val system = graph.getOrCreateAutonomousSystem(0)
+        val source = BackboneNode(0, AS(42))
+        val destination = graph.createBackboneNode(1, system)
+        assertThrows<IllegalArgumentException> {
+            graph.createEdge(0, source, destination, 0F, -10F)
+        }
+    }
+
+    @Test
+    fun `createEdge should fail if destination is not in graph`() {
+        val graph = Graph(defaultConfig)
+        val system = graph.getOrCreateAutonomousSystem(0)
+        val source = graph.createBackboneNode(0, system)
+        val destination = BackboneNode(1, AS(42))
+        assertThrows<IllegalArgumentException> {
+            graph.createEdge(0, source, destination, 0F, -10F)
+        }
+    }
+
+    @Test
+    fun `createEdge should fail if id is already in use`() {
+        val graph = Graph(defaultConfig)
+        val system = graph.getOrCreateAutonomousSystem(0)
+        val source = graph.createBackboneNode(0, system)
+        val destination = graph.createBackboneNode(1, system)
+        graph.createEdge(0, source, destination, 1F, 10F)
+        assertThrows<IllegalArgumentException> {
+            graph.createEdge(0, source, destination, 1F, 10F)
+        }
+    }
+
+    @Test
+    fun `createEdge should edge device node is not connected to the edge`() {
+        val graph = Graph(defaultConfig)
+        val system = graph.getOrCreateAutonomousSystem(0)
+        val container = DeviceContainer("name", "tag", 1024, 1F, 1, 1F)
+        val source = graph.createEdgeDeviceNode(0, system, container)
+        val destination = graph.createBackboneNode(1, system)
+        assertThrows<IllegalArgumentException> {
+            graph.createEdge(0, source, destination, 0F, 10F)
+        }
+    }
+
+    @Test
+    fun `createEdge should create a new edge and update the device counter`() {
+        val graph = Graph(defaultConfig)
+        assertNull(graph.getEdge(0))
+        val system = graph.getOrCreateAutonomousSystem(0)
+        val container = DeviceContainer("name", "tag", 1024, 1F, 42, 1F)
+        val source = graph.createEdgeDeviceNode(0, system, container)
+        val destination = graph.createEdgeNode(1, system)
+        val edge = graph.createEdge(0, source, destination, 0F, 10F)
+        assertEquals(edge, graph.getEdge(0))
+        assertEquals(42, destination.deviceCount)
+    }
+
+    @Test
+    fun `placeFogNode should fail if node is not in graph`() {
+        val graph = Graph(defaultConfig)
+        val system = graph.getOrCreateAutonomousSystem(0)
+        val container = FogContainer("name", "tag", 1024, 1F, 2, 5F)
+        assertThrows<IllegalArgumentException> {
+            graph.placeFogNode(BackboneNode(1, system), container)
+        }
+    }
+
+    @Test
+    fun `placeFogNode sets the emulation node with the given fog container`() {
+        val graph = Graph(defaultConfig)
+        val system = graph.getOrCreateAutonomousSystem(0)
+        val container = FogContainer("name", "tag", 1024, 1F, 2, 5F)
+        val node = graph.createBackboneNode(1, system)
+        assertFalse(node.hasEmulationSettings())
+        graph.placeFogNode(node, container)
+        assertTrue(node.hasEmulationSettings())
+        val emu = node.emulationNode
+        assertNotNull(emu)
+        assertEquals(container, emu!!.container)
+        assertEquals("1.2.3.5", emu.ip)
     }
 }

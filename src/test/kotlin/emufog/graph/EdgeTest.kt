@@ -143,4 +143,16 @@ internal class EdgeTest {
         assertEquals(node1Replacement, edge.source)
         assertEquals(node2Replacement, edge.destination)
     }
+
+    @Test
+    fun ass() {
+        val system = AS(0)
+        val node1 = BackboneNode(1, AS(1))
+        val node2 = system.createBackboneNode(2)
+        val edge = Edge(0, node1, node2, 1F, 1F)
+        assertEquals(node2, edge.destination)
+        assertThrows<IllegalStateException> {
+            edge.source
+        }
+    }
 }
