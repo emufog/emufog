@@ -28,6 +28,7 @@ import emufog.graph.EdgeNode
 import emufog.graph.Graph
 import emufog.graph.Node
 import emufog.reader.GraphReader
+import emufog.util.IDManager
 import org.slf4j.LoggerFactory
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
@@ -102,6 +103,8 @@ private class CaidaFormatReaderImpl(files: List<Path>) {
         ?: throw IllegalArgumentException("The given files do not contain a .links file.")
 
     private val spaceRegex = "\\s".toRegex()
+
+    private val idManager = IDManager()
 
     private val graph = Graph(Config.config!!)
 
@@ -190,7 +193,13 @@ private class CaidaFormatReaderImpl(files: List<Path>) {
                 return
             }
 
-            graph.createEdge(id, from, to, getLatency(from, to), 1000f)
+            var checkedId: Int = id
+            if (idManager.isUsed(id)) {
+                checkedId = idManager.getNextID()
+                LOG.debug("The original edge ID: {} is already in use. Using {} instead.", id, checkedId)
+            }
+            graph.createEdge(checkedId, from, to, getLatency(from, to), 1000f)
+            idManager.setUsed(checkedId)
         }
     }
 
