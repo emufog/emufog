@@ -28,75 +28,91 @@ import emufog.graph.EdgeNode
 import emufog.graph.Graph
 import emufog.graph.Node
 import emufog.reader.GraphReader
+import emufog.util.IDManager
 import org.slf4j.LoggerFactory
-import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 
 /**
- * This reader can read in the CAIDA topology an build a graph based on that data.
+ * This reader can read in the [CAIDA](https://www.caida.org/) topology an build a graph based on that data.
  */
 object CaidaFormatReader : GraphReader {
 
     /**
-     * Reads in a graph from a Caida dataset. Such a dataset consists of a .nodes.geo, a .nodes.as
-     * and a .links file. The list of input files need to contain those three files.
+     * Reads in a graph from a Caida dataset. Such a dataset consists of a `.nodes.geo`, a `.nodes.as` and a `.links`
+     * file. The list of input files need to contain those three files.
      *
      * @param files the list of files to read in
      * @return read in graph object
      */
-    @Throws(IOException::class)
-    override fun readGraph(files: List<Path>): Graph {
-        return CaidaFormatReaderImpl(files).readGraph()
-    }
+    override fun readGraph(files: List<Path>): Graph = CaidaFormatReaderImpl(files).readGraph()
 }
 
 private class CaidaFormatReaderImpl(files: List<Path>) {
 
+    private companion object {
+
+        private val LOG = LoggerFactory.getLogger(CaidaFormatReader::class.java)
+
+        /**
+         * initialize charset according to https://en.wikipedia.org/wiki/ISO/IEC_8859-1
+         */
+        private val CHARSET = StandardCharsets.ISO_8859_1
+
+        private const val NODE_COLUMNS = 8
+
+        private const val AS_COLUMNS = 3
+
+        private const val EDGE_COLUMNS = 4
+    }
+
     /* number of times AS field exceeds the Integer range */
-    private var asNoInteger: Int = 0
+    private var asNoInteger = 0
 
     /* number of times no node has been found with an ID to assign an AS */
-    private var noNodeFoundForAS: Int = 0
+    private var noNodeFoundForAS = 0
 
     /* number of times no node has been found with an ID to establish a connection */
-    private var noNodeFoundForEdge: Int = 0
+    private var noNodeFoundForEdge = 0
 
     /* number of times ID field exceeds the Integer range */
-    private var idsNoInteger: Int = 0
+    private var idsNoInteger = 0
 
     /* number of times a node line was skipped */
-    private var nodeLineSkipped: Int = 0
+    private var nodeLineSkipped = 0
 
     /* number of times a AS line was skipped */
-    private var asLineSkipped: Int = 0
+    private var asLineSkipped = 0
 
     /* number of times a link line was skipped */
-    private var linkLineSkipped: Int = 0
+    private var linkLineSkipped = 0
 
     /* number of times coordinate field exceeds the Float range */
-    private var coordinatesNoFloats: Int = 0
+    private var coordinatesNoFloats = 0
 
     /* mapping from ID's to coordinates of the nodes */
     private val nodeCoordinates: MutableMap<Int, Coordinates> = HashMap()
 
-    private val nodesFile: Path
+    private val nodesFile = getFileWithEnding(files, ".nodes.geo")
+        ?: throw IllegalArgumentException("The given files do not contain a .nodes.geo file.")
 
-    private val asFile: Path
+    private val asFile = getFileWithEnding(files, ".nodes.as")
+        ?: throw IllegalArgumentException("The given files do not contain a .nodes.as file.")
 
-    private val linkFile: Path
+    private val linkFile = getFileWithEnding(files, ".links")
+        ?: throw IllegalArgumentException("The given files do not contain a .links file.")
+
+    private val spaceRegex = "\\s".toRegex()
+
+    private val idManager = IDManager()
 
     private val graph = Graph(Config.config!!)
 
-    init {
-        nodesFile = getFileWithEnding(files, ".nodes.geo")
-            ?: throw IllegalArgumentException("The given files do not contain a .nodes.geo file.")
-        asFile = getFileWithEnding(files, ".nodes.as")
-            ?: throw IllegalArgumentException("The given files do not contain a .nodes.as file.")
-        linkFile = getFileWithEnding(files, ".links")
-            ?: throw IllegalArgumentException("The given files do not contain a .links file.")
-    }
-
+    /**
+     * Reads in and returns a [Graph] object from the first `.nodes.geo`, `.nodes.as` and `.links` file. Skips all the
+     * lines that can not be processed. Such cases are counted and printed to the debug output after reading in the
+     * graph.
+     */
     internal fun readGraph(): Graph {
         // read in the nodes
         nodesFile.toFile().forEachLine(CHARSET) { processNodeLine(it) }
@@ -131,18 +147,19 @@ private class CaidaFormatReaderImpl(files: List<Path>) {
 
     /**
      * Reads in an edge of the graph.
-     *
-     * @param line current line to process
      */
     private fun processLinkLine(line: String) {
-        val values = line.split(" ".toRegex())
+        if (line.startsWith('#')) {
+            return
+        }
+        val values = line.split(spaceRegex)
         if (values.size < EDGE_COLUMNS) {
             LOG.debug("There are not {} columns in the link line: {}", EDGE_COLUMNS, line)
             linkLineSkipped++
             return
         }
 
-        val linkStr = values[1].substring(1, values[1].length - 1)
+        val linkStr = extractIdFromString(values[1])
         val id = linkStr.toIntOrNull()
         if (id == null) {
             LOG.debug("Failed to parse the link id {} to an integer.", linkStr)
@@ -150,32 +167,19 @@ private class CaidaFormatReaderImpl(files: List<Path>) {
             return
         }
 
-        for (i in 3 until values.size - 1) {
-            var sourceStr = values[i]
-            var end = sourceStr.indexOf(':')
-            if (end == -1) {
-                end = sourceStr.length
-            }
-            sourceStr = sourceStr.substring(1, end)
-            val sourceID = sourceStr.toIntOrNull()
-            if (sourceID == null) {
-                LOG.debug("Failed to parse the link's source id {} to an integer.", sourceStr)
-                idsNoInteger++
-                return
-            }
+        val sourceStr = extractIdFromString(values[3])
+        val sourceID = sourceStr.toIntOrNull()
+        if (sourceID == null) {
+            LOG.debug("Failed to parse the link's source id {} to an integer.", sourceStr)
+            idsNoInteger++
+            return
+        }
 
-            var destinationStr = values[i + 1]
-            end = destinationStr.indexOf(':')
-            if (end == -1) {
-                end = destinationStr.length
-            }
-            destinationStr = destinationStr.substring(1, end)
+        for (i in 4 until values.size) {
+            val destinationStr = extractIdFromString(values[i])
             val destinationID = destinationStr.toIntOrNull()
             if (destinationID == null) {
-                LOG.debug(
-                    "Failed to parse the link's destination id {} to an integer.",
-                    destinationStr
-                )
+                LOG.debug("Failed to parse the link's destination id {} to an integer.", destinationStr)
                 idsNoInteger++
                 return
             }
@@ -189,28 +193,31 @@ private class CaidaFormatReaderImpl(files: List<Path>) {
                 return
             }
 
-            graph.createEdge(id, from, to, getLatency(from, to), 1000f)
+            var checkedId: Int = id
+            if (idManager.isUsed(id)) {
+                checkedId = idManager.getNextID()
+                LOG.debug("The original edge ID: {} is already in use. Using {} instead.", id, checkedId)
+            }
+            graph.createEdge(checkedId, from, to, getLatency(from, to), 1000f)
+            idManager.setUsed(checkedId)
         }
     }
 
     /**
      * Adapts the AS field of the node identified in the current line.
-     *
-     * @param line current line to process
      */
     private fun processASLine(line: String) {
-        val values = line.split(" ".toRegex())
+        if (line.startsWith('#')) {
+            return
+        }
+        val values = line.split(spaceRegex)
         if (values.size < AS_COLUMNS) {
             asLineSkipped++
-            LOG.debug(
-                "There are not {} columns in the autonomous system line: {}",
-                AS_COLUMNS,
-                line
-            )
+            LOG.debug("There are not {} columns in the autonomous system line: {}", AS_COLUMNS, line)
             return
         }
 
-        val nodeStr = values[1].substring(1)
+        val nodeStr = extractIdFromString(values[1])
         val id = nodeStr.toIntOrNull()
         if (id == null) {
             LOG.debug("Failed to parse the id {} to an integer.", nodeStr)
@@ -230,18 +237,19 @@ private class CaidaFormatReaderImpl(files: List<Path>) {
 
     /**
      * Reads in and process a line of the input file to add a node to the graph given.
-     *
-     * @param line current line to process
      */
     private fun processNodeLine(line: String) {
-        val values = line.split("\t".toRegex())
+        if (line.startsWith('#')) {
+            return
+        }
+        val values = line.split(spaceRegex)
         if (values.size < NODE_COLUMNS) {
             LOG.debug("There are not {} columns in the node line: {}", NODE_COLUMNS, line)
             nodeLineSkipped++
             return
         }
 
-        val nodeStr = values[0].substring(10, values[0].length - 1)
+        val nodeStr = extractIdFromString(values[1])
         val id = nodeStr.toIntOrNull()
         if (id == null) {
             LOG.debug("Failed to parse the id {} to an integer.", nodeStr)
@@ -250,9 +258,9 @@ private class CaidaFormatReaderImpl(files: List<Path>) {
         }
 
         try {
-            nodeCoordinates[id] = Coordinates(values[5].toFloat(), values[6].toFloat())
+            nodeCoordinates[id] = Coordinates(values[6].toFloat(), values[7].toFloat())
         } catch (e: NumberFormatException) {
-            LOG.debug("Failed to parse coordinates {} and {} to floats.", values[5], values[6])
+            LOG.debug("Failed to parse coordinates {} and {} to floats.", values[6], values[7])
             coordinatesNoFloats++
         }
     }
@@ -261,37 +269,31 @@ private class CaidaFormatReaderImpl(files: List<Path>) {
         return 1F
     }
 
-    /**
-     * Returns the path of the file matching the giving file extension at the end.
-     *
-     * @param files list of possible files
-     * @param fileExtension file extension to match
-     * @return the file of the list matching the extension or `null` if not found
-     */
-    private fun getFileWithEnding(files: List<Path>, fileExtension: String): Path? {
-        return files.firstOrNull { it.toString().endsWith(fileExtension) }
+    private fun extractIdFromString(s: String): String {
+        var end = s.indexOfFirst { it == ':' }
+        if (end == -1) {
+            end = s.length
+        }
+
+        return s.substring(1, end)
     }
+}
 
-    /**
-     * Coordinates of a node in the graph. This class gets mapped to the respective ID of the node.
-     * @property xPos x coordinate
-     * @property yPos y coordinate
-     */
-    internal data class Coordinates(val xPos: Float, val yPos: Float)
+/**
+ * Coordinates of a node in the graph. This class gets mapped to the respective ID of the node.
+ *
+ * @property xPos x coordinate
+ * @property yPos y coordinate
+ */
+private data class Coordinates(val xPos: Float, val yPos: Float)
 
-    companion object {
-
-        private val LOG = LoggerFactory.getLogger(CaidaFormatReader::class.java)
-
-        /**
-         * initialize charset according to https://en.wikipedia.org/wiki/ISO/IEC_8859-1
-         */
-        private val CHARSET = StandardCharsets.ISO_8859_1
-
-        private const val NODE_COLUMNS = 7
-
-        private const val AS_COLUMNS = 3
-
-        private const val EDGE_COLUMNS = 4
-    }
+/**
+ * Returns the path of the file matching the giving file extension at the end.
+ *
+ * @param files list of possible files
+ * @param fileExtension file extension to match
+ * @return the file of the list matching the extension or `null` if not found
+ */
+private fun getFileWithEnding(files: List<Path>, fileExtension: String): Path? {
+    return files.firstOrNull { it.toString().endsWith(fileExtension) }
 }
