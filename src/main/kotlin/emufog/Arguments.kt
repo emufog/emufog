@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package emufog;
+package emufog
 
 import picocli.CommandLine.Option
 import java.nio.file.Path
@@ -41,5 +41,5 @@ class Arguments {
     var output: Path? = null
 
     @Option(names = ["--file", "-f"], description = ["files to read in"])
-    var files: MutableList<Path> = mutableListOf()
+    var files: MutableList<Path> = ArrayList()
 }
