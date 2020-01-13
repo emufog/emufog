@@ -39,7 +39,7 @@ internal class FogWorkerTest {
         FogContainer("name", "small", 512, 1F, 6, 2.6F)
     )
 
-    private val config: Config = mockk {
+    private val defaultConfig: Config = mockk {
         every { baseAddress } returns "1.2.3.4"
         every { maxFogNodes } returns 42
         every { fogNodeTypes } returns fogTypes
@@ -48,9 +48,12 @@ internal class FogWorkerTest {
 
     @Test
     fun `findFogNodes on empty as should be empty`() {
-        val graph = Graph(config)
+        val graph = Graph(defaultConfig)
         val system = graph.getOrCreateAutonomousSystem(0)
-        val worker = FogWorker(system, mockk())
+        val classifier: FogNodeClassifier = mockk {
+            every { config } returns defaultConfig
+        }
+        val worker = FogWorker(system, classifier)
         val result = worker.findFogNodes()
         assertTrue(result.status)
         assertEquals(0, result.placements.size)
@@ -58,11 +61,14 @@ internal class FogWorkerTest {
 
     @Test
     fun `findFogNodes on non device edge nodes should be empty`() {
-        val graph = Graph(config)
+        val graph = Graph(defaultConfig)
         val system = graph.getOrCreateAutonomousSystem(0)
         graph.createEdgeNode(0, system)
         graph.createEdgeNode(1, system)
-        val worker = FogWorker(system, mockk())
+        val classifier: FogNodeClassifier = mockk {
+            every { config } returns defaultConfig
+        }
+        val worker = FogWorker(system, classifier)
         val result = worker.findFogNodes()
         assertTrue(result.status)
         assertEquals(0, result.placements.size)
@@ -70,7 +76,7 @@ internal class FogWorkerTest {
 
     @Test
     fun `findFogNodes on sample topology #1, fully covered nodes`() {
-        val graph = Graph(config)
+        val graph = Graph(defaultConfig)
         val system = graph.getOrCreateAutonomousSystem(0)
         val edge0 = graph.createEdgeNode(0, system)
         val edge1 = graph.createEdgeNode(1, system)
@@ -110,7 +116,7 @@ internal class FogWorkerTest {
         assertTrue(result.status)
         assertEquals(2, result.placements.size)
         assertEquals(fogTypes[0], result.placements[0].type)
-        assertEquals(backbone4, result.placements[0].node)
+        assertEquals(edge1, result.placements[0].node)
         assertEquals(fogTypes[1], result.placements[1].type)
         assertEquals(edge3, result.placements[1].node)
     }

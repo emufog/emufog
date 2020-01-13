@@ -28,17 +28,14 @@ import emufog.graph.EdgeNode
 /**
  * A starting node represents a starting point in the fog node placement algorithm. Such a node is based on a
  * [EdgeNode] and wraps it for the algorithm execution.
+ *
+ * @property possibleNodes set of all nodes that reachable from this starting node
+ * @property deviceCount number of devices connected to the edge node
  */
 internal class StartingNode(node: EdgeNode) : BaseNode(node) {
 
-    /**
-     * set of all nodes that reachable from this starting node
-     */
     val possibleNodes: MutableSet<BaseNode> = HashSet()
 
-    /**
-     * number of devices connected to the edge node
-     */
     var deviceCount: Int = node.deviceCount
         private set
 
@@ -57,7 +54,7 @@ internal class StartingNode(node: EdgeNode) : BaseNode(node) {
      * @param node possible fog node
      */
     fun addPossibleNode(node: BaseNode) {
-        modified = possibleNodes.add(node) || modified
+        possibleNodes.add(node)
     }
 
     /**

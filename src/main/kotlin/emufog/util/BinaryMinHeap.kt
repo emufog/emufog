@@ -38,8 +38,8 @@ class BinaryMinHeap<T> : Heap<T> {
     }
 
     override fun updateElement(element: T) {
-        heap.remove(element)
-        heap.add(element)
+        remove(element)
+        add(element)
     }
 
     override fun add(element: T): Boolean = heap.add(element)

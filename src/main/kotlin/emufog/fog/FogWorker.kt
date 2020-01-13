@@ -38,16 +38,7 @@ import org.slf4j.LoggerFactory
  * This class isolates the fog node placement algorithm of one of the autonomous systems to run it independent of
  * others. Requires the autonomous system to process.
  */
-internal class FogWorker(
-    /**
-     * the autonomous system this worker processes
-     */
-    private val system: AS,
-    /**
-     * the fog node classifier this worker is associated
-     */
-    private val classifier: FogNodeClassifier
-) {
+internal class FogWorker(private val system: AS, private val classifier: FogNodeClassifier) {
 
     companion object {
         private val LOG = LoggerFactory.getLogger(FogWorker::class.java)
@@ -92,6 +83,8 @@ private class FogHeap(baseNodes: Collection<BaseNode>, private val fogTypes: Col
 
     private val heap: Heap<BaseNode> = BinaryMinHeap(FogComparator())
 
+    private val allNodes: MutableSet<BaseNode> = baseNodes.toMutableSet()
+
     init {
         for (it in baseNodes) {
             it.determineFogType(fogTypes)
@@ -130,7 +123,10 @@ private class FogHeap(baseNodes: Collection<BaseNode>, private val fogTypes: Col
         }
 
         check(toRemove.plus(toUpdate).size == toRemove.size + toUpdate.size) { "there is an overlap in remove and update" }
-        toRemove.forEach { heap.remove(it) }
+        toRemove.forEach {
+            heap.remove(it)
+            allNodes.remove(it)
+        }
         toUpdate.forEach {
             it.determineFogType(fogTypes)
             heap.updateElement(it)
@@ -232,5 +228,5 @@ private class FogGraphBuilder(private val system: AS, private val threshold: Flo
  */
 private fun Edge.getCosts(): Float {
     // currently using latency as a cost function
-    return this.delay
+    return this.latency
 }

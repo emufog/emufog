@@ -75,13 +75,28 @@ internal class FogComparatorTest {
     }
 
     @Test
-    fun `should fail when no deployment costs are associated`() {
+    fun `should fail when no deployment costs for o1 are associated`() {
         val node1 = mockk<BaseNode> {
             every { averageDeploymentCosts } returns null
             every { node.id } returns 0
         }
         val node2 = mockk<BaseNode> {
             every { averageDeploymentCosts } returns 1F
+        }
+        val list = listOf(node1, node2)
+        assertThrows<IllegalStateException> {
+            list.sortedWith(comparator)
+        }
+    }
+
+    @Test
+    fun `should fail when no deployment costs for o2 are associated`() {
+        val node1 = mockk<BaseNode> {
+            every { averageDeploymentCosts } returns 1F
+        }
+        val node2 = mockk<BaseNode> {
+            every { averageDeploymentCosts } returns null
+            every { node.id } returns 1
         }
         val list = listOf(node1, node2)
         assertThrows<IllegalStateException> {

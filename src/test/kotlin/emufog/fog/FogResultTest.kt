@@ -64,13 +64,13 @@ internal class FogResultTest {
     fun `addPlacement should increase list by one`() {
         val result = FogResult()
         assertEquals(0, result.placements.size)
-        val node = mockk<Node>()
-        val baseNode = mockk<BaseNode> {
-            every { this@mockk.node } returns node
+        val someNode: Node = mockk()
+        val baseNode: BaseNode = mockk {
+            every { node } returns someNode
             every { type } returns mockk()
         }
         result.addPlacement(FogNodePlacement(baseNode))
         assertEquals(1, result.placements.size)
-        assertEquals(node, result.placements[0].node)
+        assertEquals(someNode, result.placements[0].node)
     }
 }

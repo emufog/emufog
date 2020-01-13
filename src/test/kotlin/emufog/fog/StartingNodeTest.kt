@@ -56,7 +56,7 @@ internal class StartingNodeTest {
         val startingNode = StartingNode(edgeNode)
         assertEquals(0, startingNode.possibleNodes.size)
 
-        val node = mockk<BaseNode>()
+        val node: BaseNode = mockk()
         startingNode.addPossibleNode(node)
         assertEquals(1, startingNode.possibleNodes.size)
         assertEquals(node, startingNode.possibleNodes.first())
@@ -67,7 +67,7 @@ internal class StartingNodeTest {
         val startingNode = StartingNode(edgeNode)
         assertEquals(0, startingNode.possibleNodes.size)
 
-        val node = mockk<BaseNode>()
+        val node: BaseNode = mockk()
         startingNode.addPossibleNode(node)
         assertEquals(node, startingNode.possibleNodes.first())
 
@@ -80,10 +80,10 @@ internal class StartingNodeTest {
         val startingNode = StartingNode(edgeNode)
         assertEquals(0, startingNode.possibleNodes.size)
 
-        val node1 = mockk<BaseNode> {
+        val node1: BaseNode = mockk {
             every { removeStartingNode(any()) } returns Unit
         }
-        val node2 = mockk<BaseNode> {
+        val node2: BaseNode = mockk {
             every { removeStartingNode(any()) } returns Unit
         }
         startingNode.addPossibleNode(node1)

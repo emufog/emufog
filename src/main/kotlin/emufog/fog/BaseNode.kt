@@ -34,6 +34,12 @@ import kotlin.math.min
  * a fog node.
  *
  * @property node the node in the original graph model
+ * @property modified indicator if the connections have been updated and therefore needs to be reevaluated
+ * @property type the fog type with the optimal costs/device count ration
+ * @property averageConnectionCosts average connection costs of all associated connections
+ * @property averageConnectionCosts the average deployment costs for all edge nodes connected to this node
+ * @property coveredNodes list of starting node and int pairs of covered nodes and their resp. count
+ * @property startingNodes set of starting nodes this node can connect to
  */
 internal open class BaseNode(internal val node: Node) {
 
@@ -44,40 +50,25 @@ internal open class BaseNode(internal val node: Node) {
     /**
      * mapping of starting nodes to their respective tuple of predecessor in the path and the overall connection costs
      */
-    private val costs: MutableMap<StartingNode, Float> = HashMap()
+    private val costMap: MutableMap<StartingNode, Float> = HashMap()
 
-    /**
-     * indicator if the connections have been updated and therefore needs to be reevaluated
-     */
     var modified = true
         protected set
 
-    /**
-     * the fog type with the optimal costs, device count ration
-     */
     var type: FogContainer? = null
         private set
 
-    /**
-     * average connection costs of all associated connections
-     */
     var averageConnectionCosts = 0f
         private set
 
-    /**
-     * Returns the average deployment costs for all edge nodes connected to this node
-     */
     var averageDeploymentCosts: Float? = null
         private set
 
     var coveredNodes: List<Pair<StartingNode, Int>> = emptyList()
         private set
 
-    /**
-     * Returns all starting nodes this node is connected to
-     */
     val startingNodes: Set<StartingNode>
-        get() = costs.keys
+        get() = costMap.keys
 
     /**
      * Returns the connection costs for the given starting node. If this node is not connected to the given node
@@ -86,7 +77,7 @@ internal open class BaseNode(internal val node: Node) {
      * @param node node to retrieve connection costs for
      * @return connection costs for the given node
      */
-    fun getCosts(node: StartingNode): Float? = costs[node]
+    fun getCosts(node: StartingNode): Float? = costMap[node]
 
     /**
      * Sets the connection costs for a path from the given starting node to this node. Requires the predecessor on the
@@ -96,8 +87,9 @@ internal open class BaseNode(internal val node: Node) {
      * @param costs connection costs
      */
     fun setCosts(node: StartingNode, costs: Float) {
-        this.costs[node] = costs
+        this.costMap[node] = costs
         node.addPossibleNode(this)
+        modified = true
     }
 
     /**
@@ -105,7 +97,7 @@ internal open class BaseNode(internal val node: Node) {
      *
      * @return `true` if connections are available, `false` otherwise
      */
-    fun hasConnections(): Boolean = costs.isNotEmpty()
+    fun hasConnections(): Boolean = costMap.isNotEmpty()
 
     /**
      * Returns a list of all covered starting nodes by this node. The list contains of a tuple of the starting node
@@ -115,9 +107,9 @@ internal open class BaseNode(internal val node: Node) {
      */
     private fun getCoveredStartingNodes(coveredCount: Int): List<Pair<StartingNode, Int>> {
         // sort the connections based on their connection costs in ascending order
-        val startingNodes = costs.keys.sortedBy { costs[it]!! }.map { it }
+        val startingNodes = costMap.keys.sortedBy { costMap[it]!! }.map { it }
         if (this is StartingNode && hasConnections() && startingNodes[0] != this) {
-            val x = 5
+            throw IllegalStateException("Starting node not in covered nodes.")
         }
         val result = mutableListOf<Pair<StartingNode, Int>>()
         var remaining = coveredCount
@@ -141,7 +133,7 @@ internal open class BaseNode(internal val node: Node) {
      * @param node starting node to delete the connection for
      */
     internal fun removeStartingNode(node: StartingNode) {
-        modified = costs.remove(node) != null || modified
+        modified = costMap.remove(node) != null || modified
     }
 
     /**
@@ -159,7 +151,7 @@ internal open class BaseNode(internal val node: Node) {
         type = null
         var coveredCount = 0
         var costsPerConnection = Float.MAX_VALUE
-        val deviceCount = costs.keys.sumBy { it.deviceCount }
+        val deviceCount = costMap.keys.sumBy { it.deviceCount }
 
         for (fogType in fogTypes) {
             val connections = min(deviceCount, fogType.maxClients)
@@ -189,7 +181,7 @@ internal open class BaseNode(internal val node: Node) {
         var count = 0
 
         coveredNodes.forEach {
-            count++
+            count += it.second
             result += (getCosts(it.first)!! - result) / count
         }
 

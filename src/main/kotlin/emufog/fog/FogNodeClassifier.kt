@@ -25,7 +25,6 @@ package emufog.fog
 
 import emufog.graph.Graph
 import java.util.concurrent.atomic.AtomicInteger
-import kotlin.streams.toList
 
 /**
  * The fog node classifier is running the fog node placement algorithm on the given graph object.
