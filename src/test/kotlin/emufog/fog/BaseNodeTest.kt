@@ -37,7 +37,7 @@ import org.junit.jupiter.api.assertThrows
 
 internal class BaseNodeTest {
 
-    private val node = mockk<Node> {
+    private val node: Node = mockk {
         every { this@mockk.hashCode() } returns 42
     }
 
@@ -54,33 +54,40 @@ internal class BaseNodeTest {
 
     @Test
     fun `averageConnectionCosts should be reflecting the cost map`() {
+        val fogTypes = listOf(FogContainer("name", "tag", 1, 1F, 10, 1F))
         val baseNode = BaseNode(node)
         assertEquals(0F, baseNode.averageConnectionCosts)
         baseNode.setCosts(mockk {
             every { addPossibleNode(baseNode) } returns Unit
+            every { deviceCount } returns 1
         }, 1F)
+        baseNode.determineFogType(fogTypes)
         assertEquals(1F, baseNode.averageConnectionCosts)
         baseNode.setCosts(mockk {
             every { addPossibleNode(baseNode) } returns Unit
+            every { deviceCount } returns 1
         }, 23.5F)
+        baseNode.determineFogType(fogTypes)
         assertEquals(24.5F / 2, baseNode.averageConnectionCosts)
         baseNode.setCosts(mockk {
             every { addPossibleNode(baseNode) } returns Unit
+            every { deviceCount } returns 1
         }, 100F)
+        baseNode.determineFogType(fogTypes)
         assertEquals(124.5F / 3, baseNode.averageConnectionCosts)
     }
 
     @Test
     fun `getCosts should return null if none are associated`() {
         val baseNode = BaseNode(node)
-        val startingNode = mockk<StartingNode>()
+        val startingNode: StartingNode = mockk()
         assertNull(baseNode.getCosts(startingNode))
     }
 
     @Test
     fun `setCosts should set the costs for the given starting node`() {
         val baseNode = BaseNode(node)
-        val edgeNode = mockk<EdgeNode> {
+        val edgeNode: EdgeNode = mockk {
             every { deviceCount } returns 10
         }
         val startingNode = StartingNode(edgeNode)
@@ -89,14 +96,14 @@ internal class BaseNodeTest {
         baseNode.setCosts(startingNode, 42F)
         assertEquals(42F, baseNode.getCosts(startingNode))
         assertTrue(baseNode.hasConnections())
-        assertEquals(1, startingNode.reachableNodes.size)
-        assertEquals(baseNode, startingNode.reachableNodes.first())
+        assertEquals(1, startingNode.possibleNodes.size)
+        assertEquals(baseNode, startingNode.possibleNodes.first())
     }
 
     @Test
     fun `removeStartingNode should delete a cost mapping for that starting node`() {
         val baseNode = BaseNode(node)
-        val edgeNode = mockk<EdgeNode> {
+        val edgeNode: EdgeNode = mockk {
             every { deviceCount } returns 10
         }
         val startingNode = StartingNode(edgeNode)
@@ -109,19 +116,19 @@ internal class BaseNodeTest {
         assertNull(baseNode.getCosts(startingNode))
     }
 
-    @Test
-    fun `findFogType should abort on non modified nodes`() {
-        val baseNode = BaseNode(node)
-        baseNode.modified = false
-        baseNode.findFogType(emptyList())
-    }
+//    @Test
+//    fun `findFogType should abort on non modified nodes`() {
+//        val baseNode = BaseNode(node)
+//        baseNode.modified = false
+//        baseNode.determineFogType(emptyList())
+//    }
 
     @Test
     fun `findFogType should fail on no connections`() {
         val baseNode = BaseNode(node)
         assertThrows<IllegalStateException> {
             val type = FogContainer("name", "tag", 1, 1F, 5, 1F)
-            baseNode.findFogType(listOf(type))
+            baseNode.determineFogType(listOf(type))
         }
     }
 
@@ -129,7 +136,7 @@ internal class BaseNodeTest {
     fun `findFogType should fail on no given fog types`() {
         val baseNode = BaseNode(node)
         assertThrows<IllegalStateException> {
-            baseNode.findFogType(emptyList())
+            baseNode.determineFogType(emptyList())
         }
     }
 
@@ -141,7 +148,7 @@ internal class BaseNodeTest {
         assertEquals(type2, baseNode.type)
         assertEquals(type2.costs / type2.maxClients, baseNode.averageDeploymentCosts)
 
-        val coveredNodes = baseNode.getCoveredStartingNodes()
+        val coveredNodes = baseNode.coveredNodes
         assertEquals(1, coveredNodes.size)
         assertEquals(0, coveredNodes[0].first.node.id)
         assertEquals(2, coveredNodes[0].second)
@@ -155,7 +162,7 @@ internal class BaseNodeTest {
         assertEquals(type1, baseNode.type)
         assertEquals(1F, baseNode.averageDeploymentCosts)
 
-        val coveredNodes = baseNode.getCoveredStartingNodes()
+        val coveredNodes = baseNode.coveredNodes
         assertEquals(1, coveredNodes.size)
         assertEquals(0, coveredNodes[0].first.node.id)
         assertEquals(1, coveredNodes[0].second)
@@ -168,7 +175,7 @@ internal class BaseNodeTest {
         assertEquals(type1, baseNode.type)
         assertEquals(20F / 11, baseNode.averageDeploymentCosts)
 
-        val coveredNodes = baseNode.getCoveredStartingNodes()
+        val coveredNodes = baseNode.coveredNodes
         assertEquals(2, coveredNodes.size)
         assertEquals(0, coveredNodes[0].first.node.id)
         assertEquals(5, coveredNodes[0].second)
@@ -178,12 +185,12 @@ internal class BaseNodeTest {
 
     private fun findOptimalFogType(types: List<FogContainer>): BaseNode {
         val baseNode = BaseNode(node)
-        val edgeNode1 = mockk<EdgeNode> {
+        val edgeNode1: EdgeNode = mockk {
             every { deviceCount } returns 5
             every { id } returns 0
         }
         baseNode.setCosts(StartingNode(edgeNode1), 1F)
-        val edgeNode2 = mockk<EdgeNode> {
+        val edgeNode2: EdgeNode = mockk {
             every { deviceCount } returns 6
             every { id } returns 1
         }
@@ -191,7 +198,7 @@ internal class BaseNodeTest {
 
         assertNull(baseNode.type)
         assertNull(baseNode.averageDeploymentCosts)
-        baseNode.findFogType(types)
+        baseNode.determineFogType(types)
 
         return baseNode
     }
@@ -199,7 +206,7 @@ internal class BaseNodeTest {
     @Test
     fun `getCoveredStartingNodes should return empty list without any connections`() {
         val baseNode = BaseNode(node)
-        val coveredNodes = baseNode.getCoveredStartingNodes()
+        val coveredNodes = baseNode.coveredNodes
         assertEquals(0, coveredNodes.size)
     }
 

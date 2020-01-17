@@ -40,7 +40,7 @@ internal class StartingNodeTest {
     fun `test the initialization of a starting node`() {
         val startingNode = StartingNode(edgeNode)
         assertEquals(42, startingNode.deviceCount)
-        assertEquals(0, startingNode.reachableNodes.size)
+        assertEquals(0, startingNode.possibleNodes.size)
     }
 
     @Test
@@ -54,43 +54,43 @@ internal class StartingNodeTest {
     @Test
     fun `addPossibleNode should add a new node to the set`() {
         val startingNode = StartingNode(edgeNode)
-        assertEquals(0, startingNode.reachableNodes.size)
+        assertEquals(0, startingNode.possibleNodes.size)
 
-        val node = mockk<BaseNode>()
+        val node: BaseNode = mockk()
         startingNode.addPossibleNode(node)
-        assertEquals(1, startingNode.reachableNodes.size)
-        assertEquals(node, startingNode.reachableNodes.first())
+        assertEquals(1, startingNode.possibleNodes.size)
+        assertEquals(node, startingNode.possibleNodes.first())
     }
 
     @Test
     fun `removePossibleNode should remove a node from the set`() {
         val startingNode = StartingNode(edgeNode)
-        assertEquals(0, startingNode.reachableNodes.size)
+        assertEquals(0, startingNode.possibleNodes.size)
 
-        val node = mockk<BaseNode>()
+        val node: BaseNode = mockk()
         startingNode.addPossibleNode(node)
-        assertEquals(node, startingNode.reachableNodes.first())
+        assertEquals(node, startingNode.possibleNodes.first())
 
         startingNode.removePossibleNode(node)
-        assertEquals(0, startingNode.reachableNodes.size)
+        assertEquals(0, startingNode.possibleNodes.size)
     }
 
     @Test
     fun `notifyPossibleNodes should call each node in the node set`() {
         val startingNode = StartingNode(edgeNode)
-        assertEquals(0, startingNode.reachableNodes.size)
+        assertEquals(0, startingNode.possibleNodes.size)
 
-        val node1 = mockk<BaseNode> {
+        val node1: BaseNode = mockk {
             every { removeStartingNode(any()) } returns Unit
         }
-        val node2 = mockk<BaseNode> {
+        val node2: BaseNode = mockk {
             every { removeStartingNode(any()) } returns Unit
         }
         startingNode.addPossibleNode(node1)
         startingNode.addPossibleNode(node2)
-        assertEquals(2, startingNode.reachableNodes.size)
+        assertEquals(2, startingNode.possibleNodes.size)
 
-        startingNode.notifyPossibleNodes()
+        startingNode.removeFromPossibleNodes()
         verify(exactly = 1) { node1.removeStartingNode(startingNode) }
         verify(exactly = 1) { node2.removeStartingNode(startingNode) }
     }

@@ -25,7 +25,6 @@ package emufog.fog
 
 import emufog.graph.Graph
 import java.util.concurrent.atomic.AtomicInteger
-import kotlin.streams.toList
 
 /**
  * The fog node classifier is running the fog node placement algorithm on the given graph object.
@@ -51,7 +50,9 @@ class FogNodeClassifier(private val graph: Graph) {
      */
     fun findPossibleFogNodes(): FogResult {
         // process all systems in parallel
-        val results = graph.systems.parallelStream().map { FogWorker(it, this).findFogNodes() }.toList()
+        val results = graph.systems
+            .map { FogWorker(it, this).findFogNodes() }
+            .toList()
 
         // init empty failed result
         val result = FogResult()
