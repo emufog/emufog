@@ -46,6 +46,7 @@ internal class StartingNode(node: EdgeNode) : BaseNode(node) {
      */
     fun decreaseDeviceCount(n: Int) {
         deviceCount -= n
+        modified = true
     }
 
     /**

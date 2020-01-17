@@ -23,30 +23,25 @@
  */
 package emufog.util
 
-import java.util.TreeSet
+import java.util.PriorityQueue
 
-class BinaryMinHeap<T> : Heap<T> {
+class PriorityHeap<T> : Heap<T> {
 
-    private val heap: TreeSet<T>
+    private val heap: PriorityQueue<T>
 
     constructor() {
-        heap = TreeSet()
+        heap = PriorityQueue()
     }
 
     constructor(comparator: Comparator<T>) {
-        heap = TreeSet(comparator)
-    }
-
-    override fun updateElement(element: T) {
-        remove(element)
-        add(element)
+        heap = PriorityQueue(comparator)
     }
 
     override fun add(element: T): Boolean = heap.add(element)
 
-    override fun peek(): T = heap.first()
+    override fun peek(): T? = heap.peek()
 
-    override fun pop(): T? = heap.pollFirst()
+    override fun pop(): T? = heap.poll()
 
     override fun remove(element: T): Boolean = heap.remove(element)
 

@@ -108,10 +108,7 @@ internal open class BaseNode(internal val node: Node) {
     private fun getCoveredStartingNodes(coveredCount: Int): List<Pair<StartingNode, Int>> {
         // sort the connections based on their connection costs in ascending order
         val startingNodes = costMap.keys.sortedBy { costMap[it]!! }.map { it }
-        if (this is StartingNode && hasConnections() && startingNodes[0] != this) {
-            throw IllegalStateException("Starting node not in covered nodes.")
-        }
-        val result = mutableListOf<Pair<StartingNode, Int>>()
+        val result: MutableList<Pair<StartingNode, Int>> = ArrayList()
         var remaining = coveredCount
 
         // pick starting nodes greedy that add up to coveredCount

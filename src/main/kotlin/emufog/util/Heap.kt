@@ -27,13 +27,11 @@ interface Heap<T> {
 
     fun add(element: T): Boolean
 
-    fun peek(): T
+    fun peek(): T?
 
     fun pop(): T?
 
     fun remove(element: T): Boolean
-
-    fun updateElement(element: T)
 
     fun isEmpty(): Boolean
 }
