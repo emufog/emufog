@@ -57,17 +57,29 @@ internal class GraphTest {
 
     @Test
     fun `getEdgeDeviceNode with a not existing id should return null`() {
-        assertNull(defaultGraph.getEdgeDeviceNode(42))
+        val graph = Graph(defaultConfig)
+        graph.getOrCreateAutonomousSystem(1)
+        graph.getOrCreateAutonomousSystem(2)
+        graph.getOrCreateAutonomousSystem(3)
+        assertNull(graph.getEdgeDeviceNode(42))
     }
 
     @Test
     fun `getBackboneNode with a not existing id should return null`() {
-        assertNull(defaultGraph.getBackboneNode(42))
+        val graph = Graph(defaultConfig)
+        graph.getOrCreateAutonomousSystem(1)
+        graph.getOrCreateAutonomousSystem(2)
+        graph.getOrCreateAutonomousSystem(3)
+        assertNull(graph.getBackboneNode(42))
     }
 
     @Test
     fun `getEdgeNode with a not existing id should return null`() {
-        assertNull(defaultGraph.getEdgeNode(42))
+        val graph = Graph(defaultConfig)
+        graph.getOrCreateAutonomousSystem(1)
+        graph.getOrCreateAutonomousSystem(2)
+        graph.getOrCreateAutonomousSystem(3)
+        assertNull(graph.getEdgeNode(42))
     }
 
     @Test
@@ -274,7 +286,7 @@ internal class GraphTest {
     }
 
     @Test
-    fun `createEdge should edge device node is not connected to the edge`() {
+    fun `createEdge should edge device node is not connected to the edge #1`() {
         val graph = Graph(defaultConfig)
         val system = graph.getOrCreateAutonomousSystem(0)
         val container = DeviceContainer("name", "tag", 1024, 1F, 1, 1F)
@@ -286,7 +298,19 @@ internal class GraphTest {
     }
 
     @Test
-    fun `createEdge should create a new edge and update the device counter`() {
+    fun `createEdge should edge device node is not connected to the edge #2`() {
+        val graph = Graph(defaultConfig)
+        val system = graph.getOrCreateAutonomousSystem(0)
+        val container = DeviceContainer("name", "tag", 1024, 1F, 1, 1F)
+        val source = graph.createBackboneNode(1, system)
+        val destination = graph.createEdgeDeviceNode(0, system, container)
+        assertThrows<IllegalArgumentException> {
+            graph.createEdge(0, source, destination, 0F, 10F)
+        }
+    }
+
+    @Test
+    fun `createEdge should create a new edge and update the device counter #1`() {
         val graph = Graph(defaultConfig)
         assertNull(graph.getEdge(0))
         val system = graph.getOrCreateAutonomousSystem(0)
@@ -296,6 +320,19 @@ internal class GraphTest {
         val edge = graph.createEdge(0, source, destination, 0F, 10F)
         assertEquals(edge, graph.getEdge(0))
         assertEquals(42, destination.deviceCount)
+    }
+
+    @Test
+    fun `createEdge should create a new edge and update the device counter #2`() {
+        val graph = Graph(defaultConfig)
+        assertNull(graph.getEdge(0))
+        val system = graph.getOrCreateAutonomousSystem(0)
+        val container = DeviceContainer("name", "tag", 1024, 1F, 42, 1F)
+        val source = graph.createEdgeNode(1, system)
+        val destination = graph.createEdgeDeviceNode(0, system, container)
+        val edge = graph.createEdge(0, source, destination, 0F, 10F)
+        assertEquals(edge, graph.getEdge(0))
+        assertEquals(42, source.deviceCount)
     }
 
     @Test
