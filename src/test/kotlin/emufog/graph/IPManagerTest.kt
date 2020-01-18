@@ -72,6 +72,15 @@ internal class IPManagerTest {
     }
 
     @Test
+    fun `get next IP for 0 0 254 254`() {
+        val config = mockk<Config> {
+            every { baseAddress } returns "0.0.254.254"
+        }
+        val manager = IPManager(config)
+        assertEquals("0.1.0.0", manager.nextIPV4Address())
+    }
+
+    @Test
     fun `get next IP for 2 254 254 254`() {
         val config = mockk<Config> {
             every { baseAddress } returns "2.254.254.254"
