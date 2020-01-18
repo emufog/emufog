@@ -23,7 +23,7 @@
  */
 package emufog
 
-import emufog.backbone.BackboneClassifier
+import emufog.backbone.identifyBackbone
 import emufog.config.Config
 import emufog.export.GraphExporter
 import emufog.export.maxinet.MaxiNetExporter
@@ -113,7 +113,7 @@ private fun runEmuFog(args: Array<String>) {
 
     // compute the backbone of the network
     start = System.nanoTime()
-    BackboneClassifier.identifyBackbone(graph)
+    identifyBackbone(graph)
     end = System.nanoTime()
     LOG.debug("Time to determine the backbone of the topology: {}", formatTimeInterval(start, end))
     LOG.info("##############################################################")
