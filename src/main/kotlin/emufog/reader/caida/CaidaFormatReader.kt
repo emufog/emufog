@@ -63,7 +63,7 @@ private class CaidaFormatReaderImpl(files: List<Path>) {
 
         private const val AS_COLUMNS = 3
 
-        private const val EDGE_COLUMNS = 4
+        private const val EDGE_COLUMNS = 5
     }
 
     /* number of times AS field exceeds the Integer range */
