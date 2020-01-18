@@ -28,67 +28,11 @@ import emufog.graph.Node
 import emufog.graph.NodeType
 import emufog.graph.NodeType.BACKBONE_NODE
 import emufog.graph.NodeType.EDGE_NODE
-import emufog.util.ConversionsUtils.formatTimeInterval
-import org.slf4j.LoggerFactory
 import java.util.ArrayDeque
 import java.util.BitSet
 import java.util.Queue
 
-/**
- * This worker class operates on a single AS of the graph so it can used in parallel.
- * Executes the 2nd and 3rd step of the classification algorithm.
- */
-internal object BackboneWorker {
-
-    private val LOG = LoggerFactory.getLogger(BackboneWorker::class.java)
-
-    internal fun identifyBackbone(system: AS) {
-        //2nd step
-        var start = System.nanoTime()
-        convertHighDegrees(system)
-        LOG.info("{} Step 2 - Time: {}", system, formatTimeInterval(start, System.nanoTime()))
-        LOG.info("{} Backbone Size: {}", system, system.backboneNodes.size)
-        LOG.info("{} Edge Size: {}", system, system.edgeNodes.size)
-
-        // 3rd step
-        start = System.nanoTime()
-        BackboneConnector(system).connectBackbone()
-        LOG.info("{} Step 3 - Time: {}", system, formatTimeInterval(start, System.nanoTime()))
-        LOG.info("{} Backbone Size: {}", system, system.backboneNodes.size)
-        LOG.info("{} Edge Size: {}", system, system.edgeNodes.size)
-    }
-
-    /**
-     * Converts nodes with an above average degree to a backbone node.
-     */
-    private fun convertHighDegrees(system: AS) {
-        val averageDegree = calculateAverageDegree(system)
-        system.edgeNodes
-            .filter { it.degree > averageDegree }
-            .forEach { it.toBackboneNode() }
-    }
-
-    /**
-     * Returns the average degree of the autonomous system based on the router and switch nodes.
-     *
-     * @return the average degree
-     */
-    private fun calculateAverageDegree(system: AS): Double {
-        var average = 0.0
-        var count = 0
-        val updateAverage: (Node) -> Unit = {
-            count++
-            average += (it.degree - average) / count
-        }
-
-        system.edgeNodes.forEach { updateAverage(it) }
-        system.backboneNodes.forEach { updateAverage(it) }
-
-        return average
-    }
-}
-
-private class BackboneConnector(private val system: AS) {
+internal class BackboneConnector(private val system: AS) {
 
     private val visited = BitSet()
 
@@ -96,7 +40,7 @@ private class BackboneConnector(private val system: AS) {
 
     private val queue: Queue<Node> = ArrayDeque()
 
-    private val predecessors: MutableMap<Node, Node?> = hashMapOf()
+    private val predecessors: MutableMap<Node, Node?> = HashMap()
 
     private fun Node?.isType(type: NodeType) = this != null && this.type == type
 
@@ -115,7 +59,7 @@ private class BackboneConnector(private val system: AS) {
         queue.add(node)
 
 
-        while (!queue.isEmpty()) {
+        while (queue.isNotEmpty()) {
             processNode(queue.poll())
         }
     }
