@@ -30,7 +30,7 @@ import emufog.graph.Node
 import emufog.graph.NodeType.BACKBONE_NODE
 import emufog.graph.NodeType.EDGE_DEVICE_NODE
 import emufog.graph.NodeType.EDGE_NODE
-import java.io.BufferedWriter
+import java.io.Writer
 import java.nio.file.FileSystems
 import java.nio.file.Path
 
@@ -41,20 +41,6 @@ import java.nio.file.Path
 object MaxiNetExporter : GraphExporter {
 
     override fun exportGraph(graph: Graph, path: Path) {
-        MaxiNetExporterImpl(graph, path).exportGraph()
-    }
-}
-
-private class MaxiNetExporterImpl internal constructor(private val graph: Graph, path: Path) {
-
-    private val writer: BufferedWriter
-
-    /**
-     * mapping of edges to their respective connector
-     */
-    private val connectors: MutableMap<Edge, String> = HashMap()
-
-    init {
         // check if file exists and can be overwritten
         val config = graph.config
         val file = path.toFile()
@@ -62,16 +48,30 @@ private class MaxiNetExporterImpl internal constructor(private val graph: Graph,
             "The given file already exist. Please provide a valid path."
         }
 
-        writer = path.toFile().bufferedWriter()
-
         // check the file ending of the given path
         val matcher = FileSystems.getDefault().getPathMatcher("glob:**.py")
         require(matcher.matches(path)) { "The file name for MaxiNet has to be a python file (.py)." }
-    }
 
-    private fun BufferedWriter.writeln(s: String) {
+        MaxiNetExporterImpl(graph, getBufferedWriter(path)).exportGraph()
+    }
+}
+
+internal fun getBufferedWriter(path: Path) = path.toFile().bufferedWriter()
+
+internal class MaxiNetExporterImpl internal constructor(private val graph: Graph, private val writer: Writer) {
+
+    /**
+     * mapping of edges to their respective connector
+     */
+    private val connectors: MutableMap<Edge, String> = HashMap()
+
+    private fun Writer.writeln(s: String) {
         this.write(s)
         this.newLine()
+    }
+
+    private fun Writer.newLine() {
+        this.write("\n")
     }
 
     internal fun exportGraph() {
