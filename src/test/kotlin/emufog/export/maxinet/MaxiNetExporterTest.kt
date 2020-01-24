@@ -25,6 +25,8 @@ package emufog.export.maxinet
 
 import emufog.config.Config
 import emufog.container.DeviceContainer
+import emufog.container.FogContainer
+import emufog.graph.EmulationNode
 import emufog.graph.Graph
 import io.mockk.every
 import io.mockk.mockk
@@ -149,7 +151,7 @@ internal class MaxiNetExporterTest {
     }
 
     @Test
-    fun `connections between nodes should be written as defined in maxinet`() {
+    fun `connections between nodes without emulation on both sides should be written as defined in maxinet`() {
         val graph = Graph(defaultConfig)
         val system = graph.getOrCreateAutonomousSystem(123)
         val edge1 = graph.createEdgeNode(1, system)
@@ -165,5 +167,21 @@ internal class MaxiNetExporterTest {
             )
         }
         verify { defaultWriter.write("topo.addLink(r1, h2, delay='1.500000ms', bw=1025.000000)") }
+    }
+
+    @Test
+    fun `connections between nodes with emulation on both sides should be written as defined in maxinet`() {
+        val graph = Graph(defaultConfig)
+        val system = graph.getOrCreateAutonomousSystem(123)
+        val edge1 = graph.createEdgeNode(1, system)
+        edge1.setEmulationNode(EmulationNode("4.3.2.1", FogContainer("name", "latest", 1, 1F, 1, 1F)))
+        val device2 = graph.createEdgeDeviceNode(2, system, DeviceContainer("name", "tag", 1, 1F, 2, 2.1F))
+        graph.createEdge(3, edge1, device2, 1.5F, 1025F)
+
+        MaxiNetExporterImpl(graph, defaultWriter).exportGraph()
+
+        verify { defaultWriter.write("c0 = topo.addSwitch(\"c0\")") }
+        verify { defaultWriter.write("topo.addLink(r1, c0, delay='0.750000ms', bw=1025.000000)") }
+        verify { defaultWriter.write("topo.addLink(c0, h2, delay='0.750000ms', bw=1025.000000)") }
     }
 }
