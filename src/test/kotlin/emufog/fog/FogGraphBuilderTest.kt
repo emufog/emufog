@@ -175,6 +175,27 @@ internal class FogGraphBuilderTest {
         assertEquals(5F, backbone6.getCosts(startingNode0))
     }
 
+    @Test
+    fun `cross AS edges should be ignored`() {
+        val config: Config = mockk {
+            every { baseAddress } returns "1.2.3.4"
+        }
+        val graph = Graph(config)
+        val system0 = graph.getOrCreateAutonomousSystem(0)
+        val system1 = graph.getOrCreateAutonomousSystem(1)
+        val edgeNode0 = graph.createEdgeNode(0, system0)
+        val edgeNode1 = graph.createEdgeNode(1, system1)
+        graph.createEdge(0, edgeNode0, edgeNode1, 1F, 10F)
+        val container = DeviceContainer("name", "tag", 1, 1F, 1, 1F)
+        val device2 = graph.createEdgeDeviceNode(2, system0, container)
+        graph.createEdge(1, edgeNode0, device2, 1F, 10F)
+
+        val nodes = calculateShortestDistances(system0, 10F)
+
+        assertEquals(1, nodes.size)
+        assertEquals(edgeNode0, nodes.first().node)
+    }
+
     private fun getTestGraph(): AS {
         val config: Config = mockk {
             every { baseAddress } returns "1.2.3.4"

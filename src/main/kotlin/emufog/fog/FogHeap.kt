@@ -72,11 +72,6 @@ internal class FogHeap(baseNodes: Set<BaseNode>, private val fogTypes: Collectio
         // filter all nodes that need an update
         val toUpdate = nodes.filter { !toRemove.contains(it) && it.modified }
 
-        coveredNodes.forEach {
-            check(!toUpdate.contains(it)) { "toUpdate contains a covered starting node." }
-        }
-
-        check(toRemove.plus(toUpdate).size == toRemove.size + toUpdate.size) { "there is an overlap in remove and update" }
         toRemove.forEach { heap.remove(it) }
         toUpdate.forEach {
             it.determineFogType(fogTypes)
