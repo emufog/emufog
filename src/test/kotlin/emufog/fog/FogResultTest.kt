@@ -23,8 +23,6 @@
  */
 package emufog.fog
 
-import emufog.graph.Node
-import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -64,13 +62,25 @@ internal class FogResultTest {
     fun `addPlacement should increase list by one`() {
         val result = FogResult()
         assertEquals(0, result.placements.size)
-        val someNode: Node = mockk()
-        val baseNode: BaseNode = mockk {
-            every { node } returns someNode
-            every { type } returns mockk()
-        }
-        result.addPlacement(FogNodePlacement(baseNode))
+        val placement: FogNodePlacement = mockk()
+
+        result.addPlacement(placement)
+
         assertEquals(1, result.placements.size)
-        assertEquals(someNode, result.placements[0].node)
+        assertEquals(placement, result.placements[0])
+    }
+
+    @Test
+    fun `addPlacements should increase list by all elements of the collection`() {
+        val result = FogResult()
+        assertEquals(0, result.placements.size)
+        val placement1: FogNodePlacement = mockk()
+        val placement2: FogNodePlacement = mockk()
+
+        result.addPlacements(listOf(placement1, placement2))
+
+        assertEquals(2, result.placements.size)
+        assertTrue(result.placements.contains(placement1))
+        assertTrue(result.placements.contains(placement2))
     }
 }
