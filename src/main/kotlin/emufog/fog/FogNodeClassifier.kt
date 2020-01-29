@@ -23,8 +23,13 @@
  */
 package emufog.fog
 
+import emufog.graph.AS
 import emufog.graph.Graph
+import emufog.util.debugTiming
+import emufog.util.getLogger
 import java.util.concurrent.atomic.AtomicInteger
+
+internal val LOG = getLogger("Fog Node Placement")
 
 /**
  * The fog node classifier is running the fog node placement algorithm on the given graph object.
@@ -49,10 +54,9 @@ class FogNodeClassifier(private val graph: Graph) {
      * @return result object of the fog node placement
      */
     fun findPossibleFogNodes(): FogResult {
-        // process all systems in parallel
-        val results = graph.systems
-            .map { FogWorker(it, this).findFogNodes() }
-            .toList()
+        val results = graph.systems.map {
+            LOG.debugTiming("Find fog nodes in $it") { findFogNodesIn(it, this) }
+        }.toList()
 
         // init empty failed result
         val result = FogResult()
@@ -79,4 +83,38 @@ class FogNodeClassifier(private val graph: Graph) {
     internal fun reduceRemainingNodes() {
         counter.decrementAndGet()
     }
+}
+
+/**
+ * Runs the fog node placement algorithm on the associated autonomous system and returns the overall result object.
+ *
+ * @return result of the fog node placement
+ */
+internal fun findFogNodesIn(system: AS, classifier: FogNodeClassifier): FogResult {
+    // initialize empty result set
+    val result = FogResult().also { it.setSuccess() }
+
+    val nodes = LOG.debugTiming("Calculate distances for edge nodes") {
+        calculateShortestDistances(system, classifier.config.costThreshold)
+    }
+    val heap = FogHeap(nodes, classifier.config.fogNodeTypes)
+
+    while (!heap.isEmpty()) {
+        // check if there are still fog nodes left to place
+        if (!classifier.fogNodesLeft()) {
+            LOG.warn("No more fog nodes left to place. Aborting.")
+            return result.also { it.setFailure() }
+        }
+
+        // find the next fog node for the remaining starting nodes
+        val fogNode = LOG.debugTiming("Time to find next fog node for $system") { heap.getNext() }
+        LOG.debug("{} Next selected fog node: {}", system, fogNode)
+
+        // reduce the remaining fog nodes available
+        classifier.reduceRemainingNodes()
+
+        result.addPlacement(FogNodePlacement(fogNode))
+    }
+
+    return result
 }

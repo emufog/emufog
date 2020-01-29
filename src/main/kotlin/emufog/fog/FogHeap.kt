@@ -72,7 +72,9 @@ internal class FogHeap(baseNodes: Set<BaseNode>, private val fogTypes: Collectio
         // filter all nodes that need an update
         val toUpdate = nodes.filter { !toRemove.contains(it) && it.modified }
 
+        LOG.debug("Removing {} elements from the fog heap", toRemove.size)
         toRemove.forEach { heap.remove(it) }
+        LOG.debug("Updating {} elements in the fog heap", toUpdate.size)
         toUpdate.forEach {
             it.determineFogType(fogTypes)
             heap.update(it)
