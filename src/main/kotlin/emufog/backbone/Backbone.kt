@@ -34,7 +34,10 @@ internal val LOG = getLogger("Backbone Classification")
 
 /**
  * Starts the backbone classification algorithm on the given graph. Modifies the graph including backbone and edge of
- * the network.
+ * the network. Uses three different steps:
+ * 1. Convert the endpoints of cross-AS edges
+ * 2. Convert nodes with an above average degree per AS
+ * 2. Connect the backbone to have at least a single connected backbone per AS
  */
 fun identifyBackbone(graph: Graph) {
     // 1st step sequentially
@@ -68,6 +71,9 @@ internal fun convertCrossAsEdges(edges: Collection<Edge>) {
     }
 }
 
+/**
+ * Identifies the backbone for the given autonomous system. Runs steps 2 and 3 of [identifyBackbone].
+ */
 internal fun identifyBackbone(system: AS) {
     //2nd step
     LOG.debugTiming("$system Step 2: High Degree Nodes") { convertHighDegrees(system) }
@@ -105,4 +111,7 @@ private fun calculateAverageDegree(system: AS): Double {
     return average
 }
 
+/**
+ * Converts an arbitrary node to a backbone node and replace it in its autonomous system.
+ */
 internal fun Node?.toBackboneNode() = this?.let { system.replaceByBackboneNode(this) }

@@ -51,7 +51,7 @@ internal class IPManager(config: Config) {
 
     /**
      * Calculates and returns the next available IP address in the subnet.
-     * @throws IllegalArgumentException if the the ip exceeds 254.254.254.254
+     * @throws IllegalStateException if the the ip exceeds 254.254.254.254
      */
     fun nextIPV4Address(): String {
         if (byte1 != 254) {

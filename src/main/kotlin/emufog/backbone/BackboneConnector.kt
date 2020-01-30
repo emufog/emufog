@@ -32,6 +32,10 @@ import java.util.ArrayDeque
 import java.util.BitSet
 import java.util.Queue
 
+/**
+ * The backbone connector picks an arbitrary backbone node and connects it to any other backbone node it can find
+ * within the given autonomous system. This way it can establish a connected backbone for the AS.
+ */
 internal class BackboneConnector(private val system: AS) {
 
     private val visited = BitSet()

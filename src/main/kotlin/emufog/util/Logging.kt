@@ -29,10 +29,19 @@ import java.util.concurrent.TimeUnit
 import kotlin.math.max
 
 /**
- * Creates and returns a new [Logger] with the given name associated.
+ * Creates and returns a new logger with the given name associated.
  */
 fun getLogger(name: String): Logger = LoggerFactory.getLogger(name)
 
+/**
+ * Executes and measures the time taken to call the given function block f. Returns the outcome of this function block
+ * and prints the given message together with the time measurement formatted using [formatTimeInterval] to the debug
+ * output of this logger.
+ *
+ * @param msg message to print to the debug log
+ * @param f function block to execute and measure
+ * @return outcome of the function block f
+ */
 fun <T> Logger.debugTiming(msg: String, f: () -> T): T {
     val start = System.nanoTime()
     val result = f()

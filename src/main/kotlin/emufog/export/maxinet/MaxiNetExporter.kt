@@ -30,6 +30,7 @@ import emufog.graph.Node
 import emufog.graph.NodeType.BACKBONE_NODE
 import emufog.graph.NodeType.EDGE_DEVICE_NODE
 import emufog.graph.NodeType.EDGE_NODE
+import java.io.BufferedWriter
 import java.io.Writer
 import java.nio.file.FileSystems
 import java.nio.file.Path
@@ -56,8 +57,14 @@ object MaxiNetExporter : GraphExporter {
     }
 }
 
-internal fun getBufferedWriter(path: Path) = path.toFile().bufferedWriter()
+/**
+ * Creates and returns a [BufferedWriter] for the given file.
+ */
+internal fun getBufferedWriter(path: Path): BufferedWriter = path.toFile().bufferedWriter()
 
+/**
+ * Actual implementation of the MaxiNet exporter. Requires the [Graph] object to export and a [Writer] to write to.
+ */
 internal class MaxiNetExporterImpl internal constructor(private val graph: Graph, private val writer: Writer) {
 
     /**
@@ -74,6 +81,9 @@ internal class MaxiNetExporterImpl internal constructor(private val graph: Graph
         this.write("\n")
     }
 
+    /**
+     * Writes the given graph object to the given [Writer] instance.
+     */
     internal fun exportGraph() {
         // begin to write the python file
         writer.writeln("#!/usr/bin/env python2")

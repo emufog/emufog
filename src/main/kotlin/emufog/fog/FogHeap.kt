@@ -27,6 +27,13 @@ import emufog.container.FogContainer
 import emufog.util.Heap
 import emufog.util.PriorityHeap
 
+/**
+ * A fog heap that sorts the elements using a [FogComparator]. It gets initialized with the given set of base nodes.
+ * Every fog node of [getNext] can choose from the collection of given fog container.
+ *
+ * @property fogTypes collection of possible fog containers to select from
+ * @param baseNodes nodes to build a heap from
+ */
 internal class FogHeap(baseNodes: Set<BaseNode>, private val fogTypes: Collection<FogContainer>) {
 
     private val heap: Heap<BaseNode> = PriorityHeap(FogComparator())
@@ -40,8 +47,15 @@ internal class FogHeap(baseNodes: Set<BaseNode>, private val fogTypes: Collectio
         }
     }
 
+    /**
+     * Returns whether the heap is empty or not.
+     */
     internal fun isEmpty(): Boolean = heap.isEmpty()
 
+    /**
+     * Calculates and returns next optimal fog node. The fog node is removed from the heap and the remaining nodes get
+     * updated.
+     */
     internal fun getNext(): BaseNode {
         val result = heap.pop()
         checkNotNull(result) { "The heap of fog nodes is empty." }

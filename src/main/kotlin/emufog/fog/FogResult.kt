@@ -40,9 +40,6 @@ class FogResult internal constructor() {
      */
     private val results: MutableList<FogNodePlacement> = ArrayList()
 
-    /**
-     * maps [results] to an immutable list type
-     */
     val placements: List<FogNodePlacement>
         get() = results
 
