@@ -16,10 +16,12 @@ val emufogVersion = "1.0"
 plugins {
     kotlin("jvm") version "1.3.61"
     jacoco
+    id("org.jetbrains.dokka") version "0.10.0"
 }
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 dependencies {
@@ -67,5 +69,10 @@ tasks {
             html.isEnabled = false
             csv.isEnabled = false
         }
+    }
+
+    dokka {
+        outputFormat = "html"
+        outputDirectory = "${buildDir}/dokka"
     }
 }

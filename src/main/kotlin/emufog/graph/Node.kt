@@ -61,6 +61,9 @@ abstract class Node internal constructor(
      */
     fun hasEmulationSettings(): Boolean = emulationNode != null
 
+    /**
+     * Set an [EmulationNode] or `null` for this instance.
+     */
     internal fun setEmulationNode(emulationNode: EmulationNode?) {
         emulationNodeMutable = emulationNode
     }

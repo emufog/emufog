@@ -25,6 +25,9 @@ package emufog.util
 
 import java.util.PriorityQueue
 
+/**
+ * The priority heap is an implementation of the [Heap] interface using the [PriorityQueue] implementation of the JDK.
+ */
 class PriorityHeap<T> : Heap<T> {
 
     private val heap: PriorityQueue<T>

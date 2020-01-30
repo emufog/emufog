@@ -30,7 +30,15 @@ import emufog.graph.Node
 import emufog.util.Heap
 import emufog.util.PriorityHeap
 
-
+/**
+ * Calculates the shortest distances for every edge node in the graph with a device attached. Every [BaseNode] of the
+ * result contains a cost mapping for every edge node to the respective costs. If the costs of the connection exceeds
+ * the threshold the algorithm aborts.
+ *
+ * @param system system to calculate the distances for
+ * @param threshold cost function threshold to stop iterating
+ * @return a set of all the nodes that are within the threshold
+ */
 internal fun calculateShortestDistances(system: AS, threshold: Float): Set<BaseNode> {
     return FogGraphBuilder(system, threshold).createFogGraph()
 }
@@ -45,6 +53,9 @@ private fun Edge.getCosts(): Float {
     return this.latency
 }
 
+/**
+ * Updates an element in the [Heap] instance. If the element is part of the heap its priority is updated.
+ */
 internal fun <T> Heap<T>.update(element: T) {
     if (this.remove(element)) {
         this.add(element)

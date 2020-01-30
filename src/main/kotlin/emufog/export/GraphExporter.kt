@@ -40,6 +40,5 @@ interface GraphExporter {
      * @throws IllegalArgumentException throws exception if the input parameters are invalid
      * @throws IOException throws exception if an error occurs when writing to disk
      */
-    @Throws(IllegalArgumentException::class, IOException::class)
     fun exportGraph(graph: Graph, path: Path)
 }

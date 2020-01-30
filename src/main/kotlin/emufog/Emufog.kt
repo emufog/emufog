@@ -37,11 +37,6 @@ import picocli.CommandLine
 import java.io.IOException
 import java.nio.file.Paths
 
-/**
- * The EmuFog main launcher class. Starts a new instance of the application with the given parameters
- * by the command line interface.
- */
-
 private val LOG = getLogger("Emufog")
 
 /**

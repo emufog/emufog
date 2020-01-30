@@ -23,15 +23,46 @@
  */
 package emufog.util
 
+/**
+ * Interface of a heap that offers the minimum set of operations required.
+ */
 interface Heap<T> {
 
+    /**
+     * Adds an element to the heap. Returns the outcome of the operation.
+     *
+     * @param element element to add
+     * @return `true` if the element was added, `false` if not
+     */
     fun add(element: T): Boolean
 
+    /**
+     * Returns the top element of the heap but does not remove it from the heap. If the heap is empty the function
+     * returns `null`.
+     *
+     * @return the current top element in the heap
+     */
     fun peek(): T?
 
+    /**
+     * Returns and removes the top element of the heap. If the heap is empty the function returns `null`.
+     *
+     * @return the removed top element of the heap
+     */
     fun pop(): T?
 
+    /**
+     * Removes an element from the heap. Returns the outcome of the operation.
+     *
+     * @param element element to remove
+     * @return `true` if the element was removed, `false` if not found
+     */
     fun remove(element: T): Boolean
 
+    /**
+     * Returns whether the heap is empty or not.
+     *
+     * @return `true` if the heap is empty, `false` if not
+     */
     fun isEmpty(): Boolean
 }
