@@ -25,7 +25,6 @@ package emufog.fog
 
 import emufog.container.FogContainer
 import emufog.graph.Node
-import org.slf4j.LoggerFactory
 import kotlin.math.min
 
 /**
@@ -42,10 +41,6 @@ import kotlin.math.min
  * @property startingNodes set of starting nodes this node can connect to
  */
 internal open class BaseNode(internal val node: Node) {
-
-    companion object {
-        private val LOG = LoggerFactory.getLogger(BaseNode::class.java)
-    }
 
     /**
      * mapping of starting nodes to their respective tuple of predecessor in the path and the overall connection costs
@@ -163,7 +158,7 @@ internal open class BaseNode(internal val node: Node) {
         checkNotNull(type) { "The node's type is null." }
         check(coveredCount > 0) { "No node is covered by this base node" }
 
-        LOG.debug("Set the fog type for {} to {}", node, type)
+        LOG.debug("Determined the optimal fog type for {} to be {}", node, type)
 
         // update the fields depending on the determined type
         averageDeploymentCosts = type!!.costs / coveredCount
@@ -194,4 +189,6 @@ internal open class BaseNode(internal val node: Node) {
     }
 
     override fun hashCode(): Int = node.hashCode()
+
+    override fun toString(): String = "Base-Node: ${node.id}"
 }

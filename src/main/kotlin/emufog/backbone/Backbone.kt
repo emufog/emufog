@@ -27,10 +27,10 @@ import emufog.graph.AS
 import emufog.graph.Edge
 import emufog.graph.Graph
 import emufog.graph.Node
-import emufog.util.ConversionsUtils.formatTimeInterval
-import org.slf4j.LoggerFactory
+import emufog.util.debugTiming
+import emufog.util.getLogger
 
-internal val LOG = LoggerFactory.getLogger("Backbone")
+internal val LOG = getLogger("Backbone Classification")
 
 /**
  * Starts the backbone classification algorithm on the given graph. Modifies the graph including backbone and edge of
@@ -38,20 +38,22 @@ internal val LOG = LoggerFactory.getLogger("Backbone")
  */
 fun identifyBackbone(graph: Graph) {
     // 1st step sequentially
-    LOG.debug("Start Backbone Classification")
-    var start = System.nanoTime()
-    convertCrossAsEdges(graph.edges)
-    LOG.debug("Graph Step 1 - Time: {}", formatTimeInterval(start, System.nanoTime()))
-    LOG.debug("Backbone Size: {}", graph.backboneNodes.size)
-    LOG.debug("Edge Size: {}", graph.edgeNodes.size)
+    LOG.debugTiming("Step 1: Cross-AS Edges") { convertCrossAsEdges(graph.edges) }
+    logBackboneSizes(graph)
 
     // 2nd step in parallel
-    start = System.nanoTime()
-    graph.systems.forEach { identifyBackbone(it) }
-    LOG.debug("Graph Step 2 - Time: {}", formatTimeInterval(start, System.nanoTime()))
+    LOG.debugTiming("Autonomous Systems Classification") { graph.systems.forEach { identifyBackbone(it) } }
+    logBackboneSizes(graph)
+}
+
+private fun logBackboneSizes(graph: Graph) {
     LOG.debug("Backbone Size: {}", graph.backboneNodes.size)
     LOG.debug("Edge Size: {}", graph.edgeNodes.size)
-    LOG.info("Finished Backbone Classification.")
+}
+
+private fun logBackboneSizesOfAs(system: AS) {
+    LOG.debug("{} Backbone Size: {}", system, system.backboneNodes.size)
+    LOG.debug("{} Edge Size: {}", system, system.edgeNodes.size)
 }
 
 /**
@@ -68,18 +70,12 @@ internal fun convertCrossAsEdges(edges: Collection<Edge>) {
 
 internal fun identifyBackbone(system: AS) {
     //2nd step
-    var start = System.nanoTime()
-    convertHighDegrees(system)
-    LOG.info("{} Step 2 - Time: {}", system, formatTimeInterval(start, System.nanoTime()))
-    LOG.info("{} Backbone Size: {}", system, system.backboneNodes.size)
-    LOG.info("{} Edge Size: {}", system, system.edgeNodes.size)
+    LOG.debugTiming("$system Step 2: High Degree Nodes") { convertHighDegrees(system) }
+    logBackboneSizesOfAs(system)
 
     // 3rd step
-    start = System.nanoTime()
-    BackboneConnector(system).connectBackbone()
-    LOG.info("{} Step 3 - Time: {}", system, formatTimeInterval(start, System.nanoTime()))
-    LOG.info("{} Backbone Size: {}", system, system.backboneNodes.size)
-    LOG.info("{} Edge Size: {}", system, system.edgeNodes.size)
+    LOG.debugTiming("$system Step 3: Connect Backbone") { BackboneConnector(system).connectBackbone() }
+    logBackboneSizesOfAs(system)
 }
 
 /**

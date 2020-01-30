@@ -25,15 +25,14 @@ package emufog
 
 import emufog.backbone.identifyBackbone
 import emufog.config.Config
-import emufog.export.GraphExporter
 import emufog.export.maxinet.MaxiNetExporter
 import emufog.fog.FogNodeClassifier
 import emufog.reader.GraphReader
 import emufog.reader.brite.BriteFormatReader
 import emufog.reader.caida.CaidaFormatReader
-import emufog.util.ConversionsUtils.formatTimeInterval
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import emufog.util.debugTiming
+import emufog.util.getLogger
+import emufog.util.infoSeparator
 import picocli.CommandLine
 import java.io.IOException
 import java.nio.file.Paths
@@ -43,7 +42,7 @@ import java.nio.file.Paths
  * by the command line interface.
  */
 
-private val LOG: Logger = LoggerFactory.getLogger("Emufog")
+private val LOG = getLogger("Emufog")
 
 /**
  * Main function call to start EmuFog.
@@ -51,9 +50,15 @@ private val LOG: Logger = LoggerFactory.getLogger("Emufog")
  * @param args arguments of the command line
  */
 fun main(args: Array<String>) {
-    LOG.info("##############################################################")
-    LOG.info("                   Welcome to EmuFog")
-    LOG.info("##############################################################")
+    LOG.infoSeparator()
+    LOG.info("       ______                ______")
+    LOG.info("      / ____/___ ___  __  __/ ____/___  ____ _")
+    LOG.info("     / __/ / __ `__ \\/ / / / /_  / __ \\/ __ `/")
+    LOG.info("    / /___/ / / / / / /_/ / __/ / /_/ / /_/ /")
+    LOG.info("   /_____/_/ /_/ /_/\\__,_/_/    \\____/\\__, /")
+    LOG.info("                                     /____/")
+    LOG.info("")
+    LOG.infoSeparator()
 
     try {
         runEmuFog(args)
@@ -61,9 +66,9 @@ fun main(args: Array<String>) {
         LOG.error("An exception stopped EmuFog!", e)
     }
 
-    LOG.info("##############################################################")
-    LOG.info("                     Closing EmuFog")
-    LOG.info("##############################################################")
+    LOG.infoSeparator()
+    LOG.info("Closing EmuFog...")
+    LOG.infoSeparator()
 }
 
 /**
@@ -97,45 +102,49 @@ private fun runEmuFog(args: Array<String>) {
         return
     }
 
-    // determines the respective format reader
+    // read in the graph object
+    LOG.infoSeparator()
+    LOG.info("Starting to read in the graph")
     val reader = getReader(arguments.inputType!!)
-
-    // read in the graph with the graph reader
-    var start = System.nanoTime()
-    val graph = reader.readGraph(arguments.files)
-    var end = System.nanoTime()
-    LOG.debug("Time to read in the graph: {}", formatTimeInterval(start, end))
-    LOG.info("##############################################################")
+    val graph = LOG.debugTiming("Read in the Graph") { reader.readGraph(arguments.files) }
     // print graph details for information purposes
     LOG.info("Number of nodes in the graph: {}", graph.edgeNodes.size)
     LOG.info("Number of edges in the graph: {}", graph.edges.size)
-    LOG.info("##############################################################")
 
     // compute the backbone of the network
-    start = System.nanoTime()
-    identifyBackbone(graph)
-    end = System.nanoTime()
-    LOG.debug("Time to determine the backbone of the topology: {}", formatTimeInterval(start, end))
-    LOG.info("##############################################################")
+    LOG.infoSeparator()
+    LOG.info("Starting the backbone identification")
+    LOG.debugTiming("Determine the backbone of the topology") { identifyBackbone(graph) }
+    LOG.info("Finished the backbone identification")
     LOG.info("Number of backbone nodes identified: {}", graph.backboneNodes.size)
-    LOG.info("##############################################################")
 
     // assign devices to the edge
+    LOG.infoSeparator()
+    LOG.info("Assigning edge devices to the network")
     graph.assignEdgeDevices()
+    LOG.info("Number of devices assigned: {}", graph.hostDevices.size)
 
     // find the fog node placements
-    val result = FogNodeClassifier(graph).findPossibleFogNodes()
-    if (result.status) {
-        LOG.info("Number of fog nodes identified: {}", result.placements.size)
-        result.placements.forEach { graph.placeFogNode(it.node, it.type); }
-
-        val exporter: GraphExporter = MaxiNetExporter
-        exporter.exportGraph(graph, arguments.output!!)
-    } else {
+    LOG.infoSeparator()
+    LOG.info("Starting the fog node placement algorithm")
+    val result = LOG.debugTiming("Place fog nodes in topology") { FogNodeClassifier(graph).findPossibleFogNodes() }
+    LOG.info("Finished the fog node placement algorithm")
+    if (!result.status) {
         // no fog placement found, aborting
         LOG.warn("Unable to find a fog placement with the provided config.")
         LOG.warn("Consider using different config.")
+        return
     }
+
+    LOG.info("Number of fog nodes identified: {}", result.placements.size)
+    result.placements.forEach { graph.placeFogNode(it.node, it.type); }
+
+    LOG.infoSeparator()
+    LOG.info("Starting the export to a MaxiNet experiment file")
+    val exporter = MaxiNetExporter
+    LOG.debugTiming("Export the topology to MaxiNet") { exporter.exportGraph(graph, arguments.output!!) }
+    LOG.info("Finished the export to a MaxiNet experiment file")
+    LOG.info("Wrote the experiment file to: {}", arguments.output)
 }
 
 /**
@@ -143,7 +152,7 @@ private fun runEmuFog(args: Array<String>) {
  * error if no argument is specified.
  *
  * @param arguments arguments to check
- * @return {@code true} if arguments are valid to start, {@code false} if arguments are invalid
+ * @return `true` if arguments are valid to start, `false` if arguments are invalid
  */
 private fun checkArguments(arguments: Arguments): Boolean {
     var valid = true

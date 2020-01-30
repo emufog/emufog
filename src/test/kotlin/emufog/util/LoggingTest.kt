@@ -30,49 +30,49 @@ internal class ConversionsUtilsTest {
 
     @Test
     fun `format long interval zero based start`() {
-        val s = ConversionsUtils.formatTimeInterval(0, 4900000000000L)
+        val s = formatTimeInterval(0, 4900000000000L)
         assertEquals("1h 21min 40s 0ms", s)
     }
 
     @Test
     fun `format long interval non zero based start`() {
-        val s = ConversionsUtils.formatTimeInterval(42, 4900000000042L)
+        val s = formatTimeInterval(42, 4900000000042L)
         assertEquals("1h 21min 40s 0ms", s)
     }
 
     @Test
     fun `format leading min`() {
-        val s = ConversionsUtils.formatTimeInterval(0, 2520000000000L)
+        val s = formatTimeInterval(0, 2520000000000L)
         assertEquals("42min 0s 0ms", s)
     }
 
     @Test
     fun `format leading sec`() {
-        val s = ConversionsUtils.formatTimeInterval(0, 5000000000L)
+        val s = formatTimeInterval(0, 5000000000L)
         assertEquals("5s 0ms", s)
     }
 
     @Test
     fun `format leading milliseconds`() {
-        val s = ConversionsUtils.formatTimeInterval(0, 124000000L)
+        val s = formatTimeInterval(0, 124000000L)
         assertEquals("124ms", s)
     }
 
     @Test
     fun `format empty interval`() {
-        val s = ConversionsUtils.formatTimeInterval(0, 0)
+        val s = formatTimeInterval(0, 0)
         assertEquals("0ms", s)
     }
 
     @Test
     fun `format below 1 ms`() {
-        val s = ConversionsUtils.formatTimeInterval(0, 999)
+        val s = formatTimeInterval(0, 999)
         assertEquals("0ms", s)
     }
 
     @Test
     fun `format negative interval`() {
-        val s = ConversionsUtils.formatTimeInterval(123456789, 1)
+        val s = formatTimeInterval(123456789, 1)
         assertEquals("0ms", s)
     }
 }
