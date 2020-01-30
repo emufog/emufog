@@ -107,7 +107,7 @@ internal fun findFogNodesIn(system: AS, classifier: FogNodeClassifier): FogResul
         }
 
         // find the next fog node for the remaining starting nodes
-        val fogNode = LOG.debugTiming("Time to find next fog node for $system") { heap.getNext() }
+        val fogNode = LOG.debugTiming("$system Time to find next fog node") { heap.getNext() }
         LOG.debug("{} Next selected fog node: {}", system, fogNode)
 
         // reduce the remaining fog nodes available

@@ -189,4 +189,6 @@ internal open class BaseNode(internal val node: Node) {
     }
 
     override fun hashCode(): Int = node.hashCode()
+
+    override fun toString(): String = "Base-Node: ${node.id}"
 }

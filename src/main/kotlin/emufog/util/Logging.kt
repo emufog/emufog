@@ -28,6 +28,9 @@ import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
 
+/**
+ * Creates and returns a new [Logger] with the given name associated.
+ */
 fun getLogger(name: String): Logger = LoggerFactory.getLogger(name)
 
 fun <T> Logger.debugTiming(msg: String, f: () -> T): T {
@@ -39,6 +42,9 @@ fun <T> Logger.debugTiming(msg: String, f: () -> T): T {
     return result
 }
 
+/**
+ * Prints a separator string to the logger using the info log level.
+ */
 fun Logger.infoSeparator() {
     this.info("##############################################################")
 }

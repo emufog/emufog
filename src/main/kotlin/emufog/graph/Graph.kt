@@ -27,7 +27,6 @@ import emufog.config.Config
 import emufog.container.DeviceContainer
 import emufog.container.FogContainer
 import emufog.util.IDManager
-import org.slf4j.LoggerFactory
 import kotlin.math.abs
 import kotlin.random.Random
 
@@ -44,10 +43,6 @@ import kotlin.random.Random
  * @property nodes all nodes of the graph
  */
 class Graph(val config: Config) {
-
-    companion object {
-        private val LOG = LoggerFactory.getLogger(Graph::class.java)
-    }
 
     private val edgesMutable: MutableList<Edge> = ArrayList()
 

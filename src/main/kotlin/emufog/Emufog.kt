@@ -51,7 +51,13 @@ private val LOG = getLogger("Emufog")
  */
 fun main(args: Array<String>) {
     LOG.infoSeparator()
-    LOG.info("                   Welcome to EmuFog")
+    LOG.info("       ______                ______")
+    LOG.info("      / ____/___ ___  __  __/ ____/___  ____ _")
+    LOG.info("     / __/ / __ `__ \\/ / / / /_  / __ \\/ __ `/")
+    LOG.info("    / /___/ / / / / / /_/ / __/ / /_/ / /_/ /")
+    LOG.info("   /_____/_/ /_/ /_/\\__,_/_/    \\____/\\__, /")
+    LOG.info("                                     /____/")
+    LOG.info("")
     LOG.infoSeparator()
 
     try {
@@ -138,6 +144,7 @@ private fun runEmuFog(args: Array<String>) {
     val exporter = MaxiNetExporter
     LOG.debugTiming("Export the topology to MaxiNet") { exporter.exportGraph(graph, arguments.output!!) }
     LOG.info("Finished the export to a MaxiNet experiment file")
+    LOG.info("Wrote the experiment file to: {}", arguments.output)
 }
 
 /**

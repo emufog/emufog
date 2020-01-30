@@ -29,9 +29,11 @@ import emufog.graph.Graph
 import emufog.graph.Node
 import emufog.reader.GraphReader
 import emufog.util.IDManager
-import org.slf4j.LoggerFactory
+import emufog.util.getLogger
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
+
+internal val LOG = getLogger("Caida Format Reader")
 
 /**
  * This reader can read in the [CAIDA](https://www.caida.org/) topology an build a graph based on that data.
@@ -52,12 +54,12 @@ private class CaidaFormatReaderImpl(files: List<Path>) {
 
     private companion object {
 
-        private val LOG = LoggerFactory.getLogger(CaidaFormatReader::class.java)
-
         /**
          * initialize charset according to https://en.wikipedia.org/wiki/ISO/IEC_8859-1
          */
         private val CHARSET = StandardCharsets.ISO_8859_1
+
+        private val spaceRegex = "\\s".toRegex()
 
         private const val NODE_COLUMNS = 8
 
@@ -101,8 +103,6 @@ private class CaidaFormatReaderImpl(files: List<Path>) {
 
     private val linkFile = getFileWithEnding(files, ".links")
         ?: throw IllegalArgumentException("The given files do not contain a .links file.")
-
-    private val spaceRegex = "\\s".toRegex()
 
     private val idManager = IDManager()
 

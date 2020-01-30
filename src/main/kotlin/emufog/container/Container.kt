@@ -52,5 +52,5 @@ abstract class Container(
      */
     fun fullName(): String = "$name:$tag"
 
-    override fun toString(): String = fullName()
+    override fun toString(): String = "[${fullName()}, memory=$memoryLimit, cpu=$cpuShare]"
 }
