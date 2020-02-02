@@ -23,11 +23,8 @@
  */
 package emufog.graph
 
-import emufog.config.Config
 import emufog.container.DeviceContainer
 import emufog.container.FogContainer
-import io.mockk.every
-import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -38,15 +35,13 @@ import org.junit.jupiter.api.assertThrows
 
 internal class GraphTest {
 
-    private val defaultConfig = mockk<Config> {
-        every { baseAddress } returns "1.2.3.4"
-    }
+    private val defaultAddress = "1.2.3.4"
 
-    private val defaultGraph = Graph(defaultConfig)
+    private val defaultGraph = Graph(defaultAddress)
 
     @Test
     fun `test the constructor`() {
-        assertEquals(defaultConfig, defaultGraph.config)
+        assertEquals(defaultAddress, defaultGraph.baseAddress)
         assertTrue(defaultGraph.backboneNodes.isEmpty())
         assertTrue(defaultGraph.edges.isEmpty())
         assertTrue(defaultGraph.edgeNodes.isEmpty())
@@ -57,7 +52,7 @@ internal class GraphTest {
 
     @Test
     fun `getEdgeDeviceNode with a not existing id should return null`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultAddress)
         graph.getOrCreateAutonomousSystem(1)
         graph.getOrCreateAutonomousSystem(2)
         graph.getOrCreateAutonomousSystem(3)
@@ -66,7 +61,7 @@ internal class GraphTest {
 
     @Test
     fun `getBackboneNode with a not existing id should return null`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultAddress)
         graph.getOrCreateAutonomousSystem(1)
         graph.getOrCreateAutonomousSystem(2)
         graph.getOrCreateAutonomousSystem(3)
@@ -75,7 +70,7 @@ internal class GraphTest {
 
     @Test
     fun `getEdgeNode with a not existing id should return null`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultAddress)
         graph.getOrCreateAutonomousSystem(1)
         graph.getOrCreateAutonomousSystem(2)
         graph.getOrCreateAutonomousSystem(3)
@@ -84,7 +79,7 @@ internal class GraphTest {
 
     @Test
     fun `getEdgeDeviceNode with an existing id should return the node`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultAddress)
         val system = graph.getOrCreateAutonomousSystem(1)
         val container = DeviceContainer("abc", "tag", 1, 1F, 1, 1F)
         val node = graph.createEdgeDeviceNode(42, system, container)
@@ -93,7 +88,7 @@ internal class GraphTest {
 
     @Test
     fun `getBackboneNode with an existing id should return null`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultAddress)
         val system = graph.getOrCreateAutonomousSystem(1)
         val node = graph.createBackboneNode(42, system)
         assertEquals(node, graph.getBackboneNode(42))
@@ -101,7 +96,7 @@ internal class GraphTest {
 
     @Test
     fun `getEdgeNode with an existing id should return null`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultAddress)
         val system = graph.getOrCreateAutonomousSystem(1)
         val node = graph.createEdgeNode(42, system)
         assertEquals(node, graph.getEdgeNode(42))
@@ -109,7 +104,7 @@ internal class GraphTest {
 
     @Test
     fun `adding an edge node to a system that is not in the graph should fail`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultAddress)
         val system = AS(1)
         assertThrows<IllegalArgumentException> {
             graph.createEdgeNode(42, system)
@@ -118,7 +113,7 @@ internal class GraphTest {
 
     @Test
     fun `adding a backbone node to a system that is not in the graph should fail`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultAddress)
         val system = AS(1)
         assertThrows<IllegalArgumentException> {
             graph.createBackboneNode(42, system)
@@ -127,7 +122,7 @@ internal class GraphTest {
 
     @Test
     fun `adding an edge device node to a system that is not in the graph should fail`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultAddress)
         val system = AS(1)
         val container = DeviceContainer("abc", "tag", 1, 1F, 1, 1F)
         assertThrows<IllegalArgumentException> {
@@ -137,7 +132,7 @@ internal class GraphTest {
 
     @Test
     fun `createEdgeNode should fail if id is already in use`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultAddress)
         val system = graph.getOrCreateAutonomousSystem(1)
         graph.createEdgeNode(0, system)
         assertThrows<IllegalArgumentException> {
@@ -147,7 +142,7 @@ internal class GraphTest {
 
     @Test
     fun `createBackboneNode should fail if id is already in use`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultAddress)
         val system = graph.getOrCreateAutonomousSystem(1)
         graph.createBackboneNode(0, system)
         assertThrows<IllegalArgumentException> {
@@ -157,7 +152,7 @@ internal class GraphTest {
 
     @Test
     fun `createEdgeDeviceNode should fail if id is already in use`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultAddress)
         val system = graph.getOrCreateAutonomousSystem(1)
         val container = DeviceContainer("abc", "tag", 1, 1F, 1, 1F)
         graph.createEdgeDeviceNode(0, system, container)
@@ -168,7 +163,7 @@ internal class GraphTest {
 
     @Test
     fun `createEdgeNode should create a node with the params and should be retrievable`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultAddress)
         val system = graph.getOrCreateAutonomousSystem(1)
         val node = graph.createEdgeNode(0, system)
         assertEquals(0, node.id)
@@ -180,7 +175,7 @@ internal class GraphTest {
 
     @Test
     fun `createBackboneNode should create a node with the params and should be retrievable`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultAddress)
         val system = graph.getOrCreateAutonomousSystem(1)
         val node = graph.createBackboneNode(0, system)
         assertEquals(0, node.id)
@@ -192,7 +187,7 @@ internal class GraphTest {
 
     @Test
     fun `createEdgeDeviceNode should create a node with the params and should be retrievable`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultAddress)
         val system = graph.getOrCreateAutonomousSystem(1)
         val container = DeviceContainer("abc", "tag", 1, 1F, 1, 1F)
         val node = graph.createEdgeDeviceNode(0, system, container)
@@ -210,28 +205,28 @@ internal class GraphTest {
 
     @Test
     fun `getAutonomousSystem should return the resp system if it is part of the graph`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultAddress)
         val system = graph.getOrCreateAutonomousSystem(1)
         assertEquals(system, graph.getAutonomousSystem(1))
     }
 
     @Test
     fun `getOrCreateAutonomousSystem should return a new system if not present`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultAddress)
         assertNull(graph.getAutonomousSystem(1))
         assertEquals(1, graph.getOrCreateAutonomousSystem(1).id)
     }
 
     @Test
     fun `getOrCreateAutonomousSystem returns an already existing system`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultAddress)
         val system = graph.getOrCreateAutonomousSystem(1)
         assertEquals(system, graph.getOrCreateAutonomousSystem(1))
     }
 
     @Test
     fun `createEdge should fail on negative latency`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultAddress)
         val system = graph.getOrCreateAutonomousSystem(0)
         val source = graph.createBackboneNode(0, system)
         val destination = graph.createBackboneNode(1, system)
@@ -242,7 +237,7 @@ internal class GraphTest {
 
     @Test
     fun `createEdge should fail on negative bandwidth`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultAddress)
         val system = graph.getOrCreateAutonomousSystem(0)
         val source = graph.createBackboneNode(0, system)
         val destination = graph.createBackboneNode(1, system)
@@ -253,7 +248,7 @@ internal class GraphTest {
 
     @Test
     fun `createEdge should fail if source is not in graph`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultAddress)
         val system = graph.getOrCreateAutonomousSystem(0)
         val source = BackboneNode(0, AS(42))
         val destination = graph.createBackboneNode(1, system)
@@ -264,7 +259,7 @@ internal class GraphTest {
 
     @Test
     fun `createEdge should fail if destination is not in graph`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultAddress)
         val system = graph.getOrCreateAutonomousSystem(0)
         val source = graph.createBackboneNode(0, system)
         val destination = BackboneNode(1, AS(42))
@@ -275,7 +270,7 @@ internal class GraphTest {
 
     @Test
     fun `createEdge should fail if id is already in use`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultAddress)
         val system = graph.getOrCreateAutonomousSystem(0)
         val source = graph.createBackboneNode(0, system)
         val destination = graph.createBackboneNode(1, system)
@@ -287,7 +282,7 @@ internal class GraphTest {
 
     @Test
     fun `createEdge should edge device node is not connected to the edge #1`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultAddress)
         val system = graph.getOrCreateAutonomousSystem(0)
         val container = DeviceContainer("name", "tag", 1024, 1F, 1, 1F)
         val source = graph.createEdgeDeviceNode(0, system, container)
@@ -299,7 +294,7 @@ internal class GraphTest {
 
     @Test
     fun `createEdge should edge device node is not connected to the edge #2`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultAddress)
         val system = graph.getOrCreateAutonomousSystem(0)
         val container = DeviceContainer("name", "tag", 1024, 1F, 1, 1F)
         val source = graph.createBackboneNode(1, system)
@@ -311,7 +306,7 @@ internal class GraphTest {
 
     @Test
     fun `createEdge should create a new edge and update the device counter #1`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultAddress)
         assertNull(graph.getEdge(0))
         val system = graph.getOrCreateAutonomousSystem(0)
         val container = DeviceContainer("name", "tag", 1024, 1F, 42, 1F)
@@ -324,7 +319,7 @@ internal class GraphTest {
 
     @Test
     fun `createEdge should create a new edge and update the device counter #2`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultAddress)
         assertNull(graph.getEdge(0))
         val system = graph.getOrCreateAutonomousSystem(0)
         val container = DeviceContainer("name", "tag", 1024, 1F, 42, 1F)
@@ -337,7 +332,7 @@ internal class GraphTest {
 
     @Test
     fun `placeFogNode should fail if node is not in graph`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultAddress)
         val system = graph.getOrCreateAutonomousSystem(0)
         val container = FogContainer("name", "tag", 1024, 1F, 2, 5F)
         assertThrows<IllegalArgumentException> {
@@ -347,7 +342,7 @@ internal class GraphTest {
 
     @Test
     fun `placeFogNode sets the emulation node with the given fog container`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultAddress)
         val system = graph.getOrCreateAutonomousSystem(0)
         val container = FogContainer("name", "tag", 1024, 1F, 2, 5F)
         val node = graph.createBackboneNode(1, system)

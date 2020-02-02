@@ -37,8 +37,9 @@ interface GraphExporter {
      *
      * @param graph the graph to export
      * @param path path to export the graph to
+     * @param overwrite boolean indicator if an existing file should be overwritten
      * @throws IllegalArgumentException throws exception if the input parameters are invalid
      * @throws IOException throws exception if an error occurs when writing to disk
      */
-    fun exportGraph(graph: Graph, path: Path)
+    fun exportGraph(graph: Graph, path: Path, overwrite: Boolean = false)
 }

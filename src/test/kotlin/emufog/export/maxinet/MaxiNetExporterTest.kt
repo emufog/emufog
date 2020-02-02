@@ -23,7 +23,6 @@
  */
 package emufog.export.maxinet
 
-import emufog.config.Config
 import emufog.container.DeviceContainer
 import emufog.container.FogContainer
 import emufog.graph.EmulationNode
@@ -47,10 +46,7 @@ import java.nio.file.Path
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class MaxiNetExporterTest {
 
-    private val defaultConfig: Config = mockk {
-        every { baseAddress } returns "1.2.3.4"
-        every { overWriteOutputFile } returns false
-    }
+    private val defaultBaseAddress = "1.2.3.4"
 
     private val defaultFile: File = mockk {
         every { exists() } returns true
@@ -79,10 +75,10 @@ internal class MaxiNetExporterTest {
             every { toFile() } returns defaultFile
         }
 
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultBaseAddress)
 
         assertThrows<IllegalArgumentException> {
-            MaxiNetExporter.exportGraph(graph, path)
+            MaxiNetExporter.exportGraph(graph, path, false)
         }
     }
 
@@ -92,16 +88,12 @@ internal class MaxiNetExporterTest {
             every { toFile() } returns defaultFile
             every { this@mockk.toString() } returns "file.py"
         }
-        val config: Config = mockk {
-            every { baseAddress } returns "1.2.3.4"
-            every { overWriteOutputFile } returns true
-        }
-        val graph = Graph(config)
+        val graph = Graph(defaultBaseAddress)
 
         mockkConstructor(MaxiNetExporterImpl::class)
         every { anyConstructed<MaxiNetExporterImpl>().exportGraph() } returns Unit
 
-        MaxiNetExporter.exportGraph(graph, path)
+        MaxiNetExporter.exportGraph(graph, path, true)
 
         verify { MaxiNetExporterImpl(graph, defaultWriter).exportGraph() }
 
@@ -114,7 +106,7 @@ internal class MaxiNetExporterTest {
             every { toFile() } returns defaultFile
             every { this@mockk.toString() } returns "file.txt"
         }
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultBaseAddress)
 
         assertThrows<IllegalArgumentException> {
             MaxiNetExporter.exportGraph(graph, path)
@@ -123,7 +115,7 @@ internal class MaxiNetExporterTest {
 
     @Test
     fun `empty graph should just call imports etc`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultBaseAddress)
 
         MaxiNetExporterImpl(graph, defaultWriter).exportGraph()
 
@@ -133,7 +125,7 @@ internal class MaxiNetExporterTest {
 
     @Test
     fun `sample graph with different should be written as defined in maxinet`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultBaseAddress)
         val system = graph.getOrCreateAutonomousSystem(123)
         graph.createBackboneNode(0, system)
         graph.createEdgeNode(1, system)
@@ -152,7 +144,7 @@ internal class MaxiNetExporterTest {
 
     @Test
     fun `connections between nodes without emulation on both sides should be written as defined in maxinet`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultBaseAddress)
         val system = graph.getOrCreateAutonomousSystem(123)
         val edge1 = graph.createEdgeNode(1, system)
         val device2 = graph.createEdgeDeviceNode(2, system, DeviceContainer("name", "tag", 1, 1F, 2, 2.1F))
@@ -171,7 +163,7 @@ internal class MaxiNetExporterTest {
 
     @Test
     fun `connections between nodes with emulation on both sides should be written as defined in maxinet`() {
-        val graph = Graph(defaultConfig)
+        val graph = Graph(defaultBaseAddress)
         val system = graph.getOrCreateAutonomousSystem(123)
         val edge1 = graph.createEdgeNode(1, system)
         edge1.setEmulationNode(EmulationNode("4.3.2.1", FogContainer("name", "latest", 1, 1F, 1, 1F)))

@@ -60,9 +60,9 @@ internal class FogNodeClassifierTest {
 
     @Test
     fun `empty graph should return an empty result`() {
-        val graph = Graph(defaultConfig1)
+        val graph = Graph(defaultConfig1.baseAddress)
 
-        val result = FogNodeClassifier(graph).findPossibleFogNodes()
+        val result = FogNodeClassifier(graph, defaultConfig1).findPossibleFogNodes()
 
         assertTrue(result.status)
         assertEquals(0, result.placements.size)
@@ -72,7 +72,7 @@ internal class FogNodeClassifierTest {
     fun `sample graph with two AS combines the partial results`() {
         val graph = createGraph(defaultConfig1)
 
-        val result = FogNodeClassifier(graph).findPossibleFogNodes()
+        val result = FogNodeClassifier(graph, defaultConfig1).findPossibleFogNodes()
 
         assertTrue(result.status)
         assertEquals(4, result.placements.size)
@@ -80,14 +80,14 @@ internal class FogNodeClassifierTest {
 
     @Test
     fun `if one system fails the result should be failed`() {
-        val graph = Graph(defaultConfig1)
+        val graph = Graph(defaultConfig1.baseAddress)
         val system0 = graph.getOrCreateAutonomousSystem(0)
         val system1 = graph.getOrCreateAutonomousSystem(1)
         mockkStatic("emufog.fog.FogNodeClassifierKt")
         every { findFogNodesIn(system0, any()) } returns FogResult().also { it.setSuccess() }
         every { findFogNodesIn(system1, any()) } returns FogResult().also { it.setFailure() }
 
-        val result = FogNodeClassifier(graph).findPossibleFogNodes()
+        val result = FogNodeClassifier(graph, defaultConfig1).findPossibleFogNodes()
 
         assertFalse(result.status)
         unmockkStatic("emufog.fog.FogNodeClassifierKt")
@@ -103,13 +103,13 @@ internal class FogNodeClassifierTest {
         }
         val graph = createGraph(config)
 
-        val result = FogNodeClassifier(graph).findPossibleFogNodes()
+        val result = FogNodeClassifier(graph, config).findPossibleFogNodes()
 
         assertFalse(result.status)
     }
 
     private fun createGraph(config: Config): Graph {
-        val graph = Graph(config)
+        val graph = Graph(config.baseAddress)
 
         val system0 = graph.getOrCreateAutonomousSystem(0)
         val edge0 = graph.createEdgeNode(0, system0)
@@ -157,7 +157,7 @@ internal class FogNodeClassifierTest {
 
     @Test
     fun `findFogNodes on empty as should be empty`() {
-        val graph = Graph(defaultConfig2)
+        val graph = Graph(defaultConfig2.baseAddress)
         val system = graph.getOrCreateAutonomousSystem(0)
         val classifier: FogNodeClassifier = mockk {
             every { config } returns defaultConfig2
@@ -169,7 +169,7 @@ internal class FogNodeClassifierTest {
 
     @Test
     fun `findFogNodes on non device edge nodes should be empty`() {
-        val graph = Graph(defaultConfig2)
+        val graph = Graph(defaultConfig2.baseAddress)
         val system = graph.getOrCreateAutonomousSystem(0)
         graph.createEdgeNode(0, system)
         graph.createEdgeNode(1, system)
@@ -183,7 +183,7 @@ internal class FogNodeClassifierTest {
 
     @Test
     fun `findFogNodes on sample topology #1, fully covered nodes`() {
-        val graph = Graph(defaultConfig2)
+        val graph = Graph(defaultConfig2.baseAddress)
         val system = graph.getOrCreateAutonomousSystem(0)
         val edge0 = graph.createEdgeNode(0, system)
         val edge1 = graph.createEdgeNode(1, system)
@@ -218,7 +218,7 @@ internal class FogNodeClassifierTest {
         graph.createEdge(10, edge2, device9, 1F, 10F)
         graph.createEdge(11, edge3, device10, 1F, 10F)
 
-        val result = findFogNodesIn(system, FogNodeClassifier(graph))
+        val result = findFogNodesIn(system, FogNodeClassifier(graph, defaultConfig2))
         assertTrue(result.status)
         assertEquals(2, result.placements.size)
         assertEquals(fogTypes2[0], result.placements[0].type)

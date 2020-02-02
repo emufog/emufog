@@ -23,11 +23,8 @@
  */
 package emufog.backbone
 
-import emufog.config.Config
 import emufog.graph.Graph
 import emufog.graph.Node
-import io.mockk.every
-import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
@@ -35,14 +32,12 @@ import org.junit.jupiter.api.Test
 
 internal class BackboneWorkerTest {
 
-    private val config = mockk<Config> {
-        every { baseAddress } returns "1.2.3.4"
-    }
+    private val defaultBaseAddress = "1.2.3.4"
 
     @Test
     fun `identify a backbone for a line topology with one autonomous system`() {
         val n = 10
-        val graph = Graph(config)
+        val graph = Graph(defaultBaseAddress)
         val system = graph.getOrCreateAutonomousSystem(0)
 
         for (i in 0 until n) {
@@ -68,7 +63,7 @@ internal class BackboneWorkerTest {
 
     @Test
     fun `identify cross as edges as backbone connections`() {
-        val graph = Graph(config)
+        val graph = Graph(defaultBaseAddress)
         val system0 = graph.getOrCreateAutonomousSystem(0)
         val system1 = graph.getOrCreateAutonomousSystem(1)
 
@@ -89,7 +84,7 @@ internal class BackboneWorkerTest {
 
     @Test
     fun `identify a circle as no backbone connection`() {
-        val graph = Graph(config)
+        val graph = Graph(defaultBaseAddress)
         val system = graph.getOrCreateAutonomousSystem(0)
 
         val node0 = graph.createEdgeNode(0, system)
@@ -118,7 +113,7 @@ internal class BackboneWorkerTest {
 
     @Test
     fun `toBackboneNode should replace a node with a backbone node`() {
-        val graph = Graph(config)
+        val graph = Graph(defaultBaseAddress)
         val system = graph.getOrCreateAutonomousSystem(0)
 
         val node = graph.createEdgeNode(0, system)

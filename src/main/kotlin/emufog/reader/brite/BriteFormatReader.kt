@@ -23,7 +23,6 @@
  */
 package emufog.reader.brite
 
-import emufog.config.Config
 import emufog.graph.Graph
 import emufog.reader.GraphReader
 import java.nio.file.Path
@@ -38,18 +37,19 @@ object BriteFormatReader : GraphReader {
      * Reads in a new graph object from a brite format file. This call only supports one file.
      *
      * @param files the list of input files must only contain one file path
+     * @param baseAddress base address of the IPv4 space to start with
      * @throws BriteFormatException if format does not match the BRITE standard
      * @throws IllegalArgumentException if the list is empty or not exactly of size one
      */
-    override fun readGraph(files: List<Path>): Graph {
+    override fun readGraph(files: List<Path>, baseAddress: String): Graph {
         require(files.isNotEmpty()) { "No files given to read in." }
         require(files.size == 1) { "The BRITE reader only supports one input file." }
 
-        return BriteFormatReaderImpl(files[0]).readGraph()
+        return BriteFormatReaderImpl(files[0], baseAddress).readGraph()
     }
 }
 
-private class BriteFormatReaderImpl internal constructor(path: Path) {
+internal class BriteFormatReaderImpl internal constructor(path: Path, baseAddress: String) {
 
     private companion object {
         /**
@@ -67,7 +67,7 @@ private class BriteFormatReaderImpl internal constructor(path: Path) {
 
     private val reader = path.toFile().bufferedReader()
 
-    private val graph = Graph(Config.config!!)
+    private val graph = Graph(baseAddress)
 
     /**
      * Reads in the BRITE topology from the associated file and returns the created [Graph] object.

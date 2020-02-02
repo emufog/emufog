@@ -23,6 +23,7 @@
  */
 package emufog.fog
 
+import emufog.config.Config
 import emufog.graph.AS
 import emufog.graph.Graph
 import emufog.util.debugTiming
@@ -34,12 +35,7 @@ internal val LOG = getLogger("Fog Node Placement")
 /**
  * The fog node classifier is running the fog node placement algorithm on the given graph object.
  */
-class FogNodeClassifier(private val graph: Graph) {
-
-    /**
-     * the graph's config to use for the fog node classification
-     */
-    internal val config = graph.config
+class FogNodeClassifier(private val graph: Graph, internal val config: Config) {
 
     /**
      * counter of remaining fog nodes to place in the graph, atomic for parallel access

@@ -23,7 +23,6 @@
  */
 package emufog.fog
 
-import emufog.config.Config
 import emufog.container.DeviceContainer
 import emufog.graph.AS
 import emufog.graph.EdgeNode
@@ -177,10 +176,7 @@ internal class FogGraphBuilderTest {
 
     @Test
     fun `cross AS edges should be ignored`() {
-        val config: Config = mockk {
-            every { baseAddress } returns "1.2.3.4"
-        }
-        val graph = Graph(config)
+        val graph = Graph("1.2.3.4")
         val system0 = graph.getOrCreateAutonomousSystem(0)
         val system1 = graph.getOrCreateAutonomousSystem(1)
         val edgeNode0 = graph.createEdgeNode(0, system0)
@@ -197,10 +193,7 @@ internal class FogGraphBuilderTest {
     }
 
     private fun getTestGraph(): AS {
-        val config: Config = mockk {
-            every { baseAddress } returns "1.2.3.4"
-        }
-        val graph = Graph(config)
+        val graph = Graph("1.2.3.4")
         val system = graph.getOrCreateAutonomousSystem(0)
         val edge0 = graph.createEdgeNode(0, system)
         val edge5 = graph.createEdgeNode(5, system)

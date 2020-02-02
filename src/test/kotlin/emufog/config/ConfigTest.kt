@@ -41,21 +41,21 @@ internal class ConfigTest {
     @Test
     fun `test a not yaml file`() {
         assertThrows<IllegalArgumentException> {
-            Config.updateConfig(Paths.get("file.txt"))
+            readConfig(Paths.get("file.txt"))
         }
     }
 
     @Test
     fun `test a directory`() {
         assertThrows<IllegalArgumentException> {
-            Config.updateConfig(Paths.get("."))
+            readConfig(Paths.get("."))
         }
     }
 
     @Test
     fun `test a not existing file`() {
         assertThrows<FileNotFoundException> {
-            Config.updateConfig(Paths.get("not-existing.yaml"))
+            readConfig(Paths.get("not-existing.yaml"))
         }
     }
 
@@ -92,9 +92,7 @@ internal class ConfigTest {
 
     @Test
     fun `read in a valid config`() {
-        Config.updateConfig(resourcesDir.resolve("config.yaml"))
-        val config = Config.config
-        requireNotNull(config)
+        val config = readConfig(resourcesDir.resolve("config.yaml"))
 
         assertEquals("10.0.0.0", config.baseAddress)
         assertEquals(true, config.overWriteOutputFile)
@@ -117,21 +115,21 @@ internal class ConfigTest {
     @Test
     fun `config with float instead of int should fail`() {
         assertThrows<IOException> {
-            Config.updateConfig(resourcesDir.resolve("config_int_float.yaml"))
+            readConfig(resourcesDir.resolve("config_int_float.yaml"))
         }
     }
 
     @Test
     fun `config with missing latency should fail`() {
         assertThrows<IOException> {
-            Config.updateConfig(resourcesDir.resolve("config_missing_latency.yaml"))
+            readConfig(resourcesDir.resolve("config_missing_latency.yaml"))
         }
     }
 
     @Test
     fun `config with wrong string for overwrite should fail`() {
         assertThrows<IOException> {
-            Config.updateConfig(resourcesDir.resolve("config_overwrite_different_string.yaml"))
+            readConfig(resourcesDir.resolve("config_overwrite_different_string.yaml"))
         }
     }
 

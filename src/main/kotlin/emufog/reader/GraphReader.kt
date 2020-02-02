@@ -37,9 +37,10 @@ interface GraphReader {
      * Returns the newly created instance.
      *
      * @param files list of files to read in
+     * @param baseAddress base address of the IPv4 space to start with
      * @return the read in graph structure
      * @throws IllegalArgumentException throws exception if given file list is invalid
      * @throws TopologyFormatException throws exception if the format does not match expectations
      */
-    fun readGraph(files: List<Path>): Graph
+    fun readGraph(files: List<Path>, baseAddress: String): Graph
 }
