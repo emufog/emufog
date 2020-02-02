@@ -33,9 +33,21 @@ import java.util.concurrent.atomic.AtomicInteger
 internal val LOG = getLogger("Fog Node Placement")
 
 /**
+ * Runs the fog node placement algorithm on the given graph instance. Returns a [FogResult] containing the outcome of
+ * the algorithm. The graph instance will not be modified. The given config is used for the tuning of the algorithm.
+ *
+ * @param graph graph instance to run the algorithm on
+ * @param config configuration for the algorithm
+ * @return result set of the algorithm
+ */
+fun findPossibleFogNodes(graph: Graph, config: Config): FogResult {
+    return FogNodeClassifier(graph, config).findPossibleFogNodes()
+}
+
+/**
  * The fog node classifier is running the fog node placement algorithm on the given graph object.
  */
-class FogNodeClassifier(private val graph: Graph, internal val config: Config) {
+internal class FogNodeClassifier(private val graph: Graph, internal val config: Config) {
 
     /**
      * counter of remaining fog nodes to place in the graph, atomic for parallel access

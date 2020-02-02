@@ -26,8 +26,9 @@ package emufog
 import emufog.backbone.identifyBackbone
 import emufog.config.Config
 import emufog.config.readConfig
+import emufog.device.assignDeviceNodes
 import emufog.export.maxinet.MaxiNetExporter
-import emufog.fog.FogNodeClassifier
+import emufog.fog.findPossibleFogNodes
 import emufog.reader.GraphReader
 import emufog.reader.brite.BriteFormatReader
 import emufog.reader.caida.CaidaFormatReader
@@ -120,14 +121,14 @@ private fun runEmuFog(args: Array<String>) {
     // assign devices to the edge
     LOG.infoSeparator()
     LOG.info("Assigning edge devices to the network")
-    graph.assignEdgeDevices(config)
+    assignDeviceNodes(graph, config)
     LOG.info("Number of devices assigned: {}", graph.hostDevices.size)
 
     // find the fog node placements
     LOG.infoSeparator()
     LOG.info("Starting the fog node placement algorithm")
     val result = LOG.debugTiming("Place fog nodes in topology") {
-        FogNodeClassifier(graph, config).findPossibleFogNodes()
+        findPossibleFogNodes(graph, config)
     }
     LOG.info("Finished the fog node placement algorithm")
     if (!result.status) {
