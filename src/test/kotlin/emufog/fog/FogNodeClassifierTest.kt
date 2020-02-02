@@ -62,7 +62,7 @@ internal class FogNodeClassifierTest {
     fun `empty graph should return an empty result`() {
         val graph = Graph(defaultConfig1.baseAddress)
 
-        val result = FogNodeClassifier(graph, defaultConfig1).findPossibleFogNodes()
+        val result = findPossibleFogNodes(graph, defaultConfig1)
 
         assertTrue(result.status)
         assertEquals(0, result.placements.size)
@@ -72,7 +72,7 @@ internal class FogNodeClassifierTest {
     fun `sample graph with two AS combines the partial results`() {
         val graph = createGraph(defaultConfig1)
 
-        val result = FogNodeClassifier(graph, defaultConfig1).findPossibleFogNodes()
+        val result = findPossibleFogNodes(graph, defaultConfig1)
 
         assertTrue(result.status)
         assertEquals(4, result.placements.size)
@@ -87,7 +87,7 @@ internal class FogNodeClassifierTest {
         every { findFogNodesIn(system0, any()) } returns FogResult().also { it.setSuccess() }
         every { findFogNodesIn(system1, any()) } returns FogResult().also { it.setFailure() }
 
-        val result = FogNodeClassifier(graph, defaultConfig1).findPossibleFogNodes()
+        val result = findPossibleFogNodes(graph, defaultConfig1)
 
         assertFalse(result.status)
         unmockkStatic("emufog.fog.FogNodeClassifierKt")
@@ -103,7 +103,7 @@ internal class FogNodeClassifierTest {
         }
         val graph = createGraph(config)
 
-        val result = FogNodeClassifier(graph, config).findPossibleFogNodes()
+        val result = findPossibleFogNodes(graph, config)
 
         assertFalse(result.status)
     }

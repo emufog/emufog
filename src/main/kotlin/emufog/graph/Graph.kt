@@ -211,24 +211,6 @@ class Graph(val baseAddress: String) {
     }
 
     /**
-     * Assigns the devices specified in the [config] to the edge nodes on a random base.
-     */
-    fun assignEdgeDevices(config: Config) {
-        config.deviceNodeTypes.forEach {
-            val upper = abs(it.averageDeviceCount) * 2
-            for (r in edgeNodes) { // random distribution within the interval from 0 to count * 2
-                val count = (Random.nextFloat() * upper).toInt()
-                for (i in 0 until count) {
-                    val device = createEdgeDeviceNode(nodeIdManager.getNextID(), r.system, it)
-                    createEdge(
-                        edgeIdManager.getNextID(), r, device, config.hostDeviceLatency, config.hostDeviceBandwidth
-                    )
-                }
-            }
-        }
-    }
-
-    /**
      * Places a fog node in the graph's topology. The graph has to contain the given node. Also a new unique IP address
      * will be assigned.
      *
