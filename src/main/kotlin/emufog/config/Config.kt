@@ -61,20 +61,6 @@ class Config internal constructor(
     val fogNodeTypes: List<FogContainer> = fogNodeTypes.map { it.toFogContainer() }
 }
 
-/*class IPv4Address(address: String) {
-
-    private val nums: Long = 0
-
-    init {
-        val splits = address.split('.')
-        require(splits.size == 4) { "" }
-        val num3 = splits[3].toIntOrNull()
-        requireNotNull(num3) {}
-        val t = num3 << 24
-    }
-
-}*/
-
 /**
  * Reads in and returns the configuration from the given [path] variable. The path needs to point to a .yaml file.
  *
