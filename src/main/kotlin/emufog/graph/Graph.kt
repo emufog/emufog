@@ -34,7 +34,7 @@ import kotlin.random.Random
  * The graph represents the overall topology of the network. A graph contains of multiple autonomous systems of [AS]
  * and their respective nodes. Nodes can be connected via edges.
  *
- * @property config the config to use with that instance
+ * @property baseAddress the base address of the IPv4 space to start assigning IPs
  * @property edges list of all edges in the graph
  * @property systems set of all autonomous systems
  * @property hostDevices all host devices of the graph
@@ -42,7 +42,7 @@ import kotlin.random.Random
  * @property backboneNodes all backbone nodes of the graph
  * @property nodes all nodes of the graph
  */
-class Graph(val config: Config) {
+class Graph(val baseAddress: String) {
 
     private val edgesMutable: MutableList<Edge> = ArrayList()
 
@@ -57,7 +57,7 @@ class Graph(val config: Config) {
     /**
      * provider of unique IP addresses for emulation
      */
-    private val ipManager = IPManager(config)
+    private val ipManager = IPManager(baseAddress)
 
     /**
      * provider of unique node IDs
@@ -213,7 +213,7 @@ class Graph(val config: Config) {
     /**
      * Assigns the devices specified in the [config] to the edge nodes on a random base.
      */
-    fun assignEdgeDevices() {
+    fun assignEdgeDevices(config: Config) {
         config.deviceNodeTypes.forEach {
             val upper = abs(it.averageDeviceCount) * 2
             for (r in edgeNodes) { // random distribution within the interval from 0 to count * 2

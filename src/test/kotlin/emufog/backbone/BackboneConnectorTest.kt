@@ -23,23 +23,18 @@
  */
 package emufog.backbone
 
-import emufog.config.Config
 import emufog.graph.Graph
-import io.mockk.every
-import io.mockk.mockk
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 
 internal class BackboneConnectorTest {
 
-    private val config = mockk<Config> {
-        every { baseAddress } returns "1.2.3.4"
-    }
+    private val defaultBaseAddress = "1.2.3.4"
 
     @Test
     fun `update the predecessor if necessary`() {
-        val graph = Graph(config)
+        val graph = Graph(defaultBaseAddress)
         val system = graph.getOrCreateAutonomousSystem(0)
         val backboneNode0 = graph.createBackboneNode(0, system)
         val edgeNode1 = graph.createEdgeNode(1, system)
@@ -61,7 +56,7 @@ internal class BackboneConnectorTest {
 
     @Test
     fun `the backbone should connect disjoint backbone parts`() {
-        val graph = Graph(config)
+        val graph = Graph(defaultBaseAddress)
         val system = graph.getOrCreateAutonomousSystem(0)
 
         val node0 = graph.createEdgeNode(0, system)

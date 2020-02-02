@@ -56,74 +56,67 @@ class Config internal constructor(
     @JsonProperty("fog-node-types") fogNodeTypes: Collection<FogTypeConfig>
 ) {
 
-    val deviceNodeTypes: List<DeviceContainer>
+    val deviceNodeTypes: List<DeviceContainer> = deviceNodeTypes.map { it.toDeviceContainer() }
 
-    val fogNodeTypes: List<FogContainer>
+    val fogNodeTypes: List<FogContainer> = fogNodeTypes.map { it.toFogContainer() }
+}
+
+/*class IPv4Address(address: String) {
+
+    private val nums: Long = 0
 
     init {
-        this.deviceNodeTypes = deviceNodeTypes.map { mapToDeviceContainer(it) }
-        this.fogNodeTypes = fogNodeTypes.map { mapToFogContainer(it) }
+        val splits = address.split('.')
+        require(splits.size == 4) { "" }
+        val num3 = splits[3].toIntOrNull()
+        requireNotNull(num3) {}
+        val t = num3 << 24
     }
 
-    companion object {
+}*/
 
-        /**
-         * current configuration from the most recent read in
-         */
-        var config: Config? = null
-            private set
+/**
+ * Reads in and returns the configuration from the given [path] variable. The path needs to point to a .yaml file.
+ *
+ * @param path path to the config .yaml file
+ * @return read in config instance
+ * @throws IOException thrown if the read in fails
+ * @throws IllegalArgumentException if the given path is not a .yaml file
+ */
+fun readConfig(path: Path): Config {
+    val matcher = FileSystems.getDefault().getPathMatcher("glob:**.yaml")
+    require(matcher.matches(path)) { "The file ending does not match .yaml." }
 
-        /**
-         * Reads in the configuration from the given [path] variable. Overwrites the current
-         * configuration [config] and returns it. The path needs to point to a .yaml file.
-         *
-         * @param path path to the config .yaml file
-         * @throws IOException thrown if the read in fails
-         * @throws IllegalArgumentException if the given path is not a .yaml file
-         */
-        fun updateConfig(path: Path) {
-            val matcher = FileSystems.getDefault().getPathMatcher("glob:**.yaml")
-            require(matcher.matches(path)) { "The file ending does not match .yaml." }
+    // parse YAML document to a kotlin object
+    val mapper = ObjectMapper(YAMLFactory()).registerKotlinModule()
+    return mapper.readValue(path.toFile(), Config::class.java)
+        ?: throw IOException("Failed to parse the YAML file: $path")
+}
 
-            // parse YAML document to a java object
-            val mapper = ObjectMapper(YAMLFactory()).registerKotlinModule()
-            val config = mapper.readValue(path.toFile(), Config::class.java)
-                ?: throw IOException("Failed to parse the YAML file: $path")
-            this.config = config
-        }
+/**
+ * Maps the configuration for a fog type to an instance of the model.
+ */
+private fun FogTypeConfig.toFogContainer(): FogContainer {
+    return FogContainer(
+        this.containerImage.name,
+        this.containerImage.version ?: "latest",
+        this.memoryLimit,
+        this.cpuShare,
+        this.maximumConnections,
+        this.costs
+    )
+}
 
-        /**
-         * Maps the configuration for a fog type to an instance of the model.
-         *
-         * @param config fog type emufog.config to map to an object
-         * @return mapped fog type object
-         */
-        private fun mapToFogContainer(config: FogTypeConfig): FogContainer {
-            return FogContainer(
-                config.containerImage.name,
-                config.containerImage.version ?: "latest",
-                config.memoryLimit,
-                config.cpuShare,
-                config.maximumConnections,
-                config.costs
-            )
-        }
-
-        /**
-         * Maps the configuration for a device type to an instance of the model.
-         *
-         * @param config device type emufog.config to map to an object
-         * @return mapped device type object
-         */
-        private fun mapToDeviceContainer(config: DeviceTypeConfig): DeviceContainer {
-            return DeviceContainer(
-                config.containerImage.name,
-                config.containerImage.version ?: "latest",
-                config.memoryLimit,
-                config.cpuShare,
-                config.scalingFactor ?: 1,
-                config.averageDeviceCount
-            )
-        }
-    }
+/**
+ * Maps the configuration for a device type to an instance of the model.
+ */
+private fun DeviceTypeConfig.toDeviceContainer(): DeviceContainer {
+    return DeviceContainer(
+        this.containerImage.name,
+        this.containerImage.version ?: "latest",
+        this.memoryLimit,
+        this.cpuShare,
+        this.scalingFactor ?: 1,
+        this.averageDeviceCount
+    )
 }

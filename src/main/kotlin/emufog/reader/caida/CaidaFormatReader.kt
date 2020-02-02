@@ -23,7 +23,6 @@
  */
 package emufog.reader.caida
 
-import emufog.config.Config
 import emufog.graph.EdgeNode
 import emufog.graph.Graph
 import emufog.graph.Node
@@ -45,12 +44,15 @@ object CaidaFormatReader : GraphReader {
      * file. The list of input files need to contain those three files.
      *
      * @param files the list of files to read in
+     * @param baseAddress base address of the IPv4 space to start with
      * @return read in graph object
      */
-    override fun readGraph(files: List<Path>): Graph = CaidaFormatReaderImpl(files).readGraph()
+    override fun readGraph(files: List<Path>, baseAddress: String): Graph {
+        return CaidaFormatReaderImpl(files, baseAddress).readGraph()
+    }
 }
 
-private class CaidaFormatReaderImpl(files: List<Path>) {
+internal class CaidaFormatReaderImpl(files: List<Path>, baseAddress: String) {
 
     private companion object {
 
@@ -106,7 +108,7 @@ private class CaidaFormatReaderImpl(files: List<Path>) {
 
     private val idManager = IDManager()
 
-    private val graph = Graph(Config.config!!)
+    private val graph = Graph(baseAddress)
 
     /**
      * Reads in and returns a [Graph] object from the first `.nodes.geo`, `.nodes.as` and `.links` file. Skips all the

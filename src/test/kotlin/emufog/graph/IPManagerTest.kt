@@ -23,9 +23,6 @@
  */
 package emufog.graph
 
-import emufog.config.Config
-import io.mockk.every
-import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -34,67 +31,46 @@ internal class IPManagerTest {
 
     @Test
     fun `should fail if IP format is too short`() {
-        val config = mockk<Config> {
-            every { baseAddress } returns "254.254.254"
-        }
         assertThrows<IllegalArgumentException> {
-            IPManager(config)
+            IPManager("254.254.254")
         }
     }
 
     @Test
     fun `should fail if IP format is no number`() {
-        val config = mockk<Config> {
-            every { baseAddress } returns "254.254.254.2A"
-        }
         assertThrows<NumberFormatException> {
-            IPManager(config)
+            IPManager("254.254.254.2A")
         }
     }
 
     @Test
     fun `get next IP for 0 0 0 0`() {
-        val config = mockk<Config> {
-            every { baseAddress } returns "0.0.0.0"
-        }
-        val manager = IPManager(config)
+        val manager = IPManager("0.0.0.0")
         assertEquals("0.0.0.1", manager.nextIPV4Address())
     }
 
     @Test
     fun `get next IP for 0 0 0 253`() {
-        val config = mockk<Config> {
-            every { baseAddress } returns "0.0.0.253"
-        }
-        val manager = IPManager(config)
+        val manager = IPManager("0.0.0.253")
         assertEquals("0.0.0.254", manager.nextIPV4Address())
         assertEquals("0.0.1.0", manager.nextIPV4Address())
     }
 
     @Test
     fun `get next IP for 0 0 254 254`() {
-        val config = mockk<Config> {
-            every { baseAddress } returns "0.0.254.254"
-        }
-        val manager = IPManager(config)
+        val manager = IPManager("0.0.254.254")
         assertEquals("0.1.0.0", manager.nextIPV4Address())
     }
 
     @Test
     fun `get next IP for 2 254 254 254`() {
-        val config = mockk<Config> {
-            every { baseAddress } returns "2.254.254.254"
-        }
-        val manager = IPManager(config)
+        val manager = IPManager("2.254.254.254")
         assertEquals("3.0.0.0", manager.nextIPV4Address())
     }
 
     @Test
     fun `should fail after 254 254 254 254`() {
-        val config = mockk<Config> {
-            every { baseAddress } returns "254.254.254.254"
-        }
-        val manager = IPManager(config)
+        val manager = IPManager("254.254.254.254")
         assertThrows<IllegalStateException> {
             manager.nextIPV4Address()
         }

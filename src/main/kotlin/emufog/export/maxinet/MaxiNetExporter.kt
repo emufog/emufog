@@ -41,11 +41,10 @@ import java.nio.file.Path
  */
 object MaxiNetExporter : GraphExporter {
 
-    override fun exportGraph(graph: Graph, path: Path) {
+    override fun exportGraph(graph: Graph, path: Path, overwrite: Boolean) {
         // check if file exists and can be overwritten
-        val config = graph.config
         val file = path.toFile()
-        require(!(!config.overWriteOutputFile && file.exists())) {
+        require(!(!overwrite && file.exists())) {
             "The given file already exist. Please provide a valid path."
         }
 

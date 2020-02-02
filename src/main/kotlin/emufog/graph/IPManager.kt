@@ -23,14 +23,12 @@
  */
 package emufog.graph
 
-import emufog.config.Config
-
 /**
  * The IP manager calculates IP address within the subnet address space defined in the base address of the given
  * config. Keeps track of the last recent IP.
- * @throws IllegalArgumentException if the [Config.baseAddress] is in the wrong format
+ * @throws IllegalArgumentException if the given address is in the wrong format
  */
-internal class IPManager(config: Config) {
+internal class IPManager(startAddress: String) {
 
     private var byte1: Int
 
@@ -41,7 +39,7 @@ internal class IPManager(config: Config) {
     private var byte4: Int
 
     init {
-        val splits = config.baseAddress.split(".")
+        val splits = startAddress.split(".")
         require(splits.size == 4) { "The format of the IP is invalid." }
         byte1 = splits[3].toInt()
         byte2 = splits[2].toInt()

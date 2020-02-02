@@ -23,15 +23,8 @@
  */
 package emufog.reader.brite
 
-import emufog.config.Config
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.mockkObject
-import io.mockk.unmockkAll
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle
@@ -44,38 +37,25 @@ internal class BriteFormatReaderTest {
 
     private val resourcePath = Paths.get("src", "test", "resources", "brite")
 
-    private val config = mockk<Config> {
-        every { baseAddress } returns "1.2.3.4"
-    }
-
-    @BeforeAll
-    fun mockConfig() {
-        mockkObject(Config)
-        every { Config.config } returns config
-    }
-
-    @AfterAll
-    fun resetMock() {
-        unmockkAll()
-    }
+    private val defaultBaseAddress = "1.2.3.4"
 
     @Test
     fun `empty list of files should fail`() {
         assertThrows<IllegalArgumentException> {
-            BriteFormatReader.readGraph(emptyList())
+            BriteFormatReader.readGraph(emptyList(), defaultBaseAddress)
         }
     }
 
     @Test
     fun `multiple files should fail`() {
         assertThrows<IllegalArgumentException> {
-            BriteFormatReader.readGraph(listOf(Paths.get("file1"), Paths.get("file2")))
+            BriteFormatReader.readGraph(listOf(Paths.get("file1"), Paths.get("file2")), defaultBaseAddress)
         }
     }
 
     private inline fun <reified T : Exception> assertExceptionForFile(file: String) {
         assertThrows<T> {
-            BriteFormatReader.readGraph(listOf(resourcePath.resolve(file)))
+            BriteFormatReader.readGraph(listOf(resourcePath.resolve(file)), defaultBaseAddress)
         }
     }
 
@@ -141,7 +121,7 @@ internal class BriteFormatReaderTest {
     @Test
     fun `read a sample topology in`() {
         val file = resourcePath.resolve("topo.brite")
-        val graph = BriteFormatReader.readGraph(listOf(file))
+        val graph = BriteFormatReader.readGraph(listOf(file), defaultBaseAddress)
         assertEquals(20, graph.edgeNodes.size)
         assertEquals(0, graph.backboneNodes.size)
         assertEquals(0, graph.hostDevices.size)
@@ -165,7 +145,7 @@ internal class BriteFormatReaderTest {
     @Test
     fun `separate autonomous systems should contain their resp nodes`() {
         val file = resourcePath.resolve("topo2.brite")
-        val graph = BriteFormatReader.readGraph(listOf(file))
+        val graph = BriteFormatReader.readGraph(listOf(file), defaultBaseAddress)
 
         assertEquals(500, graph.edgeNodes.size)
         assertEquals(0, graph.backboneNodes.size)

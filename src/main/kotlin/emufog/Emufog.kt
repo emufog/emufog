@@ -25,6 +25,7 @@ package emufog
 
 import emufog.backbone.identifyBackbone
 import emufog.config.Config
+import emufog.config.readConfig
 import emufog.export.maxinet.MaxiNetExporter
 import emufog.fog.FogNodeClassifier
 import emufog.reader.GraphReader
@@ -90,8 +91,9 @@ private fun runEmuFog(args: Array<String>) {
     }
 
     // read in the config file
+    val config: Config
     try {
-        Config.updateConfig(arguments.configPath!!)
+        config = readConfig(arguments.configPath!!)
     } catch (e: Exception) {
         LOG.error("Failed to read in the configuration file: {}", arguments.configPath, e)
         return
@@ -101,7 +103,9 @@ private fun runEmuFog(args: Array<String>) {
     LOG.infoSeparator()
     LOG.info("Starting to read in the graph")
     val reader = getReader(arguments.inputType!!)
-    val graph = LOG.debugTiming("Read in the Graph") { reader.readGraph(arguments.files) }
+    val graph = LOG.debugTiming("Read in the Graph") {
+        reader.readGraph(arguments.files, config.baseAddress)
+    }
     // print graph details for information purposes
     LOG.info("Number of nodes in the graph: {}", graph.edgeNodes.size)
     LOG.info("Number of edges in the graph: {}", graph.edges.size)
@@ -116,13 +120,15 @@ private fun runEmuFog(args: Array<String>) {
     // assign devices to the edge
     LOG.infoSeparator()
     LOG.info("Assigning edge devices to the network")
-    graph.assignEdgeDevices()
+    graph.assignEdgeDevices(config)
     LOG.info("Number of devices assigned: {}", graph.hostDevices.size)
 
     // find the fog node placements
     LOG.infoSeparator()
     LOG.info("Starting the fog node placement algorithm")
-    val result = LOG.debugTiming("Place fog nodes in topology") { FogNodeClassifier(graph).findPossibleFogNodes() }
+    val result = LOG.debugTiming("Place fog nodes in topology") {
+        FogNodeClassifier(graph, config).findPossibleFogNodes()
+    }
     LOG.info("Finished the fog node placement algorithm")
     if (!result.status) {
         // no fog placement found, aborting
@@ -137,7 +143,9 @@ private fun runEmuFog(args: Array<String>) {
     LOG.infoSeparator()
     LOG.info("Starting the export to a MaxiNet experiment file")
     val exporter = MaxiNetExporter
-    LOG.debugTiming("Export the topology to MaxiNet") { exporter.exportGraph(graph, arguments.output!!) }
+    LOG.debugTiming("Export the topology to MaxiNet") {
+        exporter.exportGraph(graph, arguments.output!!, config.overWriteOutputFile)
+    }
     LOG.info("Finished the export to a MaxiNet experiment file")
     LOG.info("Wrote the experiment file to: {}", arguments.output)
 }

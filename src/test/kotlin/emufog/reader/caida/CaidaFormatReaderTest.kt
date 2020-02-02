@@ -23,15 +23,8 @@
  */
 package emufog.reader.caida
 
-import emufog.config.Config
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.mockkObject
-import io.mockk.unmockkAll
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
@@ -48,46 +41,33 @@ internal class CaidaFormatReaderTest {
 
     private val defaultLinks = resourcePath.resolve("topo.links")
 
-    private val config = mockk<Config> {
-        every { baseAddress } returns "1.2.3.4"
-    }
-
-    @BeforeAll
-    fun mockConfig() {
-        mockkObject(Config)
-        every { Config.config } returns config
-    }
-
-    @AfterAll
-    fun resetMock() {
-        unmockkAll()
-    }
+    private val defaultBaseAddress = "1.2.3.4"
 
     @Test
     fun `empty list of files should fail`() {
         assertThrows<IllegalArgumentException> {
-            CaidaFormatReader.readGraph(emptyList())
+            CaidaFormatReader.readGraph(emptyList(), defaultBaseAddress)
         }
     }
 
     @Test
     fun `no nodes geo file should fail`() {
         assertThrows<IllegalArgumentException> {
-            CaidaFormatReader.readGraph(listOf(defaultNodesAs, defaultLinks))
+            CaidaFormatReader.readGraph(listOf(defaultNodesAs, defaultLinks), defaultBaseAddress)
         }
     }
 
     @Test
     fun `no nodes as file should fail`() {
         assertThrows<IllegalArgumentException> {
-            CaidaFormatReader.readGraph(listOf(defaultNodesGeo, defaultLinks))
+            CaidaFormatReader.readGraph(listOf(defaultNodesGeo, defaultLinks), defaultBaseAddress)
         }
     }
 
     @Test
     fun `no links file should fail`() {
         assertThrows<IllegalArgumentException> {
-            CaidaFormatReader.readGraph(listOf(defaultNodesAs, defaultNodesGeo))
+            CaidaFormatReader.readGraph(listOf(defaultNodesAs, defaultNodesGeo), defaultBaseAddress)
         }
     }
 
@@ -122,7 +102,10 @@ internal class CaidaFormatReaderTest {
     }
 
     private fun expectEmptyLinkList(file: String) {
-        val graph = CaidaFormatReader.readGraph(listOf(defaultNodesGeo, resourcePath.resolve(file), defaultNodesAs))
+        val graph = CaidaFormatReader.readGraph(
+            listOf(defaultNodesGeo, resourcePath.resolve(file), defaultNodesAs),
+            defaultBaseAddress
+        )
         assertEquals(0, graph.edges.size)
     }
 
@@ -142,7 +125,10 @@ internal class CaidaFormatReaderTest {
     }
 
     private fun expectEmptyNodeList(file: String) {
-        val graph = CaidaFormatReader.readGraph(listOf(defaultNodesGeo, defaultLinks, resourcePath.resolve(file)))
+        val graph = CaidaFormatReader.readGraph(
+            listOf(defaultNodesGeo, defaultLinks, resourcePath.resolve(file)),
+            defaultBaseAddress
+        )
         assertEquals(0, graph.edgeNodes.size)
     }
 
@@ -167,12 +153,18 @@ internal class CaidaFormatReaderTest {
     }
 
     private fun verifySkipOnCoordinates(file: String) {
-        CaidaFormatReader.readGraph(listOf(resourcePath.resolve(file), defaultLinks, defaultNodesAs))
+        CaidaFormatReader.readGraph(
+            listOf(resourcePath.resolve(file), defaultLinks, defaultNodesAs),
+            defaultBaseAddress
+        )
     }
 
     @Test
     fun `read in a sample topology #1`() {
-        val graph = CaidaFormatReader.readGraph(listOf(defaultNodesGeo, defaultLinks, defaultNodesAs))
+        val graph = CaidaFormatReader.readGraph(
+            listOf(defaultNodesGeo, defaultLinks, defaultNodesAs),
+            defaultBaseAddress
+        )
 
         assertEquals(10, graph.edgeNodes.size)
         for (i in 1 until 11) {
