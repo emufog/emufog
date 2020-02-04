@@ -27,13 +27,13 @@ repositories {
 dependencies {
     implementation("info.picocli:picocli:4.0.0")
     implementation("org.slf4j:slf4j-api:1.7.30")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.9")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.9")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.10.2")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.10.2")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.61")
 
     runtimeOnly("org.slf4j:slf4j-simple:1.7.30")
 
-    testImplementation("org.junit.jupiter:junit-jupiter:5.5.2")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.6.0")
     testImplementation("io.mockk:mockk:1.9.3")
 }
 
