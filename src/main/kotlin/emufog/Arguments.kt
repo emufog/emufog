@@ -23,7 +23,9 @@
  */
 package emufog
 
+import picocli.CommandLine
 import picocli.CommandLine.Option
+import picocli.CommandLine.ParameterException
 import java.nio.file.Path
 
 /**
@@ -42,4 +44,15 @@ class Arguments {
 
     @Option(names = ["--file", "-f"], description = ["files to read in"])
     var files: MutableList<Path> = ArrayList()
+}
+
+/**
+ * Reads in the application arguments from the command line and returns an instance of [Arguments].
+ * @throws ParameterException if the parsing of the arguments fails
+ */
+internal fun getArguments(args: Array<String>): Arguments {
+    val arguments = Arguments()
+    CommandLine(arguments).parseArgs(*args)
+
+    return arguments
 }
