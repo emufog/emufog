@@ -35,11 +35,10 @@ import emufog.reader.caida.CaidaFormatReader
 import emufog.util.debugTiming
 import emufog.util.getLogger
 import emufog.util.infoSeparator
-import picocli.CommandLine
 import java.io.IOException
 import java.nio.file.Paths
 
-private val LOG = getLogger("Emufog")
+internal val LOG = getLogger("Emufog")
 
 /**
  * Main function call to start EmuFog.
@@ -76,9 +75,9 @@ fun main(args: Array<String>) {
  */
 private fun runEmuFog(args: Array<String>) {
     // parse the command line arguments
-    val arguments = Arguments()
+    val arguments: Arguments
     try {
-        CommandLine(arguments).parseArgs(*args)
+        arguments = getArguments(args)
     } catch (e: Exception) {
         LOG.error("Failed to read in command line arguments.", e)
         return
@@ -158,11 +157,11 @@ private fun runEmuFog(args: Array<String>) {
  * @param arguments arguments to check
  * @return `true` if arguments are valid to start, `false` if arguments are invalid
  */
-private fun checkArguments(arguments: Arguments): Boolean {
+internal fun checkArguments(arguments: Arguments): Boolean {
     var valid = true
     if (arguments.configPath == null) {
-        arguments.configPath = Paths.get("src", "main", "resources", "application.yaml")
-        LOG.warn("No '--config' argument found. Will use {} as default.", arguments.configPath)
+        valid = false
+        LOG.error("No '--config' argument found. Provide a path to a configuration file.")
     }
     if (arguments.inputType.isNullOrBlank()) {
         valid = false
@@ -187,7 +186,7 @@ private fun checkArguments(arguments: Arguments): Boolean {
  * @return graph reader matching the type
  * @throws IllegalArgumentException thrown if the type is unsupported
  */
-private fun getReader(type: String): GraphReader {
+internal fun getReader(type: String): GraphReader {
     return when (type.trim().toLowerCase()) {
         "brite" -> BriteFormatReader
         "caida" -> CaidaFormatReader
