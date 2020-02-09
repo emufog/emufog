@@ -23,36 +23,36 @@
  */
 package emufog
 
-import picocli.CommandLine
-import picocli.CommandLine.Option
-import picocli.CommandLine.ParameterException
-import java.nio.file.Path
-
-/**
- * Arguments to read in from the command line.
- */
-class Arguments {
-
-    @Option(names = ["--config", "-c"], description = ["config file to use"])
-    var configPath: Path? = null
-
-    @Option(names = ["--type", "-t"], description = ["input format to read in"])
-    var inputType: String? = null
-
-    @Option(names = ["--output", "-o"], description = ["path to the output file"])
-    var output: Path? = null
-
-    @Option(names = ["--file", "-f"], description = ["files to read in"])
-    var files: MutableList<Path> = ArrayList()
-}
-
-/**
- * Reads in the application arguments from the command line and returns an instance of [Arguments].
- * @throws ParameterException if the parsing of the arguments fails
- */
-internal fun getArguments(args: Array<String>): Arguments {
-    val arguments = Arguments()
-    CommandLine(arguments).parseArgs(*args)
-
-    return arguments
-}
+//import picocli.CommandLine
+//import picocli.CommandLine.Option
+//import picocli.CommandLine.ParameterException
+//import java.nio.file.Path
+//
+///**
+// * Arguments to read in from the command line.
+// */
+//class Arguments {
+//
+//    @Option(names = ["--config", "-c"], description = ["config file to use"])
+//    var configPath: Path? = null
+//
+//    @Option(names = ["--type", "-t"], description = ["input format to read in"])
+//    var inputType: String? = null
+//
+//    @Option(names = ["--output", "-o"], description = ["path to the output file"])
+//    var output: Path? = null
+//
+//    @Option(names = ["--file", "-f"], description = ["files to read in"])
+//    var files: MutableList<Path> = ArrayList()
+//}
+//
+///**
+// * Reads in the application arguments from the command line and returns an instance of [Arguments].
+// * @throws ParameterException if the parsing of the arguments fails
+// */
+//internal fun getArguments(args: Array<String>): Arguments {
+//    val arguments = Arguments()
+//    CommandLine(arguments).parseArgs(*args)
+//
+//    return arguments
+//}
