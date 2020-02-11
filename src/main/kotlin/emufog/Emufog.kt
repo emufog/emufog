@@ -164,6 +164,10 @@ internal class Emufog : CliktCommand() {
     }
 }
 
+/**
+ * This enumeration class represents the supported input formats of EmuFog. Each format should return a [GraphReader]
+ * via [getReader].
+ */
 enum class InputFormatTypes {
     BRITE,
     CAIDA;
