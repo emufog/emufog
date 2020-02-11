@@ -24,8 +24,8 @@
 package emufog
 
 import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.parameters.arguments.argument
-import com.github.ajalt.clikt.parameters.arguments.multiple
+import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.enum
@@ -43,6 +43,7 @@ import emufog.util.debugTiming
 import emufog.util.getLogger
 import emufog.util.infoSeparator
 import java.nio.file.Path
+import java.nio.file.Paths
 
 internal val LOG = getLogger("Emufog")
 
@@ -53,21 +54,31 @@ internal val LOG = getLogger("Emufog")
  */
 fun main(args: Array<String>) = Emufog().main(args)
 
-class Emufog : CliktCommand() {
+internal class Emufog : CliktCommand() {
 
-    internal val configPath: Path by option(
+    private companion object {
+        const val defaultOutput = "output.py"
+    }
+
+    val configPath: Path by option(
         names = *arrayOf("-c", "--config"),
         help = "config file to use"
     ).path(exists = true).required()
 
-    internal val inputType: InputFormatTypes by option(
+    val inputType: InputFormatTypes by option(
         names = *arrayOf("-t", "--type"),
         help = "input format to read in"
     ).enum<InputFormatTypes>().required()
 
-    internal val output: Path? by option(names = *arrayOf("-o", "--output"), help = "path to the output file").path()
+    val output: Path by option(
+        names = *arrayOf("-o", "--output"),
+        help = "path to the output file (defaults to $defaultOutput)"
+    ).path().default(Paths.get(defaultOutput))
 
-    internal val files: List<Path> by argument("file", "files to read in").path(exists = true).multiple()
+    val files: List<Path> by option(
+        names = *arrayOf("-f", "--file"),
+        help = "files to read in"
+    ).path(exists = true).multiple(required = true)
 
     override fun run() {
         LOG.infoSeparator()
@@ -91,14 +102,7 @@ class Emufog : CliktCommand() {
         LOG.infoSeparator()
     }
 
-    internal fun runEmufog() {
-        // check the read in arguments
-//        if (!checkArguments(arguments)) {
-//            LOG.error("The arguments provided are invalid.")
-//            LOG.error("Please see https://github.com/emufog/emufog/wiki for further information.")
-//            return
-//        }
-
+    fun runEmufog() {
         // read in the config file
         val config: Config
         try {
@@ -153,7 +157,7 @@ class Emufog : CliktCommand() {
         LOG.info("Starting the export to a MaxiNet experiment file")
         val exporter = MaxiNetExporter
         LOG.debugTiming("Export the topology to MaxiNet") {
-            exporter.exportGraph(graph, output!!, config.overWriteOutputFile)
+            exporter.exportGraph(graph, output, config.overWriteOutputFile)
         }
         LOG.info("Finished the export to a MaxiNet experiment file")
         LOG.info("Wrote the experiment file to: {}", output)
@@ -174,32 +178,3 @@ enum class InputFormatTypes {
         }
     }
 }
-
-/**
- * Checks the read in arguments from the command line. Either sets a default or prints an
- * error if no argument is specified.
- *
- * @param arguments arguments to check
- * @return `true` if arguments are valid to start, `false` if arguments are invalid
- */
-//internal fun checkArguments(arguments: Arguments): Boolean {
-//    var valid = true
-//    if (arguments.configPath == null) {
-//        valid = false
-//        LOG.error("No '--config' argument found. Provide a path to a configuration file.")
-//    }
-//    if (arguments.inputType.isNullOrBlank()) {
-//        valid = false
-//        LOG.error("No '--type' argument found. Specify a valid input format.")
-//    }
-//    if (arguments.output == null) {
-//        arguments.output = Paths.get("output.py")
-//        LOG.warn("No '--output' argument found. Will use {} as default.", arguments.output)
-//    }
-//    if (arguments.files.isEmpty()) {
-//        valid = false
-//        LOG.error("No '--file' argument found. Provide at least one input file.")
-//    }
-//
-//    return valid
-//}

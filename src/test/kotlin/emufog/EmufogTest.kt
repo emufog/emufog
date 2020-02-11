@@ -30,18 +30,13 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
-import io.mockk.verify
 import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle
-import org.junit.jupiter.api.assertThrows
 import org.slf4j.Logger
-import java.nio.file.Paths
 
 @TestInstance(Lifecycle.PER_CLASS)
 internal class EmufogTest {
@@ -64,88 +59,15 @@ internal class EmufogTest {
 
     @Test
     fun `getReader should return BriteReader for brite`() {
-        val reader = getReader("brite")
-
-        assertTrue(reader is BriteFormatReader)
-    }
-
-    @Test
-    fun `getReader should return BriteReader for BRITE`() {
-        val reader = getReader("BRITE")
-
-        assertTrue(reader is BriteFormatReader)
-    }
-
-    @Test
-    fun `getReader should return BriteReader for brite with spaces`() {
-        val reader = getReader(" brite   ")
+        val reader = InputFormatTypes.BRITE.getReader()
 
         assertTrue(reader is BriteFormatReader)
     }
 
     @Test
     fun `getReader should return CaidaReader for caida`() {
-        val reader = getReader("caida")
+        val reader = InputFormatTypes.CAIDA.getReader()
 
         assertTrue(reader is CaidaFormatReader)
-    }
-
-    @Test
-    fun `getReader should return CaidaReader for CAIDA`() {
-        val reader = getReader("CAIDA")
-
-        assertTrue(reader is CaidaFormatReader)
-    }
-
-    @Test
-    fun `getReader should return CaidaReader for caida with spaces`() {
-        val reader = getReader(" caida   ")
-
-        assertTrue(reader is CaidaFormatReader)
-    }
-
-    @Test
-    fun `getReader should throw an exception for unsupported types`() {
-        assertThrows<IllegalArgumentException> {
-            getReader("unsupported type")
-        }
-    }
-
-    @Test
-    fun `checkArguments with configPath null should return false`() {
-        assertFalse(checkArguments(Arguments()))
-
-        verify { log.error("No '--config' argument found. Provide a path to a configuration file.") }
-    }
-
-    @Test
-    fun `checkArguments with type null should return false`() {
-        assertFalse(checkArguments(Arguments()))
-
-        verify { log.error("No '--type' argument found. Specify a valid input format.") }
-    }
-
-    @Test
-    fun `checkArguments with output null should set the default`() {
-        val arguments = Arguments()
-        arguments.inputType = "brite"
-        arguments.configPath = Paths.get("dir", "config")
-        arguments.files = mutableListOf(Paths.get("dir", "input"))
-
-        assertTrue(checkArguments(arguments))
-        assertEquals("output.py", arguments.output.toString())
-
-        verify { log.error("No '--type' argument found. Specify a valid input format.") }
-    }
-
-    @Test
-    fun `checkArguments should return true if all arguments are set`() {
-        val arguments = Arguments()
-        arguments.inputType = "brite"
-        arguments.configPath = Paths.get("dir", "config")
-        arguments.output = Paths.get("dir", "output")
-        arguments.files = mutableListOf(Paths.get("dir", "input"))
-
-        assertTrue(checkArguments(arguments))
     }
 }
