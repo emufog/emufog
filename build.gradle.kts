@@ -26,7 +26,7 @@ repositories {
 }
 
 dependencies {
-    implementation("info.picocli:picocli:4.0.0")
+    implementation("com.github.ajalt:clikt:2.4.0")
     implementation("org.slf4j:slf4j-api:1.7.30")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.10.2")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.10.2")

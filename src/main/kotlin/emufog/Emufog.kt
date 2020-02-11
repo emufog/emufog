@@ -23,6 +23,13 @@
  */
 package emufog
 
+import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.multiple
+import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.required
+import com.github.ajalt.clikt.parameters.types.enum
+import com.github.ajalt.clikt.parameters.types.path
 import emufog.backbone.identifyBackbone
 import emufog.config.Config
 import emufog.config.readConfig
@@ -35,7 +42,7 @@ import emufog.reader.caida.CaidaFormatReader
 import emufog.util.debugTiming
 import emufog.util.getLogger
 import emufog.util.infoSeparator
-import java.io.IOException
+import java.nio.file.Path
 import java.nio.file.Paths
 
 internal val LOG = getLogger("Emufog")
@@ -45,151 +52,133 @@ internal val LOG = getLogger("Emufog")
  *
  * @param args arguments of the command line
  */
-fun main(args: Array<String>) {
-    LOG.infoSeparator()
-    LOG.info("       ______                ______")
-    LOG.info("      / ____/___ ___  __  __/ ____/___  ____ _")
-    LOG.info("     / __/ / __ `__ \\/ / / / /_  / __ \\/ __ `/")
-    LOG.info("    / /___/ / / / / / /_/ / __/ / /_/ / /_/ /")
-    LOG.info("   /_____/_/ /_/ /_/\\__,_/_/    \\____/\\__, /")
-    LOG.info("                                     /____/")
-    LOG.info("")
-    LOG.infoSeparator()
+fun main(args: Array<String>) = Emufog().main(args)
 
-    try {
-        runEmuFog(args)
-    } catch (e: Exception) {
-        LOG.error("An exception stopped EmuFog!", e)
+internal class Emufog : CliktCommand() {
+
+    private companion object {
+        const val defaultOutput = "output.py"
     }
 
-    LOG.infoSeparator()
-    LOG.info("Closing EmuFog...")
-    LOG.infoSeparator()
+    val configPath: Path by option(
+        names = *arrayOf("-c", "--config"),
+        help = "config file to use"
+    ).path(exists = true).required()
+
+    val inputType: InputFormatTypes by option(
+        names = *arrayOf("-t", "--type"),
+        help = "input format to read in"
+    ).enum<InputFormatTypes>().required()
+
+    val output: Path by option(
+        names = *arrayOf("-o", "--output"),
+        help = "path to the output file (defaults to $defaultOutput)"
+    ).path().default(Paths.get(defaultOutput))
+
+    val files: List<Path> by option(
+        names = *arrayOf("-f", "--file"),
+        help = "files to read in"
+    ).path(exists = true).multiple(required = true)
+
+    override fun run() {
+        LOG.infoSeparator()
+        LOG.info("       ______                ______")
+        LOG.info("      / ____/___ ___  __  __/ ____/___  ____ _")
+        LOG.info("     / __/ / __ `__ \\/ / / / /_  / __ \\/ __ `/")
+        LOG.info("    / /___/ / / / / / /_/ / __/ / /_/ / /_/ /")
+        LOG.info("   /_____/_/ /_/ /_/\\__,_/_/    \\____/\\__, /")
+        LOG.info("                                     /____/")
+        LOG.info("")
+        LOG.infoSeparator()
+
+        try {
+            runEmufog()
+        } catch (e: Exception) {
+            LOG.error("An exception stopped EmuFog!", e)
+        }
+
+        LOG.infoSeparator()
+        LOG.info("Closing EmuFog...")
+        LOG.infoSeparator()
+    }
+
+    fun runEmufog() {
+        // read in the config file
+        val config: Config
+        try {
+            config = readConfig(configPath)
+        } catch (e: Exception) {
+            LOG.error("Failed to read in the configuration file: {}", configPath, e)
+            return
+        }
+
+        // read in the graph object
+        LOG.infoSeparator()
+        LOG.info("Starting to read in the graph")
+        val reader = inputType.getReader()
+        val graph = LOG.debugTiming("Read in the Graph") {
+            reader.readGraph(files, config.baseAddress)
+        }
+        // print graph details for information purposes
+        LOG.info("Number of nodes in the graph: {}", graph.edgeNodes.size)
+        LOG.info("Number of edges in the graph: {}", graph.edges.size)
+
+        // compute the backbone of the network
+        LOG.infoSeparator()
+        LOG.info("Starting the backbone identification")
+        LOG.debugTiming("Determine the backbone of the topology") { identifyBackbone(graph) }
+        LOG.info("Finished the backbone identification")
+        LOG.info("Number of backbone nodes identified: {}", graph.backboneNodes.size)
+
+        // assign devices to the edge
+        LOG.infoSeparator()
+        LOG.info("Assigning edge devices to the network")
+        assignDeviceNodes(graph, config)
+        LOG.info("Number of devices assigned: {}", graph.hostDevices.size)
+
+        // find the fog node placements
+        LOG.infoSeparator()
+        LOG.info("Starting the fog node placement algorithm")
+        val result = LOG.debugTiming("Place fog nodes in topology") {
+            findPossibleFogNodes(graph, config)
+        }
+        LOG.info("Finished the fog node placement algorithm")
+        if (!result.status) {
+            // no fog placement found, aborting
+            LOG.warn("Unable to find a fog placement with the provided config.")
+            LOG.warn("Consider using different config.")
+            return
+        }
+
+        LOG.info("Number of fog nodes identified: {}", result.placements.size)
+        result.placements.forEach { graph.placeFogNode(it.node, it.type); }
+
+        LOG.infoSeparator()
+        LOG.info("Starting the export to a MaxiNet experiment file")
+        val exporter = MaxiNetExporter
+        LOG.debugTiming("Export the topology to MaxiNet") {
+            exporter.exportGraph(graph, output, config.overWriteOutputFile)
+        }
+        LOG.info("Finished the export to a MaxiNet experiment file")
+        LOG.info("Wrote the experiment file to: {}", output)
+    }
 }
 
 /**
- * Runs an execution of emufog with the given arguments from the command line.
- *
- * @param args arguments passed to the execution
- * @throws IOException thrown in case of a problem during the execution
+ * This enumeration class represents the supported input formats of EmuFog. Each format should return a [GraphReader]
+ * via [getReader].
  */
-private fun runEmuFog(args: Array<String>) {
-    // parse the command line arguments
-    val arguments: Arguments
-    try {
-        arguments = getArguments(args)
-    } catch (e: Exception) {
-        LOG.error("Failed to read in command line arguments.", e)
-        return
-    }
+enum class InputFormatTypes {
+    BRITE,
+    CAIDA;
 
-    // check the read in arguments
-    if (!checkArguments(arguments)) {
-        LOG.error("The arguments provided are invalid.")
-        LOG.error("Please see https://github.com/emufog/emufog/wiki for further information.")
-        return
-    }
-
-    // read in the config file
-    val config: Config
-    try {
-        config = readConfig(arguments.configPath!!)
-    } catch (e: Exception) {
-        LOG.error("Failed to read in the configuration file: {}", arguments.configPath, e)
-        return
-    }
-
-    // read in the graph object
-    LOG.infoSeparator()
-    LOG.info("Starting to read in the graph")
-    val reader = getReader(arguments.inputType!!)
-    val graph = LOG.debugTiming("Read in the Graph") {
-        reader.readGraph(arguments.files, config.baseAddress)
-    }
-    // print graph details for information purposes
-    LOG.info("Number of nodes in the graph: {}", graph.edgeNodes.size)
-    LOG.info("Number of edges in the graph: {}", graph.edges.size)
-
-    // compute the backbone of the network
-    LOG.infoSeparator()
-    LOG.info("Starting the backbone identification")
-    LOG.debugTiming("Determine the backbone of the topology") { identifyBackbone(graph) }
-    LOG.info("Finished the backbone identification")
-    LOG.info("Number of backbone nodes identified: {}", graph.backboneNodes.size)
-
-    // assign devices to the edge
-    LOG.infoSeparator()
-    LOG.info("Assigning edge devices to the network")
-    assignDeviceNodes(graph, config)
-    LOG.info("Number of devices assigned: {}", graph.hostDevices.size)
-
-    // find the fog node placements
-    LOG.infoSeparator()
-    LOG.info("Starting the fog node placement algorithm")
-    val result = LOG.debugTiming("Place fog nodes in topology") {
-        findPossibleFogNodes(graph, config)
-    }
-    LOG.info("Finished the fog node placement algorithm")
-    if (!result.status) {
-        // no fog placement found, aborting
-        LOG.warn("Unable to find a fog placement with the provided config.")
-        LOG.warn("Consider using different config.")
-        return
-    }
-
-    LOG.info("Number of fog nodes identified: {}", result.placements.size)
-    result.placements.forEach { graph.placeFogNode(it.node, it.type); }
-
-    LOG.infoSeparator()
-    LOG.info("Starting the export to a MaxiNet experiment file")
-    val exporter = MaxiNetExporter
-    LOG.debugTiming("Export the topology to MaxiNet") {
-        exporter.exportGraph(graph, arguments.output!!, config.overWriteOutputFile)
-    }
-    LOG.info("Finished the export to a MaxiNet experiment file")
-    LOG.info("Wrote the experiment file to: {}", arguments.output)
-}
-
-/**
- * Checks the read in arguments from the command line. Either sets a default or prints an
- * error if no argument is specified.
- *
- * @param arguments arguments to check
- * @return `true` if arguments are valid to start, `false` if arguments are invalid
- */
-internal fun checkArguments(arguments: Arguments): Boolean {
-    var valid = true
-    if (arguments.configPath == null) {
-        valid = false
-        LOG.error("No '--config' argument found. Provide a path to a configuration file.")
-    }
-    if (arguments.inputType.isNullOrBlank()) {
-        valid = false
-        LOG.error("No '--type' argument found. Specify a valid input format.")
-    }
-    if (arguments.output == null) {
-        arguments.output = Paths.get("output.py")
-        LOG.warn("No '--output' argument found. Will use {} as default.", arguments.output)
-    }
-    if (arguments.files.isEmpty()) {
-        valid = false
-        LOG.error("No '--file' argument found. Provide at least one input file.")
-    }
-
-    return valid
-}
-
-/**
- * Returns the reader matching the given type from the command line.
- *
- * @param type topology type to read in
- * @return graph reader matching the type
- * @throws IllegalArgumentException thrown if the type is unsupported
- */
-internal fun getReader(type: String): GraphReader {
-    return when (type.trim().toLowerCase()) {
-        "brite" -> BriteFormatReader
-        "caida" -> CaidaFormatReader
-        else -> throw IllegalArgumentException("Unsupported Input Format: $type")
+    /**
+     * Returns the respective [GraphReader] instance matching the given format type.
+     */
+    fun getReader(): GraphReader {
+        return when (this) {
+            BRITE -> BriteFormatReader
+            CAIDA -> CaidaFormatReader
+        }
     }
 }
