@@ -52,9 +52,12 @@ internal val LOG = getLogger("Emufog")
  *
  * @param args arguments of the command line
  */
-fun main(args: Array<String>) = Emufog().main(args)
+fun main(args: Array<String>) = EmufogCommand().main(args)
 
-internal class Emufog : CliktCommand() {
+/**
+ * Internal class to represent the command line call of EmuFog. Mainly focuses on the parsing of command line arguments.
+ */
+internal class EmufogCommand : CliktCommand() {
 
     private companion object {
         const val defaultOutput = "output.py"
@@ -81,6 +84,26 @@ internal class Emufog : CliktCommand() {
     ).path(exists = true).multiple(required = true)
 
     override fun run() {
+        EmufogExecution(configPath, inputType, output, files).safelyRun()
+    }
+}
+
+/**
+ * This class represents the actual execution of EmuFog.
+ *
+ * @property configPath path to the config file
+ * @property inputType type of the input files
+ * @property output path to the output file
+ * @property files list of input files
+ */
+internal class EmufogExecution(
+    private val configPath: Path,
+    private val inputType: InputFormatTypes,
+    private val output: Path,
+    private val files: List<Path>
+) {
+
+    fun safelyRun() {
         LOG.infoSeparator()
         LOG.info("       ______                ______")
         LOG.info("      / ____/___ ___  __  __/ ____/___  ____ _")
@@ -92,7 +115,7 @@ internal class Emufog : CliktCommand() {
         LOG.infoSeparator()
 
         try {
-            runEmufog()
+            run()
         } catch (e: Exception) {
             LOG.error("An exception stopped EmuFog!", e)
         }
@@ -102,7 +125,7 @@ internal class Emufog : CliktCommand() {
         LOG.infoSeparator()
     }
 
-    fun runEmufog() {
+    fun run() {
         // read in the config file
         val config: Config
         try {
