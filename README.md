@@ -1,7 +1,7 @@
 # EmuFog
 
 [![Build Status](https://travis-ci.org/emufog/emufog.svg?branch=master)](https://travis-ci.org/emufog/emufog)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/eb3e7eba854d4ebd9ce1afc2f29d5ea3)](https://www.codacy.com/manual/unly/emufog?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=emufog/emufog&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/eb3e7eba854d4ebd9ce1afc2f29d5ea3)](https://www.codacy.com/manual/unly/emufog?utm_source=github.com&utm_medium=referral&utm_content=emufog/emufog&utm_campaign=Badge_Grade)
 [![codecov](https://codecov.io/gh/emufog/emufog/branch/master/graph/badge.svg)](https://codecov.io/gh/emufog/emufog)
 [![MIT License](https://img.shields.io/badge/license-MIT-green "MIT License")](LICENSE)
 
@@ -19,21 +19,25 @@ It uses [Gradle](https://gradle.org/) to include dependencies and build binaries
 Therefore, this repository contains a Gradle wrapper file `gradlew` for Linux and macOS and a `gradlew.bat` for Windows.
 
 To build EmuFog simply clone the git repository
+
 ```bash
 git clone https://github.com/emufog/emufog.git
 ```
-    
+
 change the directory to the newly added emufog directory
+
 ```bash
 cd emufog/
 ```
-    
+
 Run the Gradle `build` task to compile the sources and run the tests.
+
 ```bash
 ./gradlew build
 ```
 
 The distributions archives can be found in `build/distributions`.
+
 ```bash
 distributions/
 ├── emufog.tar
@@ -45,6 +49,7 @@ distributions/
 Download the latest release as an archive from the [here](https://github.com/emufog/emufog/releases).
 
 Extract the files from the archive e.g.
+
 ```bash
 unzip -q emufog.zip
 cd emufog/bin
@@ -52,11 +57,13 @@ cd emufog/bin
 
 Run the script depending on your operating system.
 For Linux and macOS:
+
 ```bash
 ./emufog --help
 ```
 
 and for Microsoft Windows:
+
 ```bash
 ./emufog.bat --help
 ```
@@ -67,10 +74,11 @@ The following steps explain how to use EmuFog in more detail.
 
 EmuFog currently supports two different graph data formats:
 1. The [BRITE](https://www.cs.bu.edu/brite/) network generator supporting the following models:
-    * *Routing of Multipoint Connections* by Waxman, DOI: [10.1109/infcom.2002.1019309](https://doi.org/10.1109%2F49.12889)
-    * *On Distinguishing between Power-Law Internet Topology Generators* by Bu and Towsley, DOI: [10.1109/infcom.2002.1019309](https://doi.org/10.1109%2Finfcom.2002.1019309)
-    * *Emergence of Scaling in Random Networks* by Barabási and Albert, DOI: [10.1126/science.286.5439.509](https://doi.org/10.1126%2Fscience.286.5439.509)
-    * *Topology of Evolving Networks: Local Events and Universality* by Barabási and Albert, DOI: [10.1103/physrevlett.85.5234](https://doi.org/10.1103%2Fphysrevlett.85.5234)
+  * _Routing of Multipoint Connections_ by Waxman, DOI: [10.1109/infcom.2002.1019309](https://doi.org/10.1109%2F49.12889)
+  * _On Distinguishing between Power-Law Internet Topology Generators_ by Bu and Towsley, DOI: [10.1109/infcom.2002.1019309](https://doi.org/10.1109%2Finfcom.2002.1019309)
+  * _Emergence of Scaling in Random Networks_ by Barabási and Albert, DOI: [10.1126/science.286.5439.509](https://doi.org/10.1126%2Fscience.286.5439.509)
+  * _Topology of Evolving Networks: Local Events and Universality_ by Barabási and Albert, DOI: [10.1103/physrevlett.85.5234](https://doi.org/10.1103%2Fphysrevlett.85.5234)
+  
 2. The [Macroscopic Internet Topology Data Kit](https://www.caida.org/data/internet-topology-data-kit/) from Caida including measured real world internet topologies
 
 ### Write The Configuration File
@@ -79,43 +87,43 @@ To specify the hardware capabilities and the software to test, EmuFog uses a con
 The EmuFog repository contains an [exemplary configuration file](src/dist/example-config.yaml) to get started.
 The parameters used are explained in the tables below in more detail.
 
-| Parameter | Description |
-|----------|------|
-| base-address | The base IP address of the network containing all nodes. This is the starting point and first address assigned. Format: `XXX.XXX.XXX.XXX` |
-| overwrite-experiment-file | Indicates whether the output file should be overwritten in case it already exists. `true` to overwrite file, `false` to keep it. |
-| max-fog-nodes | The maximum number of fog nodes to place in the network. |
-| cost-threshold | The cost function's threshold. Depends on the cost function chosen. The current implementation uses latency as a cost function. |
-| host-device-latency | Latency to use between a placed client device at the edge of the network and its associated edge node. |
-| host-device-bandwidth | Bandwidth to use between a placed client device at the edge of the network and its associated edge node. Measured in MB/s. |
-| device-node-types | List of device containers that get assigned to the edge of the network. See below. |
-| fog-node-types | List of possible fog node types that can be placed in the topology. See below. |
+| Parameter                 | Description                                                                                                                               |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| base-address              | The base IP address of the network containing all nodes. This is the starting point and first address assigned. Format: `XXX.XXX.XXX.XXX` |
+| overwrite-experiment-file | Indicates whether the output file should be overwritten in case it already exists. `true` to overwrite file, `false` to keep it.          |
+| max-fog-nodes             | The maximum number of fog nodes to place in the network.                                                                                  |
+| cost-threshold            | The cost function's threshold. Depends on the cost function chosen. The current implementation uses latency as a cost function.           |
+| host-device-latency       | Latency to use between a placed client device at the edge of the network and its associated edge node.                                    |
+| host-device-bandwidth     | Bandwidth to use between a placed client device at the edge of the network and its associated edge node. Measured in MB/s.                |
+| device-node-types         | List of device containers that get assigned to the edge of the network. See below.                                                        |
+| fog-node-types            | List of possible fog node types that can be placed in the topology. See below.                                                            |
 
 The device containers use the following parameters:
 
-| Parameter | Description |
-|----------|------|
-| container-image | Docker image to use. See below. |
-| scaling-factor | Scales the workload of this device higher than 1. Defaults to `1` |
-| average-device-count | The average number of devices of this type connected to an edge node. |
-| memory-limit | Memory size of this container in Bytes. |
-| cpu-share | Scaling of the CPU power. Container receives share of its value in respect to the total sum. |
+| Parameter            | Description                                                                                  |
+| -------------------- | -------------------------------------------------------------------------------------------- |
+| container-image      | Docker image to use. See below.                                                              |
+| scaling-factor       | Scales the workload of this device higher than 1. Defaults to `1`                            |
+| average-device-count | The average number of devices of this type connected to an edge node.                        |
+| memory-limit         | Memory size of this container in Bytes.                                                      |
+| cpu-share            | Scaling of the CPU power. Container receives share of its value in respect to the total sum. |
 
 Fog nodes share some generic parameters with client devices. Still, all parameters are listed below.
 
-| Parameter | Description |
-|----------|------|
-| container-image | Docker image to use. See below. |
-| maximum-connections | The maximum number of connections from client devices this container can handle. |
-| costs | Deployment costs of this fog node in the network. |
-| memory-limit | Memory size of this container in Bytes. |
-| cpu-share | Scaling of the CPU power. Container receives share of its value in respect to the total sum. |
+| Parameter           | Description                                                                                  |
+| ------------------- | -------------------------------------------------------------------------------------------- |
+| container-image     | Docker image to use. See below.                                                              |
+| maximum-connections | The maximum number of connections from client devices this container can handle.             |
+| costs               | Deployment costs of this fog node in the network.                                            |
+| memory-limit        | Memory size of this container in Bytes.                                                      |
+| cpu-share           | Scaling of the CPU power. Container receives share of its value in respect to the total sum. |
 
 A Docker container consists of:
 
-| Parameter | Description |
-|----------|------|
-| name | Name of the Docker container to use. |
-| version | Version of the Docker container to use. Defaults to `latest` |
+| Parameter | Description                                                  |
+| --------- | ------------------------------------------------------------ |
+| name      | Name of the Docker container to use.                         |
+| version   | Version of the Docker container to use. Defaults to `latest` |
 
 ### Execute EmuFog
 
@@ -123,14 +131,15 @@ EmuFog requires input by the user to run.
 Therefore, the information can be passed via a command line interface as arguments.
 The following table lists the required arguments, their shortcut and their respective description.
 
-| Argument | Shortcut | Description |
-|----------|-------------|------|
-| --Config | -c | Path to the configuration file to use. |
-| --Type | -t | The type of reader to use. Currently supported: BRITE and CAIDA. This argument is case insensitive. |
-| --File | -f | Path to a topology file to read in. This argument can be used multiple times. |
-| --Output | -o | Path to the output file to write. Defaults to `output.py`. |
+| Argument | Shortcut | Description                                                                                         |
+| -------- | -------- | --------------------------------------------------------------------------------------------------- |
+| --Config | -c       | Path to the configuration file to use.                                                              |
+| --Type   | -t       | The type of reader to use. Currently supported: BRITE and CAIDA. This argument is case insensitive. |
+| --File   | -f       | Path to a topology file to read in. This argument can be used multiple times.                       |
+| --Output | -o       | Path to the output file to write. Defaults to `output.py`.                                          |
 
 A call of EmuFog could look like this for Linux and macOS:
+
 ```bash
 ./emufog -c config.yaml -t brite -f topology.brite -o out.py
 ```
