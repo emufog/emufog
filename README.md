@@ -74,10 +74,11 @@ The following steps explain how to use EmuFog in more detail.
 
 EmuFog currently supports two different graph data formats:
 1. The [BRITE](https://www.cs.bu.edu/brite/) network generator supporting the following models:
-    * _Routing of Multipoint Connections_ by Waxman, DOI: [10.1109/infcom.2002.1019309](https://doi.org/10.1109%2F49.12889)
-    * _On Distinguishing between Power-Law Internet Topology Generators_ by Bu and Towsley, DOI: [10.1109/infcom.2002.1019309](https://doi.org/10.1109%2Finfcom.2002.1019309)
-    * _Emergence of Scaling in Random Networks_ by Barabási and Albert, DOI: [10.1126/science.286.5439.509](https://doi.org/10.1126%2Fscience.286.5439.509)
-    * _Topology of Evolving Networks: Local Events and Universality_ by Barabási and Albert, DOI: [10.1103/physrevlett.85.5234](https://doi.org/10.1103%2Fphysrevlett.85.5234)
+  * _Routing of Multipoint Connections_ by Waxman, DOI: [10.1109/infcom.2002.1019309](https://doi.org/10.1109%2F49.12889)
+  * _On Distinguishing between Power-Law Internet Topology Generators_ by Bu and Towsley, DOI: [10.1109/infcom.2002.1019309](https://doi.org/10.1109%2Finfcom.2002.1019309)
+  * _Emergence of Scaling in Random Networks_ by Barabási and Albert, DOI: [10.1126/science.286.5439.509](https://doi.org/10.1126%2Fscience.286.5439.509)
+  * _Topology of Evolving Networks: Local Events and Universality_ by Barabási and Albert, DOI: [10.1103/physrevlett.85.5234](https://doi.org/10.1103%2Fphysrevlett.85.5234)
+  
 2. The [Macroscopic Internet Topology Data Kit](https://www.caida.org/data/internet-topology-data-kit/) from Caida including measured real world internet topologies
 
 ### Write The Configuration File
