@@ -14,7 +14,7 @@ Applications for clients and fog nodes can be anything shipped in a Docker conta
 
 ## Build EmuFog From Source
 
-EmuFog is build using [Kotlin 1.3](https://github.com/JetBrains/kotlin/releases/tag/v1.3.61) on the JDK 11.
+EmuFog is build using [Kotlin 1.4](https://github.com/JetBrains/kotlin/releases/tag/v1.4.10) on the JDK 11.
 It uses [Gradle](https://gradle.org/) to include dependencies and build binaries from the source code.
 Therefore, this repository contains a Gradle wrapper file `gradlew` for Linux and macOS and a `gradlew.bat` for Windows.
 
