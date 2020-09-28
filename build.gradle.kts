@@ -6,7 +6,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.61")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.10")
     }
 }
 
@@ -14,7 +14,7 @@ val emufogMainClass = "emufog.EmufogKt"
 val emufogVersion = "1.0"
 
 plugins {
-    kotlin("jvm") version "1.3.61"
+    kotlin("jvm") version "1.4.10"
     application
     jacoco
     id("org.jetbrains.dokka") version "0.10.0"
@@ -30,7 +30,7 @@ dependencies {
     implementation("org.slf4j:slf4j-api:1.7.30")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.10.2")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.10.2")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.61")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.10")
 
     runtimeOnly("org.slf4j:slf4j-simple:1.7.30")
 
